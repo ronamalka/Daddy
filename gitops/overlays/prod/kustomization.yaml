@@ -13,39 +13,34 @@ patches:
     patch: |
       - op: replace
         path: /spec/replicas
-        value: 3
+        value: 1
       - op: replace
         path: /spec/template/spec/containers/0/image
         value: quay.io/rh_ee_rmalka/daddy:prod
-      - op: replace
-        path: /spec/template/spec/containers/0/resources/requests/memory
-        value: "512Mi"
-      - op: replace
-        path: /spec/template/spec/containers/0/resources/requests/cpu
-        value: "500m"
-      - op: replace
-        path: /spec/template/spec/containers/0/resources/limits/memory
-        value: "1Gi"
-      - op: replace
-        path: /spec/template/spec/containers/0/resources/limits/cpu
-        value: "1000m"
   - target:
-      kind: Deployment
-      name: postgres
+      kind: Secret
+      name: daddy-app-secret
     patch: |
       - op: replace
-        path: /spec/template/spec/containers/0/resources/requests/memory
-        value: "512Mi"
+        path: /stringData/AUTH_URL
+        value: https://daddy-app-daddy-prod.apps.cluster-cpgwh.cpgwh.sandbox765.opentlc.com
+  - target:
+      kind: Secret
+      name: postgres-secret
+    patch: |
       - op: replace
-        path: /spec/template/spec/containers/0/resources/limits/memory
-        value: "1Gi"
+        path: /stringData/POSTGRES_PASSWORD
+        value: CHANGE_ME_PROD_PASSWORD
+      - op: replace
+        path: /stringData/DATABASE_URL
+        value: postgresql://daddy:CHANGE_ME_PROD_PASSWORD@postgres:5432/daddy
   - target:
       kind: PersistentVolumeClaim
       name: postgres-data
     patch: |
       - op: replace
         path: /spec/resources/requests/storage
-        value: 20Gi
+        value: 10Gi
 
 labels:
   - pairs:

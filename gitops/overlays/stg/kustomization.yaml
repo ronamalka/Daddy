@@ -13,10 +13,24 @@ patches:
     patch: |
       - op: replace
         path: /spec/replicas
-        value: 2
+        value: 1
       - op: replace
         path: /spec/template/spec/containers/0/image
         value: quay.io/rh_ee_rmalka/daddy:stg
+  - target:
+      kind: Secret
+      name: daddy-app-secret
+    patch: |
+      - op: replace
+        path: /stringData/AUTH_URL
+        value: https://daddy-app-daddy-stg.apps.cluster-cpgwh.cpgwh.sandbox765.opentlc.com
+  - target:
+      kind: PersistentVolumeClaim
+      name: postgres-data
+    patch: |
+      - op: replace
+        path: /spec/resources/requests/storage
+        value: 5Gi
 
 labels:
   - pairs:
