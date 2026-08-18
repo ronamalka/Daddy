@@ -31,6 +31,33 @@ interface ServiceRequest {
   _count: { responses: number };
 }
 
+interface FeaturedDaddy {
+  id: string;
+  name: string;
+  avatar: string | null;
+  bio: string | null;
+  city: string | null;
+  services: string[];
+  serviceAreas: { districtName: string; cityName: string | null }[];
+  completedOrders: number;
+  reviewCount: number;
+  avgRating: number;
+  startingPrice: number | null;
+}
+
+interface LiveReview {
+  id: string;
+  rating: number;
+  comment: string;
+  ratingAttitude: number | null;
+  ratingTimeliness: number | null;
+  ratingPrice: number | null;
+  ratingQuality: number | null;
+  createdAt: string;
+  user: { name: string; city: string | null };
+  gig: { title: string; user: { name: string } };
+}
+
 const DISTRICT_LIST = Object.entries(DISTRICTS).map(([code, name]) => ({ code: Number(code), name }));
 
 const DAD_QUOTES = [
@@ -48,45 +75,74 @@ const STATS = [
   { number: "38", label: "שירותים שונים", icon: "🛠️" },
 ];
 
-const TESTIMONIALS = [
+const FALLBACK_TESTIMONIALS = [
   {
     name: "נועם ג׳",
     text: "הזמנתי הרכבת ארון מאיקאה. האבאל׳ה הגיע עם ארגז כלים, בדיחות יבשות, ושוקולד. הארון עומד עד היום, הבדיחות פחות.",
     service: "הרכבת רהיטים",
+    daddyName: "משה כ׳",
     rating: 5,
   },
   {
     name: "שירה מ׳",
     text: "אבא שלי לא מבין בטכנולוגיה אז הזמנתי לו אבאל׳ה שילמד אותו וואטסאפ. עכשיו הוא שולח לי מימס בלי הפסקה.",
     service: "עזרה טכנית",
+    daddyName: "דוד ל׳",
     rating: 5,
   },
   {
     name: "עידו ק׳",
     text: "חיפשתי מישהו שיוריד לי את חשבון הסלולר. האבאל׳ה חסך לי 80 שקל בחודש. קוראים לזה ROI של אבא.",
     service: "הוזלת חשבונות",
+    daddyName: "יוסי ב׳",
     rating: 5,
   },
 ];
 
-const HOW_IT_WORKS = [
+const BUYER_STEPS = [
+  { step: "01", title: "ספר מה צריך", desc: "חפש שירות או פרסם בקשה. בלי טפסים, בלי בירוקרטיה.", icon: "🔍" },
+  { step: "02", title: "בחר אבאל׳ה", desc: "דפדף, קרא ביקורות, השווה מחירים — ותבחר את המתאים.", icon: "👀" },
+  { step: "03", title: "תאם וסגור", desc: "שלח הודעה, תאם זמן, ותתחיל לנוח.", icon: "📱" },
+  { step: "04", title: "דרג ושתף", desc: "העבודה הסתיימה? תן ביקורת ועזור לאחרים לבחור נכון.", icon: "⭐" },
+];
+
+const DADDY_STEPS = [
+  { step: "01", title: "צור פרופיל", desc: "הרשם, ספר מה אתה יודע לעשות, ואיפה אתה עובד.", icon: "📝" },
+  { step: "02", title: "קבל פניות", desc: "לקוחות מחפשים — הגב לבקשות או תן להם למצוא אותך.", icon: "📩" },
+  { step: "03", title: "עשה את העבודה", desc: "תגיע, תסדר, ותשאיר רושם. כמו אבא אמיתי.", icon: "🔧" },
+  { step: "04", title: "בנה מוניטין", desc: "ביקורות טובות = יותר עבודה. פשוט ככה.", icon: "🏆" },
+];
+
+const WHY_CHOOSE = [
   {
-    step: "01",
-    title: "ספר לנו מה צריך",
-    desc: "חפש שירות, או תאר מה אתה צריך. בלי טפסים, בלי בירוקרטיה.",
-    icon: "🔍",
+    title: "אבאל׳ות אמיתיים",
+    desc: "לא חברות ענק. אנשים אמיתיים עם ידיים טובות, ניסיון, ורצון לעזור.",
+    icon: "🤙",
   },
   {
-    step: "02",
-    title: "מצא את האבאל׳ה שלך",
-    desc: "דפדף בין אבאל׳ות מנוסים באזור שלך, קרא ביקורות, ובחר.",
-    icon: "🤝",
+    title: "דירוג מידרג",
+    desc: "4 קריטריונים: איכות, יחס, זמנים, מחיר. תדע בדיוק מה אתה מקבל.",
+    icon: "📊",
   },
   {
-    step: "03",
-    title: "שב ותהנה",
-    desc: "האבאל׳ה יגיע, יסדר הכל, ואולי גם ישאיר טיפ או שניים לחיים.",
-    icon: "🛋️",
+    title: "מחירים הוגנים",
+    desc: "ללא עמלות נסתרות. המחיר שאתה רואה — זה המחיר שאתה משלם.",
+    icon: "💰",
+  },
+  {
+    title: "כל השירותים",
+    desc: "מהרכבת ארון ועד הוזלת חשבונות. 38 שירותים ב-8 קטגוריות.",
+    icon: "🛠️",
+  },
+  {
+    title: "לפי אזור",
+    desc: "מצא אבאל׳ה בשכונה שלך. 7 מחוזות, עשרות ערים.",
+    icon: "📍",
+  },
+  {
+    title: "מהיר ופשוט",
+    desc: "חפש, בחר, שלח הודעה. בתוך דקות יש לך אבאל׳ה.",
+    icon: "⚡",
   },
 ];
 
@@ -111,12 +167,36 @@ export default function HomePage() {
   const [submitted, setSubmitted] = useState(false);
 
   const [dadQuote] = useState(() => DAD_QUOTES[Math.floor(Math.random() * DAD_QUOTES.length)]);
+  const [featuredDaddies, setFeaturedDaddies] = useState<FeaturedDaddy[]>([]);
+  const [liveReviews, setLiveReviews] = useState<LiveReview[]>([]);
+  const [howItWorksTab, setHowItWorksTab] = useState<"buyer" | "daddy">("buyer");
 
   const filteredServices = serviceSearch
     ? ALL_SERVICES.filter((s) => s.nameHe.includes(serviceSearch) || s.description.includes(serviceSearch))
     : selectedCategory
     ? ALL_SERVICES.filter((s) => s.category === selectedCategory)
     : [];
+
+  useEffect(() => {
+    let cancelled = false;
+    async function fetchHomepageData() {
+      try {
+        const [daddiesRes, reviewsRes] = await Promise.all([
+          fetch("/api/featured-daddies"),
+          fetch("/api/recent-reviews"),
+        ]);
+        const [daddies, reviews] = await Promise.all([daddiesRes.json(), reviewsRes.json()]);
+        if (!cancelled) {
+          setFeaturedDaddies(Array.isArray(daddies) ? daddies : []);
+          setLiveReviews(Array.isArray(reviews) ? reviews : []);
+        }
+      } catch {
+        // fallback data already shown
+      }
+    }
+    fetchHomepageData();
+    return () => { cancelled = true; };
+  }, []);
 
   useEffect(() => {
     if (!selectedService) return;
@@ -429,41 +509,220 @@ export default function HomePage() {
         )}
       </section>
 
-      {/* ===== HOW IT WORKS ===== */}
+      {/* ===== MEET OUR TALENTED DADDIES ===== */}
+      <section className="bg-gradient-to-br from-[#F0EEFF]/50 via-[#FAFBFF] to-white py-16">
+        <div className="mx-auto max-w-6xl px-4">
+          <div className="mb-10 flex flex-col items-center md:flex-row md:justify-between">
+            <div className="text-center md:text-right">
+              <h2 className="text-[28px] font-extrabold text-[#2D3436] md:text-[32px]">הכירו את האבאל׳ות שלנו</h2>
+              <p className="mt-2 text-[15px] text-[#636E72]">בעלי מקצוע מנוסים שכבר הוכיחו את עצמם</p>
+            </div>
+            <Link href="/register" className="mt-4 md:mt-0 inline-flex items-center gap-2 rounded-xl border-2 border-[#6C5CE7] px-5 py-2.5 text-[13px] font-bold text-[#6C5CE7] transition-all hover:bg-[#6C5CE7] hover:text-white">
+              הצטרף כאבאל׳ה
+              <svg className="h-4 w-4 rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+              </svg>
+            </Link>
+          </div>
+
+          {featuredDaddies.length > 0 ? (
+            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+              {featuredDaddies.slice(0, 6).map((d) => {
+                const serviceNames = d.services.slice(0, 3).map((slug) => {
+                  const svc = ALL_SERVICES.find((s) => s.slug === slug);
+                  return svc?.nameHe || slug;
+                });
+                return (
+                  <Link key={d.id} href={`/sellers/${d.id}`} className="group rounded-2xl border border-[#E8ECF1] bg-white p-6 transition-all duration-300 hover:shadow-[0_12px_40px_rgba(108,92,231,0.12)] hover:border-[#A29BFE]/40 hover:-translate-y-1">
+                    <div className="flex items-center gap-4 mb-4">
+                      <div className="relative">
+                        <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-[#6C5CE7] to-[#A29BFE] text-[22px] font-bold text-white shadow-[0_4px_16px_rgba(108,92,231,0.25)]">
+                          {d.name[0]}
+                        </div>
+                        {d.avgRating >= 4.5 && (
+                          <div className="absolute -top-1 -left-1 flex h-6 w-6 items-center justify-center rounded-full bg-[#FECA57] text-[10px] shadow-sm">⭐</div>
+                        )}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-[16px] font-bold text-[#2D3436] group-hover:text-[#6C5CE7] transition-colors">{d.name}</p>
+                        {d.serviceAreas.length > 0 && (
+                          <p className="text-[12px] text-[#B2BEC3] truncate">{d.serviceAreas.map((a) => a.cityName || a.districtName).join(", ")}</p>
+                        )}
+                        {d.avgRating > 0 && (
+                          <div className="flex items-center gap-1 mt-1">
+                            <div className="flex gap-0.5">
+                              {Array.from({ length: 5 }).map((_, i) => (
+                                <svg key={i} className={`h-3 w-3 ${i < Math.round(d.avgRating) ? "text-[#FECA57]" : "text-[#E8ECF1]"}`} fill="currentColor" viewBox="0 0 20 20">
+                                  <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                </svg>
+                              ))}
+                            </div>
+                            <span className="text-[11px] text-[#B2BEC3]">({d.reviewCount})</span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                    {d.bio && <p className="text-[13px] text-[#636E72] line-clamp-2 leading-relaxed mb-4">{d.bio}</p>}
+                    <div className="flex flex-wrap gap-1.5 mb-4">
+                      {serviceNames.map((name) => (
+                        <span key={name} className="rounded-full bg-[#F0EEFF] px-2.5 py-1 text-[11px] font-semibold text-[#6C5CE7]">{name}</span>
+                      ))}
+                      {d.services.length > 3 && (
+                        <span className="rounded-full bg-[#E8ECF1] px-2.5 py-1 text-[11px] font-semibold text-[#636E72]">+{d.services.length - 3}</span>
+                      )}
+                    </div>
+                    <div className="flex items-center justify-between border-t border-[#E8ECF1] pt-3">
+                      <div className="flex items-center gap-3 text-[12px] text-[#B2BEC3]">
+                        <span>{d.completedOrders} עבודות</span>
+                        <span>·</span>
+                        <span>{d.reviewCount} ביקורות</span>
+                      </div>
+                      {d.startingPrice && (
+                        <span className="text-[13px] font-bold text-[#00B894]">החל מ-{d.startingPrice}₪</span>
+                      )}
+                    </div>
+                  </Link>
+                );
+              })}
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="animate-pulse rounded-2xl border border-[#E8ECF1] bg-white p-6">
+                  <div className="flex items-center gap-4 mb-4">
+                    <div className="h-16 w-16 rounded-2xl bg-[#F0EEFF]" />
+                    <div className="flex-1">
+                      <div className="h-4 w-24 rounded bg-[#F0EEFF] mb-2" />
+                      <div className="h-3 w-16 rounded bg-[#F0EEFF]" />
+                    </div>
+                  </div>
+                  <div className="h-3 w-full rounded bg-[#F0EEFF] mb-2" />
+                  <div className="h-3 w-2/3 rounded bg-[#F0EEFF]" />
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </section>
+
+      {/* ===== WHY CHOOSE אבאל׳ה ===== */}
       <section className="mx-auto max-w-6xl px-4 py-16">
         <div className="mb-10 text-center">
-          <h2 className="text-[28px] font-extrabold text-[#2D3436] md:text-[32px]">איך זה עובד?</h2>
-          <p className="mt-2 text-[15px] text-[#636E72]">שלושה צעדים פשוטים, ואתה מסודר</p>
+          <h2 className="text-[28px] font-extrabold text-[#2D3436] md:text-[32px]">למה אבאל׳ה?</h2>
+          <p className="mt-2 text-[15px] text-[#636E72]">כי יש הבדל בין &quot;מישהו שמכיר מישהו&quot; לבין אבאל׳ה אמיתי</p>
         </div>
-
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
-          {HOW_IT_WORKS.map((item, i) => (
-            <div key={i} className="group relative rounded-2xl bg-white border border-[#E8ECF1] p-7 transition-all hover:shadow-[0_8px_30px_rgba(108,92,231,0.1)] hover:-translate-y-1">
-              <div className="absolute -top-4 -right-2 flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-[#6C5CE7] to-[#A29BFE] text-[14px] font-extrabold text-white shadow-[0_4px_12px_rgba(108,92,231,0.3)]">
-                {item.step}
+        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          {WHY_CHOOSE.map((item, i) => (
+            <div key={i} className="group rounded-2xl border border-[#E8ECF1] bg-white p-6 transition-all hover:shadow-[0_8px_30px_rgba(108,92,231,0.1)] hover:-translate-y-1">
+              <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-[#F0EEFF] text-[28px] transition-colors group-hover:bg-gradient-to-br group-hover:from-[#6C5CE7] group-hover:to-[#A29BFE]">
+                {item.icon}
               </div>
-              <span className="text-[40px] block mb-4">{item.icon}</span>
-              <h3 className="text-[18px] font-bold text-[#2D3436] mb-2">{item.title}</h3>
+              <h3 className="text-[16px] font-bold text-[#2D3436] mb-2">{item.title}</h3>
               <p className="text-[14px] leading-relaxed text-[#636E72]">{item.desc}</p>
             </div>
           ))}
         </div>
       </section>
 
-      {/* ===== TESTIMONIALS ===== */}
-      <section className="bg-gradient-to-br from-[#F0EEFF] via-[#FAFBFF] to-[#E8F8F8] py-16">
+      {/* ===== HOW IT WORKS — BUYERS & DADDIES ===== */}
+      <section className="bg-[#F8F7FF] py-16">
+        <div className="mx-auto max-w-6xl px-4">
+          <div className="mb-8 text-center">
+            <h2 className="text-[28px] font-extrabold text-[#2D3436] md:text-[32px]">איך זה עובד?</h2>
+            <p className="mt-2 text-[15px] text-[#636E72]">תהליך פשוט, לשני הצדדים</p>
+          </div>
+
+          {/* Tab switcher */}
+          <div className="mx-auto mb-10 flex max-w-sm overflow-hidden rounded-xl border border-[#E8ECF1] bg-white p-1">
+            <button
+              onClick={() => setHowItWorksTab("buyer")}
+              className={`flex-1 rounded-lg py-3 text-[14px] font-bold transition-all ${
+                howItWorksTab === "buyer"
+                  ? "bg-[#6C5CE7] text-white shadow-[0_2px_8px_rgba(108,92,231,0.3)]"
+                  : "text-[#636E72] hover:text-[#6C5CE7]"
+              }`}
+            >
+              🛒 אני מחפש שירות
+            </button>
+            <button
+              onClick={() => setHowItWorksTab("daddy")}
+              className={`flex-1 rounded-lg py-3 text-[14px] font-bold transition-all ${
+                howItWorksTab === "daddy"
+                  ? "bg-[#6C5CE7] text-white shadow-[0_2px_8px_rgba(108,92,231,0.3)]"
+                  : "text-[#636E72] hover:text-[#6C5CE7]"
+              }`}
+            >
+              🔧 אני אבאל׳ה
+            </button>
+          </div>
+
+          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+            {(howItWorksTab === "buyer" ? BUYER_STEPS : DADDY_STEPS).map((item, i) => (
+              <div key={i} className="group relative rounded-2xl bg-white border border-[#E8ECF1] p-6 transition-all hover:shadow-[0_8px_30px_rgba(108,92,231,0.1)] hover:-translate-y-1">
+                <div className="absolute -top-3 -right-2 flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-[#6C5CE7] to-[#A29BFE] text-[12px] font-extrabold text-white shadow-[0_4px_12px_rgba(108,92,231,0.3)]">
+                  {item.step}
+                </div>
+                <span className="text-[36px] block mb-3">{item.icon}</span>
+                <h3 className="text-[16px] font-bold text-[#2D3436] mb-2">{item.title}</h3>
+                <p className="text-[13px] leading-relaxed text-[#636E72]">{item.desc}</p>
+                {i < 3 && (
+                  <div className="hidden lg:block absolute top-1/2 -left-3 -translate-y-1/2 text-[#E8ECF1]">
+                    <svg className="h-5 w-5 rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+                    </svg>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ===== WHAT OUR COMMUNITY SAYS ===== */}
+      <section className="py-16">
         <div className="mx-auto max-w-6xl px-4">
           <div className="mb-10 text-center">
-            <h2 className="text-[28px] font-extrabold text-[#2D3436] md:text-[32px]">מה אומרים עלינו</h2>
-            <p className="mt-2 text-[15px] text-[#636E72]">אנשים אמיתיים, ביקורות אמיתיות (ובדיחות יבשות)</p>
+            <h2 className="text-[28px] font-extrabold text-[#2D3436] md:text-[32px]">מה הקהילה אומרת</h2>
+            <p className="mt-2 text-[15px] text-[#636E72]">ביקורות אמיתיות מאנשים אמיתיים (כולל בדיחות יבשות)</p>
           </div>
 
           <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
-            {TESTIMONIALS.map((t, i) => (
-              <div key={i} className="relative rounded-2xl bg-white p-6 shadow-[0_4px_20px_rgba(108,92,231,0.06)] border border-[#E8ECF1]/60">
-                <div className="absolute -top-3 right-6 flex h-8 w-8 items-center justify-center rounded-full bg-[#FECA57] text-[14px] shadow-sm">
-                  &ldquo;
+            {(liveReviews.length > 0 ? liveReviews.slice(0, 3) : []).map((review) => (
+              <div key={review.id} className="relative rounded-2xl bg-white p-6 shadow-[0_4px_20px_rgba(108,92,231,0.06)] border border-[#E8ECF1]/60">
+                <div className="absolute -top-3 right-6 flex h-8 w-8 items-center justify-center rounded-full bg-[#FECA57] text-[14px] font-bold shadow-sm">&ldquo;</div>
+                <div className="flex gap-0.5 mb-3 mt-1">
+                  {Array.from({ length: review.rating }).map((_, j) => (
+                    <svg key={j} className="h-4 w-4 text-[#FECA57]" fill="currentColor" viewBox="0 0 20 20">
+                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                    </svg>
+                  ))}
                 </div>
+                {(review.ratingQuality || review.ratingAttitude || review.ratingTimeliness || review.ratingPrice) && (
+                  <div className="mb-3 flex flex-wrap gap-2">
+                    {review.ratingQuality && <span className="rounded-full bg-[#F0EEFF] px-2 py-0.5 text-[10px] font-semibold text-[#6C5CE7]">איכות {review.ratingQuality}/10</span>}
+                    {review.ratingAttitude && <span className="rounded-full bg-[#E8F8F8] px-2 py-0.5 text-[10px] font-semibold text-[#00B894]">יחס {review.ratingAttitude}/10</span>}
+                    {review.ratingTimeliness && <span className="rounded-full bg-[#FFF8E6] px-2 py-0.5 text-[10px] font-semibold text-[#D4A600]">זמנים {review.ratingTimeliness}/10</span>}
+                    {review.ratingPrice && <span className="rounded-full bg-[#FDF0ED] px-2 py-0.5 text-[10px] font-semibold text-[#E17055]">מחיר {review.ratingPrice}/10</span>}
+                  </div>
+                )}
+                <p className="text-[14px] leading-relaxed text-[#2D3436] mb-4 line-clamp-4">{review.comment}</p>
+                <div className="flex items-center justify-between border-t border-[#E8ECF1] pt-3">
+                  <div className="flex items-center gap-2">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-[#6C5CE7] to-[#A29BFE] text-[12px] font-bold text-white">{review.user.name[0]}</div>
+                    <div>
+                      <span className="text-[13px] font-semibold text-[#2D3436]">{review.user.name}</span>
+                      {review.user.city && <span className="text-[11px] text-[#B2BEC3] mr-1">· {review.user.city}</span>}
+                    </div>
+                  </div>
+                  <span className="rounded-full bg-[#F0EEFF] px-3 py-1 text-[10px] font-semibold text-[#6C5CE7] truncate max-w-[120px]">{review.gig.title}</span>
+                </div>
+                <p className="mt-2 text-[11px] text-[#B2BEC3]">על השירות של {review.gig.user.name}</p>
+              </div>
+            ))}
+            {/* Fallback testimonials when no live reviews */}
+            {liveReviews.length === 0 && FALLBACK_TESTIMONIALS.map((t, i) => (
+              <div key={i} className="relative rounded-2xl bg-white p-6 shadow-[0_4px_20px_rgba(108,92,231,0.06)] border border-[#E8ECF1]/60">
+                <div className="absolute -top-3 right-6 flex h-8 w-8 items-center justify-center rounded-full bg-[#FECA57] text-[14px] font-bold shadow-sm">&ldquo;</div>
                 <div className="flex gap-0.5 mb-3 mt-1">
                   {Array.from({ length: t.rating }).map((_, j) => (
                     <svg key={j} className="h-4 w-4 text-[#FECA57]" fill="currentColor" viewBox="0 0 20 20">
@@ -474,15 +733,12 @@ export default function HomePage() {
                 <p className="text-[14px] leading-relaxed text-[#2D3436] mb-4">{t.text}</p>
                 <div className="flex items-center justify-between border-t border-[#E8ECF1] pt-3">
                   <div className="flex items-center gap-2">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-[#6C5CE7] to-[#A29BFE] text-[12px] font-bold text-white">
-                      {t.name[0]}
-                    </div>
+                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-[#6C5CE7] to-[#A29BFE] text-[12px] font-bold text-white">{t.name[0]}</div>
                     <span className="text-[13px] font-semibold text-[#2D3436]">{t.name}</span>
                   </div>
-                  <span className="rounded-full bg-[#F0EEFF] px-3 py-1 text-[11px] font-semibold text-[#6C5CE7]">
-                    {t.service}
-                  </span>
+                  <span className="rounded-full bg-[#F0EEFF] px-3 py-1 text-[11px] font-semibold text-[#6C5CE7]">{t.service}</span>
                 </div>
+                <p className="mt-2 text-[11px] text-[#B2BEC3]">על השירות של {t.daddyName}</p>
               </div>
             ))}
           </div>
