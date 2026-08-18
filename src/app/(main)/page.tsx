@@ -32,17 +32,21 @@ export default function MarketplacePage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    let cancelled = false;
     const params = new URLSearchParams();
     if (search) params.set("search", search);
     if (category) params.set("category", category);
 
-    setLoading(true);
     fetch(`/api/gigs?${params}`)
       .then((r) => r.json())
       .then((data) => {
-        setGigs(data);
-        setLoading(false);
+        if (!cancelled) {
+          setGigs(data);
+          setLoading(false);
+        }
       });
+
+    return () => { cancelled = true; };
   }, [search, category]);
 
   return (

@@ -18,11 +18,6 @@ interface GigDetail {
 }
 
 const TIER_ORDER = ["BASIC", "STANDARD", "PREMIUM"];
-const TIER_ACCENT: Record<string, { border: string; bg: string; text: string }> = {
-  BASIC: { border: "border-[#00D2D3]", bg: "bg-[#00D2D3]", text: "text-[#00D2D3]" },
-  STANDARD: { border: "border-[#6C5CE7]", bg: "bg-[#6C5CE7]", text: "text-[#6C5CE7]" },
-  PREMIUM: { border: "border-[#FECA57]", bg: "bg-[#FECA57]", text: "text-[#FECA57]" },
-};
 
 export default function GigDetailPage() {
   const params = useParams();
@@ -69,7 +64,6 @@ export default function GigDetailPage() {
 
   const currentTier = gig.tiers.find((t) => t.tier === selectedTier) || gig.tiers[0];
   const sortedTiers = [...gig.tiers].sort((a, b) => TIER_ORDER.indexOf(a.tier) - TIER_ORDER.indexOf(b.tier));
-  const accent = TIER_ACCENT[selectedTier] || TIER_ACCENT.BASIC;
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8">
