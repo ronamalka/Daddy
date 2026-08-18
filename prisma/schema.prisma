@@ -1,0 +1,139 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  BUYER
+  SELLER
+  ADMIN
+}
+
+enum OrderStatus {
+  PENDING
+  IN_PROGRESS
+  DELIVERED
+  COMPLETED
+  CANCELLED
+}
+
+enum GigTier {
+  BASIC
+  STANDARD
+  PREMIUM
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  name         String
+  passwordHash String
+  role         Role     @default(BUYER)
+  avatar       String?
+  bio          String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  gigs             Gig[]
+  ordersAsBuyer    Order[]   @relation("BuyerOrders")
+  ordersAsSeller   Order[]   @relation("SellerOrders")
+  reviews          Review[]
+  sentMessages     Message[] @relation("SentMessages")
+  receivedMessages Message[] @relation("ReceivedMessages")
+}
+
+model Category {
+  id   String @id @default(cuid())
+  name String @unique
+  slug String @unique
+  gigs Gig[]
+}
+
+model Gig {
+  id          String   @id @default(cuid())
+  title       String
+  description String
+  image       String?
+  categoryId  String
+  sellerId    String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  category Category         @relation(fields: [categoryId], references: [id])
+  seller   User             @relation(fields: [sellerId], references: [id])
+  tiers    GigPricingTier[]
+  orders   Order[]
+  reviews  Review[]
+
+  @@index([categoryId])
+  @@index([sellerId])
+}
+
+model GigPricingTier {
+  id           String  @id @default(cuid())
+  gigId        String
+  tier         GigTier
+  title        String
+  description  String
+  price        Float
+  deliveryDays Int
+  revisions    Int
+
+  gig Gig @relation(fields: [gigId], references: [id], onDelete: Cascade)
+
+  @@unique([gigId, tier])
+}
+
+model Order {
+  id        String      @id @default(cuid())
+  gigId     String
+  buyerId   String
+  sellerId  String
+  tier      GigTier
+  price     Float
+  status    OrderStatus @default(PENDING)
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+
+  gig      Gig       @relation(fields: [gigId], references: [id])
+  buyer    User      @relation("BuyerOrders", fields: [buyerId], references: [id])
+  seller   User      @relation("SellerOrders", fields: [sellerId], references: [id])
+  messages Message[]
+  review   Review?
+
+  @@index([buyerId])
+  @@index([sellerId])
+}
+
+model Review {
+  id        String   @id @default(cuid())
+  rating    Int
+  comment   String
+  orderId   String   @unique
+  gigId     String
+  userId    String
+  createdAt DateTime @default(now())
+
+  order Order @relation(fields: [orderId], references: [id])
+  gig   Gig   @relation(fields: [gigId], references: [id])
+  user  User  @relation(fields: [userId], references: [id])
+}
+
+model Message {
+  id         String   @id @default(cuid())
+  content    String
+  orderId    String
+  senderId   String
+  receiverId String
+  createdAt  DateTime @default(now())
+
+  order    Order @relation(fields: [orderId], references: [id])
+  sender   User  @relation("SentMessages", fields: [senderId], references: [id])
+  receiver User  @relation("ReceivedMessages", fields: [receiverId], references: [id])
+
+  @@index([orderId])
+}
