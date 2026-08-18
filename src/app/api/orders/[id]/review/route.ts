@@ -30,7 +30,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
     return NextResponse.json({ error: "Already reviewed" }, { status: 409 });
   }
 
-  const { rating, comment } = await request.json();
+  const { rating, comment, communicationRating, qualityRating, timelinessRating } = await request.json();
   if (!rating || rating < 1 || rating > 5 || !comment) {
     return NextResponse.json({ error: "Invalid review" }, { status: 400 });
   }
@@ -42,6 +42,9 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
       orderId,
       gigId: order.gigId,
       userId: session.user.id,
+      ...(communicationRating && { communicationRating }),
+      ...(qualityRating && { qualityRating }),
+      ...(timelinessRating && { timelinessRating }),
     },
   });
 

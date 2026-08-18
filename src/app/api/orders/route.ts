@@ -53,6 +53,9 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Invalid tier" }, { status: 400 });
   }
 
+  const dueDate = new Date();
+  dueDate.setDate(dueDate.getDate() + pricingTier.deliveryDays);
+
   const order = await prisma.order.create({
     data: {
       gigId,
@@ -60,6 +63,7 @@ export async function POST(request: Request) {
       sellerId: gig.sellerId,
       tier,
       price: pricingTier.price,
+      dueDate,
     },
     include: { gig: true },
   });

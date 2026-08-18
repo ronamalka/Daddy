@@ -4,7 +4,7 @@ interface GigCardProps {
   id: string;
   title: string;
   image: string | null;
-  seller: { name: string; avatar: string | null };
+  seller: { name: string; avatar: string | null; serviceAreas?: { districtName: string; cityName: string | null }[] };
   startingPrice: number;
   avgRating: number;
   reviewCount: number;
@@ -39,7 +39,18 @@ export function GigCard({ id, title, image, seller, startingPrice, avgRating, re
           <div className={`flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br ${AVATAR_GRADIENTS[gradientIndex]} text-[12px] font-bold text-white`}>
             {seller.name[0]}
           </div>
-          <span className="text-[13px] font-medium text-[#636E72]">{seller.name}</span>
+          <div className="min-w-0 flex-1">
+            <span className="text-[13px] font-medium text-[#636E72]">{seller.name}</span>
+            {seller.serviceAreas && seller.serviceAreas.length > 0 && (
+              <div className="flex items-center gap-1 text-[11px] text-[#B2BEC3] truncate">
+                <svg className="h-3 w-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
+                </svg>
+                {seller.serviceAreas.map((a) => a.cityName || a.districtName).join(", ")}
+              </div>
+            )}
+          </div>
         </div>
         <h3 className="mb-3 line-clamp-2 text-[14px] font-semibold leading-snug text-[#2D3436] transition-colors group-hover:text-[#6C5CE7]">
           {title}

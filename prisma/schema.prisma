@@ -35,15 +35,21 @@ model User {
   role         Role     @default(BUYER)
   avatar       String?
   bio          String?
+  phone        String?
+  city         String?
+  cityCode     Int?
+  districtCode Int?
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
   gigs             Gig[]
-  ordersAsBuyer    Order[]   @relation("BuyerOrders")
-  ordersAsSeller   Order[]   @relation("SellerOrders")
+  ordersAsBuyer    Order[]       @relation("BuyerOrders")
+  ordersAsSeller   Order[]       @relation("SellerOrders")
   reviews          Review[]
-  sentMessages     Message[] @relation("SentMessages")
-  receivedMessages Message[] @relation("ReceivedMessages")
+  sentMessages     Message[]     @relation("SentMessages")
+  receivedMessages Message[]     @relation("ReceivedMessages")
+  favorites        Favorite[]
+  serviceAreas     ServiceArea[]
 }
 
 model Category {
@@ -51,6 +57,22 @@ model Category {
   name String @unique
   slug String @unique
   gigs Gig[]
+}
+
+model ServiceArea {
+  id           String @id @default(cuid())
+  userId       String
+  districtCode Int
+  districtName String
+  cityCode     Int?
+  cityName     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, districtCode, cityCode])
+  @@index([userId])
+  @@index([districtCode])
+  @@index([cityCode])
 }
 
 model Gig {
@@ -63,11 +85,15 @@ model Gig {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  category Category         @relation(fields: [categoryId], references: [id])
-  seller   User             @relation(fields: [sellerId], references: [id])
-  tiers    GigPricingTier[]
-  orders   Order[]
-  reviews  Review[]
+  category  Category         @relation(fields: [categoryId], references: [id])
+  seller    User             @relation(fields: [sellerId], references: [id])
+  tiers     GigPricingTier[]
+  orders    Order[]
+  reviews   Review[]
+  images    GigImage[]
+  faqs      GigFaq[]
+  favorites Favorite[]
+  requirements GigRequirement[]
 
   @@index([categoryId])
   @@index([sellerId])
@@ -88,6 +114,55 @@ model GigPricingTier {
   @@unique([gigId, tier])
 }
 
+model GigImage {
+  id    String @id @default(cuid())
+  gigId String
+  url   String
+  order Int    @default(0)
+
+  gig Gig @relation(fields: [gigId], references: [id], onDelete: Cascade)
+
+  @@index([gigId])
+}
+
+model GigFaq {
+  id       String @id @default(cuid())
+  gigId    String
+  question String
+  answer   String
+  order    Int    @default(0)
+
+  gig Gig @relation(fields: [gigId], references: [id], onDelete: Cascade)
+
+  @@index([gigId])
+}
+
+model GigRequirement {
+  id       String  @id @default(cuid())
+  gigId    String
+  question String
+  required Boolean @default(true)
+  order    Int     @default(0)
+
+  gig     Gig               @relation(fields: [gigId], references: [id], onDelete: Cascade)
+  answers OrderRequirement[]
+
+  @@index([gigId])
+}
+
+model Favorite {
+  id        String   @id @default(cuid())
+  userId    String
+  gigId     String
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+  gig  Gig  @relation(fields: [gigId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, gigId])
+  @@index([userId])
+}
+
 model Order {
   id        String      @id @default(cuid())
   gigId     String
@@ -96,27 +171,46 @@ model Order {
   tier      GigTier
   price     Float
   status    OrderStatus @default(PENDING)
+  dueDate   DateTime?
   createdAt DateTime    @default(now())
   updatedAt DateTime    @updatedAt
 
-  gig      Gig       @relation(fields: [gigId], references: [id])
-  buyer    User      @relation("BuyerOrders", fields: [buyerId], references: [id])
-  seller   User      @relation("SellerOrders", fields: [sellerId], references: [id])
-  messages Message[]
-  review   Review?
+  gig          Gig                @relation(fields: [gigId], references: [id])
+  buyer        User               @relation("BuyerOrders", fields: [buyerId], references: [id])
+  seller       User               @relation("SellerOrders", fields: [sellerId], references: [id])
+  messages     Message[]
+  review       Review?
+  requirements OrderRequirement[]
 
   @@index([buyerId])
   @@index([sellerId])
 }
 
+model OrderRequirement {
+  id            String @id @default(cuid())
+  orderId       String
+  requirementId String
+  answer        String
+
+  order       Order          @relation(fields: [orderId], references: [id])
+  requirement GigRequirement @relation(fields: [requirementId], references: [id])
+
+  @@unique([orderId, requirementId])
+}
+
 model Review {
-  id        String   @id @default(cuid())
-  rating    Int
-  comment   String
-  orderId   String   @unique
-  gigId     String
-  userId    String
-  createdAt DateTime @default(now())
+  id                  String    @id @default(cuid())
+  rating              Int
+  comment             String
+  communicationRating Int?
+  qualityRating       Int?
+  timelinessRating    Int?
+  sellerResponse      String?
+  sellerResponseAt    DateTime?
+  orderId             String    @unique
+  gigId               String
+  userId              String
+  createdAt           DateTime  @default(now())
 
   order Order @relation(fields: [orderId], references: [id])
   gig   Gig   @relation(fields: [gigId], references: [id])
@@ -126,14 +220,16 @@ model Review {
 model Message {
   id         String   @id @default(cuid())
   content    String
-  orderId    String
+  orderId    String?
   senderId   String
   receiverId String
   createdAt  DateTime @default(now())
 
-  order    Order @relation(fields: [orderId], references: [id])
-  sender   User  @relation("SentMessages", fields: [senderId], references: [id])
-  receiver User  @relation("ReceivedMessages", fields: [receiverId], references: [id])
+  order    Order? @relation(fields: [orderId], references: [id])
+  sender   User   @relation("SentMessages", fields: [senderId], references: [id])
+  receiver User   @relation("ReceivedMessages", fields: [receiverId], references: [id])
 
   @@index([orderId])
+  @@index([senderId])
+  @@index([receiverId])
 }

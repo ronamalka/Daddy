@@ -61,6 +61,7 @@ export function Navbar() {
                 <NavLink href="/gigs/create">צור שירות</NavLink>
               )}
               <NavLink href="/orders">הזמנות</NavLink>
+              <NavLink href="/favorites">מועדפים</NavLink>
               <NavLink href="/inbox">
                 <span className="flex items-center gap-1.5">
                   הודעות
@@ -223,6 +224,9 @@ export function Navbar() {
               )}
               <MobileNavLink href="/orders" onClick={closeMobile}>
                 הזמנות
+              </MobileNavLink>
+              <MobileNavLink href="/favorites" onClick={closeMobile}>
+                מועדפים
               </MobileNavLink>
               <MobileNavLink href="/inbox" onClick={closeMobile}>
                 הודעות

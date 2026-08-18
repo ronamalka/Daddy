@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { GigCard } from "@/components/gig-card";
 
 interface Gig {
@@ -25,29 +25,71 @@ const CATEGORIES = [
   { label: "💻 טכנולוגיה", slug: "tech-support" },
 ];
 
+const SORT_OPTIONS = [
+  { label: "החדשים ביותר", value: "newest" },
+  { label: "מחיר: נמוך לגבוה", value: "price_asc" },
+  { label: "מחיר: גבוה לנמוך", value: "price_desc" },
+  { label: "דירוג גבוה", value: "rating" },
+  { label: "הכי פופולרי", value: "popular" },
+];
+
+interface District { code: number; name: string; }
+interface CityOption { code: number; name: string; districtCode: number; }
+
 export default function MarketplacePage() {
   const [gigs, setGigs] = useState<Gig[]>([]);
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("");
+  const [sortBy, setSortBy] = useState("newest");
+  const [minPrice, setMinPrice] = useState("");
+  const [maxPrice, setMaxPrice] = useState("");
   const [loading, setLoading] = useState(true);
+  const [showFilters, setShowFilters] = useState(false);
+
+  const [districts, setDistricts] = useState<District[]>([]);
+  const [allCities, setAllCities] = useState<CityOption[]>([]);
+  const [selectedDistrict, setSelectedDistrict] = useState("");
+  const [selectedCity, setSelectedCity] = useState("");
+  const [citySearch, setCitySearch] = useState("");
 
   useEffect(() => {
-    let cancelled = false;
-    const params = new URLSearchParams();
-    if (search) params.set("search", search);
-    if (category) params.set("category", category);
-
-    fetch(`/api/gigs?${params}`)
+    fetch("/api/locations")
       .then((r) => r.json())
       .then((data) => {
-        if (!cancelled) {
-          setGigs(data);
-          setLoading(false);
-        }
-      });
+        setDistricts(data.districts);
+        setAllCities(data.cities);
+      })
+      .catch(() => {});
+  }, []);
 
-    return () => { cancelled = true; };
-  }, [search, category]);
+  const filteredCitiesForDropdown = allCities
+    .filter((c) => (selectedDistrict ? c.districtCode === Number(selectedDistrict) : true))
+    .filter((c) => (citySearch ? c.name.includes(citySearch) : true));
+
+  const fetchGigs = useCallback(() => {
+    const p = new URLSearchParams();
+    if (search) p.set("search", search);
+    if (category) p.set("category", category);
+    if (sortBy !== "newest") p.set("sortBy", sortBy);
+    if (minPrice) p.set("minPrice", minPrice);
+    if (maxPrice) p.set("maxPrice", maxPrice);
+    if (selectedCity) p.set("cityCode", selectedCity);
+    else if (selectedDistrict) p.set("district", selectedDistrict);
+
+    fetch(`/api/gigs?${p}`)
+      .then((r) => r.json())
+      .then((data) => {
+        setGigs(data);
+        setLoading(false);
+      });
+  }, [search, category, sortBy, minPrice, maxPrice, selectedDistrict, selectedCity]);
+
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      fetchGigs();
+    }, 300);
+    return () => clearTimeout(timeout);
+  }, [fetchGigs]);
 
   return (
     <div>
@@ -102,9 +144,9 @@ export default function MarketplacePage() {
         </div>
       </section>
 
-      {/* Category Pills + Grid */}
+      {/* Category Pills + Filters + Grid */}
       <div className="mx-auto max-w-7xl px-4 py-8">
-        <div className="mb-8 flex flex-wrap gap-2">
+        <div className="mb-6 flex flex-wrap items-center gap-2">
           {CATEGORIES.map((cat) => (
             <button
               key={cat.slug}
@@ -119,6 +161,116 @@ export default function MarketplacePage() {
             </button>
           ))}
         </div>
+
+        {/* Sort + Filter Bar */}
+        <div className="mb-6 flex flex-wrap items-center gap-3">
+          <select
+            value={sortBy}
+            onChange={(e) => setSortBy(e.target.value)}
+            className="rounded-[12px] border border-[#E8ECF1] bg-white px-4 py-2.5 text-[13px] font-medium text-[#2D3436] focus:border-[#6C5CE7] focus:outline-none focus:ring-2 focus:ring-[#6C5CE7]/20"
+          >
+            {SORT_OPTIONS.map((opt) => (
+              <option key={opt.value} value={opt.value}>{opt.label}</option>
+            ))}
+          </select>
+
+          <button
+            onClick={() => setShowFilters(!showFilters)}
+            className={`flex items-center gap-2 rounded-[12px] border px-4 py-2.5 text-[13px] font-medium transition-all ${
+              showFilters ? "border-[#6C5CE7] bg-[#F0EEFF] text-[#6C5CE7]" : "border-[#E8ECF1] bg-white text-[#636E72] hover:border-[#A29BFE]/30"
+            }`}
+          >
+            <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 6h9.75M10.5 6a1.5 1.5 0 11-3 0m3 0a1.5 1.5 0 10-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-9.75 0h9.75" />
+            </svg>
+            סינון
+          </button>
+
+          <span className="text-[13px] text-[#B2BEC3]">{gigs.length} תוצאות</span>
+        </div>
+
+        {/* Filters Panel */}
+        {showFilters && (
+          <div className="mb-6 space-y-4 rounded-[12px] border border-[#E8ECF1] bg-[#FAFBFF] p-4">
+            {/* Location Filter */}
+            <div>
+              <span className="text-[13px] font-medium text-[#636E72] mb-2 block">מיקום:</span>
+              <div className="flex flex-wrap gap-2 mb-2">
+                <button
+                  onClick={() => { setSelectedDistrict(""); setSelectedCity(""); }}
+                  className={`rounded-[9999px] px-3 py-1.5 text-[12px] font-semibold transition-all ${
+                    !selectedDistrict ? "bg-[#6C5CE7] text-white" : "border border-[#E8ECF1] bg-white text-[#636E72] hover:text-[#6C5CE7]"
+                  }`}
+                >
+                  כל הארץ
+                </button>
+                {districts.map((d) => (
+                  <button
+                    key={d.code}
+                    onClick={() => { setSelectedDistrict(String(d.code)); setSelectedCity(""); }}
+                    className={`rounded-[9999px] px-3 py-1.5 text-[12px] font-semibold transition-all ${
+                      selectedDistrict === String(d.code) ? "bg-[#6C5CE7] text-white" : "border border-[#E8ECF1] bg-white text-[#636E72] hover:text-[#6C5CE7]"
+                    }`}
+                  >
+                    {d.name}
+                  </button>
+                ))}
+              </div>
+              {selectedDistrict && (
+                <div className="relative">
+                  <input
+                    type="text"
+                    placeholder="חפש עיר ספציפית..."
+                    value={citySearch}
+                    onChange={(e) => { setCitySearch(e.target.value); setSelectedCity(""); }}
+                    className="w-full rounded-[8px] border border-[#E8ECF1] bg-white px-3 py-2 text-[13px] text-[#2D3436] placeholder-[#B2BEC3] focus:border-[#6C5CE7] focus:outline-none"
+                  />
+                  {citySearch && filteredCitiesForDropdown.length > 0 && (
+                    <div className="absolute z-10 mt-1 max-h-40 w-full overflow-y-auto rounded-[8px] border border-[#E8ECF1] bg-white shadow-lg">
+                      {filteredCitiesForDropdown.slice(0, 20).map((c) => (
+                        <button
+                          key={c.code}
+                          onClick={() => { setSelectedCity(String(c.code)); setCitySearch(c.name); }}
+                          className="w-full px-3 py-2 text-[13px] text-[#2D3436] text-right hover:bg-[#F0EEFF]"
+                        >
+                          {c.name}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+
+            {/* Price Filter */}
+            <div className="flex flex-wrap items-center gap-3">
+              <span className="text-[13px] font-medium text-[#636E72]">טווח מחיר:</span>
+              <input
+                type="number"
+                placeholder="מינימום ₪"
+                value={minPrice}
+                onChange={(e) => setMinPrice(e.target.value)}
+                className="w-28 rounded-[8px] border border-[#E8ECF1] bg-white px-3 py-2 text-[13px] text-[#2D3436] focus:border-[#6C5CE7] focus:outline-none"
+              />
+              <span className="text-[#B2BEC3]">—</span>
+              <input
+                type="number"
+                placeholder="מקסימום ₪"
+                value={maxPrice}
+                onChange={(e) => setMaxPrice(e.target.value)}
+                className="w-28 rounded-[8px] border border-[#E8ECF1] bg-white px-3 py-2 text-[13px] text-[#2D3436] focus:border-[#6C5CE7] focus:outline-none"
+              />
+              {(minPrice || maxPrice || selectedDistrict) && (
+                <button
+                  onClick={() => { setMinPrice(""); setMaxPrice(""); setSelectedDistrict(""); setSelectedCity(""); setCitySearch(""); }}
+                  className="text-[12px] text-[#6C5CE7] hover:underline"
+                >
+                  נקה הכל
+                </button>
+              )}
+            </div>
+          </div>
+        )}
 
         {loading ? (
           <div className="flex items-center justify-center py-20">
