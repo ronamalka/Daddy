@@ -21,6 +21,12 @@ enum OrderStatus {
   CANCELLED
 }
 
+enum RequestStatus {
+  OPEN
+  IN_PROGRESS
+  CLOSED
+}
+
 enum GigTier {
   BASIC
   STANDARD
@@ -50,6 +56,10 @@ model User {
   receivedMessages Message[]     @relation("ReceivedMessages")
   favorites        Favorite[]
   serviceAreas     ServiceArea[]
+  userServices     UserService[]
+  servicePrices    ServicePrice[]
+  serviceRequests  ServiceRequest[]  @relation("BuyerRequests")
+  requestResponses RequestResponse[] @relation("SellerResponses")
 }
 
 model Category {
@@ -73,6 +83,56 @@ model ServiceArea {
   @@index([userId])
   @@index([districtCode])
   @@index([cityCode])
+}
+
+model UserService {
+  id          String @id @default(cuid())
+  userId      String
+  serviceSlug String
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, serviceSlug])
+  @@index([userId])
+  @@index([serviceSlug])
+}
+
+model ServiceRequest {
+  id           String        @id @default(cuid())
+  title        String
+  description  String
+  serviceSlug  String?
+  buyerId      String
+  districtCode Int?
+  districtName String?
+  cityCode     Int?
+  cityName     String?
+  status       RequestStatus @default(OPEN)
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  buyer     User              @relation("BuyerRequests", fields: [buyerId], references: [id])
+  responses RequestResponse[]
+
+  @@index([buyerId])
+  @@index([status])
+  @@index([districtCode])
+}
+
+model RequestResponse {
+  id            String   @id @default(cuid())
+  requestId     String
+  sellerId      String
+  message       String
+  proposedPrice Float?
+  createdAt     DateTime @default(now())
+
+  request ServiceRequest @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  seller  User           @relation("SellerResponses", fields: [sellerId], references: [id])
+
+  @@unique([requestId, sellerId])
+  @@index([requestId])
+  @@index([sellerId])
 }
 
 model Gig {
@@ -202,6 +262,10 @@ model Review {
   id                  String    @id @default(cuid())
   rating              Int
   comment             String
+  ratingAttitude      Int?
+  ratingTimeliness    Int?
+  ratingPrice         Int?
+  ratingQuality       Int?
   communicationRating Int?
   qualityRating       Int?
   timelinessRating    Int?
@@ -215,6 +279,21 @@ model Review {
   order Order @relation(fields: [orderId], references: [id])
   gig   Gig   @relation(fields: [gigId], references: [id])
   user  User  @relation(fields: [userId], references: [id])
+}
+
+model ServicePrice {
+  id          String @id @default(cuid())
+  userId      String
+  serviceSlug String
+  price       Float
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, serviceSlug])
+  @@index([userId])
 }
 
 model Message {

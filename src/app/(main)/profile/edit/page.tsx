@@ -19,11 +19,13 @@ export default function EditProfilePage() {
     fetch("/api/profile")
       .then((r) => r.json())
       .then((data) => {
-        setName(data.name || "");
-        setBio(data.bio || "");
-        setPhone(data.phone || "");
-        setCity(data.city || "");
-        setAvatar(data.avatar || "");
+        if (data) {
+          setName(data.name || "");
+          setBio(data.bio || "");
+          setPhone(data.phone || "");
+          setCity(data.city || "");
+          setAvatar(data.avatar || "");
+        }
         setLoading(false);
       });
   }, []);

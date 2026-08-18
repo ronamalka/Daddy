@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { LocationPicker } from "@/components/location-picker";
+import { ServicePicker } from "@/components/service-picker";
 
 interface ServiceAreaEntry {
   districtCode: number;
@@ -26,6 +27,9 @@ export default function RegisterPage() {
 
   const [selectedCity, setSelectedCity] = useState<{ cityCode: number; cityName: string; districtCode: number; districtName: string } | null>(null);
   const [serviceAreas, setServiceAreas] = useState<ServiceAreaEntry[]>([]);
+  const [selectedServices, setSelectedServices] = useState<string[]>([]);
+
+  const totalSteps = role === "SELLER" ? 3 : 2;
 
   async function handleSubmit() {
     setLoading(true);
@@ -43,6 +47,7 @@ export default function RegisterPage() {
         cityName: selectedCity?.cityName,
         districtCode: selectedCity?.districtCode,
         serviceAreas: role === "SELLER" ? serviceAreas : [],
+        services: role === "SELLER" ? selectedServices : [],
       }),
     });
 
@@ -68,7 +73,29 @@ export default function RegisterPage() {
     }
   }
 
+  function handleNext() {
+    if (step === 1) {
+      setStep(2);
+    } else if (step === 2 && role === "SELLER") {
+      setStep(3);
+    } else {
+      handleSubmit();
+    }
+  }
+
   const inputClass = "w-full rounded-[12px] border border-[#E8ECF1] bg-[#FAFBFF] px-4 py-3 text-[16px] text-[#2D3436] placeholder-[#B2BEC3] transition-all focus:border-[#6C5CE7] focus:outline-none focus:ring-2 focus:ring-[#6C5CE7]/20";
+
+  const stepTitles = [
+    "צור חשבון חדש",
+    "איפה אתה נמצא?",
+    "מה אתה יודע לעשות?",
+  ];
+
+  const stepDescs = [
+    "הצטרף לקהילה והתחל את המסע שלך",
+    role === "SELLER" ? "בחר את האזורים בהם אתה נותן שירות" : "בחר את העיר שלך כדי למצוא אבאל׳ות קרובים",
+    "בחר את השירותים שאתה מציע ללקוחות",
+  ];
 
   return (
     <div className="w-full max-w-md">
@@ -82,9 +109,8 @@ export default function RegisterPage() {
       </div>
 
       <div className="rounded-[16px] bg-[#FFFFFF] p-8 shadow-[0_4px_16px_rgba(108,92,231,0.08)]">
-        {/* Step indicator */}
         <div className="mb-6 flex items-center justify-center gap-2">
-          {[1, 2].map((s) => (
+          {Array.from({ length: totalSteps }, (_, i) => i + 1).map((s) => (
             <div
               key={s}
               className={`h-2 rounded-full transition-all ${
@@ -95,14 +121,10 @@ export default function RegisterPage() {
         </div>
 
         <h1 className="mb-2 text-center text-[24px] font-bold tracking-[-0.01em] text-[#2D3436]">
-          {step === 1 ? "צור חשבון חדש" : "איפה אתה נמצא?"}
+          {stepTitles[step - 1]}
         </h1>
         <p className="mb-6 text-center text-[14px] text-[#636E72]">
-          {step === 1
-            ? "הצטרף לקהילה והתחל את המסע שלך"
-            : role === "SELLER"
-            ? "בחר את האזורים בהם אתה נותן שירות"
-            : "בחר את העיר שלך כדי למצוא אבאל׳ות קרובים"}
+          {stepDescs[step - 1]}
         </p>
 
         {error && (
@@ -115,7 +137,7 @@ export default function RegisterPage() {
         )}
 
         {step === 1 && (
-          <form onSubmit={(e) => { e.preventDefault(); setStep(2); }} className="space-y-5">
+          <form onSubmit={(e) => { e.preventDefault(); handleNext(); }} className="space-y-5">
             <div>
               <label htmlFor="name" className="mb-1.5 block text-[14px] font-medium text-[#2D3436]">שם מלא</label>
               <input id="name" required placeholder="ישראל ישראלי" value={name} onChange={(e) => setName(e.target.value)} className={inputClass} />
@@ -164,12 +186,7 @@ export default function RegisterPage() {
         {step === 2 && (
           <div className="space-y-5">
             {role === "SELLER" ? (
-              <LocationPicker
-                mode="multi"
-                areas={serviceAreas}
-                onAreasChange={setServiceAreas}
-                label="אזורי שירות"
-              />
+              <LocationPicker mode="multi" areas={serviceAreas} onAreasChange={setServiceAreas} label="אזורי שירות" />
             ) : (
               <LocationPicker
                 mode="single"
@@ -180,18 +197,46 @@ export default function RegisterPage() {
             )}
 
             <div className="flex gap-3">
+              <button type="button" onClick={() => setStep(1)} className="flex-1 rounded-[12px] border border-[#E8ECF1] py-3.5 text-[16px] font-semibold text-[#636E72] transition-all hover:bg-[#FAFBFF]">
+                חזרה
+              </button>
               <button
                 type="button"
-                onClick={() => setStep(1)}
-                className="flex-1 rounded-[12px] border border-[#E8ECF1] py-3.5 text-[16px] font-semibold text-[#636E72] transition-all hover:bg-[#FAFBFF]"
+                onClick={handleNext}
+                disabled={loading}
+                className="flex-1 rounded-[12px] bg-[#6C5CE7] py-3.5 text-[16px] font-semibold text-white shadow-[0_4px_16px_rgba(108,92,231,0.08)] transition-all hover:bg-[#5A4BD1] active:scale-[0.98] disabled:opacity-50"
               >
+                {role === "SELLER" ? "המשך" : loading ? "יוצר חשבון..." : "צור חשבון"}
+              </button>
+            </div>
+
+            <button type="button" onClick={handleSubmit} disabled={loading} className="w-full text-center text-[13px] text-[#B2BEC3] hover:text-[#636E72] transition-colors">
+              דלג, אבחר אחר כך
+            </button>
+          </div>
+        )}
+
+        {step === 3 && (
+          <div className="space-y-5">
+            <div className="max-h-[400px] overflow-y-auto">
+              <ServicePicker selected={selectedServices} onChange={setSelectedServices} />
+            </div>
+
+            {selectedServices.length > 0 && (
+              <p className="text-center text-[13px] text-[#6C5CE7] font-medium">
+                {selectedServices.length} שירותים נבחרו
+              </p>
+            )}
+
+            <div className="flex gap-3">
+              <button type="button" onClick={() => setStep(2)} className="flex-1 rounded-[12px] border border-[#E8ECF1] py-3.5 text-[16px] font-semibold text-[#636E72] transition-all hover:bg-[#FAFBFF]">
                 חזרה
               </button>
               <button
                 type="button"
                 onClick={handleSubmit}
                 disabled={loading}
-                className="flex-1 rounded-[12px] bg-[#6C5CE7] py-3.5 text-[16px] font-semibold text-white shadow-[0_4px_16px_rgba(108,92,231,0.08)] transition-all hover:bg-[#5A4BD1] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex-1 rounded-[12px] bg-[#6C5CE7] py-3.5 text-[16px] font-semibold text-white shadow-[0_4px_16px_rgba(108,92,231,0.08)] transition-all hover:bg-[#5A4BD1] active:scale-[0.98] disabled:opacity-50"
               >
                 {loading ? (
                   <span className="flex items-center justify-center gap-2">
@@ -201,18 +246,11 @@ export default function RegisterPage() {
                     </svg>
                     יוצר חשבון...
                   </span>
-                ) : (
-                  "צור חשבון"
-                )}
+                ) : "צור חשבון"}
               </button>
             </div>
 
-            <button
-              type="button"
-              onClick={handleSubmit}
-              disabled={loading}
-              className="w-full text-center text-[13px] text-[#B2BEC3] hover:text-[#636E72] transition-colors"
-            >
+            <button type="button" onClick={handleSubmit} disabled={loading} className="w-full text-center text-[13px] text-[#B2BEC3] hover:text-[#636E72] transition-colors">
               דלג, אבחר אחר כך
             </button>
           </div>

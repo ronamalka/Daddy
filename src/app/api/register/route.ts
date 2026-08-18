@@ -3,7 +3,7 @@ import { hash } from "bcryptjs";
 import { prisma } from "@/lib/prisma";
 
 export async function POST(request: Request) {
-  const { name, email, password, role, cityCode, cityName, districtCode, serviceAreas } = await request.json();
+  const { name, email, password, role, cityCode, cityName, districtCode, serviceAreas, services } = await request.json();
 
   if (!name || !email || !password) {
     return NextResponse.json({ error: "Missing fields" }, { status: 400 });
@@ -32,6 +32,11 @@ export async function POST(request: Request) {
             cityCode: a.cityCode ?? null,
             cityName: a.cityName ?? null,
           })),
+        },
+      }),
+      ...(Array.isArray(services) && services.length > 0 && {
+        userServices: {
+          create: services.map((slug: string) => ({ serviceSlug: slug })),
         },
       }),
     },

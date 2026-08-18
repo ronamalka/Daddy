@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { useParams } from "next/navigation";
+import { ReviewForm } from "@/components/review-form";
 
 interface OrderDetail {
   id: string;
@@ -15,7 +16,16 @@ interface OrderDetail {
   buyer: { id: string; name: string; avatar: string | null };
   seller: { id: string; name: string; avatar: string | null };
   messages: { id: string; content: string; createdAt: string; sender: { id: string; name: string; avatar: string | null } }[];
-  review: { id: string; rating: number; comment: string; communicationRating: number | null; qualityRating: number | null; timelinessRating: number | null; sellerResponse: string | null } | null;
+  review: {
+    id: string;
+    rating: number;
+    comment: string;
+    ratingAttitude: number | null;
+    ratingTimeliness: number | null;
+    ratingPrice: number | null;
+    ratingQuality: number | null;
+    sellerResponse: string | null;
+  } | null;
 }
 
 const STATUS_STYLE: Record<string, { bg: string; text: string; label: string }> = {
@@ -33,11 +43,6 @@ export default function OrderDetailPage() {
   const [message, setMessage] = useState("");
   const [sending, setSending] = useState(false);
   const [reviewOpen, setReviewOpen] = useState(false);
-  const [rating, setRating] = useState(5);
-  const [comment, setComment] = useState("");
-  const [commRating, setCommRating] = useState(5);
-  const [qualRating, setQualRating] = useState(5);
-  const [timeRating, setTimeRating] = useState(5);
   const [sellerResponseText, setSellerResponseText] = useState("");
   const [respondingTo, setRespondingTo] = useState(false);
 
@@ -76,25 +81,6 @@ export default function OrderDetailPage() {
     }
   }
 
-  async function submitReview(e: React.FormEvent) {
-    e.preventDefault();
-    const res = await fetch(`/api/orders/${params.id}/review`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        rating, comment,
-        communicationRating: commRating,
-        qualityRating: qualRating,
-        timelinessRating: timeRating,
-      }),
-    });
-    if (res.ok) {
-      const review = await res.json();
-      setOrder((prev) => prev ? { ...prev, review } : prev);
-      setReviewOpen(false);
-    }
-  }
-
   async function submitSellerResponse() {
     if (!order?.review || !sellerResponseText.trim()) return;
     setRespondingTo(true);
@@ -108,6 +94,13 @@ export default function OrderDetailPage() {
       setSellerResponseText("");
     }
     setRespondingTo(false);
+  }
+
+  function handleReviewSubmitted() {
+    fetch(`/api/orders/${params.id}`)
+      .then((r) => r.json())
+      .then(setOrder);
+    setReviewOpen(false);
   }
 
   const [now] = useState(() => Date.now());
@@ -184,32 +177,40 @@ export default function OrderDetailPage() {
             <button onClick={() => updateStatus("CANCELLED")} className="flex items-center gap-2 rounded-[12px] border-2 border-[#E17055]/20 bg-[#E17055]/5 px-5 py-2.5 text-[14px] font-semibold text-[#E17055] transition-all hover:bg-[#E17055]/10">בטל הזמנה</button>
           )}
           {isBuyer && order.status === "COMPLETED" && !order.review && (
-            <button onClick={() => setReviewOpen(true)} className="flex items-center gap-2 rounded-[12px] bg-[#FECA57] px-5 py-2.5 text-[14px] font-semibold text-[#2D3436] transition-all hover:bg-[#FECA57]/80">כתוב ביקורת</button>
+            <button onClick={() => setReviewOpen(true)} className="flex items-center gap-2 rounded-[12px] bg-[#FECA57] px-5 py-2.5 text-[14px] font-semibold text-[#2D3436] transition-all hover:bg-[#FECA57]/80">כתוב חוות דעת</button>
           )}
         </div>
 
-        {/* Review Display */}
+        {/* Existing Review Display */}
         {order.review && (
           <div className="mt-5 rounded-[12px] bg-[#FECA57]/10 p-4">
-            <div className="flex items-center gap-1 text-[#FECA57]">
-              {Array.from({ length: 5 }, (_, i) => (
-                <svg key={i} className={`h-5 w-5 ${i < order.review!.rating ? "text-[#FECA57]" : "text-[#E8ECF1]"}`} fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-                </svg>
-              ))}
+            <div className="flex items-center gap-2 mb-2">
+              <span className="text-[18px] font-bold text-[#F0932B]">{order.review.rating}/10</span>
+              <span className="text-[13px] text-[#B2BEC3]">ציון כללי</span>
             </div>
-            {(order.review.communicationRating || order.review.qualityRating || order.review.timelinessRating) && (
-              <div className="mt-2 flex flex-wrap gap-4 text-[12px] text-[#636E72]">
-                {order.review.communicationRating && <span>תקשורת: {order.review.communicationRating}/5</span>}
-                {order.review.qualityRating && <span>איכות: {order.review.qualityRating}/5</span>}
-                {order.review.timelinessRating && <span>זמנים: {order.review.timelinessRating}/5</span>}
+
+            {order.review.ratingAttitude != null && (
+              <div className="flex flex-wrap gap-3 mb-3 text-[12px]">
+                <span className="flex items-center gap-1 rounded-[8px] bg-white/60 px-2.5 py-1 text-[#636E72]">
+                  ⭐ איכות: <b className="text-[#2D3436]">{order.review.ratingQuality}/10</b>
+                </span>
+                <span className="flex items-center gap-1 rounded-[8px] bg-white/60 px-2.5 py-1 text-[#636E72]">
+                  🤝 יחס: <b className="text-[#2D3436]">{order.review.ratingAttitude}/10</b>
+                </span>
+                <span className="flex items-center gap-1 rounded-[8px] bg-white/60 px-2.5 py-1 text-[#636E72]">
+                  ⏰ זמנים: <b className="text-[#2D3436]">{order.review.ratingTimeliness}/10</b>
+                </span>
+                <span className="flex items-center gap-1 rounded-[8px] bg-white/60 px-2.5 py-1 text-[#636E72]">
+                  💰 מחיר: <b className="text-[#2D3436]">{order.review.ratingPrice}/10</b>
+                </span>
               </div>
             )}
-            <p className="mt-2 text-[14px] leading-relaxed text-[#2D3436]">{order.review.comment}</p>
+
+            <p className="text-[14px] leading-relaxed text-[#2D3436]">{order.review.comment}</p>
 
             {order.review.sellerResponse && (
               <div className="mt-3 rounded-[8px] bg-white/60 p-3">
-                <p className="text-[12px] font-semibold text-[#6C5CE7] mb-1">תגובת המוכר:</p>
+                <p className="text-[12px] font-semibold text-[#6C5CE7] mb-1">תגובת בעל המקצוע:</p>
                 <p className="text-[13px] text-[#636E72]">{order.review.sellerResponse}</p>
               </div>
             )}
@@ -219,7 +220,7 @@ export default function OrderDetailPage() {
                 <input
                   value={sellerResponseText}
                   onChange={(e) => setSellerResponseText(e.target.value)}
-                  placeholder="כתוב תגובה לביקורת..."
+                  placeholder="כתוב תגובה לחוות הדעת..."
                   className="flex-1 rounded-[8px] border border-[#E8ECF1] bg-white px-3 py-2 text-[13px] focus:border-[#6C5CE7] focus:outline-none"
                 />
                 <button
@@ -235,42 +236,14 @@ export default function OrderDetailPage() {
         )}
       </div>
 
-      {/* Review Form with Sub-ratings */}
+      {/* New Midrag-style Review Form */}
       {reviewOpen && (
-        <div className="mb-6 rounded-[16px] border border-[#E8ECF1] bg-[#FFFFFF] p-6 shadow-[0_2px_8px_rgba(108,92,231,0.06)]">
-          <h2 className="mb-4 text-[18px] font-bold text-[#2D3436]">כתוב ביקורת</h2>
-          <form onSubmit={submitReview} className="space-y-4">
-            <div>
-              <label className="mb-2 block text-[14px] font-medium text-[#636E72]">דירוג כללי</label>
-              <StarPicker value={rating} onChange={setRating} />
-            </div>
-            <div className="grid grid-cols-3 gap-4">
-              <div>
-                <label className="mb-2 block text-[13px] font-medium text-[#636E72]">תקשורת</label>
-                <StarPicker value={commRating} onChange={setCommRating} size="sm" />
-              </div>
-              <div>
-                <label className="mb-2 block text-[13px] font-medium text-[#636E72]">איכות</label>
-                <StarPicker value={qualRating} onChange={setQualRating} size="sm" />
-              </div>
-              <div>
-                <label className="mb-2 block text-[13px] font-medium text-[#636E72]">עמידה בזמנים</label>
-                <StarPicker value={timeRating} onChange={setTimeRating} size="sm" />
-              </div>
-            </div>
-            <textarea
-              value={comment}
-              onChange={(e) => setComment(e.target.value)}
-              required
-              rows={3}
-              placeholder="שתף את החוויה שלך..."
-              className="w-full rounded-[12px] border border-[#E8ECF1] bg-[#FAFBFF] px-4 py-3 text-[14px] text-[#2D3436] placeholder-[#B2BEC3] focus:border-[#6C5CE7] focus:outline-none focus:ring-2 focus:ring-[#6C5CE7]/20"
-            />
-            <div className="flex gap-3">
-              <button type="submit" className="rounded-[12px] bg-[#6C5CE7] px-5 py-2.5 text-[14px] font-semibold text-white hover:bg-[#5A4BD1]">שלח ביקורת</button>
-              <button type="button" onClick={() => setReviewOpen(false)} className="rounded-[12px] border border-[#E8ECF1] px-5 py-2.5 text-[14px] font-medium text-[#636E72] hover:bg-[#FAFBFF]">ביטול</button>
-            </div>
-          </form>
+        <div className="mb-6">
+          <ReviewForm
+            orderId={order.id}
+            sellerName={order.seller.name}
+            onSubmitted={handleReviewSubmitted}
+          />
         </div>
       )}
 
@@ -325,21 +298,6 @@ export default function OrderDetailPage() {
           </button>
         </form>
       </div>
-    </div>
-  );
-}
-
-function StarPicker({ value, onChange, size = "md" }: { value: number; onChange: (v: number) => void; size?: "sm" | "md" }) {
-  const cls = size === "sm" ? "h-5 w-5" : "h-8 w-8";
-  return (
-    <div className="flex gap-1">
-      {[1, 2, 3, 4, 5].map((n) => (
-        <button key={n} type="button" onClick={() => onChange(n)} className="transition-transform hover:scale-110">
-          <svg className={`${cls} ${n <= value ? "text-[#FECA57]" : "text-[#E8ECF1]"}`} fill="currentColor" viewBox="0 0 24 24">
-            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-          </svg>
-        </button>
-      ))}
     </div>
   );
 }
