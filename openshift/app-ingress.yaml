@@ -1,0 +1,26 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: daddy-app
+  namespace: daddy
+  labels:
+    app: daddy-app
+  annotations:
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: daddy.YOUR_DOMAIN.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: daddy-app
+                port:
+                  name: http
+  tls:
+    - hosts:
+        - daddy.YOUR_DOMAIN.com
+      secretName: daddy-tls

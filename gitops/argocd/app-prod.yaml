@@ -1,0 +1,19 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: daddy-prod
+  namespace: openshift-gitops
+  labels:
+    app.kubernetes.io/part-of: daddy
+spec:
+  project: daddy
+  source:
+    repoURL: https://github.com/ronamalka/Daddy.git
+    targetRevision: main
+    path: gitops/overlays/prod
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: daddy-prod
+  syncPolicy:
+    syncOptions:
+      - CreateNamespace=true

@@ -98,7 +98,6 @@ export default function RequestDetailPage() {
   }
 
   const svc = request.serviceSlug ? getServiceBySlug(request.serviceSlug) : null;
-  const isBuyer = session?.user?.id === request.buyer.id || session?.user?.email;
   const isSeller = session?.user?.role === "SELLER";
   const alreadyResponded = request.responses.some((r) => r.seller.id === session?.user?.id);
 

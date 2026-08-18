@@ -1,0 +1,31 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: daddy-db-migrate
+  namespace: daddy
+  labels:
+    app: daddy-app
+spec:
+  backoffLimit: 3
+  template:
+    metadata:
+      labels:
+        app: daddy-db-migrate
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: migrate
+          image: IMAGE_REGISTRY/daddy:latest
+          command: ["sh", "-c"]
+          args:
+            - |
+              npx prisma db push --skip-generate &&
+              echo "Schema pushed successfully" &&
+              npx tsx prisma/seed.ts &&
+              echo "Seed completed successfully"
+          env:
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secret
+                  key: DATABASE_URL

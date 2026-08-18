@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { SERVICE_CATEGORIES, ALL_SERVICES, getServiceBySlug } from "@/lib/services";
@@ -33,6 +33,63 @@ interface ServiceRequest {
 
 const DISTRICT_LIST = Object.entries(DISTRICTS).map(([code, name]) => ({ code: Number(code), name }));
 
+const DAD_QUOTES = [
+  "מי צריך יוטיוב כשיש אבאל׳ה?",
+  "תירגע, אני אסדר את זה.",
+  "אני לא חשמלאי, אבל אני יודע להחליף נורה.",
+  "יש לי חבר שמכיר חבר... או שאני פשוט אעשה את זה בעצמי.",
+  "זה לא מסובך, צריך רק פטיש ואמונה.",
+];
+
+const STATS = [
+  { number: "1,200+", label: "אבאל׳ות רשומים", icon: "👨‍🔧" },
+  { number: "8,500+", label: "עבודות שהושלמו", icon: "✅" },
+  { number: "4.8", label: "דירוג ממוצע", icon: "⭐" },
+  { number: "38", label: "שירותים שונים", icon: "🛠️" },
+];
+
+const TESTIMONIALS = [
+  {
+    name: "נועם ג׳",
+    text: "הזמנתי הרכבת ארון מאיקאה. האבאל׳ה הגיע עם ארגז כלים, בדיחות יבשות, ושוקולד. הארון עומד עד היום, הבדיחות פחות.",
+    service: "הרכבת רהיטים",
+    rating: 5,
+  },
+  {
+    name: "שירה מ׳",
+    text: "אבא שלי לא מבין בטכנולוגיה אז הזמנתי לו אבאל׳ה שילמד אותו וואטסאפ. עכשיו הוא שולח לי מימס בלי הפסקה.",
+    service: "עזרה טכנית",
+    rating: 5,
+  },
+  {
+    name: "עידו ק׳",
+    text: "חיפשתי מישהו שיוריד לי את חשבון הסלולר. האבאל׳ה חסך לי 80 שקל בחודש. קוראים לזה ROI של אבא.",
+    service: "הוזלת חשבונות",
+    rating: 5,
+  },
+];
+
+const HOW_IT_WORKS = [
+  {
+    step: "01",
+    title: "ספר לנו מה צריך",
+    desc: "חפש שירות, או תאר מה אתה צריך. בלי טפסים, בלי בירוקרטיה.",
+    icon: "🔍",
+  },
+  {
+    step: "02",
+    title: "מצא את האבאל׳ה שלך",
+    desc: "דפדף בין אבאל׳ות מנוסים באזור שלך, קרא ביקורות, ובחר.",
+    icon: "🤝",
+  },
+  {
+    step: "03",
+    title: "שב ותהנה",
+    desc: "האבאל׳ה יגיע, יסדר הכל, ואולי גם ישאיר טיפ או שניים לחיים.",
+    icon: "🛋️",
+  },
+];
+
 export default function HomePage() {
   const { data: session } = useSession();
   const [view, setView] = useState<"browse" | "results" | "requests">("browse");
@@ -53,34 +110,39 @@ export default function HomePage() {
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
 
+  const [dadQuote] = useState(() => DAD_QUOTES[Math.floor(Math.random() * DAD_QUOTES.length)]);
+
   const filteredServices = serviceSearch
     ? ALL_SERVICES.filter((s) => s.nameHe.includes(serviceSearch) || s.description.includes(serviceSearch))
     : selectedCategory
     ? ALL_SERVICES.filter((s) => s.category === selectedCategory)
     : [];
 
-  const searchProviders = useCallback(() => {
-    if (!selectedService) return;
-    setLoadingProviders(true);
-    const p = new URLSearchParams();
-    p.set("service", selectedService);
-    if (selectedDistrict) p.set("district", selectedDistrict);
-
-    fetch(`/api/providers?${p}`)
-      .then((r) => r.json())
-      .then((data) => {
-        setProviders(Array.isArray(data) ? data : []);
-        setLoadingProviders(false);
-        setView("results");
-      })
-      .catch(() => setLoadingProviders(false));
-  }, [selectedService, selectedDistrict]);
-
   useEffect(() => {
-    if (selectedService) {
-      searchProviders();
+    if (!selectedService) return;
+    let cancelled = false;
+
+    async function fetchProviders() {
+      setLoadingProviders(true);
+      const p = new URLSearchParams();
+      p.set("service", selectedService);
+      if (selectedDistrict) p.set("district", selectedDistrict);
+      try {
+        const r = await fetch(`/api/providers?${p}`);
+        const data = await r.json();
+        if (!cancelled) {
+          setProviders(Array.isArray(data) ? data : []);
+          setLoadingProviders(false);
+          setView("results");
+        }
+      } catch {
+        if (!cancelled) setLoadingProviders(false);
+      }
     }
-  }, [selectedService, selectedDistrict, searchProviders]);
+
+    fetchProviders();
+    return () => { cancelled = true; };
+  }, [selectedService, selectedDistrict]);
 
   function loadRequests(district?: string) {
     setLoadingRequests(true);
@@ -129,379 +191,650 @@ export default function HomePage() {
     setSubmitted(false);
   }
 
-  const selectedServiceDef = selectedService ? getServiceBySlug(selectedService) : null;
+  const selectedServiceDef = selectedService ? getServiceBySlug(selectedService) : undefined;
+
+  if (view === "results") {
+    return <ResultsView
+      providers={providers}
+      loadingProviders={loadingProviders}
+      selectedServiceDef={selectedServiceDef}
+      selectedDistrict={selectedDistrict}
+      setSelectedDistrict={setSelectedDistrict}
+      resetSearch={resetSearch}
+      session={session}
+      showRequestForm={showRequestForm}
+      setShowRequestForm={setShowRequestForm}
+      reqTitle={reqTitle}
+      setReqTitle={setReqTitle}
+      reqDesc={reqDesc}
+      setReqDesc={setReqDesc}
+      submitting={submitting}
+      submitRequest={submitRequest}
+      submitted={submitted}
+    />;
+  }
+
+  if (view === "requests") {
+    return <RequestsView
+      requests={requests}
+      loadingRequests={loadingRequests}
+      selectedDistrict={selectedDistrict}
+      setSelectedDistrict={setSelectedDistrict}
+      loadRequests={loadRequests}
+      resetSearch={resetSearch}
+    />;
+  }
 
   return (
-    <div>
-      {/* Hero */}
-      <section className="relative overflow-hidden py-16 md:py-20" style={{ background: "linear-gradient(135deg, #6C5CE7 0%, #A29BFE 40%, #00D2D3 100%)" }}>
-        <div className="absolute inset-0 overflow-hidden">
-          <div className="absolute -top-20 -left-20 h-80 w-80 rounded-full bg-white/10" />
-          <div className="absolute -bottom-40 -right-20 h-96 w-96 rounded-full bg-white/5" />
+    <div className="min-h-screen">
+      {/* ===== HERO SECTION ===== */}
+      <section className="relative overflow-hidden">
+        <div className="absolute inset-0" style={{ background: "linear-gradient(135deg, #1a1333 0%, #2D1B69 30%, #6C5CE7 70%, #00D2D3 100%)" }} />
+        <div className="absolute inset-0">
+          <div className="absolute top-10 left-[10%] h-72 w-72 rounded-full bg-[#6C5CE7]/20 blur-3xl" />
+          <div className="absolute bottom-10 right-[15%] h-64 w-64 rounded-full bg-[#00D2D3]/15 blur-3xl" />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-96 w-96 rounded-full bg-[#A29BFE]/10 blur-3xl" />
         </div>
-        <div className="relative mx-auto max-w-7xl px-4">
-          <h1 className="mb-3 text-[32px] font-bold leading-tight tracking-[-0.02em] text-white md:text-[44px]">
-            מה אתה צריך היום? 🫡
-          </h1>
-          <p className="mb-8 text-[16px] text-white/70 md:text-[18px]">
-            חפש שירות, בחר אזור, ומצא אבאל׳ה שיסדר לך הכל
-          </p>
 
-          {/* Service search bar */}
-          <div className="flex max-w-2xl overflow-hidden rounded-[16px] bg-white shadow-[0_8px_32px_rgba(0,0,0,0.15)]">
-            <div className="flex flex-1 items-center gap-3 px-5">
-              <svg className="h-5 w-5 flex-shrink-0 text-[#B2BEC3]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
-              </svg>
-              <input
-                type="text"
-                placeholder='חפש שירות... "הרכבת רהיטים", "תליית טלוויזיה"'
-                value={serviceSearch}
-                onChange={(e) => {
-                  setServiceSearch(e.target.value);
-                  if (!e.target.value) {
-                    setView("browse");
-                    setSelectedService("");
-                  }
-                }}
-                className="w-full py-4 text-[15px] text-[#2D3436] placeholder-[#B2BEC3] focus:outline-none"
-              />
+        <div className="relative mx-auto max-w-6xl px-4 pt-16 pb-20 md:pt-24 md:pb-28">
+          <div className="text-center">
+            <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 backdrop-blur-sm">
+              <span className="text-lg">💬</span>
+              <span className="text-[13px] text-white/70 font-medium">&quot;{dadQuote}&quot;</span>
             </div>
-            {serviceSearch && (
-              <button onClick={() => { setServiceSearch(""); setView("browse"); setSelectedService(""); }} className="px-4 text-[#B2BEC3] hover:text-[#636E72]">
-                <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            )}
-          </div>
 
-          {/* Search autocomplete dropdown */}
-          {serviceSearch && filteredServices.length > 0 && (
-            <div className="relative max-w-2xl">
-              <div className="absolute z-20 mt-2 max-h-60 w-full overflow-y-auto rounded-[12px] border border-[#E8ECF1] bg-white shadow-xl">
-                {filteredServices.slice(0, 15).map((svc) => (
+            <h1 className="mb-5 text-[38px] font-extrabold leading-[1.15] tracking-tight text-white md:text-[56px]">
+              כל אחד צריך
+              <br />
+              <span className="bg-gradient-to-l from-[#00D2D3] via-[#A29BFE] to-[#FECA57] bg-clip-text text-transparent">
+                אבאל׳ה טוב
+              </span>
+            </h1>
+
+            <p className="mx-auto mb-10 max-w-xl text-[16px] leading-relaxed text-white/60 md:text-[18px]">
+              שוק השירותים הכי ישראלי שיש. בעלי מקצוע מנוסים שיסדרו לך הכל — מהרכבת ארון ועד הוזלת חשבונות. בלי פילטרים, בלי בולשיט.
+            </p>
+
+            {/* Search bar */}
+            <div className="mx-auto max-w-2xl">
+              <div className="relative">
+                <div className="flex overflow-hidden rounded-2xl bg-white shadow-[0_20px_60px_rgba(0,0,0,0.3)]">
+                  <div className="flex flex-1 items-center gap-3 px-5">
+                    <svg className="h-5 w-5 flex-shrink-0 text-[#B2BEC3]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+                    </svg>
+                    <input
+                      type="text"
+                      placeholder='מה אתה צריך? נסה "הרכבת רהיטים" או "תליית טלוויזיה"'
+                      value={serviceSearch}
+                      onChange={(e) => {
+                        setServiceSearch(e.target.value);
+                        if (!e.target.value) {
+                          setView("browse");
+                          setSelectedService("");
+                        }
+                      }}
+                      className="w-full py-4 text-[15px] text-[#2D3436] placeholder-[#B2BEC3] focus:outline-none"
+                    />
+                  </div>
+                  {serviceSearch && (
+                    <button onClick={() => { setServiceSearch(""); setView("browse"); setSelectedService(""); }} className="px-4 text-[#B2BEC3] hover:text-[#636E72] transition-colors">
+                      <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    </button>
+                  )}
+                </div>
+
+                {/* Search autocomplete dropdown */}
+                {serviceSearch && filteredServices.length > 0 && (
+                  <div className="absolute z-20 mt-2 max-h-72 w-full overflow-y-auto rounded-xl border border-[#E8ECF1] bg-white shadow-2xl">
+                    {filteredServices.slice(0, 12).map((svc) => (
+                      <button
+                        key={svc.slug}
+                        onClick={() => {
+                          setSelectedService(svc.slug);
+                          setServiceSearch(svc.nameHe);
+                        }}
+                        className="flex w-full items-center gap-3 px-5 py-3.5 text-right transition-colors hover:bg-[#F0EEFF]"
+                      >
+                        <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#F0EEFF] text-[18px]">{svc.categoryIcon}</span>
+                        <div className="flex-1">
+                          <p className="text-[14px] font-semibold text-[#2D3436]">{svc.nameHe}</p>
+                          <p className="text-[12px] text-[#B2BEC3]">{svc.categoryName} · {svc.description}</p>
+                        </div>
+                        <svg className="h-4 w-4 text-[#B2BEC3]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+                        </svg>
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Quick tags */}
+              <div className="mt-5 flex flex-wrap items-center justify-center gap-2 text-[13px]">
+                <span className="text-white/40">פופולרי:</span>
+                {["הרכבת רהיטים", "תליית טלוויזיה", "הוזלת חשבונות", "עזרה בהובלה", "עזרה טכנית לגיל השלישי"].map((tag) => (
                   <button
-                    key={svc.slug}
+                    key={tag}
                     onClick={() => {
-                      setSelectedService(svc.slug);
-                      setServiceSearch(svc.nameHe);
+                      setServiceSearch(tag);
+                      const match = ALL_SERVICES.find((s) => s.nameHe === tag);
+                      if (match) {
+                        setSelectedService(match.slug);
+                        setServiceSearch(match.nameHe);
+                      }
                     }}
-                    className="flex w-full items-center gap-3 px-4 py-3 text-right hover:bg-[#F0EEFF] transition-colors"
+                    className="rounded-full border border-white/15 bg-white/5 px-3.5 py-1.5 text-white/70 backdrop-blur-sm transition-all hover:bg-white/10 hover:text-white hover:border-white/25"
                   >
-                    <span className="text-[16px]">{svc.categoryIcon}</span>
-                    <div>
-                      <p className="text-[14px] font-medium text-[#2D3436]">{svc.nameHe}</p>
-                      <p className="text-[11px] text-[#B2BEC3]">{svc.categoryName} · {svc.description}</p>
-                    </div>
+                    {tag}
                   </button>
                 ))}
               </div>
             </div>
-          )}
+          </div>
+        </div>
 
-          {/* Quick tags */}
-          <div className="mt-6 flex flex-wrap items-center gap-2 text-[13px]">
-            <span className="text-white/50">פופולרי:</span>
-            {["הרכבת רהיטים", "תליית טלוויזיה", "הוזלת חשבונות", "עזרה בהובלה", "עזרה טכנית לגיל השלישי"].map((tag) => (
-              <button
-                key={tag}
-                onClick={() => {
-                  setServiceSearch(tag);
-                  const match = ALL_SERVICES.find((s) => s.nameHe === tag);
-                  if (match) {
-                    setSelectedService(match.slug);
-                    setServiceSearch(match.nameHe);
-                  }
-                }}
-                className="rounded-[9999px] border border-white/20 px-3.5 py-1.5 text-white/80 transition-all hover:bg-white/10 hover:text-white"
-              >
-                {tag}
-              </button>
+        {/* Wave divider */}
+        <div className="absolute bottom-0 left-0 right-0">
+          <svg viewBox="0 0 1440 60" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full">
+            <path d="M0 60V30C240 0 480 0 720 30C960 60 1200 60 1440 30V60H0Z" fill="var(--color-bg)" />
+          </svg>
+        </div>
+      </section>
+
+      {/* ===== STATS BAR ===== */}
+      <section className="relative z-10 -mt-4">
+        <div className="mx-auto max-w-5xl px-4">
+          <div className="grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-4">
+            {STATS.map((stat) => (
+              <div key={stat.label} className="flex items-center gap-3 rounded-2xl bg-white px-4 py-4 shadow-[0_4px_20px_rgba(108,92,231,0.08)] border border-[#E8ECF1]/60">
+                <span className="text-2xl">{stat.icon}</span>
+                <div>
+                  <p className="text-[20px] font-extrabold text-[#2D3436] leading-none">{stat.number}</p>
+                  <p className="text-[12px] text-[#B2BEC3] mt-0.5">{stat.label}</p>
+                </div>
+              </div>
             ))}
           </div>
         </div>
       </section>
 
-      <div className="mx-auto max-w-7xl px-4 py-8">
-        {/* Browse mode — service categories */}
-        {view === "browse" && !serviceSearch && (
-          <>
-            <h2 className="mb-6 text-[20px] font-bold text-[#2D3436]">מה אתה מחפש?</h2>
-            <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
-              {SERVICE_CATEGORIES.map((cat) => (
+      {/* ===== CATEGORIES ===== */}
+      <section className="mx-auto max-w-6xl px-4 pt-16 pb-4">
+        <div className="mb-8 text-center">
+          <h2 className="text-[28px] font-extrabold text-[#2D3436] md:text-[32px]">מה צריך לסדר?</h2>
+          <p className="mt-2 text-[15px] text-[#636E72]">תבחר קטגוריה ותראה מה האבאל׳ות יודעים לעשות</p>
+        </div>
+
+        <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
+          {SERVICE_CATEGORIES.map((cat) => (
+            <button
+              key={cat.slug}
+              onClick={() => setSelectedCategory(selectedCategory === cat.slug ? "" : cat.slug)}
+              className={`group relative overflow-hidden rounded-2xl border-2 p-6 text-right transition-all duration-300 ${
+                selectedCategory === cat.slug
+                  ? "border-[#6C5CE7] bg-gradient-to-br from-[#6C5CE7] to-[#A29BFE] shadow-[0_8px_30px_rgba(108,92,231,0.25)]"
+                  : "border-[#E8ECF1] bg-white hover:border-[#A29BFE]/40 hover:shadow-[0_8px_24px_rgba(108,92,231,0.1)] hover:-translate-y-1"
+              }`}
+            >
+              <div className={`absolute -bottom-6 -left-6 h-24 w-24 rounded-full transition-all duration-300 ${
+                selectedCategory === cat.slug ? "bg-white/10" : "bg-[#F0EEFF]/50 group-hover:bg-[#F0EEFF]"
+              }`} />
+              <span className="relative text-[36px] block mb-3">{cat.icon}</span>
+              <p className={`relative text-[15px] font-bold ${selectedCategory === cat.slug ? "text-white" : "text-[#2D3436]"}`}>
+                {cat.nameHe}
+              </p>
+              <p className={`relative mt-1 text-[12px] ${selectedCategory === cat.slug ? "text-white/70" : "text-[#B2BEC3]"}`}>
+                {cat.services.length} שירותים
+              </p>
+            </button>
+          ))}
+        </div>
+
+        {/* Services under selected category */}
+        {selectedCategory && (
+          <div className="mt-8 animate-in fade-in slide-in-from-top-2 duration-300">
+            <div className="flex items-center gap-3 mb-5">
+              <h3 className="text-[18px] font-bold text-[#2D3436]">
+                {SERVICE_CATEGORIES.find((c) => c.slug === selectedCategory)?.nameHe}
+              </h3>
+              <div className="h-px flex-1 bg-[#E8ECF1]" />
+            </div>
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+              {ALL_SERVICES.filter((s) => s.category === selectedCategory).map((svc) => (
                 <button
-                  key={cat.slug}
-                  onClick={() => setSelectedCategory(selectedCategory === cat.slug ? "" : cat.slug)}
-                  className={`group rounded-[16px] border-2 p-5 text-right transition-all ${
-                    selectedCategory === cat.slug
-                      ? "border-[#6C5CE7] bg-[#F0EEFF] shadow-[0_4px_16px_rgba(108,92,231,0.15)]"
-                      : "border-[#E8ECF1] bg-white hover:border-[#A29BFE]/40 hover:shadow-[0_4px_16px_rgba(108,92,231,0.08)]"
-                  }`}
+                  key={svc.slug}
+                  onClick={() => {
+                    setSelectedService(svc.slug);
+                    setServiceSearch(svc.nameHe);
+                  }}
+                  className="group flex items-center gap-4 rounded-xl border border-[#E8ECF1] bg-white p-4 text-right transition-all hover:border-[#6C5CE7] hover:shadow-[0_4px_16px_rgba(108,92,231,0.1)] hover:-translate-y-0.5"
                 >
-                  <span className="text-[28px]">{cat.icon}</span>
-                  <p className={`mt-2 text-[15px] font-semibold ${selectedCategory === cat.slug ? "text-[#6C5CE7]" : "text-[#2D3436]"}`}>
-                    {cat.nameHe}
-                  </p>
-                  <p className="mt-0.5 text-[12px] text-[#B2BEC3]">{cat.services.length} שירותים</p>
+                  <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#F0EEFF] text-[20px] transition-colors group-hover:bg-[#6C5CE7] group-hover:text-white group-hover:grayscale-0">
+                    {svc.categoryIcon}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-[14px] font-semibold text-[#2D3436] group-hover:text-[#6C5CE7]">{svc.nameHe}</p>
+                    <p className="text-[12px] text-[#B2BEC3] truncate">{svc.description}</p>
+                  </div>
+                  <svg className="h-5 w-5 text-[#B2BEC3] group-hover:text-[#6C5CE7] transition-transform group-hover:-translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+                  </svg>
                 </button>
               ))}
             </div>
+          </div>
+        )}
+      </section>
 
-            {/* Services under selected category */}
-            {selectedCategory && (
-              <div className="mt-6">
-                <h3 className="mb-4 text-[16px] font-bold text-[#2D3436]">
-                  {SERVICE_CATEGORIES.find((c) => c.slug === selectedCategory)?.nameHe}
-                </h3>
-                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
-                  {ALL_SERVICES.filter((s) => s.category === selectedCategory).map((svc) => (
-                    <button
-                      key={svc.slug}
-                      onClick={() => {
-                        setSelectedService(svc.slug);
-                        setServiceSearch(svc.nameHe);
-                      }}
-                      className="group flex items-center gap-3 rounded-[12px] border border-[#E8ECF1] bg-white p-4 text-right transition-all hover:border-[#6C5CE7] hover:shadow-[0_4px_12px_rgba(108,92,231,0.1)]"
-                    >
-                      <div className="flex-1">
-                        <p className="text-[14px] font-semibold text-[#2D3436] group-hover:text-[#6C5CE7]">{svc.nameHe}</p>
-                        <p className="text-[12px] text-[#B2BEC3]">{svc.description}</p>
-                      </div>
-                      <svg className="h-5 w-5 text-[#B2BEC3] group-hover:text-[#6C5CE7]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
-                      </svg>
-                    </button>
+      {/* ===== HOW IT WORKS ===== */}
+      <section className="mx-auto max-w-6xl px-4 py-16">
+        <div className="mb-10 text-center">
+          <h2 className="text-[28px] font-extrabold text-[#2D3436] md:text-[32px]">איך זה עובד?</h2>
+          <p className="mt-2 text-[15px] text-[#636E72]">שלושה צעדים פשוטים, ואתה מסודר</p>
+        </div>
+
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+          {HOW_IT_WORKS.map((item, i) => (
+            <div key={i} className="group relative rounded-2xl bg-white border border-[#E8ECF1] p-7 transition-all hover:shadow-[0_8px_30px_rgba(108,92,231,0.1)] hover:-translate-y-1">
+              <div className="absolute -top-4 -right-2 flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-[#6C5CE7] to-[#A29BFE] text-[14px] font-extrabold text-white shadow-[0_4px_12px_rgba(108,92,231,0.3)]">
+                {item.step}
+              </div>
+              <span className="text-[40px] block mb-4">{item.icon}</span>
+              <h3 className="text-[18px] font-bold text-[#2D3436] mb-2">{item.title}</h3>
+              <p className="text-[14px] leading-relaxed text-[#636E72]">{item.desc}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* ===== TESTIMONIALS ===== */}
+      <section className="bg-gradient-to-br from-[#F0EEFF] via-[#FAFBFF] to-[#E8F8F8] py-16">
+        <div className="mx-auto max-w-6xl px-4">
+          <div className="mb-10 text-center">
+            <h2 className="text-[28px] font-extrabold text-[#2D3436] md:text-[32px]">מה אומרים עלינו</h2>
+            <p className="mt-2 text-[15px] text-[#636E72]">אנשים אמיתיים, ביקורות אמיתיות (ובדיחות יבשות)</p>
+          </div>
+
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+            {TESTIMONIALS.map((t, i) => (
+              <div key={i} className="relative rounded-2xl bg-white p-6 shadow-[0_4px_20px_rgba(108,92,231,0.06)] border border-[#E8ECF1]/60">
+                <div className="absolute -top-3 right-6 flex h-8 w-8 items-center justify-center rounded-full bg-[#FECA57] text-[14px] shadow-sm">
+                  &ldquo;
+                </div>
+                <div className="flex gap-0.5 mb-3 mt-1">
+                  {Array.from({ length: t.rating }).map((_, j) => (
+                    <svg key={j} className="h-4 w-4 text-[#FECA57]" fill="currentColor" viewBox="0 0 20 20">
+                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                    </svg>
                   ))}
                 </div>
-              </div>
-            )}
-
-            {/* Service requests section for sellers */}
-            {session?.user?.role === "SELLER" && (
-              <div className="mt-10">
-                <div className="flex items-center justify-between mb-4">
-                  <h2 className="text-[20px] font-bold text-[#2D3436]">בקשות שירות פתוחות</h2>
-                  <button
-                    onClick={() => { setView("requests"); loadRequests(); }}
-                    className="text-[13px] font-semibold text-[#6C5CE7] hover:text-[#5A4BD1]"
-                  >
-                    הצג הכל ←
-                  </button>
+                <p className="text-[14px] leading-relaxed text-[#2D3436] mb-4">{t.text}</p>
+                <div className="flex items-center justify-between border-t border-[#E8ECF1] pt-3">
+                  <div className="flex items-center gap-2">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-[#6C5CE7] to-[#A29BFE] text-[12px] font-bold text-white">
+                      {t.name[0]}
+                    </div>
+                    <span className="text-[13px] font-semibold text-[#2D3436]">{t.name}</span>
+                  </div>
+                  <span className="rounded-full bg-[#F0EEFF] px-3 py-1 text-[11px] font-semibold text-[#6C5CE7]">
+                    {t.service}
+                  </span>
                 </div>
-                <p className="text-[14px] text-[#636E72]">לקוחות מחפשים עזרה — הגב וסגור עבודה</p>
               </div>
-            )}
-          </>
-        )}
+            ))}
+          </div>
+        </div>
+      </section>
 
-        {/* Results mode — providers list */}
-        {view === "results" && (
-          <>
-            <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
-              <div>
-                <button onClick={resetSearch} className="text-[13px] text-[#6C5CE7] hover:text-[#5A4BD1] mb-2">→ חזרה לכל השירותים</button>
-                <h2 className="text-[20px] font-bold text-[#2D3436]">
-                  {selectedServiceDef?.nameHe || "תוצאות"}
-                </h2>
-                <p className="text-[14px] text-[#636E72]">{selectedServiceDef?.description}</p>
-              </div>
-            </div>
-
-            {/* Area filter */}
-            <div className="mb-6 flex flex-wrap gap-2">
+      {/* ===== CTA / OPEN REQUESTS FOR SELLERS ===== */}
+      {session?.user?.role === "SELLER" ? (
+        <section className="mx-auto max-w-6xl px-4 py-16">
+          <div className="overflow-hidden rounded-2xl bg-gradient-to-br from-[#2D1B69] to-[#6C5CE7] p-8 md:p-12 text-center relative">
+            <div className="absolute top-0 left-0 h-64 w-64 rounded-full bg-white/5 -translate-x-1/3 -translate-y-1/3" />
+            <div className="absolute bottom-0 right-0 h-48 w-48 rounded-full bg-[#00D2D3]/10 translate-x-1/4 translate-y-1/4" />
+            <div className="relative">
+              <h2 className="text-[24px] font-extrabold text-white md:text-[28px]">יש לך ידיים טובות?</h2>
+              <p className="mt-3 text-[15px] text-white/60 max-w-md mx-auto">
+                לקוחות מחפשים עזרה עכשיו. צפה בבקשות פתוחות, הגב, וסגור עבודה.
+              </p>
               <button
-                onClick={() => setSelectedDistrict("")}
-                className={`rounded-[9999px] px-4 py-2 text-[13px] font-semibold transition-all ${
-                  !selectedDistrict ? "bg-[#6C5CE7] text-white" : "border border-[#E8ECF1] bg-white text-[#636E72] hover:text-[#6C5CE7]"
-                }`}
+                onClick={() => { setView("requests"); loadRequests(); }}
+                className="mt-6 inline-flex items-center gap-2 rounded-xl bg-white px-6 py-3 text-[14px] font-bold text-[#6C5CE7] shadow-[0_4px_16px_rgba(0,0,0,0.15)] transition-all hover:shadow-[0_8px_24px_rgba(0,0,0,0.2)] hover:-translate-y-0.5"
               >
-                כל הארץ
+                צפה בבקשות פתוחות
+                <svg className="h-4 w-4 rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+                </svg>
               </button>
-              {DISTRICT_LIST.map((d) => (
-                <button
-                  key={d.code}
-                  onClick={() => setSelectedDistrict(String(d.code))}
-                  className={`rounded-[9999px] px-4 py-2 text-[13px] font-semibold transition-all ${
-                    selectedDistrict === String(d.code) ? "bg-[#6C5CE7] text-white" : "border border-[#E8ECF1] bg-white text-[#636E72] hover:text-[#6C5CE7]"
-                  }`}
-                >
-                  {d.name}
-                </button>
-              ))}
             </div>
+          </div>
+        </section>
+      ) : (
+        <section className="mx-auto max-w-6xl px-4 py-16">
+          <div className="overflow-hidden rounded-2xl bg-gradient-to-br from-[#2D1B69] to-[#6C5CE7] p-8 md:p-12 text-center relative">
+            <div className="absolute top-0 left-0 h-64 w-64 rounded-full bg-white/5 -translate-x-1/3 -translate-y-1/3" />
+            <div className="absolute bottom-0 right-0 h-48 w-48 rounded-full bg-[#00D2D3]/10 translate-x-1/4 translate-y-1/4" />
+            <div className="relative">
+              <h2 className="text-[24px] font-extrabold text-white md:text-[28px]">
+                {session?.user ? "לא מצאת מה שחיפשת?" : "מוכן להיות אבאל׳ה?"}
+              </h2>
+              <p className="mt-3 text-[15px] text-white/60 max-w-md mx-auto">
+                {session?.user
+                  ? "פרסם בקשת שירות ואבאל׳ות מנוסים ייצרו איתך קשר עם הצעות."
+                  : "הצטרף לקהילה של בעלי מקצוע מנוסים, קבל עבודות, ותעשה את מה שאתה אוהב."
+                }
+              </p>
+              <Link
+                href={session?.user ? "/gigs/create" : "/register"}
+                className="mt-6 inline-flex items-center gap-2 rounded-xl bg-white px-6 py-3 text-[14px] font-bold text-[#6C5CE7] shadow-[0_4px_16px_rgba(0,0,0,0.15)] transition-all hover:shadow-[0_8px_24px_rgba(0,0,0,0.2)] hover:-translate-y-0.5"
+              >
+                {session?.user ? "צור שירות חדש" : "הצטרף עכשיו — בחינם"}
+                <svg className="h-4 w-4 rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+                </svg>
+              </Link>
+            </div>
+          </div>
+        </section>
+      )}
 
-            {loadingProviders ? (
-              <div className="flex items-center justify-center py-16">
-                <div className="h-10 w-10 animate-spin rounded-full border-4 border-[#F0EEFF] border-t-[#6C5CE7]" />
-              </div>
-            ) : providers.length > 0 ? (
-              <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-                {providers.map((p) => (
-                  <Link
-                    key={p.id}
-                    href={`/sellers/${p.id}`}
-                    className="group rounded-[16px] border border-[#E8ECF1] bg-white p-5 transition-all hover:shadow-[0_8px_24px_rgba(108,92,231,0.12)] hover:border-[#A29BFE]/40"
-                  >
-                    <div className="flex items-center gap-3 mb-3">
-                      <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-[#6C5CE7] to-[#A29BFE] text-[16px] font-bold text-white">
-                        {p.name[0]}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-[15px] font-semibold text-[#2D3436] group-hover:text-[#6C5CE7]">{p.name}</p>
-                        {p.serviceAreas.length > 0 && (
-                          <p className="text-[12px] text-[#B2BEC3] truncate">
-                            {p.serviceAreas.map((a) => a.cityName || a.districtName).join(", ")}
-                          </p>
-                        )}
-                      </div>
-                    </div>
-                    {p.bio && <p className="mb-3 text-[13px] text-[#636E72] line-clamp-2">{p.bio}</p>}
-                    <div className="flex items-center gap-4 text-[12px] text-[#B2BEC3]">
-                      <span>{p.completedOrders} הזמנות</span>
-                      <span>{p.reviewCount} ביקורות</span>
-                      <span>{p.services.length} שירותים</span>
-                    </div>
-                  </Link>
-                ))}
-              </div>
-            ) : (
-              <div className="rounded-[16px] border border-[#E8ECF1] bg-white p-8 text-center">
-                <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-[#F0EEFF]">
-                  <svg className="h-8 w-8 text-[#A29BFE]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M15.182 16.318A4.486 4.486 0 0012.016 15a4.486 4.486 0 00-3.198 1.318M21 12a9 9 0 11-18 0 9 9 0 0118 0zM9.75 9.75c0 .414-.168.75-.375.75S9 10.164 9 9.75 9.168 9 9.375 9s.375.336.375.75zm-.375 0h.008v.015h-.008V9.75zm5.625 0c0 .414-.168.75-.375.75s-.375-.336-.375-.75.168-.75.375-.75.375.336.375.75zm-.375 0h.008v.015h-.008V9.75z" />
-                  </svg>
+      {/* ===== FOOTER ===== */}
+      <footer className="border-t border-[#E8ECF1] bg-white py-10">
+        <div className="mx-auto max-w-6xl px-4">
+          <div className="flex flex-col items-center gap-4 md:flex-row md:justify-between">
+            <div>
+              <span className="text-gradient-hero text-xl font-extrabold">אבאל׳ה</span>
+              <p className="text-[13px] text-[#B2BEC3] mt-1">שוק השירותים של ישראל</p>
+            </div>
+            <div className="flex items-center gap-6 text-[13px] text-[#636E72]">
+              <Link href="/" className="hover:text-[#6C5CE7] transition-colors">עיון</Link>
+              <Link href="/register" className="hover:text-[#6C5CE7] transition-colors">הרשמה</Link>
+              <Link href="/login" className="hover:text-[#6C5CE7] transition-colors">התחברות</Link>
+            </div>
+            <p className="text-[12px] text-[#B2BEC3]">
+              2024 אבאל׳ה. כל הזכויות שמורות (חוץ מזכות לנוח ביום שישי).
+            </p>
+          </div>
+        </div>
+      </footer>
+    </div>
+  );
+}
+
+/* ===== RESULTS VIEW ===== */
+function ResultsView({
+  providers, loadingProviders, selectedServiceDef, selectedDistrict, setSelectedDistrict,
+  resetSearch, session, showRequestForm, setShowRequestForm,
+  reqTitle, setReqTitle, reqDesc, setReqDesc, submitting, submitRequest, submitted,
+}: {
+  providers: Provider[];
+  loadingProviders: boolean;
+  selectedServiceDef: ReturnType<typeof getServiceBySlug>;
+  selectedDistrict: string;
+  setSelectedDistrict: (v: string) => void;
+  resetSearch: () => void;
+  session: ReturnType<typeof useSession>["data"];
+  showRequestForm: boolean;
+  setShowRequestForm: (v: boolean) => void;
+  reqTitle: string;
+  setReqTitle: (v: string) => void;
+  reqDesc: string;
+  setReqDesc: (v: string) => void;
+  submitting: boolean;
+  submitRequest: () => void;
+  submitted: boolean;
+}) {
+  return (
+    <div className="min-h-screen">
+      {/* Results header */}
+      <div className="border-b border-[#E8ECF1] bg-white">
+        <div className="mx-auto max-w-6xl px-4 py-6">
+          <button onClick={resetSearch} className="mb-3 flex items-center gap-1 text-[13px] text-[#6C5CE7] hover:text-[#5A4BD1] transition-colors">
+            <svg className="h-4 w-4 rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+            </svg>
+            חזרה לכל השירותים
+          </button>
+          <h1 className="text-[24px] font-extrabold text-[#2D3436]">
+            {selectedServiceDef?.nameHe || "תוצאות"}
+          </h1>
+          {selectedServiceDef?.description && (
+            <p className="text-[14px] text-[#636E72] mt-1">{selectedServiceDef.description}</p>
+          )}
+        </div>
+      </div>
+
+      <div className="mx-auto max-w-6xl px-4 py-6">
+        {/* Area filter */}
+        <div className="mb-6 flex flex-wrap gap-2">
+          <button
+            onClick={() => setSelectedDistrict("")}
+            className={`rounded-full px-4 py-2 text-[13px] font-semibold transition-all ${
+              !selectedDistrict ? "bg-[#6C5CE7] text-white shadow-[0_2px_8px_rgba(108,92,231,0.3)]" : "border border-[#E8ECF1] bg-white text-[#636E72] hover:text-[#6C5CE7] hover:border-[#A29BFE]/40"
+            }`}
+          >
+            כל הארץ
+          </button>
+          {DISTRICT_LIST.map((d) => (
+            <button
+              key={d.code}
+              onClick={() => setSelectedDistrict(String(d.code))}
+              className={`rounded-full px-4 py-2 text-[13px] font-semibold transition-all ${
+                selectedDistrict === String(d.code) ? "bg-[#6C5CE7] text-white shadow-[0_2px_8px_rgba(108,92,231,0.3)]" : "border border-[#E8ECF1] bg-white text-[#636E72] hover:text-[#6C5CE7] hover:border-[#A29BFE]/40"
+              }`}
+            >
+              {d.name}
+            </button>
+          ))}
+        </div>
+
+        {loadingProviders ? (
+          <div className="flex flex-col items-center justify-center py-20">
+            <div className="h-12 w-12 animate-spin rounded-full border-4 border-[#F0EEFF] border-t-[#6C5CE7]" />
+            <p className="mt-4 text-[14px] text-[#B2BEC3]">מחפש אבאל׳ות...</p>
+          </div>
+        ) : providers.length > 0 ? (
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {providers.map((p) => (
+              <Link
+                key={p.id}
+                href={`/sellers/${p.id}`}
+                className="group rounded-2xl border border-[#E8ECF1] bg-white p-5 transition-all duration-300 hover:shadow-[0_12px_32px_rgba(108,92,231,0.12)] hover:border-[#A29BFE]/40 hover:-translate-y-1"
+              >
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-[#6C5CE7] to-[#A29BFE] text-[18px] font-bold text-white shadow-[0_4px_12px_rgba(108,92,231,0.2)]">
+                    {p.name[0]}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-[16px] font-bold text-[#2D3436] group-hover:text-[#6C5CE7] transition-colors">{p.name}</p>
+                    {p.serviceAreas.length > 0 && (
+                      <p className="text-[12px] text-[#B2BEC3] truncate">
+                        {p.serviceAreas.map((a) => a.cityName || a.districtName).join(", ")}
+                      </p>
+                    )}
+                  </div>
                 </div>
-                <p className="text-[16px] font-semibold text-[#2D3436] mb-1">לא נמצאו אבאל׳ות לשירות הזה</p>
-                <p className="text-[14px] text-[#636E72] mb-6">
-                  {selectedDistrict ? "נסה לחפש בכל הארץ, או פרסם בקשה ואבאל׳ות ייצרו איתך קשר" : "פרסם בקשה ואבאל׳ות באזור שלך ייצרו איתך קשר"}
-                </p>
+                {p.bio && <p className="mb-4 text-[13px] text-[#636E72] line-clamp-2 leading-relaxed">{p.bio}</p>}
+                <div className="flex items-center gap-3 text-[12px]">
+                  <span className="inline-flex items-center gap-1 rounded-full bg-[#F0EEFF] px-2.5 py-1 text-[#6C5CE7] font-semibold">
+                    {p.completedOrders} הזמנות
+                  </span>
+                  <span className="inline-flex items-center gap-1 rounded-full bg-[#FFF8E6] px-2.5 py-1 text-[#D4A600] font-semibold">
+                    {p.reviewCount} ביקורות
+                  </span>
+                  <span className="inline-flex items-center gap-1 rounded-full bg-[#E8F8F8] px-2.5 py-1 text-[#00B894] font-semibold">
+                    {p.services.length} שירותים
+                  </span>
+                </div>
+              </Link>
+            ))}
+          </div>
+        ) : (
+          <div className="rounded-2xl border border-[#E8ECF1] bg-white p-12 text-center">
+            <div className="mx-auto mb-5 flex h-20 w-20 items-center justify-center rounded-2xl bg-[#F0EEFF]">
+              <span className="text-[36px]">🤷‍♂️</span>
+            </div>
+            <p className="text-[18px] font-bold text-[#2D3436] mb-2">לא נמצאו אבאל׳ות לשירות הזה</p>
+            <p className="text-[14px] text-[#636E72] mb-8 max-w-sm mx-auto">
+              {selectedDistrict ? "נסה לחפש בכל הארץ, או פרסם בקשה ואבאל׳ות ייצרו איתך קשר" : "פרסם בקשה ואבאל׳ות באזור שלך ייצרו איתך קשר"}
+            </p>
 
-                {session?.user ? (
-                  !showRequestForm ? (
+            {session?.user ? (
+              !showRequestForm ? (
+                <button
+                  onClick={() => setShowRequestForm(true)}
+                  className="inline-flex items-center gap-2 rounded-xl bg-[#6C5CE7] px-6 py-3 text-[14px] font-bold text-white shadow-[0_4px_16px_rgba(108,92,231,0.3)] transition-all hover:bg-[#5A4BD1] hover:shadow-[0_8px_24px_rgba(108,92,231,0.4)]"
+                >
+                  פרסם בקשת שירות
+                </button>
+              ) : (
+                <div className="mx-auto max-w-md text-right">
+                  <input
+                    value={reqTitle}
+                    onChange={(e) => setReqTitle(e.target.value)}
+                    placeholder="מה אתה צריך? (כותרת קצרה)"
+                    className="mb-3 w-full rounded-xl border border-[#E8ECF1] bg-[#FAFBFF] px-4 py-3 text-[14px] text-[#2D3436] placeholder-[#B2BEC3] focus:border-[#6C5CE7] focus:outline-none focus:ring-2 focus:ring-[#6C5CE7]/10"
+                  />
+                  <textarea
+                    value={reqDesc}
+                    onChange={(e) => setReqDesc(e.target.value)}
+                    placeholder="תאר בפירוט מה צריך לעשות, מתי, ותקציב משוער..."
+                    rows={4}
+                    className="mb-3 w-full rounded-xl border border-[#E8ECF1] bg-[#FAFBFF] px-4 py-3 text-[14px] text-[#2D3436] placeholder-[#B2BEC3] focus:border-[#6C5CE7] focus:outline-none focus:ring-2 focus:ring-[#6C5CE7]/10 resize-none"
+                  />
+                  <div className="flex gap-3">
+                    <button onClick={() => setShowRequestForm(false)} className="flex-1 rounded-xl border border-[#E8ECF1] py-2.5 text-[14px] font-medium text-[#636E72] hover:bg-[#FAFBFF]">ביטול</button>
                     <button
-                      onClick={() => setShowRequestForm(true)}
-                      className="rounded-[12px] bg-[#6C5CE7] px-6 py-3 text-[14px] font-semibold text-white transition-all hover:bg-[#5A4BD1]"
+                      onClick={submitRequest}
+                      disabled={submitting || !reqTitle.trim() || !reqDesc.trim()}
+                      className="flex-1 rounded-xl bg-[#6C5CE7] py-2.5 text-[14px] font-bold text-white hover:bg-[#5A4BD1] disabled:opacity-40 transition-all"
                     >
-                      פרסם בקשת שירות
+                      {submitting ? "שולח..." : "פרסם בקשה"}
                     </button>
-                  ) : (
-                    <div className="mx-auto max-w-md text-right">
-                      <input
-                        value={reqTitle}
-                        onChange={(e) => setReqTitle(e.target.value)}
-                        placeholder="מה אתה צריך? (כותרת קצרה)"
-                        className="mb-3 w-full rounded-[12px] border border-[#E8ECF1] bg-[#FAFBFF] px-4 py-3 text-[14px] text-[#2D3436] placeholder-[#B2BEC3] focus:border-[#6C5CE7] focus:outline-none"
-                      />
-                      <textarea
-                        value={reqDesc}
-                        onChange={(e) => setReqDesc(e.target.value)}
-                        placeholder="תאר בפירוט מה צריך לעשות, מתי, ותקציב משוער..."
-                        rows={4}
-                        className="mb-3 w-full rounded-[12px] border border-[#E8ECF1] bg-[#FAFBFF] px-4 py-3 text-[14px] text-[#2D3436] placeholder-[#B2BEC3] focus:border-[#6C5CE7] focus:outline-none resize-none"
-                      />
-                      <div className="flex gap-3">
-                        <button onClick={() => setShowRequestForm(false)} className="flex-1 rounded-[12px] border border-[#E8ECF1] py-2.5 text-[14px] font-medium text-[#636E72]">ביטול</button>
-                        <button
-                          onClick={submitRequest}
-                          disabled={submitting || !reqTitle.trim() || !reqDesc.trim()}
-                          className="flex-1 rounded-[12px] bg-[#6C5CE7] py-2.5 text-[14px] font-semibold text-white hover:bg-[#5A4BD1] disabled:opacity-40"
-                        >
-                          {submitting ? "שולח..." : "פרסם בקשה"}
-                        </button>
-                      </div>
-                    </div>
-                  )
-                ) : (
-                  <Link href="/register" className="rounded-[12px] bg-[#6C5CE7] px-6 py-3 text-[14px] font-semibold text-white transition-all hover:bg-[#5A4BD1]">
-                    הירשם כדי לפרסם בקשה
-                  </Link>
-                )}
-              </div>
+                  </div>
+                </div>
+              )
+            ) : (
+              <Link href="/register" className="inline-flex items-center gap-2 rounded-xl bg-[#6C5CE7] px-6 py-3 text-[14px] font-bold text-white shadow-[0_4px_16px_rgba(108,92,231,0.3)] transition-all hover:bg-[#5A4BD1]">
+                הירשם כדי לפרסם בקשה
+              </Link>
             )}
-
-            {submitted && (
-              <div className="mt-4 rounded-[12px] bg-[#00B894]/10 px-4 py-3 text-[14px] font-medium text-[#00B894] text-center">
-                הבקשה פורסמה בהצלחה! אבאל׳ות באזור שלך יוכלו ליצור איתך קשר.
-              </div>
-            )}
-          </>
+          </div>
         )}
 
-        {/* Requests mode — for sellers */}
-        {view === "requests" && (
-          <>
-            <div className="mb-6">
-              <button onClick={resetSearch} className="text-[13px] text-[#6C5CE7] hover:text-[#5A4BD1] mb-2">→ חזרה לדף הראשי</button>
-              <h2 className="text-[20px] font-bold text-[#2D3436]">בקשות שירות פתוחות</h2>
-              <p className="text-[14px] text-[#636E72]">לקוחות מחפשים עזרה — הגב, נהל מו״מ, וסגור עבודה</p>
-            </div>
+        {submitted && (
+          <div className="mt-4 rounded-xl bg-[#00B894]/10 border border-[#00B894]/20 px-5 py-4 text-[14px] font-medium text-[#00B894] text-center">
+            הבקשה פורסמה בהצלחה! אבאל׳ות באזור שלך יוכלו ליצור איתך קשר.
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
 
-            {/* Area filter for requests */}
-            <div className="mb-6 flex flex-wrap gap-2">
-              <button
-                onClick={() => { setSelectedDistrict(""); loadRequests(""); }}
-                className={`rounded-[9999px] px-4 py-2 text-[13px] font-semibold transition-all ${
-                  !selectedDistrict ? "bg-[#6C5CE7] text-white" : "border border-[#E8ECF1] bg-white text-[#636E72]"
-                }`}
-              >
-                כל הארץ
-              </button>
-              {DISTRICT_LIST.map((d) => (
-                <button
-                  key={d.code}
-                  onClick={() => { setSelectedDistrict(String(d.code)); loadRequests(String(d.code)); }}
-                  className={`rounded-[9999px] px-4 py-2 text-[13px] font-semibold transition-all ${
-                    selectedDistrict === String(d.code) ? "bg-[#6C5CE7] text-white" : "border border-[#E8ECF1] bg-white text-[#636E72]"
-                  }`}
-                >
-                  {d.name}
-                </button>
-              ))}
-            </div>
+/* ===== REQUESTS VIEW ===== */
+function RequestsView({
+  requests, loadingRequests, selectedDistrict, setSelectedDistrict, loadRequests, resetSearch,
+}: {
+  requests: ServiceRequest[];
+  loadingRequests: boolean;
+  selectedDistrict: string;
+  setSelectedDistrict: (v: string) => void;
+  loadRequests: (d?: string) => void;
+  resetSearch: () => void;
+}) {
+  return (
+    <div className="min-h-screen">
+      <div className="border-b border-[#E8ECF1] bg-white">
+        <div className="mx-auto max-w-6xl px-4 py-6">
+          <button onClick={resetSearch} className="mb-3 flex items-center gap-1 text-[13px] text-[#6C5CE7] hover:text-[#5A4BD1] transition-colors">
+            <svg className="h-4 w-4 rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+            </svg>
+            חזרה לדף הראשי
+          </button>
+          <h1 className="text-[24px] font-extrabold text-[#2D3436]">בקשות שירות פתוחות</h1>
+          <p className="text-[14px] text-[#636E72] mt-1">לקוחות מחפשים עזרה — הגב, נהל מו״מ, וסגור עבודה</p>
+        </div>
+      </div>
 
-            {loadingRequests ? (
-              <div className="flex items-center justify-center py-16">
-                <div className="h-10 w-10 animate-spin rounded-full border-4 border-[#F0EEFF] border-t-[#6C5CE7]" />
-              </div>
-            ) : requests.length > 0 ? (
-              <div className="space-y-4">
-                {requests.map((req) => {
-                  const svc = req.serviceSlug ? getServiceBySlug(req.serviceSlug) : null;
-                  return (
-                    <div key={req.id} className="rounded-[16px] border border-[#E8ECF1] bg-white p-5 transition-all hover:shadow-[0_4px_12px_rgba(108,92,231,0.08)]">
-                      <div className="flex items-start justify-between mb-2">
-                        <div>
-                          <h3 className="text-[16px] font-semibold text-[#2D3436]">{req.title}</h3>
-                          <div className="flex items-center gap-2 mt-1 text-[12px] text-[#B2BEC3]">
-                            <span>{req.buyer.name}</span>
-                            {req.districtName && <span>· {req.cityName || req.districtName}</span>}
-                            {svc && <span>· {svc.nameHe}</span>}
-                            <span>· {new Date(req.createdAt).toLocaleDateString("he-IL")}</span>
-                          </div>
-                        </div>
-                        <span className="rounded-[9999px] bg-[#00D2D3]/10 px-3 py-1 text-[11px] font-semibold text-[#00B894]">
-                          {req._count.responses} הצעות
+      <div className="mx-auto max-w-6xl px-4 py-6">
+        {/* Area filter */}
+        <div className="mb-6 flex flex-wrap gap-2">
+          <button
+            onClick={() => { setSelectedDistrict(""); loadRequests(""); }}
+            className={`rounded-full px-4 py-2 text-[13px] font-semibold transition-all ${
+              !selectedDistrict ? "bg-[#6C5CE7] text-white shadow-[0_2px_8px_rgba(108,92,231,0.3)]" : "border border-[#E8ECF1] bg-white text-[#636E72] hover:text-[#6C5CE7]"
+            }`}
+          >
+            כל הארץ
+          </button>
+          {DISTRICT_LIST.map((d) => (
+            <button
+              key={d.code}
+              onClick={() => { setSelectedDistrict(String(d.code)); loadRequests(String(d.code)); }}
+              className={`rounded-full px-4 py-2 text-[13px] font-semibold transition-all ${
+                selectedDistrict === String(d.code) ? "bg-[#6C5CE7] text-white shadow-[0_2px_8px_rgba(108,92,231,0.3)]" : "border border-[#E8ECF1] bg-white text-[#636E72] hover:text-[#6C5CE7]"
+              }`}
+            >
+              {d.name}
+            </button>
+          ))}
+        </div>
+
+        {loadingRequests ? (
+          <div className="flex flex-col items-center justify-center py-20">
+            <div className="h-12 w-12 animate-spin rounded-full border-4 border-[#F0EEFF] border-t-[#6C5CE7]" />
+            <p className="mt-4 text-[14px] text-[#B2BEC3]">טוען בקשות...</p>
+          </div>
+        ) : requests.length > 0 ? (
+          <div className="space-y-4">
+            {requests.map((req) => {
+              const svc = req.serviceSlug ? getServiceBySlug(req.serviceSlug) : null;
+              return (
+                <div key={req.id} className="group rounded-2xl border border-[#E8ECF1] bg-white p-6 transition-all hover:shadow-[0_8px_24px_rgba(108,92,231,0.08)] hover:border-[#A29BFE]/40">
+                  <div className="flex items-start justify-between mb-3">
+                    <div>
+                      <h3 className="text-[16px] font-bold text-[#2D3436] group-hover:text-[#6C5CE7] transition-colors">{req.title}</h3>
+                      <div className="flex items-center gap-2 mt-1.5 text-[12px] text-[#B2BEC3]">
+                        <span className="inline-flex items-center gap-1">
+                          <svg className="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0" />
+                          </svg>
+                          {req.buyer.name}
                         </span>
+                        {req.districtName && <span>· {req.cityName || req.districtName}</span>}
+                        {svc && <span>· {svc.nameHe}</span>}
+                        <span>· {new Date(req.createdAt).toLocaleDateString("he-IL")}</span>
                       </div>
-                      <p className="text-[14px] text-[#636E72] line-clamp-3 mb-3">{req.description}</p>
-                      <Link
-                        href={`/requests/${req.id}`}
-                        className="text-[13px] font-semibold text-[#6C5CE7] hover:text-[#5A4BD1]"
-                      >
-                        צפה בבקשה והגב ←
-                      </Link>
                     </div>
-                  );
-                })}
-              </div>
-            ) : (
-              <div className="rounded-[16px] border border-[#E8ECF1] bg-white p-8 text-center">
-                <p className="text-[16px] font-medium text-[#2D3436]">אין בקשות פתוחות כרגע</p>
-                <p className="mt-1 text-[14px] text-[#B2BEC3]">בדוק שוב מאוחר יותר</p>
-              </div>
-            )}
-          </>
+                    <span className="rounded-full bg-[#00D2D3]/10 px-3 py-1.5 text-[11px] font-bold text-[#00B894]">
+                      {req._count.responses} הצעות
+                    </span>
+                  </div>
+                  <p className="text-[14px] text-[#636E72] line-clamp-2 mb-4 leading-relaxed">{req.description}</p>
+                  <Link
+                    href={`/requests/${req.id}`}
+                    className="inline-flex items-center gap-1 text-[13px] font-bold text-[#6C5CE7] hover:text-[#5A4BD1] transition-colors"
+                  >
+                    צפה בבקשה והגב
+                    <svg className="h-4 w-4 rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+                    </svg>
+                  </Link>
+                </div>
+              );
+            })}
+          </div>
+        ) : (
+          <div className="rounded-2xl border border-[#E8ECF1] bg-white p-12 text-center">
+            <span className="text-[40px] block mb-3">📭</span>
+            <p className="text-[16px] font-bold text-[#2D3436]">אין בקשות פתוחות כרגע</p>
+            <p className="mt-1 text-[14px] text-[#B2BEC3]">בדוק שוב מאוחר יותר</p>
+          </div>
         )}
       </div>
     </div>

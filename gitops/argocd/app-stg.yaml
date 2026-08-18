@@ -1,0 +1,22 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: daddy-stg
+  namespace: openshift-gitops
+  labels:
+    app.kubernetes.io/part-of: daddy
+spec:
+  project: daddy
+  source:
+    repoURL: https://github.com/ronamalka/Daddy.git
+    targetRevision: main
+    path: gitops/overlays/stg
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: daddy-stg
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

@@ -1,0 +1,19 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: daddy
+  namespace: openshift-gitops
+spec:
+  description: Daddy Marketplace
+  sourceRepos:
+    - "https://github.com/ronamalka/Daddy.git"
+  destinations:
+    - namespace: daddy-dev
+      server: https://kubernetes.default.svc
+    - namespace: daddy-stg
+      server: https://kubernetes.default.svc
+    - namespace: daddy-prod
+      server: https://kubernetes.default.svc
+  clusterResourceWhitelist:
+    - group: ""
+      kind: Namespace
