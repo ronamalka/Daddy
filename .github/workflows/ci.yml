@@ -62,7 +62,7 @@ jobs:
         id: tag
         run: |
           if [ "${{ github.ref }}" = "refs/heads/main" ]; then
-            echo "env=stg" >> $GITHUB_OUTPUT
+            echo "env=dev" >> $GITHUB_OUTPUT
           elif [ "${{ github.ref }}" = "refs/heads/develop" ]; then
             echo "env=dev" >> $GITHUB_OUTPUT
           fi
@@ -95,7 +95,7 @@ jobs:
         id: env
         run: |
           if [ "${{ github.ref }}" = "refs/heads/main" ]; then
-            echo "overlay=stg" >> $GITHUB_OUTPUT
+            echo "overlay=dev" >> $GITHUB_OUTPUT
           elif [ "${{ github.ref }}" = "refs/heads/develop" ]; then
             echo "overlay=dev" >> $GITHUB_OUTPUT
           fi

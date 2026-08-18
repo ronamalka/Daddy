@@ -18,6 +18,13 @@ patches:
         path: /spec/template/spec/containers/0/image
         value: quay.io/rh_ee_rmalka/daddy:dev
   - target:
+      kind: Secret
+      name: daddy-app-secret
+    patch: |
+      - op: replace
+        path: /stringData/AUTH_URL
+        value: https://daddy-app-daddy-dev.apps.cluster-cpgwh.cpgwh.sandbox765.opentlc.com
+  - target:
       kind: PersistentVolumeClaim
       name: postgres-data
     patch: |
