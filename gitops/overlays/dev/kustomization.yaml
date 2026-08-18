@@ -23,7 +23,7 @@ patches:
     patch: |
       - op: replace
         path: /stringData/AUTH_URL
-        value: https://daddy-app-daddy-dev.apps.cluster-cpgwh.cpgwh.sandbox765.opentlc.com
+        value: https://daddy-app-daddy-dev.apps.cluster-x8bxx.x8bxx.sandbox2963.opentlc.com
   - target:
       kind: PersistentVolumeClaim
       name: postgres-data
