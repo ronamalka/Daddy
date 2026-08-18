@@ -16,13 +16,13 @@ interface Gig {
 
 const CATEGORIES = [
   { label: "הכל", slug: "" },
-  { label: "גרפיקה ועיצוב", slug: "graphics-design" },
-  { label: "תכנות וטכנולוגיה", slug: "programming-tech" },
-  { label: "שיווק דיגיטלי", slug: "digital-marketing" },
-  { label: "וידאו ואנימציה", slug: "video-animation" },
-  { label: "כתיבה ותרגום", slug: "writing-translation" },
-  { label: "מוזיקה ואודיו", slug: "music-audio" },
-  { label: "עסקים", slug: "business" },
+  { label: "🔧 תיקונים ותחזוקה", slug: "home-maintenance" },
+  { label: "🚗 רכב ותחבורה", slug: "car-transport" },
+  { label: "📞 מיקוח ובירוקרטיה", slug: "negotiation-bureaucracy" },
+  { label: "🌿 גינון וארגון", slug: "garden-yard" },
+  { label: "🎓 ייעוץ והדרכה", slug: "consulting-training" },
+  { label: "📦 הובלות ושינוע", slug: "moving-lifting" },
+  { label: "💻 טכנולוגיה", slug: "tech-support" },
 ];
 
 export default function MarketplacePage() {
@@ -62,7 +62,7 @@ export default function MarketplacePage() {
             עם מה שאתה צריך היום 🫡
           </h1>
           <p className="mb-8 text-[16px] text-white/70 md:text-[18px]">
-            הפרויקטים שלך יושלמו בידי פרילנסרים מוכשרים מכל העולם
+            אבאל׳ות מנוסים שיסדרו לך הכל – מהברגה ועד בירוקרטיה
           </p>
 
           <div className="flex max-w-2xl overflow-hidden rounded-[16px] bg-white shadow-[0_8px_32px_rgba(0,0,0,0.15)]">
@@ -72,7 +72,7 @@ export default function MarketplacePage() {
               </svg>
               <input
                 type="text"
-                placeholder='נסה "עיצוב אתר"'
+                placeholder='נסה "הרכבת רהיטים" או "בדיקת דירה"'
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 className="w-full py-4 text-[15px] text-[#2D3436] placeholder-[#B2BEC3] focus:outline-none"
@@ -85,7 +85,7 @@ export default function MarketplacePage() {
 
           <div className="mt-6 flex flex-wrap items-center gap-2 text-[13px]">
             <span className="text-white/50">פופולרי:</span>
-            {["עיצוב אתר", "עיצוב לוגו", "עריכת וידאו", "קידום אתרים"].map((tag) => (
+            {["הרכבת ארון", "תליית טלוויזיה", "טסט לרכב", "הוזלת חשבונות"].map((tag) => (
               <button
                 key={tag}
                 onClick={() => setSearch(tag)}

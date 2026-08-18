@@ -5,13 +5,13 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 const CATEGORIES = [
-  { id: "graphics-design", name: "גרפיקה ועיצוב" },
-  { id: "programming-tech", name: "תכנות וטכנולוגיה" },
-  { id: "digital-marketing", name: "שיווק דיגיטלי" },
-  { id: "video-animation", name: "וידאו ואנימציה" },
-  { id: "writing-translation", name: "כתיבה ותרגום" },
-  { id: "music-audio", name: "מוזיקה ואודיו" },
-  { id: "business", name: "עסקים" },
+  { id: "home-maintenance", name: "🔧 תיקונים ותחזוקת הבית" },
+  { id: "car-transport", name: "🚗 רכב ותחבורה" },
+  { id: "negotiation-bureaucracy", name: "📞 מיקוח ובירוקרטיה" },
+  { id: "garden-yard", name: "🌿 גינון, חצר וארגון" },
+  { id: "consulting-training", name: "🎓 ייעוץ, הדרכה וסיוע אישי" },
+  { id: "moving-lifting", name: "📦 הובלות ושינוע" },
+  { id: "tech-support", name: "💻 טכנולוגיה ומחשבים" },
 ];
 
 const TIERS = ["BASIC", "STANDARD", "PREMIUM"] as const;

@@ -34,11 +34,11 @@ describe("System Tests — Public API", () => {
     });
 
     it("filters by category", async () => {
-      const { status, body } = await fetchApi("/api/gigs?category=graphics-design");
+      const { status, body } = await fetchApi("/api/gigs?category=home-maintenance");
       expect(status).toBe(200);
       expect(Array.isArray(body)).toBe(true);
       for (const gig of body) {
-        expect(gig.category.slug).toBe("graphics-design");
+        expect(gig.category.slug).toBe("home-maintenance");
       }
     });
 
@@ -61,7 +61,7 @@ describe("System Tests — Public API", () => {
     });
 
     it("returns gig detail for valid seed gig", async () => {
-      const { status, body } = await fetchApi("/api/gigs/seed-gig-1");
+      const { status, body } = await fetchApi("/api/gigs/seed-gig-ikea");
       if (status === 200) {
         expect(body).toHaveProperty("title");
         expect(body).toHaveProperty("seller");
