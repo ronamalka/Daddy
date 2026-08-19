@@ -15,23 +15,6 @@ spec:
       labels:
         app: daddy-app
     spec:
-      initContainers:
-        - name: db-migrate
-          image: quay.io/rh_ee_rmalka/daddy:latest
-          command: ["sh", "-c", "node node_modules/prisma/build/cli.js db push --url $DATABASE_URL --accept-data-loss"]
-          env:
-            - name: DATABASE_URL
-              valueFrom:
-                secretKeyRef:
-                  name: postgres-secret
-                  key: DATABASE_URL
-          resources:
-            requests:
-              memory: "64Mi"
-              cpu: "10m"
-            limits:
-              memory: "256Mi"
-              cpu: "200m"
       containers:
         - name: daddy-app
           image: quay.io/rh_ee_rmalka/daddy:latest
