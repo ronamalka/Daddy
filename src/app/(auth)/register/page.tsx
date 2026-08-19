@@ -90,7 +90,7 @@ export default function RegisterPage() {
     await signIn("google", { callbackUrl: "/" });
   }
 
-  const inputClass = "w-full rounded-[12px] border border-[#E8ECF1] bg-[#FAFBFF] px-4 py-3 text-[16px] text-[#2D3436] placeholder-[#B2BEC3] transition-all focus:border-[#6C5CE7] focus:outline-none focus:ring-2 focus:ring-[#6C5CE7]/20";
+  const inputClass = "w-full rounded-xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface-elevated))] px-4 py-3 text-[16px] text-[rgb(var(--color-text))] placeholder-[rgb(var(--color-text-muted))] transition-all focus:border-[rgb(var(--color-primary))] focus:outline-none focus:ring-2 focus:ring-[rgba(var(--color-primary),0.2)]";
 
   const stepTitles = [
     "צור חשבון חדש",
@@ -109,33 +109,33 @@ export default function RegisterPage() {
       <div className="mb-8 text-center lg:hidden">
         <h2
           className="text-3xl font-extrabold tracking-[-0.02em] bg-clip-text text-transparent"
-          style={{ backgroundImage: "linear-gradient(135deg, #6C5CE7 0%, #A29BFE 50%, #00D2D3 100%)" }}
+          style={{ backgroundImage: "linear-gradient(135deg, rgb(var(--color-primary)) 0%, rgb(var(--color-primary-light)) 50%, rgb(var(--color-accent)) 100%)" }}
         >
           אבאל׳ה
         </h2>
       </div>
 
-      <div className="rounded-[16px] bg-[#FFFFFF] p-8 shadow-[0_4px_16px_rgba(108,92,231,0.08)]">
+      <div className="rounded-2xl bg-[rgb(var(--color-surface))] p-8 shadow-[0_4px_16px_rgba(var(--color-primary),0.08)]">
         <div className="mb-6 flex items-center justify-center gap-2">
           {Array.from({ length: totalSteps }, (_, i) => i + 1).map((s) => (
             <div
               key={s}
               className={`h-2 rounded-full transition-all ${
-                s === step ? "w-8 bg-[#6C5CE7]" : s < step ? "w-8 bg-[#A29BFE]" : "w-8 bg-[#E8ECF1]"
+                s === step ? "w-8 bg-[rgb(var(--color-primary))]" : s < step ? "w-8 bg-[rgb(var(--color-primary-light))]" : "w-8 bg-[rgb(var(--color-border))]"
               }`}
             />
           ))}
         </div>
 
-        <h1 className="mb-2 text-center text-[24px] font-bold tracking-[-0.01em] text-[#2D3436]">
+        <h1 className="mb-2 text-center text-[24px] font-bold tracking-[-0.01em] text-[rgb(var(--color-text))]">
           {stepTitles[step - 1]}
         </h1>
-        <p className="mb-6 text-center text-[14px] text-[#636E72]">
+        <p className="mb-6 text-center text-[14px] text-[rgb(var(--color-text-secondary))]">
           {stepDescs[step - 1]}
         </p>
 
         {error && (
-          <div className="mb-4 flex items-center gap-2 rounded-[12px] bg-[#E17055]/10 px-4 py-3 text-[14px] text-[#E17055]">
+          <div className="mb-4 flex items-center gap-2 rounded-xl bg-[rgba(var(--color-error),0.1)] px-4 py-3 text-[14px] text-[rgb(var(--color-error))]">
             <svg className="h-4 w-4 flex-shrink-0" viewBox="0 0 20 20" fill="currentColor">
               <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
             </svg>
@@ -149,7 +149,7 @@ export default function RegisterPage() {
               type="button"
               onClick={handleGoogleSignUp}
               disabled={googleLoading || loading}
-              className="flex w-full items-center justify-center gap-3 rounded-[12px] border border-[#E8ECF1] bg-[#FAFBFF] py-3.5 text-[16px] font-medium text-[#2D3436] transition-all hover:bg-[#F0F0F5] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex w-full items-center justify-center gap-3 rounded-xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface-elevated))] py-3.5 text-[16px] font-medium text-[rgb(var(--color-text))] transition-all hover:bg-[rgb(var(--color-bg))] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {googleLoading ? (
                 <svg className="h-5 w-5 animate-spin" viewBox="0 0 24 24" fill="none">
@@ -168,52 +168,52 @@ export default function RegisterPage() {
             </button>
 
             <div className="flex items-center gap-3">
-              <div className="h-px flex-1 bg-[#E8ECF1]" />
-              <span className="text-[13px] text-[#B2BEC3]">או</span>
-              <div className="h-px flex-1 bg-[#E8ECF1]" />
+              <div className="h-px flex-1 bg-[rgb(var(--color-border))]" />
+              <span className="text-[13px] text-[rgb(var(--color-text-muted))]">או</span>
+              <div className="h-px flex-1 bg-[rgb(var(--color-border))]" />
             </div>
 
           <form onSubmit={(e) => { e.preventDefault(); handleNext(); }} className="space-y-5">
             <div>
-              <label htmlFor="name" className="mb-1.5 block text-[14px] font-medium text-[#2D3436]">שם מלא</label>
+              <label htmlFor="name" className="mb-1.5 block text-[14px] font-medium text-[rgb(var(--color-text))]">שם מלא</label>
               <input id="name" required placeholder="ישראל ישראלי" value={name} onChange={(e) => setName(e.target.value)} className={inputClass} />
             </div>
             <div>
-              <label htmlFor="email" className="mb-1.5 block text-[14px] font-medium text-[#2D3436]">אימייל</label>
+              <label htmlFor="email" className="mb-1.5 block text-[14px] font-medium text-[rgb(var(--color-text))]">אימייל</label>
               <input id="email" type="email" required placeholder="you@example.com" dir="ltr" value={email} onChange={(e) => setEmail(e.target.value)} className={inputClass} />
             </div>
             <div>
-              <label htmlFor="password" className="mb-1.5 block text-[14px] font-medium text-[#2D3436]">סיסמה</label>
+              <label htmlFor="password" className="mb-1.5 block text-[14px] font-medium text-[rgb(var(--color-text))]">סיסמה</label>
               <input id="password" type="password" required minLength={6} placeholder="לפחות 6 תווים" value={password} onChange={(e) => setPassword(e.target.value)} className={inputClass} />
             </div>
             <div>
-              <label className="mb-1.5 block text-[14px] font-medium text-[#2D3436]">אני רוצה</label>
+              <label className="mb-1.5 block text-[14px] font-medium text-[rgb(var(--color-text))]">אני רוצה</label>
               <div className="grid grid-cols-2 gap-3">
                 <label className="relative cursor-pointer">
                   <input type="radio" name="role" value="BUYER" checked={role === "BUYER"} onChange={() => setRole("BUYER")} className="peer sr-only" />
-                  <div className="rounded-[12px] border-2 border-[#E8ECF1] bg-[#FAFBFF] p-4 text-center transition-all peer-checked:border-[#6C5CE7] peer-checked:bg-[#F0EEFF]">
+                  <div className="rounded-xl border-2 border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface-elevated))] p-4 text-center transition-all peer-checked:border-[rgb(var(--color-primary))] peer-checked:bg-[rgba(var(--color-primary),0.1)]">
                     <div className="mb-1">
-                      <svg className="mx-auto h-7 w-7 text-[#636E72]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
+                      <svg className="mx-auto h-7 w-7 text-[rgb(var(--color-text-secondary))]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
                         <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 00-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 00-16.536-1.84M7.5 14.25L5.106 5.272M6 20.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm12.75 0a.75.75 0 11-1.5 0 .75.75 0 011.5 0z" />
                       </svg>
                     </div>
-                    <span className="text-[14px] font-semibold text-[#2D3436]">לקנות שירותים</span>
+                    <span className="text-[14px] font-semibold text-[rgb(var(--color-text))]">לקנות שירותים</span>
                   </div>
                 </label>
                 <label className="relative cursor-pointer">
                   <input type="radio" name="role" value="SELLER" checked={role === "SELLER"} onChange={() => setRole("SELLER")} className="peer sr-only" />
-                  <div className="rounded-[12px] border-2 border-[#E8ECF1] bg-[#FAFBFF] p-4 text-center transition-all peer-checked:border-[#6C5CE7] peer-checked:bg-[#F0EEFF]">
+                  <div className="rounded-xl border-2 border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface-elevated))] p-4 text-center transition-all peer-checked:border-[rgb(var(--color-primary))] peer-checked:bg-[rgba(var(--color-primary),0.1)]">
                     <div className="mb-1">
-                      <svg className="mx-auto h-7 w-7 text-[#636E72]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
+                      <svg className="mx-auto h-7 w-7 text-[rgb(var(--color-text-secondary))]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
                         <path strokeLinecap="round" strokeLinejoin="round" d="M20.25 14.15v4.25c0 1.094-.787 2.036-1.872 2.18-2.087.277-4.216.42-6.378.42s-4.291-.143-6.378-.42c-1.085-.144-1.872-1.086-1.872-2.18v-4.25m16.5 0a2.18 2.18 0 00.75-1.661V8.706c0-1.081-.768-2.015-1.837-2.175a48.114 48.114 0 00-3.413-.387m4.5 8.006c-.194.165-.42.295-.673.38A23.978 23.978 0 0112 15.75c-2.648 0-5.195-.429-7.577-1.22a2.016 2.016 0 01-.673-.38m0 0A2.18 2.18 0 013 12.489V8.706c0-1.081.768-2.015 1.837-2.175a48.111 48.111 0 013.413-.387m7.5 0V5.25A2.25 2.25 0 0013.5 3h-3a2.25 2.25 0 00-2.25 2.25v.894m7.5 0a48.667 48.667 0 00-7.5 0M12 12.75h.008v.008H12v-.008z" />
                       </svg>
                     </div>
-                    <span className="text-[14px] font-semibold text-[#2D3436]">למכור שירותים</span>
+                    <span className="text-[14px] font-semibold text-[rgb(var(--color-text))]">למכור שירותים</span>
                   </div>
                 </label>
               </div>
             </div>
-            <button type="submit" className="w-full rounded-[12px] bg-[#6C5CE7] py-3.5 text-[16px] font-semibold text-white shadow-[0_4px_16px_rgba(108,92,231,0.08)] transition-all hover:bg-[#5A4BD1] active:scale-[0.98]">
+            <button type="submit" className="w-full rounded-xl bg-[rgb(var(--color-primary))] py-3.5 text-[16px] font-semibold text-white shadow-[0_4px_16px_rgba(var(--color-primary),0.08)] transition-all hover:bg-[rgb(var(--color-primary-hover))] active:scale-[0.98]">
               המשך
             </button>
           </form>
@@ -234,20 +234,20 @@ export default function RegisterPage() {
             )}
 
             <div className="flex gap-3">
-              <button type="button" onClick={() => setStep(1)} className="flex-1 rounded-[12px] border border-[#E8ECF1] py-3.5 text-[16px] font-semibold text-[#636E72] transition-all hover:bg-[#FAFBFF]">
+              <button type="button" onClick={() => setStep(1)} className="flex-1 rounded-xl border border-[rgb(var(--color-border))] py-3.5 text-[16px] font-semibold text-[rgb(var(--color-text-secondary))] transition-all hover:bg-[rgb(var(--color-surface-elevated))]">
                 חזרה
               </button>
               <button
                 type="button"
                 onClick={handleNext}
                 disabled={loading}
-                className="flex-1 rounded-[12px] bg-[#6C5CE7] py-3.5 text-[16px] font-semibold text-white shadow-[0_4px_16px_rgba(108,92,231,0.08)] transition-all hover:bg-[#5A4BD1] active:scale-[0.98] disabled:opacity-50"
+                className="flex-1 rounded-xl bg-[rgb(var(--color-primary))] py-3.5 text-[16px] font-semibold text-white shadow-[0_4px_16px_rgba(var(--color-primary),0.08)] transition-all hover:bg-[rgb(var(--color-primary-hover))] active:scale-[0.98] disabled:opacity-50"
               >
                 {role === "SELLER" ? "המשך" : loading ? "יוצר חשבון..." : "צור חשבון"}
               </button>
             </div>
 
-            <button type="button" onClick={handleSubmit} disabled={loading} className="w-full text-center text-[13px] text-[#B2BEC3] hover:text-[#636E72] transition-colors">
+            <button type="button" onClick={handleSubmit} disabled={loading} className="w-full text-center text-[13px] text-[rgb(var(--color-text-muted))] hover:text-[rgb(var(--color-text-secondary))] transition-colors">
               דלג, אבחר אחר כך
             </button>
           </div>
@@ -260,20 +260,20 @@ export default function RegisterPage() {
             </div>
 
             {selectedServices.length > 0 && (
-              <p className="text-center text-[13px] text-[#6C5CE7] font-medium">
+              <p className="text-center text-[13px] text-[rgb(var(--color-primary))] font-medium">
                 {selectedServices.length} שירותים נבחרו
               </p>
             )}
 
             <div className="flex gap-3">
-              <button type="button" onClick={() => setStep(2)} className="flex-1 rounded-[12px] border border-[#E8ECF1] py-3.5 text-[16px] font-semibold text-[#636E72] transition-all hover:bg-[#FAFBFF]">
+              <button type="button" onClick={() => setStep(2)} className="flex-1 rounded-xl border border-[rgb(var(--color-border))] py-3.5 text-[16px] font-semibold text-[rgb(var(--color-text-secondary))] transition-all hover:bg-[rgb(var(--color-surface-elevated))]">
                 חזרה
               </button>
               <button
                 type="button"
                 onClick={handleSubmit}
                 disabled={loading}
-                className="flex-1 rounded-[12px] bg-[#6C5CE7] py-3.5 text-[16px] font-semibold text-white shadow-[0_4px_16px_rgba(108,92,231,0.08)] transition-all hover:bg-[#5A4BD1] active:scale-[0.98] disabled:opacity-50"
+                className="flex-1 rounded-xl bg-[rgb(var(--color-primary))] py-3.5 text-[16px] font-semibold text-white shadow-[0_4px_16px_rgba(var(--color-primary),0.08)] transition-all hover:bg-[rgb(var(--color-primary-hover))] active:scale-[0.98] disabled:opacity-50"
               >
                 {loading ? (
                   <span className="flex items-center justify-center gap-2">
@@ -287,16 +287,16 @@ export default function RegisterPage() {
               </button>
             </div>
 
-            <button type="button" onClick={handleSubmit} disabled={loading} className="w-full text-center text-[13px] text-[#B2BEC3] hover:text-[#636E72] transition-colors">
+            <button type="button" onClick={handleSubmit} disabled={loading} className="w-full text-center text-[13px] text-[rgb(var(--color-text-muted))] hover:text-[rgb(var(--color-text-secondary))] transition-colors">
               דלג, אבחר אחר כך
             </button>
           </div>
         )}
 
         <div className="mt-6 text-center">
-          <p className="text-[14px] text-[#636E72]">
+          <p className="text-[14px] text-[rgb(var(--color-text-secondary))]">
             כבר חבר?{" "}
-            <Link href="/login" className="font-semibold text-[#6C5CE7] transition-colors hover:text-[#5A4BD1]">
+            <Link href="/login" className="font-semibold text-[rgb(var(--color-primary))] transition-colors hover:text-[rgb(var(--color-primary-hover))]">
               התחבר
             </Link>
           </p>

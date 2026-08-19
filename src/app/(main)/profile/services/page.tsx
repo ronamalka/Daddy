@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { ServicePicker } from "@/components/service-picker";
+import { Check } from "lucide-react";
 
 export default function ProfileServicesPage() {
   const { data: session } = useSession();
@@ -54,7 +55,7 @@ export default function ProfileServicesPage() {
   if (!session) {
     return (
       <div className="flex flex-col items-center justify-center py-20">
-        <p className="text-[16px] text-[#636E72]">התחבר כדי לנהל שירותים.</p>
+        <p className="text-[16px] text-[rgb(var(--color-text-secondary))]">התחבר כדי לנהל שירותים.</p>
       </div>
     );
   }
@@ -63,12 +64,12 @@ export default function ProfileServicesPage() {
     <div className="mx-auto max-w-2xl px-4 py-8">
       <div className="mb-6 flex items-center justify-between">
         <div>
-          <h1 className="text-[24px] font-bold text-[#2D3436]">השירותים שלי</h1>
-          <p className="mt-1 text-[14px] text-[#636E72]">בחר את השירותים שאתה מציע ללקוחות</p>
+          <h1 className="text-[24px] font-bold text-[rgb(var(--color-text))]">השירותים שלי</h1>
+          <p className="mt-1 text-[14px] text-[rgb(var(--color-text-secondary))]">בחר את השירותים שאתה מציע ללקוחות</p>
         </div>
         <button
           onClick={() => router.back()}
-          className="rounded-[12px] border border-[#E8ECF1] px-4 py-2 text-[13px] font-medium text-[#636E72] hover:bg-[#FAFBFF] transition-all"
+          className="rounded-xl border border-[rgb(var(--color-border))] px-4 py-2 text-[13px] font-medium text-[rgb(var(--color-text-secondary))] hover:bg-[rgb(var(--color-surface-elevated))] transition-all"
         >
           חזרה
         </button>
@@ -76,32 +77,30 @@ export default function ProfileServicesPage() {
 
       {loading ? (
         <div className="flex items-center justify-center py-12">
-          <div className="h-8 w-8 animate-spin rounded-full border-4 border-[#F0EEFF] border-t-[#6C5CE7]" />
+          <div className="h-8 w-8 animate-spin rounded-full border-4 border-[rgba(var(--color-primary),0.1)] border-t-[rgb(var(--color-primary))]" />
         </div>
       ) : (
-        <div className="rounded-[16px] border border-[#E8ECF1] bg-white p-6 shadow-[0_2px_8px_rgba(108,92,231,0.06)]">
+        <div className="rounded-2xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] p-6 shadow-[0_2px_8px_rgba(var(--color-primary),0.06)]">
           <ServicePicker selected={services} onChange={setServices} />
 
           <div className="mt-6 flex items-center gap-3">
             <button
               onClick={handleSave}
               disabled={saving}
-              className="rounded-[12px] bg-[#6C5CE7] px-6 py-3 text-[14px] font-semibold text-white transition-all hover:bg-[#5A4BD1] disabled:opacity-40"
+              className="rounded-xl bg-[rgb(var(--color-primary))] px-6 py-3 text-[14px] font-semibold text-white transition-all hover:bg-[rgb(var(--color-primary-hover))] disabled:opacity-40"
             >
               {saving ? "שומר..." : "שמור שינויים"}
             </button>
             {saved && (
-              <span className="flex items-center gap-1.5 text-[14px] font-medium text-[#00B894]">
-                <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
-                </svg>
+              <span className="flex items-center gap-1.5 text-[14px] font-medium text-[rgb(var(--color-success))]">
+                <Check className="h-4 w-4" />
                 נשמר בהצלחה
               </span>
             )}
-            {error && <span className="text-[14px] font-medium text-[#FF6B6B]">{error}</span>}
+            {error && <span className="text-[14px] font-medium text-[rgb(var(--color-error))]">{error}</span>}
 
             {services.length > 0 && (
-              <span className="ms-auto text-[13px] text-[#6C5CE7] font-medium">{services.length} שירותים נבחרו</span>
+              <span className="ms-auto text-[13px] text-[rgb(var(--color-primary))] font-medium">{services.length} שירותים נבחרו</span>
             )}
           </div>
         </div>

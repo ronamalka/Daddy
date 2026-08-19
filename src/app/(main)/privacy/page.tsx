@@ -65,9 +65,9 @@ const SECTIONS = [
 
 export default function PrivacyPage() {
   return (
-    <div className="min-h-screen bg-[#FAFBFF]">
+    <div className="min-h-screen bg-[rgb(var(--color-surface-elevated))]">
       {/* Hero */}
-      <section className="bg-gradient-to-br from-[#2D3436] via-[#2D3436] to-[#6C5CE7]/20 py-16 text-center text-white">
+      <section className="bg-gradient-to-br from-[rgb(var(--color-text))] via-[rgb(var(--color-text))] to-[rgba(var(--color-primary),0.2)] py-16 text-center text-white">
         <div className="mx-auto max-w-4xl px-4">
           <h1 className="text-[36px] font-extrabold md:text-[42px]">מדיניות פרטיות</h1>
           <p className="mt-3 text-[15px] text-white/60">עדכון אחרון: אוגוסט 2026</p>
@@ -76,23 +76,23 @@ export default function PrivacyPage() {
 
       {/* Content */}
       <section className="mx-auto max-w-3xl px-4 py-12">
-        <div className="rounded-2xl border border-[#E8ECF1] bg-white p-8 md:p-12">
-          <p className="text-[15px] leading-relaxed text-[#636E72] mb-8">
+        <div className="rounded-2xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] p-8 md:p-12">
+          <p className="text-[15px] leading-relaxed text-[rgb(var(--color-text-secondary))] mb-8">
             אבאל׳ה (&quot;אנחנו&quot;, &quot;שלנו&quot;) מחויבת להגנה על פרטיות המשתמשים שלה. מדיניות זו מסבירה אילו נתונים אנחנו אוספים, למה, ומה הזכויות שלך. המדיניות נכתבה בהתאם לחוק הגנת הפרטיות, התשמ&quot;א-1981 ותקנות הגנת הפרטיות (אבטחת מידע), התשע&quot;ז-2017.
           </p>
 
           <div className="space-y-8">
             {SECTIONS.map((section, i) => (
               <div key={i}>
-                <h2 className="text-[18px] font-bold text-[#2D3436] mb-4 flex items-center gap-2">
-                  <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-[#F0EEFF] text-[12px] font-extrabold text-[#6C5CE7]">{i + 1}</span>
+                <h2 className="text-[18px] font-bold text-[rgb(var(--color-text))] mb-4 flex items-center gap-2">
+                  <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-[rgba(var(--color-primary),0.1)] text-[12px] font-extrabold text-[rgb(var(--color-primary))]">{i + 1}</span>
                   {section.title}
                 </h2>
                 <ul className="space-y-2">
                   {section.content.map((item, j) => (
-                    <li key={j} className="text-[14px] leading-relaxed text-[#636E72] pr-4 relative before:content-['•'] before:absolute before:right-0 before:text-[#6C5CE7]">
+                    <li key={j} className="text-[14px] leading-relaxed text-[rgb(var(--color-text-secondary))] pr-4 relative before:content-['•'] before:absolute before:right-0 before:text-[rgb(var(--color-primary))]">
                       {item.split("**").map((part, k) =>
-                        k % 2 === 1 ? <strong key={k} className="text-[#2D3436]">{part}</strong> : <span key={k}>{part}</span>
+                        k % 2 === 1 ? <strong key={k} className="text-[rgb(var(--color-text))]">{part}</strong> : <span key={k}>{part}</span>
                       )}
                     </li>
                   ))}
@@ -103,7 +103,7 @@ export default function PrivacyPage() {
         </div>
 
         <div className="mt-8 text-center">
-          <Link href="/" className="text-[14px] text-[#6C5CE7] font-semibold hover:underline">← חזרה לדף הבית</Link>
+          <Link href="/" className="text-[14px] text-[rgb(var(--color-primary))] font-semibold hover:underline">← חזרה לדף הבית</Link>
         </div>
       </section>
     </div>
