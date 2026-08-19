@@ -4,6 +4,73 @@ import { prisma } from "../index";
 
 export const reviewsRoutes = Router();
 
+reviewsRoutes.get("/by-order/:orderId", async (req: Request, res: Response) => {
+  const orderId = req.params.orderId as string;
+
+  const review = await prisma.review.findUnique({
+    where: { orderId },
+    select: {
+      id: true,
+      rating: true,
+      comment: true,
+      ratingAttitude: true,
+      ratingTimeliness: true,
+      ratingPrice: true,
+      ratingQuality: true,
+      sellerResponse: true,
+      sellerResponseAt: true,
+      userId: true,
+      createdAt: true,
+    },
+  });
+
+  if (!review) {
+    res.status(404).json({ error: "Review not found" });
+    return;
+  }
+
+  res.json(review);
+});
+
+reviewsRoutes.post("/:id/flag", requireAuth, async (req: Request, res: Response) => {
+  const id = req.params.id as string;
+  const { reason } = req.body;
+
+  if (!reason?.trim()) {
+    res.status(400).json({ error: "Reason is required" });
+    return;
+  }
+
+  const review = await prisma.review.findUnique({ where: { id } });
+  if (!review) {
+    res.status(404).json({ error: "Review not found" });
+    return;
+  }
+
+  if (review.userId === req.user!.id) {
+    res.status(400).json({ error: "Cannot flag your own review" });
+    return;
+  }
+
+  const existing = await prisma.reviewFlag.findUnique({
+    where: { reviewId_userId: { reviewId: id, userId: req.user!.id } },
+  });
+  if (existing) {
+    res.status(409).json({ error: "Already flagged" });
+    return;
+  }
+
+  const flag = await prisma.reviewFlag.create({
+    data: {
+      reviewId: id,
+      userId: req.user!.id,
+      reason,
+    },
+  });
+
+  res.status(201).json(flag);
+});
+
 reviewsRoutes.post("/:id/respond", requireAuth, async (req: Request, res: Response) => {
   const id = req.params.id as string;
 

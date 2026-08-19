@@ -61,6 +61,9 @@ export default function OrderDetailPage() {
   const [reqAnswers, setReqAnswers] = useState<Record<string, string>>({});
   const [submittingReqs, setSubmittingReqs] = useState(false);
   const [reqsSubmitted, setReqsSubmitted] = useState(false);
+  const [flagReason, setFlagReason] = useState("");
+  const [showFlagForm, setShowFlagForm] = useState(false);
+  const [flagSubmitted, setFlagSubmitted] = useState(false);
 
   useEffect(() => {
     fetch(`/api/orders/${params.id}`)
@@ -118,6 +121,20 @@ export default function OrderDetailPage() {
       setSellerResponseText("");
     }
     setRespondingTo(false);
+  }
+
+  async function flagReview() {
+    if (!order?.review || !flagReason.trim()) return;
+    const res = await fetch(`/api/reviews/${order.review.id}/flag`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ reason: flagReason }),
+    });
+    if (res.ok) {
+      setFlagSubmitted(true);
+      setShowFlagForm(false);
+      setFlagReason("");
+    }
   }
 
   function handleReviewSubmitted() {
@@ -279,6 +296,45 @@ export default function OrderDetailPage() {
                   שלח
                 </button>
               </div>
+            )}
+
+            {/* Flag Review */}
+            {!isSeller && !flagSubmitted && (
+              <div className="mt-3 border-t border-[#E8ECF1] pt-3">
+                {!showFlagForm ? (
+                  <button
+                    onClick={() => setShowFlagForm(true)}
+                    className="text-[12px] text-[#B2BEC3] hover:text-[#E17055] transition-colors"
+                  >
+                    🚩 דווח על חוות דעת זו
+                  </button>
+                ) : (
+                  <div className="flex gap-2">
+                    <input
+                      value={flagReason}
+                      onChange={(e) => setFlagReason(e.target.value)}
+                      placeholder="סיבת הדיווח..."
+                      className="flex-1 rounded-[8px] border border-[#E8ECF1] bg-white px-3 py-2 text-[13px] focus:border-[#E17055] focus:outline-none"
+                    />
+                    <button
+                      onClick={flagReview}
+                      disabled={!flagReason.trim()}
+                      className="rounded-[8px] bg-[#E17055] px-4 py-2 text-[13px] font-semibold text-white hover:bg-[#D63031] disabled:opacity-40"
+                    >
+                      דווח
+                    </button>
+                    <button
+                      onClick={() => { setShowFlagForm(false); setFlagReason(""); }}
+                      className="rounded-[8px] border border-[#E8ECF1] px-3 py-2 text-[13px] text-[#636E72] hover:bg-[#F8F9FA]"
+                    >
+                      ביטול
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
+            {flagSubmitted && (
+              <p className="mt-3 text-[12px] text-[#00B894]">✓ הדיווח נשלח בהצלחה</p>
             )}
           </div>
         )}

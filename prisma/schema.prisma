@@ -61,6 +61,7 @@ model User {
   serviceRequests  ServiceRequest[]  @relation("BuyerRequests")
   requestResponses RequestResponse[] @relation("SellerResponses")
   passwordResets   PasswordReset[]
+  reviewFlags      ReviewFlag[]
 }
 
 model PasswordReset {
@@ -291,9 +292,24 @@ model Review {
   userId              String
   createdAt           DateTime  @default(now())
 
-  order Order @relation(fields: [orderId], references: [id])
-  gig   Gig   @relation(fields: [gigId], references: [id])
-  user  User  @relation(fields: [userId], references: [id])
+  order Order        @relation(fields: [orderId], references: [id])
+  gig   Gig          @relation(fields: [gigId], references: [id])
+  user  User         @relation(fields: [userId], references: [id])
+  flags ReviewFlag[]
+}
+
+model ReviewFlag {
+  id        String   @id @default(cuid())
+  reviewId  String
+  userId    String
+  reason    String
+  createdAt DateTime @default(now())
+
+  review Review @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+  user   User   @relation(fields: [userId], references: [id])
+
+  @@unique([reviewId, userId])
+  @@index([reviewId])
 }
 
 model ServicePrice {
