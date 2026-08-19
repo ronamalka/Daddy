@@ -37,7 +37,7 @@ model User {
   id           String   @id @default(cuid())
   email        String   @unique
   name         String
-  passwordHash String
+  passwordHash String?
   role         Role     @default(BUYER)
   avatar       String?
   bio          String?

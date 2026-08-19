@@ -1,0 +1,77 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  BUYER
+  SELLER
+  ADMIN
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  name         String
+  passwordHash String?
+  role         Role     @default(BUYER)
+  avatar       String?
+  bio          String?
+  phone        String?
+  city         String?
+  cityCode     Int?
+  districtCode Int?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  serviceAreas  ServiceArea[]
+  userServices  UserService[]
+  servicePrices ServicePrice[]
+}
+
+model ServiceArea {
+  id           String @id @default(cuid())
+  userId       String
+  districtCode Int
+  districtName String
+  cityCode     Int?
+  cityName     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, districtCode, cityCode])
+  @@index([userId])
+  @@index([districtCode])
+  @@index([cityCode])
+}
+
+model UserService {
+  id          String @id @default(cuid())
+  userId      String
+  serviceSlug String
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, serviceSlug])
+  @@index([userId])
+  @@index([serviceSlug])
+}
+
+model ServicePrice {
+  id          String   @id @default(cuid())
+  userId      String
+  serviceSlug String
+  price       Float
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, serviceSlug])
+  @@index([userId])
+}
