@@ -26,6 +26,8 @@ jobs:
         env:
           DATABASE_URL: "postgresql://dummy:dummy@localhost:5432/dummy"
       - run: npx tsc --noEmit
+      - run: npm run lint -- --max-warnings=0
+        continue-on-error: true
 
   typecheck-services:
     name: Type Check Services
