@@ -2,14 +2,40 @@
 
 import Link from "next/link";
 import { useSession, signOut } from "next-auth/react";
-import { useState, useRef, useEffect } from "react";
+import { useState } from "react";
+import {
+  Menu,
+  ShoppingBag,
+  Heart,
+  MessageSquare,
+  User,
+  LogOut,
+  Plus,
+  Shield,
+  Briefcase,
+  Search,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Sheet } from "@/components/ui/sheet";
+import {
+  DropdownMenu,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuLabel,
+} from "@/components/ui/dropdown-menu";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
+import { cn } from "@/lib/utils";
 
-function UserAvatar({ name }: { name: string }) {
+function UserAvatar({ name, size = "sm" }: { name: string; size?: "sm" | "md" }) {
   const initial = name.charAt(0).toUpperCase();
+  const sizeClasses = size === "md" ? "h-10 w-10 text-sm" : "h-8 w-8 text-xs";
   return (
     <div
-      className="avatar h-9 w-9 text-sm bg-gradient-featured text-white"
-      title={name}
+      className={cn(
+        sizeClasses,
+        "inline-flex items-center justify-center rounded-full font-bold",
+        "bg-gradient-to-br from-[rgb(var(--color-primary))] to-[rgb(var(--color-primary-light))] text-white"
+      )}
     >
       {initial}
     </div>
@@ -18,31 +44,11 @@ function UserAvatar({ name }: { name: string }) {
 
 export function Navbar() {
   const { data: session } = useSession();
-  const [menuOpen, setMenuOpen] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
-  const profileRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (profileRef.current && !profileRef.current.contains(event.target as Node)) {
-        setProfileOpen(false);
-      }
-    }
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
-
-  const closeMobile = () => setMenuOpen(false);
 
   return (
-    <nav
-      className="sticky top-0 z-50 border-b"
-      style={{
-        backgroundColor: "var(--color-surface)",
-        borderColor: "var(--color-border-light)",
-        boxShadow: "var(--shadow-sm)",
-      }}
-    >
+    <nav className="sticky top-0 z-50 glass-strong">
       <div className="mx-auto flex max-w-7xl items-center justify-between px-5 py-3 lg:px-8">
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2 select-none">
@@ -53,269 +59,185 @@ export function Navbar() {
 
         {/* Desktop nav */}
         <div className="hidden items-center gap-1 md:flex">
-          <NavLink href="/">עיון</NavLink>
-          <NavLink href="/gigs">שירותים</NavLink>
+          <NavLink href="/" icon={<Search className="h-4 w-4" />}>עיון</NavLink>
+          <NavLink href="/gigs" icon={<Briefcase className="h-4 w-4" />}>שירותים</NavLink>
 
           {session?.user ? (
             <>
               {session.user.role === "SELLER" && (
-                <NavLink href="/gigs/create">צור שירות</NavLink>
+                <NavLink href="/gigs/create" icon={<Plus className="h-4 w-4" />}>צור שירות</NavLink>
               )}
-              <NavLink href="/orders">הזמנות</NavLink>
-              <NavLink href="/favorites">מועדפים</NavLink>
-              <NavLink href="/inbox">
-                <span className="flex items-center gap-1.5">
-                  הודעות
-                </span>
-              </NavLink>
+              <NavLink href="/orders" icon={<ShoppingBag className="h-4 w-4" />}>הזמנות</NavLink>
+              <NavLink href="/favorites" icon={<Heart className="h-4 w-4" />}>מועדפים</NavLink>
+              <NavLink href="/inbox" icon={<MessageSquare className="h-4 w-4" />}>הודעות</NavLink>
               {session.user.role === "ADMIN" && (
-                <NavLink href="/admin">ניהול</NavLink>
+                <NavLink href="/admin" icon={<Shield className="h-4 w-4" />}>ניהול</NavLink>
               )}
 
-              {/* Profile dropdown */}
-              <div className="relative me-2" ref={profileRef}>
-                <button
-                  onClick={() => setProfileOpen(!profileOpen)}
-                  className="flex items-center gap-2 rounded-full p-1 transition-all duration-200 hover:ring-2"
-                  style={{
-                    ["--tw-ring-color" as string]: "var(--color-primary-pale)",
+              <div className="mx-2 h-5 w-px bg-[rgb(var(--color-border))]" />
+              <ThemeToggle />
+
+              <DropdownMenu
+                open={profileOpen}
+                onOpenChange={setProfileOpen}
+                trigger={
+                  <button className="flex items-center gap-2 rounded-full p-1 transition-all duration-200 hover:ring-2 hover:ring-[rgba(var(--color-primary),0.2)]">
+                    <UserAvatar name={session.user.name || "U"} />
+                  </button>
+                }
+              >
+                <DropdownMenuLabel>
+                  <p className="text-sm font-semibold text-[rgb(var(--color-text))]">
+                    {session.user.name}
+                  </p>
+                  <p className="text-xs mt-0.5 text-[rgb(var(--color-text-muted))]">
+                    {session.user.email}
+                  </p>
+                </DropdownMenuLabel>
+
+                <DropdownMenuItem onClick={() => setProfileOpen(false)}>
+                  <Link href="/profile" className="flex items-center gap-2 w-full">
+                    <User className="h-4 w-4" />
+                    הפרופיל שלי
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setProfileOpen(false)}>
+                  <Link href="/orders" className="flex items-center gap-2 w-full">
+                    <ShoppingBag className="h-4 w-4" />
+                    ההזמנות שלי
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  variant="destructive"
+                  onClick={() => {
+                    setProfileOpen(false);
+                    signOut();
                   }}
                 >
-                  <UserAvatar name={session.user.name || "U"} />
-                </button>
-
-                {profileOpen && (
-                  <div
-                    className="absolute start-0 top-full mt-2 w-56 overflow-hidden py-1 animate-in fade-in slide-in-from-top-1 duration-150"
-                    style={{
-                      backgroundColor: "var(--color-surface)",
-                      border: "1px solid var(--color-border)",
-                      borderRadius: "var(--radius-card)",
-                      boxShadow: "var(--shadow-lg)",
-                    }}
-                  >
-                    <div
-                      className="px-4 py-3 mb-1"
-                      style={{
-                        borderBottom: "1px solid var(--color-border-light)",
-                      }}
-                    >
-                      <p className="text-sm font-semibold" style={{ color: "var(--color-text)" }}>
-                        {session.user.name}
-                      </p>
-                      <p className="text-xs mt-0.5" style={{ color: "var(--color-text-muted)" }}>
-                        {session.user.email}
-                      </p>
-                    </div>
-
-                    <DropdownLink href="/profile" onClick={() => setProfileOpen(false)}>
-                      הפרופיל שלי
-                    </DropdownLink>
-                    <DropdownLink href="/orders" onClick={() => setProfileOpen(false)}>
-                      ההזמנות שלי
-                    </DropdownLink>
-                    <div
-                      className="my-1"
-                      style={{ borderTop: "1px solid var(--color-border-light)" }}
-                    />
-                    <button
-                      onClick={() => {
-                        setProfileOpen(false);
-                        signOut();
-                      }}
-                      className="flex w-full items-center gap-2 px-4 py-2.5 text-sm transition-colors duration-150"
-                      style={{ color: "var(--color-accent-warm)" }}
-                      onMouseEnter={(e) =>
-                        (e.currentTarget.style.backgroundColor = "#FFF5F5")
-                      }
-                      onMouseLeave={(e) =>
-                        (e.currentTarget.style.backgroundColor = "transparent")
-                      }
-                    >
-                      התנתק
-                    </button>
-                  </div>
-                )}
-              </div>
+                  <LogOut className="h-4 w-4" />
+                  התנתק
+                </DropdownMenuItem>
+              </DropdownMenu>
             </>
           ) : (
             <div className="flex items-center gap-3 me-3">
-              <Link
-                href="/login"
-                className="btn-ghost text-sm"
-              >
-                התחברות
-              </Link>
-              <Link
-                href="/register"
-                className="btn-primary text-sm"
-              >
-                הצטרף לאבאל׳ה
-              </Link>
+              <ThemeToggle />
+              <Button variant="ghost" size="sm" asChild>
+                <Link href="/login">התחברות</Link>
+              </Button>
+              <Button size="sm" asChild>
+                <Link href="/register">הצטרף לאבאל׳ה</Link>
+              </Button>
             </div>
           )}
         </div>
 
-        {/* Mobile menu button */}
-        <button
-          className="flex items-center justify-center h-10 w-10 md:hidden transition-colors duration-200"
-          style={{
-            borderRadius: "var(--radius-button)",
-            color: "var(--color-text-secondary)",
-          }}
-          onClick={() => setMenuOpen(!menuOpen)}
-          onMouseEnter={(e) =>
-            (e.currentTarget.style.backgroundColor = "var(--color-primary-pale)")
-          }
-          onMouseLeave={(e) =>
-            (e.currentTarget.style.backgroundColor = "transparent")
-          }
-          aria-label={menuOpen ? "סגור תפריט" : "פתח תפריט"}
-        >
-          {menuOpen ? (
-            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          ) : (
-            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
-            </svg>
-          )}
-        </button>
+        {/* Mobile */}
+        <div className="flex items-center gap-2 md:hidden">
+          <ThemeToggle />
+          <button
+            className="flex h-10 w-10 items-center justify-center rounded-lg text-[rgb(var(--color-text-secondary))] hover:bg-[rgb(var(--color-surface-elevated))] transition-colors"
+            onClick={() => setMobileOpen(true)}
+            aria-label="פתח תפריט"
+          >
+            <Menu className="h-5 w-5" />
+          </button>
+        </div>
       </div>
 
-      {/* Mobile menu */}
-      <div
-        className={`md:hidden overflow-hidden transition-all duration-300 ease-in-out ${
-          menuOpen ? "max-h-[500px] opacity-100" : "max-h-0 opacity-0"
-        }`}
-        style={{
-          borderTop: menuOpen ? "1px solid var(--color-border-light)" : "none",
-        }}
-      >
-        <div className="px-5 py-4 flex flex-col gap-1">
-          <MobileNavLink href="/" onClick={closeMobile}>
+      {/* Mobile sheet */}
+      <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
+        <div className="flex flex-col gap-1">
+          {session?.user && (
+            <div className="flex items-center gap-3 rounded-xl bg-[rgb(var(--color-surface-elevated))] p-4 mb-4">
+              <UserAvatar name={session.user.name || "U"} size="md" />
+              <div>
+                <p className="text-sm font-semibold text-[rgb(var(--color-text))]">
+                  {session.user.name}
+                </p>
+                <p className="text-xs text-[rgb(var(--color-text-muted))]">
+                  {session.user.email}
+                </p>
+              </div>
+            </div>
+          )}
+
+          <MobileNavLink href="/" onClick={() => setMobileOpen(false)} icon={<Search className="h-4 w-4" />}>
             עיון
           </MobileNavLink>
-          <MobileNavLink href="/gigs" onClick={closeMobile}>
+          <MobileNavLink href="/gigs" onClick={() => setMobileOpen(false)} icon={<Briefcase className="h-4 w-4" />}>
             שירותים
           </MobileNavLink>
 
           {session?.user ? (
             <>
-              <div
-                className="flex items-center gap-3 px-3 py-3 mb-2"
-                style={{
-                  backgroundColor: "var(--color-primary-pale)",
-                  borderRadius: "var(--radius-button)",
-                }}
-              >
-                <UserAvatar name={session.user.name || "U"} />
-                <div>
-                  <p className="text-sm font-semibold" style={{ color: "var(--color-text)" }}>
-                    {session.user.name}
-                  </p>
-                  <p className="text-xs" style={{ color: "var(--color-text-muted)" }}>
-                    {session.user.email}
-                  </p>
-                </div>
-              </div>
-
               {session.user.role === "SELLER" && (
-                <MobileNavLink href="/gigs/create" onClick={closeMobile}>
+                <MobileNavLink href="/gigs/create" onClick={() => setMobileOpen(false)} icon={<Plus className="h-4 w-4" />}>
                   צור שירות
                 </MobileNavLink>
               )}
-              <MobileNavLink href="/orders" onClick={closeMobile}>
+              <MobileNavLink href="/orders" onClick={() => setMobileOpen(false)} icon={<ShoppingBag className="h-4 w-4" />}>
                 הזמנות
               </MobileNavLink>
-              <MobileNavLink href="/favorites" onClick={closeMobile}>
+              <MobileNavLink href="/favorites" onClick={() => setMobileOpen(false)} icon={<Heart className="h-4 w-4" />}>
                 מועדפים
               </MobileNavLink>
-              <MobileNavLink href="/inbox" onClick={closeMobile}>
+              <MobileNavLink href="/inbox" onClick={() => setMobileOpen(false)} icon={<MessageSquare className="h-4 w-4" />}>
                 הודעות
               </MobileNavLink>
               {session.user.role === "ADMIN" && (
-                <MobileNavLink href="/admin" onClick={closeMobile}>
+                <MobileNavLink href="/admin" onClick={() => setMobileOpen(false)} icon={<Shield className="h-4 w-4" />}>
                   ניהול
                 </MobileNavLink>
               )}
-              <MobileNavLink href="/profile" onClick={closeMobile}>
+              <MobileNavLink href="/profile" onClick={() => setMobileOpen(false)} icon={<User className="h-4 w-4" />}>
                 פרופיל
               </MobileNavLink>
 
-              <div
-                className="my-2"
-                style={{ borderTop: "1px solid var(--color-border-light)" }}
-              />
+              <div className="my-3 border-t border-[rgb(var(--color-border-light))]" />
               <button
                 onClick={() => {
-                  closeMobile();
+                  setMobileOpen(false);
                   signOut();
                 }}
-                className="flex items-center gap-2 px-3 py-2.5 text-sm font-medium transition-colors duration-150"
-                style={{
-                  color: "var(--color-accent-warm)",
-                  borderRadius: "var(--radius-button)",
-                }}
-                onMouseEnter={(e) =>
-                  (e.currentTarget.style.backgroundColor = "#FFF5F5")
-                }
-                onMouseLeave={(e) =>
-                  (e.currentTarget.style.backgroundColor = "transparent")
-                }
+                className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-[rgb(var(--color-error))] hover:bg-[rgba(var(--color-error),0.05)] transition-colors"
               >
+                <LogOut className="h-4 w-4" />
                 התנתק
               </button>
             </>
           ) : (
-            <div className="flex flex-col gap-2 mt-2">
-              <Link
-                href="/login"
-                onClick={closeMobile}
-                className="btn-ghost text-sm w-full justify-center"
-              >
-                התחברות
-              </Link>
-              <Link
-                href="/register"
-                onClick={closeMobile}
-                className="btn-primary text-sm w-full justify-center"
-              >
-                הצטרף לאבאל׳ה
-              </Link>
+            <div className="flex flex-col gap-2 mt-4">
+              <Button variant="ghost" className="w-full justify-center" onClick={() => setMobileOpen(false)} asChild>
+                <Link href="/login">התחברות</Link>
+              </Button>
+              <Button className="w-full justify-center" onClick={() => setMobileOpen(false)} asChild>
+                <Link href="/register">הצטרף לאבאל׳ה</Link>
+              </Button>
             </div>
           )}
         </div>
-      </div>
+      </Sheet>
     </nav>
   );
 }
 
-/* ---- Sub-components ---- */
-
 function NavLink({
   href,
   children,
+  icon,
 }: {
   href: string;
   children: React.ReactNode;
+  icon?: React.ReactNode;
 }) {
   return (
     <Link
       href={href}
-      className="relative px-3 py-2 text-sm font-medium transition-colors duration-200"
-      style={{ color: "var(--color-text-secondary)" }}
-      onMouseEnter={(e) => {
-        e.currentTarget.style.color = "var(--color-primary)";
-        e.currentTarget.style.backgroundColor = "var(--color-primary-pale)";
-        e.currentTarget.style.borderRadius = "var(--radius-button)";
-      }}
-      onMouseLeave={(e) => {
-        e.currentTarget.style.color = "var(--color-text-secondary)";
-        e.currentTarget.style.backgroundColor = "transparent";
-      }}
+      className="flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium text-[rgb(var(--color-text-secondary))] transition-colors duration-200 hover:bg-[rgb(var(--color-surface-elevated))] hover:text-[rgb(var(--color-text))]"
     >
+      {icon}
       {children}
     </Link>
   );
@@ -325,58 +247,20 @@ function MobileNavLink({
   href,
   onClick,
   children,
+  icon,
 }: {
   href: string;
   onClick: () => void;
   children: React.ReactNode;
+  icon?: React.ReactNode;
 }) {
   return (
     <Link
       href={href}
       onClick={onClick}
-      className="flex items-center gap-2 px-3 py-2.5 text-sm font-medium transition-colors duration-150"
-      style={{
-        color: "var(--color-text-secondary)",
-        borderRadius: "var(--radius-button)",
-      }}
-      onMouseEnter={(e) => {
-        e.currentTarget.style.color = "var(--color-primary)";
-        e.currentTarget.style.backgroundColor = "var(--color-primary-pale)";
-      }}
-      onMouseLeave={(e) => {
-        e.currentTarget.style.color = "var(--color-text-secondary)";
-        e.currentTarget.style.backgroundColor = "transparent";
-      }}
+      className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-[rgb(var(--color-text-secondary))] transition-colors duration-150 hover:bg-[rgb(var(--color-surface-elevated))] hover:text-[rgb(var(--color-text))]"
     >
-      {children}
-    </Link>
-  );
-}
-
-function DropdownLink({
-  href,
-  onClick,
-  children,
-}: {
-  href: string;
-  onClick: () => void;
-  children: React.ReactNode;
-}) {
-  return (
-    <Link
-      href={href}
-      onClick={onClick}
-      className="flex items-center gap-2 px-4 py-2.5 text-sm transition-colors duration-150"
-      style={{ color: "var(--color-text-secondary)" }}
-      onMouseEnter={(e) => {
-        e.currentTarget.style.backgroundColor = "var(--color-primary-pale)";
-        e.currentTarget.style.color = "var(--color-primary)";
-      }}
-      onMouseLeave={(e) => {
-        e.currentTarget.style.backgroundColor = "transparent";
-        e.currentTarget.style.color = "var(--color-text-secondary)";
-      }}
-    >
+      {icon}
       {children}
     </Link>
   );
