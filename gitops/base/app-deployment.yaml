@@ -18,7 +18,9 @@ spec:
       initContainers:
         - name: db-migrate
           image: quay.io/rh_ee_rmalka/daddy:latest
-          command: ["npx", "prisma", "db", "push", "--skip-generate"]
+          command: ["node", "node_modules/prisma/build/cli.js", "db", "push", "--skip-generate"]
+          securityContext:
+            runAsUser: 0
           env:
             - name: DATABASE_URL
               valueFrom:
