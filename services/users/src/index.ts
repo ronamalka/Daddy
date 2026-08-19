@@ -16,6 +16,7 @@ import { locationsRoutes } from "./routes/locations";
 import { featuredRoutes } from "./routes/featured";
 import { loginRoutes } from "./routes/login";
 import { oauthRoutes } from "./routes/oauth";
+import { passwordResetRoutes } from "./routes/password-reset";
 
 const pool = new pg.Pool({ connectionString: process.env.DATABASE_URL });
 const adapter = new PrismaPg(pool);
@@ -34,6 +35,7 @@ app.get("/health", (_req, res) => {
 app.use("/register", registerRoutes);
 app.use("/login", loginRoutes);
 app.use("/oauth", oauthRoutes);
+app.use("/password-reset", passwordResetRoutes);
 app.use("/profile", profileRoutes);
 app.use("/admin", adminRoutes);
 app.use("/providers", providersRoutes);
