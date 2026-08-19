@@ -178,6 +178,7 @@ export default function HomePage() {
   const [submitted, setSubmitted] = useState(false);
   const [featuredDaddies, setFeaturedDaddies] = useState<FeaturedDaddy[]>([]);
   const [liveReviews, setLiveReviews] = useState<LiveReview[]>([]);
+  const [fetchError, setFetchError] = useState<string | null>(null);
   const [howItWorksTab, setHowItWorksTab] = useState<"buyer" | "daddy">("buyer");
 
   const filteredServices = serviceSearch
@@ -200,7 +201,11 @@ export default function HomePage() {
           setLiveReviews(Array.isArray(reviews) ? reviews : []);
         }
       } catch {
-        // fallback data already shown
+        if (!cancelled) {
+          setFetchError("לא הצלחנו לטעון נתונים. נסה לרענן את הדף.");
+          setFeaturedDaddies([]);
+          setLiveReviews([]);
+        }
       }
     }
     fetchHomepageData();
@@ -423,6 +428,14 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+
+      {fetchError && (
+        <div className="mx-auto max-w-4xl px-4 mt-8">
+          <div className="rounded-lg border border-[rgba(var(--color-error),0.2)] bg-[rgba(var(--color-error),0.05)] px-5 py-4 text-center text-sm text-[rgb(var(--color-error))]">
+            {fetchError}
+          </div>
+        </div>
+      )}
 
       {/* ===== CATEGORIES ===== */}
       <section className="mx-auto max-w-6xl px-4 pt-20 pb-4">

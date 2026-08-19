@@ -23,6 +23,15 @@ export function Sheet({ open, onOpenChange, children }: SheetProps) {
     };
   }, [open]);
 
+  React.useEffect(() => {
+    if (!open) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onOpenChange(false);
+    };
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [open, onOpenChange]);
+
   return (
     <AnimatePresence>
       {open && (

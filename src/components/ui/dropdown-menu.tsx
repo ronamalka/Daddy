@@ -24,15 +24,21 @@ export function DropdownMenu({
   const ref = React.useRef<HTMLDivElement>(null);
 
   React.useEffect(() => {
+    if (!open) return;
     function handleClickOutside(event: MouseEvent) {
       if (ref.current && !ref.current.contains(event.target as Node)) {
         onOpenChange(false);
       }
     }
-    if (open) {
-      document.addEventListener("mousedown", handleClickOutside);
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === "Escape") onOpenChange(false);
     }
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
   }, [open, onOpenChange]);
 
   return (
