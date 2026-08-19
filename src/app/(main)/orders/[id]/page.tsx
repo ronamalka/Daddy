@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { useParams } from "next/navigation";
 import { ReviewForm } from "@/components/review-form";
+import { Star, Handshake, Clock, Coins, Tag, ClipboardList, MessageCircle, Send } from "lucide-react";
 
 interface GigRequirement {
   id: string;
@@ -42,11 +43,11 @@ interface OrderDetail {
 }
 
 const STATUS_STYLE: Record<string, { bg: string; text: string; label: string }> = {
-  PENDING: { bg: "bg-[#FDCB6E]/15", text: "text-[#E67E22]", label: "ממתין" },
-  IN_PROGRESS: { bg: "bg-[#6C5CE7]/10", text: "text-[#6C5CE7]", label: "בעבודה" },
-  DELIVERED: { bg: "bg-[#A29BFE]/15", text: "text-[#5A4BD1]", label: "נמסר" },
-  COMPLETED: { bg: "bg-[#00B894]/15", text: "text-[#00B894]", label: "הושלם" },
-  CANCELLED: { bg: "bg-[#E17055]/10", text: "text-[#E17055]", label: "בוטל" },
+  PENDING: { bg: "bg-[rgba(var(--color-accent-yellow),0.15)]", text: "text-[rgb(var(--color-warning))]", label: "ממתין" },
+  IN_PROGRESS: { bg: "bg-[rgba(var(--color-primary),0.1)]", text: "text-[rgb(var(--color-primary))]", label: "בעבודה" },
+  DELIVERED: { bg: "bg-[rgba(var(--color-primary-light),0.15)]", text: "text-[rgb(var(--color-primary-hover))]", label: "נמסר" },
+  COMPLETED: { bg: "bg-[rgba(var(--color-success),0.15)]", text: "text-[rgb(var(--color-success))]", label: "הושלם" },
+  CANCELLED: { bg: "bg-[rgba(var(--color-error),0.1)]", text: "text-[rgb(var(--color-error))]", label: "בוטל" },
 };
 
 export default function OrderDetailPage() {
@@ -190,7 +191,7 @@ export default function OrderDetailPage() {
   const [now] = useState(() => Date.now());
 
   if (!order) {
-    return <div className="flex items-center justify-center py-20"><div className="h-10 w-10 animate-spin rounded-full border-4 border-[#F0EEFF] border-t-[#6C5CE7]" /></div>;
+    return <div className="flex items-center justify-center py-20"><div className="h-10 w-10 animate-spin rounded-full border-4 border-[rgba(var(--color-primary),0.1)] border-t-[rgb(var(--color-primary))]" /></div>;
   }
 
   const isBuyer = session?.user?.id === order.buyer.id;
@@ -201,46 +202,41 @@ export default function OrderDetailPage() {
   return (
     <div className="mx-auto max-w-4xl px-4 py-8">
       {/* Order Header Card */}
-      <div className="mb-6 rounded-[16px] border border-[#E8ECF1] bg-[#FFFFFF] p-6 shadow-[0_2px_8px_rgba(108,92,231,0.06)]">
+      <div className="mb-6 rounded-2xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] p-6 shadow-[0_2px_8px_rgba(var(--color-primary),0.06)]">
         <div className="mb-5 flex items-start justify-between">
           <div className="flex-1">
-            <h1 className="text-[20px] font-bold text-[#2D3436]">{order.gig.title}</h1>
-            <div className="mt-2 flex flex-wrap items-center gap-3 text-[14px] text-[#636E72]">
+            <h1 className="text-[20px] font-bold text-[rgb(var(--color-text))]">{order.gig.title}</h1>
+            <div className="mt-2 flex flex-wrap items-center gap-3 text-[14px] text-[rgb(var(--color-text-secondary))]">
               <span className="flex items-center gap-1.5">
-                <svg className="h-4 w-4 text-[#A29BFE]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M9.568 3H5.25A2.25 2.25 0 003 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 005.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 009.568 3z" />
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 6h.008v.008H6V6z" />
-                </svg>
+                <Tag className="h-4 w-4 text-[rgb(var(--color-primary-light))]" />
                 חבילת {order.tier}
               </span>
-              <span className="text-[#E8ECF1]">|</span>
-              <span className="font-semibold text-[#2D3436]">₪{order.price}</span>
-              <span className="text-[#E8ECF1]">|</span>
+              <span className="text-[rgb(var(--color-border))]">|</span>
+              <span className="font-semibold text-[rgb(var(--color-text))]">₪{order.price}</span>
+              <span className="text-[rgb(var(--color-border))]">|</span>
               <span>{new Date(order.createdAt).toLocaleDateString()}</span>
             </div>
           </div>
-          <span className={`rounded-[9999px] px-4 py-1.5 text-[13px] font-semibold ${statusInfo.bg} ${statusInfo.text}`}>
+          <span className={`rounded-full px-4 py-1.5 text-[13px] font-semibold ${statusInfo.bg} ${statusInfo.text}`}>
             {statusInfo.label}
           </span>
         </div>
 
         {/* Due Date Countdown */}
         {daysLeft !== null && order.status !== "COMPLETED" && order.status !== "CANCELLED" && (
-          <div className={`mb-5 flex items-center gap-2 rounded-[12px] px-4 py-3 ${
-            daysLeft < 0 ? "bg-[#E17055]/10" : daysLeft <= 1 ? "bg-[#FDCB6E]/15" : "bg-[#00B894]/10"
+          <div className={`mb-5 flex items-center gap-2 rounded-xl px-4 py-3 ${
+            daysLeft < 0 ? "bg-[rgba(var(--color-error),0.1)]" : daysLeft <= 1 ? "bg-[rgba(var(--color-accent-yellow),0.15)]" : "bg-[rgba(var(--color-success),0.1)]"
           }`}>
-            <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
+            <Clock className="h-5 w-5" />
             <span className={`text-[14px] font-medium ${
-              daysLeft < 0 ? "text-[#E17055]" : daysLeft <= 1 ? "text-[#E67E22]" : "text-[#00B894]"
+              daysLeft < 0 ? "text-[rgb(var(--color-error))]" : daysLeft <= 1 ? "text-[rgb(var(--color-warning))]" : "text-[rgb(var(--color-success))]"
             }`}>
               {daysLeft < 0 ? `באיחור של ${Math.abs(daysLeft)} ימים` :
                daysLeft === 0 ? "מועד האספקה היום!" :
                daysLeft === 1 ? "יום אחד לאספקה" :
                `${daysLeft} ימים לאספקה`}
             </span>
-            <span className="text-[12px] text-[#B2BEC3] ms-auto">
+            <span className="text-[12px] text-[rgb(var(--color-text-muted))] ms-auto">
               עד {new Date(order.dueDate!).toLocaleDateString()}
             </span>
           </div>
@@ -250,58 +246,58 @@ export default function OrderDetailPage() {
         <div className="flex flex-wrap gap-3">
           {isSeller && order.status === "PENDING" && (
             <>
-              <button onClick={() => updateStatus("IN_PROGRESS")} className="flex items-center gap-2 rounded-[12px] bg-[#6C5CE7] px-5 py-2.5 text-[14px] font-semibold text-white transition-all hover:bg-[#5A4BD1]">קבל הזמנה</button>
-              <button onClick={() => updateStatus("CANCELLED")} className="flex items-center gap-2 rounded-[12px] border-2 border-[#E17055]/20 bg-[#E17055]/5 px-5 py-2.5 text-[14px] font-semibold text-[#E17055] transition-all hover:bg-[#E17055]/10">דחה הזמנה</button>
+              <button onClick={() => updateStatus("IN_PROGRESS")} className="flex items-center gap-2 rounded-xl bg-[rgb(var(--color-primary))] px-5 py-2.5 text-[14px] font-semibold text-white transition-all hover:bg-[rgb(var(--color-primary-hover))]">קבל הזמנה</button>
+              <button onClick={() => updateStatus("CANCELLED")} className="flex items-center gap-2 rounded-xl border-2 border-[rgba(var(--color-error),0.2)] bg-[rgba(var(--color-error),0.05)] px-5 py-2.5 text-[14px] font-semibold text-[rgb(var(--color-error))] transition-all hover:bg-[rgba(var(--color-error),0.1)]">דחה הזמנה</button>
             </>
           )}
           {isSeller && order.status === "IN_PROGRESS" && (
-            <button onClick={() => updateStatus("DELIVERED")} className="flex items-center gap-2 rounded-[12px] bg-[#6C5CE7] px-5 py-2.5 text-[14px] font-semibold text-white transition-all hover:bg-[#5A4BD1]">סמן כנמסר</button>
+            <button onClick={() => updateStatus("DELIVERED")} className="flex items-center gap-2 rounded-xl bg-[rgb(var(--color-primary))] px-5 py-2.5 text-[14px] font-semibold text-white transition-all hover:bg-[rgb(var(--color-primary-hover))]">סמן כנמסר</button>
           )}
           {isBuyer && order.status === "DELIVERED" && (
             <>
-              <button onClick={() => updateStatus("COMPLETED")} className="flex items-center gap-2 rounded-[12px] bg-[#00B894] px-5 py-2.5 text-[14px] font-semibold text-white transition-all hover:bg-[#00A884]">אשר קבלה</button>
-              <button onClick={() => updateStatus("REVISION")} className="flex items-center gap-2 rounded-[12px] border-2 border-[#FDCB6E]/30 bg-[#FDCB6E]/10 px-5 py-2.5 text-[14px] font-semibold text-[#E67E22] transition-all hover:bg-[#FDCB6E]/20">בקש תיקון</button>
+              <button onClick={() => updateStatus("COMPLETED")} className="flex items-center gap-2 rounded-xl bg-[rgb(var(--color-success))] px-5 py-2.5 text-[14px] font-semibold text-white transition-all hover:opacity-90">אשר קבלה</button>
+              <button onClick={() => updateStatus("REVISION")} className="flex items-center gap-2 rounded-xl border-2 border-[rgba(var(--color-accent-yellow),0.3)] bg-[rgba(var(--color-accent-yellow),0.1)] px-5 py-2.5 text-[14px] font-semibold text-[rgb(var(--color-warning))] transition-all hover:bg-[rgba(var(--color-accent-yellow),0.2)]">בקש תיקון</button>
             </>
           )}
           {isBuyer && order.status === "PENDING" && (
-            <button onClick={() => updateStatus("CANCELLED")} className="flex items-center gap-2 rounded-[12px] border-2 border-[#E17055]/20 bg-[#E17055]/5 px-5 py-2.5 text-[14px] font-semibold text-[#E17055] transition-all hover:bg-[#E17055]/10">בטל הזמנה</button>
+            <button onClick={() => updateStatus("CANCELLED")} className="flex items-center gap-2 rounded-xl border-2 border-[rgba(var(--color-error),0.2)] bg-[rgba(var(--color-error),0.05)] px-5 py-2.5 text-[14px] font-semibold text-[rgb(var(--color-error))] transition-all hover:bg-[rgba(var(--color-error),0.1)]">בטל הזמנה</button>
           )}
           {isBuyer && order.status === "COMPLETED" && !order.review && (
-            <button onClick={() => setReviewOpen(true)} className="flex items-center gap-2 rounded-[12px] bg-[#FECA57] px-5 py-2.5 text-[14px] font-semibold text-[#2D3436] transition-all hover:bg-[#FECA57]/80">כתוב חוות דעת</button>
+            <button onClick={() => setReviewOpen(true)} className="flex items-center gap-2 rounded-xl bg-[rgb(var(--color-accent-yellow))] px-5 py-2.5 text-[14px] font-semibold text-[rgb(var(--color-text))] transition-all hover:opacity-80">כתוב חוות דעת</button>
           )}
         </div>
 
         {/* Existing Review Display */}
         {order.review && (
-          <div className="mt-5 rounded-[12px] bg-[#FECA57]/10 p-4">
+          <div className="mt-5 rounded-xl bg-[rgba(var(--color-accent-yellow),0.1)] p-4">
             <div className="flex items-center gap-2 mb-2">
-              <span className="text-[18px] font-bold text-[#F0932B]">{order.review.rating}/10</span>
-              <span className="text-[13px] text-[#B2BEC3]">ציון כללי</span>
+              <span className="text-[18px] font-bold text-[rgb(var(--color-warning))]">{order.review.rating}/10</span>
+              <span className="text-[13px] text-[rgb(var(--color-text-muted))]">ציון כללי</span>
             </div>
 
             {order.review.ratingAttitude != null && (
               <div className="flex flex-wrap gap-3 mb-3 text-[12px]">
-                <span className="flex items-center gap-1 rounded-[8px] bg-white/60 px-2.5 py-1 text-[#636E72]">
-                  ⭐ איכות: <b className="text-[#2D3436]">{order.review.ratingQuality}/10</b>
+                <span className="flex items-center gap-1 rounded-lg bg-[rgba(var(--color-surface),0.6)] px-2.5 py-1 text-[rgb(var(--color-text-secondary))]">
+                  <Star className="h-3.5 w-3.5 text-[rgb(var(--color-accent-yellow))]" /> איכות: <b className="text-[rgb(var(--color-text))]">{order.review.ratingQuality}/10</b>
                 </span>
-                <span className="flex items-center gap-1 rounded-[8px] bg-white/60 px-2.5 py-1 text-[#636E72]">
-                  🤝 יחס: <b className="text-[#2D3436]">{order.review.ratingAttitude}/10</b>
+                <span className="flex items-center gap-1 rounded-lg bg-[rgba(var(--color-surface),0.6)] px-2.5 py-1 text-[rgb(var(--color-text-secondary))]">
+                  <Handshake className="h-3.5 w-3.5 text-[rgb(var(--color-primary))]" /> יחס: <b className="text-[rgb(var(--color-text))]">{order.review.ratingAttitude}/10</b>
                 </span>
-                <span className="flex items-center gap-1 rounded-[8px] bg-white/60 px-2.5 py-1 text-[#636E72]">
-                  ⏰ זמנים: <b className="text-[#2D3436]">{order.review.ratingTimeliness}/10</b>
+                <span className="flex items-center gap-1 rounded-lg bg-[rgba(var(--color-surface),0.6)] px-2.5 py-1 text-[rgb(var(--color-text-secondary))]">
+                  <Clock className="h-3.5 w-3.5 text-[rgb(var(--color-accent))]" /> זמנים: <b className="text-[rgb(var(--color-text))]">{order.review.ratingTimeliness}/10</b>
                 </span>
-                <span className="flex items-center gap-1 rounded-[8px] bg-white/60 px-2.5 py-1 text-[#636E72]">
-                  💰 מחיר: <b className="text-[#2D3436]">{order.review.ratingPrice}/10</b>
+                <span className="flex items-center gap-1 rounded-lg bg-[rgba(var(--color-surface),0.6)] px-2.5 py-1 text-[rgb(var(--color-text-secondary))]">
+                  <Coins className="h-3.5 w-3.5 text-[rgb(var(--color-success))]" /> מחיר: <b className="text-[rgb(var(--color-text))]">{order.review.ratingPrice}/10</b>
                 </span>
               </div>
             )}
 
-            <p className="text-[14px] leading-relaxed text-[#2D3436]">{order.review.comment}</p>
+            <p className="text-[14px] leading-relaxed text-[rgb(var(--color-text))]">{order.review.comment}</p>
 
             {order.review.sellerResponse && (
-              <div className="mt-3 rounded-[8px] bg-white/60 p-3">
-                <p className="text-[12px] font-semibold text-[#6C5CE7] mb-1">תגובת בעל המקצוע:</p>
-                <p className="text-[13px] text-[#636E72]">{order.review.sellerResponse}</p>
+              <div className="mt-3 rounded-lg bg-[rgba(var(--color-surface),0.6)] p-3">
+                <p className="text-[12px] font-semibold text-[rgb(var(--color-primary))] mb-1">תגובת בעל המקצוע:</p>
+                <p className="text-[13px] text-[rgb(var(--color-text-secondary))]">{order.review.sellerResponse}</p>
               </div>
             )}
 
@@ -311,12 +307,12 @@ export default function OrderDetailPage() {
                   value={sellerResponseText}
                   onChange={(e) => setSellerResponseText(e.target.value)}
                   placeholder="כתוב תגובה לחוות הדעת..."
-                  className="flex-1 rounded-[8px] border border-[#E8ECF1] bg-white px-3 py-2 text-[13px] focus:border-[#6C5CE7] focus:outline-none"
+                  className="flex-1 rounded-lg border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] px-3 py-2 text-[13px] focus:border-[rgb(var(--color-primary))] focus:outline-none"
                 />
                 <button
                   onClick={submitSellerResponse}
                   disabled={respondingTo || !sellerResponseText.trim()}
-                  className="rounded-[8px] bg-[#6C5CE7] px-4 py-2 text-[13px] font-semibold text-white hover:bg-[#5A4BD1] disabled:opacity-40"
+                  className="rounded-lg bg-[rgb(var(--color-primary))] px-4 py-2 text-[13px] font-semibold text-white hover:bg-[rgb(var(--color-primary-hover))] disabled:opacity-40"
                 >
                   שלח
                 </button>
@@ -367,31 +363,29 @@ export default function OrderDetailPage() {
 
       {/* Requirements Form */}
       {order.gig.requirements.length > 0 && (
-        <div className="mb-6 rounded-[16px] border border-[#E8ECF1] bg-[#FFFFFF] p-6 shadow-[0_2px_8px_rgba(108,92,231,0.06)]">
+        <div className="mb-6 rounded-2xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] p-6 shadow-[0_2px_8px_rgba(var(--color-primary),0.06)]">
           <div className="flex items-center gap-2 mb-4">
-            <svg className="h-5 w-5 text-[#6C5CE7]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25zM6.75 12h.008v.008H6.75V12zm0 3h.008v.008H6.75V15zm0 3h.008v.008H6.75V18z" />
-            </svg>
-            <h2 className="text-[16px] font-bold text-[#2D3436]">דרישות ההזמנה</h2>
+            <ClipboardList className="h-5 w-5 text-[rgb(var(--color-primary))]" />
+            <h2 className="text-[16px] font-bold text-[rgb(var(--color-text))]">דרישות ההזמנה</h2>
             {reqsSubmitted && (
-              <span className="rounded-[9999px] bg-[#00B894]/15 px-2.5 py-0.5 text-[11px] font-semibold text-[#00B894]">נשלח</span>
+              <span className="rounded-full bg-[rgba(var(--color-success),0.15)] px-2.5 py-0.5 text-[11px] font-semibold text-[rgb(var(--color-success))]">נשלח</span>
             )}
           </div>
 
           {isBuyer && !reqsSubmitted ? (
             <div className="space-y-4">
-              <p className="text-[13px] text-[#636E72]">מלא את הפרטים הבאים כדי שבעל המקצוע יוכל להתחיל לעבוד</p>
+              <p className="text-[13px] text-[rgb(var(--color-text-secondary))]">מלא את הפרטים הבאים כדי שבעל המקצוע יוכל להתחיל לעבוד</p>
               {order.gig.requirements.map((req) => (
                 <div key={req.id}>
-                  <label className="mb-1.5 flex items-center gap-1 text-[13px] font-semibold text-[#2D3436]">
+                  <label className="mb-1.5 flex items-center gap-1 text-[13px] font-semibold text-[rgb(var(--color-text))]">
                     {req.question}
-                    {req.required && <span className="text-[#FF6B6B]">*</span>}
+                    {req.required && <span className="text-[rgb(var(--color-error))]">*</span>}
                   </label>
                   <textarea
                     value={reqAnswers[req.id] || ""}
                     onChange={(e) => setReqAnswers((prev) => ({ ...prev, [req.id]: e.target.value }))}
                     rows={2}
-                    className="w-full rounded-[10px] border border-[#E8ECF1] bg-[#FAFBFF] px-3 py-2.5 text-[14px] text-[#2D3436] placeholder-[#B2BEC3] focus:border-[#6C5CE7] focus:outline-none focus:ring-2 focus:ring-[#6C5CE7]/20 resize-none"
+                    className="w-full rounded-[10px] border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface-elevated))] px-3 py-2.5 text-[14px] text-[rgb(var(--color-text))] placeholder-[rgb(var(--color-text-muted))] focus:border-[rgb(var(--color-primary))] focus:outline-none focus:ring-2 focus:ring-[rgba(var(--color-primary),0.2)] resize-none"
                     placeholder="הזן תשובה..."
                   />
                 </div>
@@ -399,7 +393,7 @@ export default function OrderDetailPage() {
               <button
                 onClick={submitRequirements}
                 disabled={submittingReqs || order.gig.requirements.filter((r) => r.required).some((r) => !reqAnswers[r.id]?.trim())}
-                className="rounded-[12px] bg-[#6C5CE7] px-5 py-2.5 text-[14px] font-semibold text-white transition-all hover:bg-[#5A4BD1] disabled:opacity-40 disabled:cursor-not-allowed"
+                className="rounded-xl bg-[rgb(var(--color-primary))] px-5 py-2.5 text-[14px] font-semibold text-white transition-all hover:bg-[rgb(var(--color-primary-hover))] disabled:opacity-40 disabled:cursor-not-allowed"
               >
                 {submittingReqs ? "שולח..." : "שלח דרישות"}
               </button>
@@ -407,10 +401,10 @@ export default function OrderDetailPage() {
           ) : (
             <div className="space-y-3">
               {order.gig.requirements.map((req) => (
-                <div key={req.id} className="rounded-[10px] bg-[#FAFBFF] p-3">
-                  <p className="text-[13px] font-semibold text-[#2D3436] mb-1">{req.question}</p>
-                  <p className="text-[14px] text-[#636E72]">
-                    {reqAnswers[req.id] || <span className="text-[#B2BEC3] italic">לא נענה</span>}
+                <div key={req.id} className="rounded-[10px] bg-[rgb(var(--color-surface-elevated))] p-3">
+                  <p className="text-[13px] font-semibold text-[rgb(var(--color-text))] mb-1">{req.question}</p>
+                  <p className="text-[14px] text-[rgb(var(--color-text-secondary))]">
+                    {reqAnswers[req.id] || <span className="text-[rgb(var(--color-text-muted))] italic">לא נענה</span>}
                   </p>
                 </div>
               ))}
@@ -431,19 +425,17 @@ export default function OrderDetailPage() {
       )}
 
       {/* Messages Section */}
-      <div className="rounded-[16px] border border-[#E8ECF1] bg-[#FFFFFF] shadow-[0_2px_8px_rgba(108,92,231,0.06)] overflow-hidden">
-        <div className="flex items-center gap-2 border-b border-[#E8ECF1] px-6 py-4">
-          <svg className="h-5 w-5 text-[#6C5CE7]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M8.625 12a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H8.25m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H12m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 01-2.555-.337A5.972 5.972 0 015.41 20.97a5.969 5.969 0 01-.474-.065 4.48 4.48 0 00.978-2.025c.09-.457-.133-.901-.467-1.226C3.93 16.178 3 14.189 3 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25z" />
-          </svg>
-          <h2 className="text-[16px] font-bold text-[#2D3436]">הודעות</h2>
-          <span className="rounded-[9999px] bg-[#F0EEFF] px-2.5 py-0.5 text-[12px] font-semibold text-[#6C5CE7]">{order.messages.length}</span>
+      <div className="rounded-2xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] shadow-[0_2px_8px_rgba(var(--color-primary),0.06)] overflow-hidden">
+        <div className="flex items-center gap-2 border-b border-[rgb(var(--color-border))] px-6 py-4">
+          <MessageCircle className="h-5 w-5 text-[rgb(var(--color-primary))]" />
+          <h2 className="text-[16px] font-bold text-[rgb(var(--color-text))]">הודעות</h2>
+          <span className="rounded-full bg-[rgba(var(--color-primary),0.1)] px-2.5 py-0.5 text-[12px] font-semibold text-[rgb(var(--color-primary))]">{order.messages.length}</span>
         </div>
 
-        <div className="max-h-[400px] overflow-y-auto p-6 bg-[#FAFBFF]">
+        <div className="max-h-[400px] overflow-y-auto p-6 bg-[rgb(var(--color-surface-elevated))]">
           {order.messages.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-8">
-              <p className="text-[14px] text-[#B2BEC3]">אין הודעות עדיין. התחל את השיחה!</p>
+              <p className="text-[14px] text-[rgb(var(--color-text-muted))]">אין הודעות עדיין. התחל את השיחה!</p>
             </div>
           ) : (
             <div className="space-y-4">
@@ -452,14 +444,14 @@ export default function OrderDetailPage() {
                 return (
                   <div key={msg.id} className={`flex ${isMe ? "justify-end" : "justify-start"}`}>
                     <div className={`max-w-[320px] ${isMe ? "order-2" : "order-1"}`}>
-                      <div className={`rounded-[16px] px-4 py-3 ${isMe ? "rounded-br-[4px] bg-[#6C5CE7] text-white" : "rounded-bl-[4px] bg-[#FFFFFF] border border-[#E8ECF1] text-[#2D3436]"}`}>
-                        <p className={`text-[12px] font-semibold mb-1 ${isMe ? "text-white/70" : "text-[#6C5CE7]"}`}>{msg.sender.name}</p>
+                      <div className={`rounded-2xl px-4 py-3 ${isMe ? "rounded-br-[4px] bg-[rgb(var(--color-primary))] text-white" : "rounded-bl-[4px] bg-[rgb(var(--color-surface))] border border-[rgb(var(--color-border))] text-[rgb(var(--color-text))]"}`}>
+                        <p className={`text-[12px] font-semibold mb-1 ${isMe ? "text-white/70" : "text-[rgb(var(--color-primary))]"}`}>{msg.sender.name}</p>
                         {msg.attachment && (
                           <a href={msg.attachment} target="_blank" rel="noopener noreferrer" className="mb-2 block">
                             {/\.(jpg|jpeg|png|gif|webp)$/i.test(msg.attachment) ? (
-                              <img src={msg.attachment} alt="צרופה" className="max-w-full rounded-[8px] max-h-48" />
+                              <img src={msg.attachment} alt="צרופה" className="max-w-full rounded-lg max-h-48" />
                             ) : (
-                              <span className={`inline-flex items-center gap-1 rounded-[8px] px-2 py-1 text-[12px] ${isMe ? "bg-white/20" : "bg-[#F0EEFF]"}`}>
+                              <span className={`inline-flex items-center gap-1 rounded-lg px-2 py-1 text-[12px] ${isMe ? "bg-white/20" : "bg-[rgba(var(--color-primary),0.1)]"}`}>
                                 📎 קובץ מצורף
                               </span>
                             )}
@@ -467,7 +459,7 @@ export default function OrderDetailPage() {
                         )}
                         <p className="text-[14px] leading-relaxed">{msg.content}</p>
                       </div>
-                      <p className={`mt-1 text-[11px] text-[#B2BEC3] ${isMe ? "text-right" : "text-left"}`}>
+                      <p className={`mt-1 text-[11px] text-[rgb(var(--color-text-muted))] ${isMe ? "text-right" : "text-left"}`}>
                         {new Date(msg.createdAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
                       </p>
                     </div>
@@ -478,17 +470,15 @@ export default function OrderDetailPage() {
           )}
         </div>
 
-        <form onSubmit={sendMessage} className="flex items-center gap-3 border-t border-[#E8ECF1] p-4 bg-[#FFFFFF]">
+        <form onSubmit={sendMessage} className="flex items-center gap-3 border-t border-[rgb(var(--color-border))] p-4 bg-[rgb(var(--color-surface))]">
           <input
             value={message}
             onChange={(e) => setMessage(e.target.value)}
             placeholder="כתוב הודעה..."
-            className="flex-1 rounded-[12px] border border-[#E8ECF1] bg-[#FAFBFF] px-4 py-3 text-[14px] text-[#2D3436] placeholder-[#B2BEC3] focus:border-[#6C5CE7] focus:outline-none focus:ring-2 focus:ring-[#6C5CE7]/20"
+            className="flex-1 rounded-xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface-elevated))] px-4 py-3 text-[14px] text-[rgb(var(--color-text))] placeholder-[rgb(var(--color-text-muted))] focus:border-[rgb(var(--color-primary))] focus:outline-none focus:ring-2 focus:ring-[rgba(var(--color-primary),0.2)]"
           />
-          <button type="submit" disabled={sending || !message.trim()} className="flex items-center justify-center rounded-[12px] bg-[#6C5CE7] p-3 text-white hover:bg-[#5A4BD1] disabled:opacity-40 disabled:cursor-not-allowed">
-            <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5" />
-            </svg>
+          <button type="submit" disabled={sending || !message.trim()} className="flex items-center justify-center rounded-xl bg-[rgb(var(--color-primary))] p-3 text-white hover:bg-[rgb(var(--color-primary-hover))] disabled:opacity-40 disabled:cursor-not-allowed">
+            <Send className="h-5 w-5" />
           </button>
         </form>
       </div>

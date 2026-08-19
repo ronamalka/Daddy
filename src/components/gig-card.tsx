@@ -1,4 +1,6 @@
 import Link from "next/link";
+import { Star, MapPin } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface GigCardProps {
   id: string;
@@ -11,10 +13,10 @@ interface GigCardProps {
 }
 
 const AVATAR_GRADIENTS = [
-  "from-[#6C5CE7] to-[#A29BFE]",
-  "from-[#00D2D3] to-[#00B894]",
-  "from-[#FF6B6B] to-[#FECA57]",
-  "from-[#A29BFE] to-[#00D2D3]",
+  "from-[rgb(var(--color-primary))] to-[rgb(var(--color-primary-light))]",
+  "from-[rgb(var(--color-accent))] to-[rgb(var(--color-success))]",
+  "from-[rgb(var(--color-error))] to-[rgb(var(--color-accent-yellow))]",
+  "from-[rgb(var(--color-primary-light))] to-[rgb(var(--color-accent))]",
 ];
 
 export function GigCard({ id, title, image, seller, startingPrice, avgRating, reviewCount }: GigCardProps) {
@@ -23,48 +25,46 @@ export function GigCard({ id, title, image, seller, startingPrice, avgRating, re
   return (
     <Link
       href={`/gigs/${id}`}
-      className="group block overflow-hidden rounded-[16px] border border-[#E8ECF1] bg-[#FFFFFF] transition-all hover:shadow-[0_8px_24px_rgba(108,92,231,0.12)] hover:border-[#A29BFE]/40"
+      className="group block overflow-hidden rounded-xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] transition-all hover:shadow-lg hover:border-[rgba(var(--color-primary),0.3)]"
     >
-      <div className="aspect-video w-full overflow-hidden bg-[#F0EEFF]">
+      <div className="aspect-video w-full overflow-hidden bg-[rgba(var(--color-primary),0.1)]">
         {image ? (
           <img src={image} alt={title} className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105" />
         ) : (
-          <div className="flex h-full w-full items-center justify-center" style={{ background: "linear-gradient(135deg, #6C5CE7 0%, #A29BFE 50%, #00D2D3 100%)" }}>
+          <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-[rgb(var(--color-primary))] via-[rgb(var(--color-primary-light))] to-[rgb(var(--color-accent))]">
             <span className="text-5xl font-bold text-white/30">א</span>
           </div>
         )}
       </div>
       <div className="p-4">
         <div className="mb-3 flex items-center gap-2.5">
-          <div className={`flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br ${AVATAR_GRADIENTS[gradientIndex]} text-[12px] font-bold text-white`}>
+          <div className={cn(
+            "flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br text-[12px] font-bold text-white",
+            AVATAR_GRADIENTS[gradientIndex]
+          )}>
             {seller.name[0]}
           </div>
           <div className="min-w-0 flex-1">
-            <span className="text-[13px] font-medium text-[#636E72]">{seller.name}</span>
+            <span className="text-[13px] font-medium text-[rgb(var(--color-text-secondary))]">{seller.name}</span>
             {seller.serviceAreas && seller.serviceAreas.length > 0 && (
-              <div className="flex items-center gap-1 text-[11px] text-[#B2BEC3] truncate">
-                <svg className="h-3 w-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
-                </svg>
+              <div className="flex items-center gap-1 text-[11px] text-[rgb(var(--color-text-muted))] truncate">
+                <MapPin className="h-3 w-3 flex-shrink-0" />
                 {seller.serviceAreas.map((a) => a.cityName || a.districtName).join(", ")}
               </div>
             )}
           </div>
         </div>
-        <h3 className="mb-3 line-clamp-2 text-[14px] font-semibold leading-snug text-[#2D3436] transition-colors group-hover:text-[#6C5CE7]">
+        <h3 className="mb-3 line-clamp-2 text-[14px] font-semibold leading-snug text-[rgb(var(--color-text))] transition-colors group-hover:text-[rgb(var(--color-primary))]">
           {title}
         </h3>
         <div className="mb-3 flex items-center gap-1.5">
-          <svg className="h-4 w-4 text-[#FECA57]" fill="currentColor" viewBox="0 0 24 24">
-            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-          </svg>
-          <span className="text-[13px] font-bold text-[#2D3436]">{avgRating.toFixed(1)}</span>
-          <span className="text-[13px] text-[#B2BEC3]">({reviewCount})</span>
+          <Star className="h-4 w-4 text-[rgb(var(--color-accent-yellow))] fill-[rgb(var(--color-accent-yellow))]" />
+          <span className="text-[13px] font-bold text-[rgb(var(--color-text))]">{avgRating.toFixed(1)}</span>
+          <span className="text-[13px] text-[rgb(var(--color-text-muted))]">({reviewCount})</span>
         </div>
-        <div className="border-t border-[#F1F3F8] pt-3">
-          <span className="text-[12px] text-[#B2BEC3]">החל מ-</span>
-          <span className="me-1.5 text-[18px] font-bold text-[#2D3436]">₪{startingPrice}</span>
+        <div className="border-t border-[rgb(var(--color-border-light))] pt-3">
+          <span className="text-[12px] text-[rgb(var(--color-text-muted))]">החל מ-</span>
+          <span className="me-1.5 text-[18px] font-bold text-[rgb(var(--color-text))]">₪{startingPrice}</span>
         </div>
       </div>
     </Link>

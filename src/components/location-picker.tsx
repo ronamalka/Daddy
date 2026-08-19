@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
+import { cn } from "@/lib/utils";
 
 interface District {
   code: number;
@@ -108,18 +109,18 @@ export function LocationPicker({ mode, value, areas = [], onChange, onAreasChang
   if (loading) {
     return (
       <div className="flex items-center justify-center py-6">
-        <div className="h-6 w-6 animate-spin rounded-full border-3 border-[#F0EEFF] border-t-[#6C5CE7]" />
+        <div className="h-6 w-6 animate-spin rounded-full border-3 border-[rgba(var(--color-primary),0.1)] border-t-[rgb(var(--color-primary))]" />
       </div>
     );
   }
 
   return (
     <div>
-      {label && <label className="mb-2 block text-[13px] font-semibold text-[#636E72]">{label}</label>}
+      {label && <label className="mb-2 block text-[13px] font-semibold text-[rgb(var(--color-text-secondary))]">{label}</label>}
 
       {/* Districts */}
       <div className="mb-3">
-        <p className="mb-2 text-[12px] font-medium text-[#B2BEC3]">אזור</p>
+        <p className="mb-2 text-[12px] font-medium text-[rgb(var(--color-text-muted))]">אזור</p>
         <div className="flex flex-wrap gap-2">
           {districts.map((d) => {
             const selected = mode === "multi" ? isDistrictSelected(d.code) : selectedDistrict === d.code;
@@ -129,13 +130,14 @@ export function LocationPicker({ mode, value, areas = [], onChange, onAreasChang
                 key={d.code}
                 type="button"
                 onClick={() => handleDistrictClick(d)}
-                className={`rounded-[9999px] px-4 py-2 text-[13px] font-semibold transition-all ${
+                className={cn(
+                  "rounded-full px-4 py-2 text-[13px] font-semibold transition-all",
                   selected
-                    ? "bg-[#6C5CE7] text-white shadow-[0_2px_8px_rgba(108,92,231,0.3)]"
+                    ? "bg-[rgb(var(--color-primary))] text-white shadow-[0_2px_8px_rgba(var(--color-primary),0.3)]"
                     : partial
-                    ? "border-2 border-[#6C5CE7] bg-[#F0EEFF] text-[#6C5CE7]"
-                    : "border border-[#E8ECF1] bg-white text-[#636E72] hover:border-[#A29BFE]/30 hover:text-[#6C5CE7]"
-                }`}
+                    ? "border-2 border-[rgb(var(--color-primary))] bg-[rgba(var(--color-primary),0.1)] text-[rgb(var(--color-primary))]"
+                    : "border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] text-[rgb(var(--color-text-secondary))] hover:border-[rgba(var(--color-primary-light),0.3)] hover:text-[rgb(var(--color-primary))]"
+                )}
               >
                 {d.name}
               </button>
@@ -148,9 +150,9 @@ export function LocationPicker({ mode, value, areas = [], onChange, onAreasChang
       {(mode === "single" ? selectedDistrict : true) && (
         <div>
           <div className="mb-2 flex items-center gap-2">
-            <p className="text-[12px] font-medium text-[#B2BEC3]">עיר</p>
+            <p className="text-[12px] font-medium text-[rgb(var(--color-text-muted))]">עיר</p>
             {mode === "multi" && areas.length > 0 && (
-              <span className="rounded-[9999px] bg-[#F0EEFF] px-2 py-0.5 text-[11px] font-semibold text-[#6C5CE7]">
+              <span className="rounded-full bg-[rgba(var(--color-primary),0.1)] px-2 py-0.5 text-[11px] font-semibold text-[rgb(var(--color-primary))]">
                 {areas.length} נבחרו
               </span>
             )}
@@ -160,9 +162,9 @@ export function LocationPicker({ mode, value, areas = [], onChange, onAreasChang
             placeholder="חפש עיר..."
             value={citySearch}
             onChange={(e) => setCitySearch(e.target.value)}
-            className="mb-2 w-full rounded-[12px] border border-[#E8ECF1] bg-[#FAFBFF] px-4 py-2.5 text-[13px] text-[#2D3436] placeholder-[#B2BEC3] focus:border-[#6C5CE7] focus:outline-none focus:ring-2 focus:ring-[#6C5CE7]/20"
+            className="mb-2 w-full rounded-xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface-elevated))] px-4 py-2.5 text-[13px] text-[rgb(var(--color-text))] placeholder-[rgb(var(--color-text-muted))] focus:border-[rgb(var(--color-primary))] focus:outline-none focus:ring-2 focus:ring-[rgba(var(--color-primary),0.2)]"
           />
-          <div className="max-h-48 overflow-y-auto rounded-[12px] border border-[#E8ECF1] bg-white">
+          <div className="max-h-48 overflow-y-auto rounded-xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))]">
             {filteredCities.slice(0, 100).map((c) => {
               const selected = mode === "multi"
                 ? isCitySelected(c.code) || isDistrictSelected(c.districtCode)
@@ -174,22 +176,24 @@ export function LocationPicker({ mode, value, areas = [], onChange, onAreasChang
                   type="button"
                   disabled={disabledByDistrict}
                   onClick={() => handleCityClick(c)}
-                  className={`flex w-full items-center justify-between px-4 py-2 text-[13px] transition-colors ${
+                  className={cn(
+                    "flex w-full items-center justify-between px-4 py-2 text-[13px] transition-colors",
                     selected
-                      ? "bg-[#F0EEFF] text-[#6C5CE7] font-medium"
-                      : "text-[#2D3436] hover:bg-[#FAFBFF]"
-                  } ${disabledByDistrict ? "opacity-40 cursor-not-allowed" : ""}`}
+                      ? "bg-[rgba(var(--color-primary),0.1)] text-[rgb(var(--color-primary))] font-medium"
+                      : "text-[rgb(var(--color-text))] hover:bg-[rgb(var(--color-surface-elevated))]",
+                    disabledByDistrict && "opacity-40 cursor-not-allowed"
+                  )}
                 >
                   <span>{c.name}</span>
-                  <span className="text-[11px] text-[#B2BEC3]">{c.districtName}</span>
+                  <span className="text-[11px] text-[rgb(var(--color-text-muted))]">{c.districtName}</span>
                 </button>
               );
             })}
             {filteredCities.length === 0 && (
-              <p className="px-4 py-3 text-[13px] text-[#B2BEC3]">לא נמצאו ערים</p>
+              <p className="px-4 py-3 text-[13px] text-[rgb(var(--color-text-muted))]">לא נמצאו ערים</p>
             )}
             {filteredCities.length > 100 && (
-              <p className="px-4 py-2 text-[11px] text-[#B2BEC3] text-center">מציג 100 מתוך {filteredCities.length} — חפש כדי לסנן</p>
+              <p className="px-4 py-2 text-[11px] text-[rgb(var(--color-text-muted))] text-center">מציג 100 מתוך {filteredCities.length} — חפש כדי לסנן</p>
             )}
           </div>
         </div>
@@ -198,18 +202,18 @@ export function LocationPicker({ mode, value, areas = [], onChange, onAreasChang
       {/* Selected areas summary (multi mode) */}
       {mode === "multi" && areas.length > 0 && (
         <div className="mt-3">
-          <p className="mb-1.5 text-[12px] font-medium text-[#B2BEC3]">אזורי שירות שנבחרו:</p>
+          <p className="mb-1.5 text-[12px] font-medium text-[rgb(var(--color-text-muted))]">אזורי שירות שנבחרו:</p>
           <div className="flex flex-wrap gap-1.5">
             {areas.map((a, i) => (
               <span
                 key={i}
-                className="inline-flex items-center gap-1 rounded-[9999px] bg-[#F0EEFF] px-3 py-1 text-[12px] font-medium text-[#6C5CE7]"
+                className="inline-flex items-center gap-1 rounded-full bg-[rgba(var(--color-primary),0.1)] px-3 py-1 text-[12px] font-medium text-[rgb(var(--color-primary))]"
               >
                 {a.cityName || a.districtName}
                 <button
                   type="button"
                   onClick={() => onAreasChange?.(areas.filter((_, j) => j !== i))}
-                  className="text-[#A29BFE] hover:text-[#6C5CE7]"
+                  className="text-[rgb(var(--color-primary-light))] hover:text-[rgb(var(--color-primary))]"
                 >
                   ×
                 </button>
