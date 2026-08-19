@@ -141,7 +141,7 @@ orderDetailRoutes.post("/:id/messages", requireAuth, async (req: Request, res: R
     return;
   }
 
-  const { content } = req.body;
+  const { content, attachment } = req.body;
   if (!content?.trim()) {
     res.status(400).json({ error: "Message cannot be empty" });
     return;
@@ -152,6 +152,7 @@ orderDetailRoutes.post("/:id/messages", requireAuth, async (req: Request, res: R
   const message = await prisma.message.create({
     data: {
       content,
+      attachment: attachment || null,
       orderId,
       senderId: req.user!.id,
       receiverId,

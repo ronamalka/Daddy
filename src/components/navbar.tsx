@@ -20,6 +20,7 @@ export function Navbar() {
   const { data: session } = useSession();
   const [menuOpen, setMenuOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
   const profileRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -31,6 +32,19 @@ export function Navbar() {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+
+  useEffect(() => {
+    if (!session?.user) return;
+    function fetchUnread() {
+      fetch("/api/messages/unread-count")
+        .then((r) => r.json())
+        .then((d) => setUnreadCount(d.count ?? 0))
+        .catch(() => {});
+    }
+    fetchUnread();
+    const interval = setInterval(fetchUnread, 30000);
+    return () => clearInterval(interval);
+  }, [session]);
 
   const closeMobile = () => setMenuOpen(false);
 
@@ -64,8 +78,13 @@ export function Navbar() {
               <NavLink href="/orders">הזמנות</NavLink>
               <NavLink href="/favorites">מועדפים</NavLink>
               <NavLink href="/inbox">
-                <span className="flex items-center gap-1.5">
+                <span className="relative flex items-center gap-1.5">
                   הודעות
+                  {unreadCount > 0 && (
+                    <span className="absolute -top-2 -end-4 flex h-5 min-w-5 items-center justify-center rounded-full bg-[#E17055] px-1 text-[10px] font-bold text-white">
+                      {unreadCount > 99 ? "99+" : unreadCount}
+                    </span>
+                  )}
                 </span>
               </NavLink>
               {session.user.role === "ADMIN" && (
@@ -233,7 +252,14 @@ export function Navbar() {
                 מועדפים
               </MobileNavLink>
               <MobileNavLink href="/inbox" onClick={closeMobile}>
-                הודעות
+                <span className="flex items-center gap-2">
+                  הודעות
+                  {unreadCount > 0 && (
+                    <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-[#E17055] px-1 text-[10px] font-bold text-white">
+                      {unreadCount > 99 ? "99+" : unreadCount}
+                    </span>
+                  )}
+                </span>
               </MobileNavLink>
               {session.user.role === "ADMIN" && (
                 <MobileNavLink href="/admin" onClick={closeMobile}>

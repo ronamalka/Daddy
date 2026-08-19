@@ -5,7 +5,7 @@ import { prisma } from "../index";
 export const messagesRoutes = Router();
 
 messagesRoutes.post("/", requireAuth, async (req: Request, res: Response) => {
-  const { receiverId, content } = req.body;
+  const { receiverId, content, attachment } = req.body;
 
   if (!receiverId || !content?.trim()) {
     res.status(400).json({ error: "receiverId and content required" });
@@ -20,6 +20,7 @@ messagesRoutes.post("/", requireAuth, async (req: Request, res: Response) => {
   const message = await prisma.message.create({
     data: {
       content,
+      attachment: attachment || null,
       senderId: req.user!.id,
       receiverId,
     },
@@ -55,4 +56,38 @@ messagesRoutes.get("/", requireAuth, async (req: Request, res: Response) => {
   });
 
   res.json(messages);
+});
+
+messagesRoutes.get("/unread-count", requireAuth, async (req: Request, res: Response) => {
+  const count = await prisma.message.count({
+    where: {
+      receiverId: req.user!.id,
+      readAt: null,
+    },
+  });
+
+  res.json({ count });
+});
+
+messagesRoutes.post("/mark-read", requireAuth, async (req: Request, res: Response) => {
+  const { orderId, senderId } = req.body;
+
+  const where: Record<string, unknown> = {
+    receiverId: req.user!.id,
+    readAt: null,
+  };
+
+  if (orderId) {
+    where.orderId = orderId;
+  } else if (senderId) {
+    where.senderId = senderId;
+    where.orderId = null;
+  }
+
+  const { count } = await prisma.message.updateMany({
+    where,
+    data: { readAt: new Date() },
+  });
+
+  res.json({ marked: count });
 });

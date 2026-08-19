@@ -27,7 +27,7 @@ interface OrderDetail {
   gig: { id: string; title: string; image: string | null; tiers: { tier: string; deliveryDays: number }[]; requirements: GigRequirement[] };
   buyer: { id: string; name: string; avatar: string | null };
   seller: { id: string; name: string; avatar: string | null };
-  messages: { id: string; content: string; createdAt: string; sender: { id: string; name: string; avatar: string | null } }[];
+  messages: { id: string; content: string; attachment: string | null; createdAt: string; sender: { id: string; name: string; avatar: string | null } }[];
   requirements: OrderRequirement[];
   review: {
     id: string;
@@ -76,8 +76,33 @@ export default function OrderDetailPage() {
           data.requirements.forEach((r: OrderRequirement) => { answers[r.requirementId] = r.answer; });
           setReqAnswers(answers);
         }
+        fetch("/api/messages/mark-read", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ orderId: params.id }),
+        }).catch(() => {});
       });
   }, [params.id]);
+
+  useEffect(() => {
+    if (!order) return;
+    const interval = setInterval(() => {
+      fetch(`/api/orders/${params.id}`)
+        .then((r) => r.json())
+        .then((data) => {
+          if (data.messages?.length > (order.messages?.length ?? 0)) {
+            setOrder((prev) => prev ? { ...prev, messages: data.messages } : prev);
+            fetch("/api/messages/mark-read", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ orderId: params.id }),
+            }).catch(() => {});
+          }
+        })
+        .catch(() => {});
+    }, 10000);
+    return () => clearInterval(interval);
+  }, [params.id, order?.messages?.length]);
 
   async function sendMessage(e: React.FormEvent) {
     e.preventDefault();
@@ -429,6 +454,17 @@ export default function OrderDetailPage() {
                     <div className={`max-w-[320px] ${isMe ? "order-2" : "order-1"}`}>
                       <div className={`rounded-[16px] px-4 py-3 ${isMe ? "rounded-br-[4px] bg-[#6C5CE7] text-white" : "rounded-bl-[4px] bg-[#FFFFFF] border border-[#E8ECF1] text-[#2D3436]"}`}>
                         <p className={`text-[12px] font-semibold mb-1 ${isMe ? "text-white/70" : "text-[#6C5CE7]"}`}>{msg.sender.name}</p>
+                        {msg.attachment && (
+                          <a href={msg.attachment} target="_blank" rel="noopener noreferrer" className="mb-2 block">
+                            {/\.(jpg|jpeg|png|gif|webp)$/i.test(msg.attachment) ? (
+                              <img src={msg.attachment} alt="צרופה" className="max-w-full rounded-[8px] max-h-48" />
+                            ) : (
+                              <span className={`inline-flex items-center gap-1 rounded-[8px] px-2 py-1 text-[12px] ${isMe ? "bg-white/20" : "bg-[#F0EEFF]"}`}>
+                                📎 קובץ מצורף
+                              </span>
+                            )}
+                          </a>
+                        )}
                         <p className="text-[14px] leading-relaxed">{msg.content}</p>
                       </div>
                       <p className={`mt-1 text-[11px] text-[#B2BEC3] ${isMe ? "text-right" : "text-left"}`}>

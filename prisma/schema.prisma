@@ -330,9 +330,11 @@ model ServicePrice {
 model Message {
   id         String   @id @default(cuid())
   content    String
+  attachment String?
   orderId    String?
   senderId   String
   receiverId String
+  readAt     DateTime?
   createdAt  DateTime @default(now())
 
   order    Order? @relation(fields: [orderId], references: [id])

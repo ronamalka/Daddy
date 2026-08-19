@@ -55,9 +55,11 @@ model OrderRequirement {
 model Message {
   id         String   @id @default(cuid())
   content    String
+  attachment String?
   orderId    String?
   senderId   String   // cross-service ref to users-service
   receiverId String   // cross-service ref to users-service
+  readAt     DateTime?
   createdAt  DateTime @default(now())
 
   order Order? @relation(fields: [orderId], references: [id])
