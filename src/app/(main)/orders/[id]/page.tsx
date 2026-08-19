@@ -5,6 +5,18 @@ import { useSession } from "next-auth/react";
 import { useParams } from "next/navigation";
 import { ReviewForm } from "@/components/review-form";
 
+interface GigRequirement {
+  id: string;
+  question: string;
+  required: boolean;
+}
+
+interface OrderRequirement {
+  id: string;
+  requirementId: string;
+  answer: string;
+}
+
 interface OrderDetail {
   id: string;
   tier: string;
@@ -12,10 +24,11 @@ interface OrderDetail {
   status: string;
   dueDate: string | null;
   createdAt: string;
-  gig: { id: string; title: string; image: string | null; tiers: { tier: string; deliveryDays: number }[] };
+  gig: { id: string; title: string; image: string | null; tiers: { tier: string; deliveryDays: number }[]; requirements: GigRequirement[] };
   buyer: { id: string; name: string; avatar: string | null };
   seller: { id: string; name: string; avatar: string | null };
   messages: { id: string; content: string; createdAt: string; sender: { id: string; name: string; avatar: string | null } }[];
+  requirements: OrderRequirement[];
   review: {
     id: string;
     rating: number;
@@ -45,11 +58,22 @@ export default function OrderDetailPage() {
   const [reviewOpen, setReviewOpen] = useState(false);
   const [sellerResponseText, setSellerResponseText] = useState("");
   const [respondingTo, setRespondingTo] = useState(false);
+  const [reqAnswers, setReqAnswers] = useState<Record<string, string>>({});
+  const [submittingReqs, setSubmittingReqs] = useState(false);
+  const [reqsSubmitted, setReqsSubmitted] = useState(false);
 
   useEffect(() => {
     fetch(`/api/orders/${params.id}`)
       .then((r) => r.json())
-      .then(setOrder);
+      .then((data) => {
+        setOrder(data);
+        if (data.requirements?.length > 0) {
+          setReqsSubmitted(true);
+          const answers: Record<string, string> = {};
+          data.requirements.forEach((r: OrderRequirement) => { answers[r.requirementId] = r.answer; });
+          setReqAnswers(answers);
+        }
+      });
   }, [params.id]);
 
   async function sendMessage(e: React.FormEvent) {
@@ -101,6 +125,24 @@ export default function OrderDetailPage() {
       .then((r) => r.json())
       .then(setOrder);
     setReviewOpen(false);
+  }
+
+  async function submitRequirements() {
+    if (!order) return;
+    const answers = Object.entries(reqAnswers)
+      .filter(([, v]) => v.trim())
+      .map(([requirementId, answer]) => ({ requirementId, answer }));
+    if (answers.length === 0) return;
+    setSubmittingReqs(true);
+    const res = await fetch(`/api/orders/${params.id}/requirements`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ answers }),
+    });
+    if (res.ok) {
+      setReqsSubmitted(true);
+    }
+    setSubmittingReqs(false);
   }
 
   const [now] = useState(() => Date.now());
@@ -165,13 +207,19 @@ export default function OrderDetailPage() {
         {/* Action Buttons */}
         <div className="flex flex-wrap gap-3">
           {isSeller && order.status === "PENDING" && (
-            <button onClick={() => updateStatus("IN_PROGRESS")} className="flex items-center gap-2 rounded-[12px] bg-[#6C5CE7] px-5 py-2.5 text-[14px] font-semibold text-white transition-all hover:bg-[#5A4BD1]">התחל לעבוד</button>
+            <>
+              <button onClick={() => updateStatus("IN_PROGRESS")} className="flex items-center gap-2 rounded-[12px] bg-[#6C5CE7] px-5 py-2.5 text-[14px] font-semibold text-white transition-all hover:bg-[#5A4BD1]">קבל הזמנה</button>
+              <button onClick={() => updateStatus("CANCELLED")} className="flex items-center gap-2 rounded-[12px] border-2 border-[#E17055]/20 bg-[#E17055]/5 px-5 py-2.5 text-[14px] font-semibold text-[#E17055] transition-all hover:bg-[#E17055]/10">דחה הזמנה</button>
+            </>
           )}
           {isSeller && order.status === "IN_PROGRESS" && (
-            <button onClick={() => updateStatus("DELIVERED")} className="flex items-center gap-2 rounded-[12px] bg-[#6C5CE7] px-5 py-2.5 text-[14px] font-semibold text-white transition-all hover:bg-[#5A4BD1]">שלח הזמנה</button>
+            <button onClick={() => updateStatus("DELIVERED")} className="flex items-center gap-2 rounded-[12px] bg-[#6C5CE7] px-5 py-2.5 text-[14px] font-semibold text-white transition-all hover:bg-[#5A4BD1]">סמן כנמסר</button>
           )}
           {isBuyer && order.status === "DELIVERED" && (
-            <button onClick={() => updateStatus("COMPLETED")} className="flex items-center gap-2 rounded-[12px] bg-[#00B894] px-5 py-2.5 text-[14px] font-semibold text-white transition-all hover:bg-[#00A884]">אשר קבלה</button>
+            <>
+              <button onClick={() => updateStatus("COMPLETED")} className="flex items-center gap-2 rounded-[12px] bg-[#00B894] px-5 py-2.5 text-[14px] font-semibold text-white transition-all hover:bg-[#00A884]">אשר קבלה</button>
+              <button onClick={() => updateStatus("REVISION")} className="flex items-center gap-2 rounded-[12px] border-2 border-[#FDCB6E]/30 bg-[#FDCB6E]/10 px-5 py-2.5 text-[14px] font-semibold text-[#E67E22] transition-all hover:bg-[#FDCB6E]/20">בקש תיקון</button>
+            </>
           )}
           {isBuyer && order.status === "PENDING" && (
             <button onClick={() => updateStatus("CANCELLED")} className="flex items-center gap-2 rounded-[12px] border-2 border-[#E17055]/20 bg-[#E17055]/5 px-5 py-2.5 text-[14px] font-semibold text-[#E17055] transition-all hover:bg-[#E17055]/10">בטל הזמנה</button>
@@ -235,6 +283,60 @@ export default function OrderDetailPage() {
           </div>
         )}
       </div>
+
+      {/* Requirements Form */}
+      {order.gig.requirements.length > 0 && (
+        <div className="mb-6 rounded-[16px] border border-[#E8ECF1] bg-[#FFFFFF] p-6 shadow-[0_2px_8px_rgba(108,92,231,0.06)]">
+          <div className="flex items-center gap-2 mb-4">
+            <svg className="h-5 w-5 text-[#6C5CE7]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25zM6.75 12h.008v.008H6.75V12zm0 3h.008v.008H6.75V15zm0 3h.008v.008H6.75V18z" />
+            </svg>
+            <h2 className="text-[16px] font-bold text-[#2D3436]">דרישות ההזמנה</h2>
+            {reqsSubmitted && (
+              <span className="rounded-[9999px] bg-[#00B894]/15 px-2.5 py-0.5 text-[11px] font-semibold text-[#00B894]">נשלח</span>
+            )}
+          </div>
+
+          {isBuyer && !reqsSubmitted ? (
+            <div className="space-y-4">
+              <p className="text-[13px] text-[#636E72]">מלא את הפרטים הבאים כדי שבעל המקצוע יוכל להתחיל לעבוד</p>
+              {order.gig.requirements.map((req) => (
+                <div key={req.id}>
+                  <label className="mb-1.5 flex items-center gap-1 text-[13px] font-semibold text-[#2D3436]">
+                    {req.question}
+                    {req.required && <span className="text-[#FF6B6B]">*</span>}
+                  </label>
+                  <textarea
+                    value={reqAnswers[req.id] || ""}
+                    onChange={(e) => setReqAnswers((prev) => ({ ...prev, [req.id]: e.target.value }))}
+                    rows={2}
+                    className="w-full rounded-[10px] border border-[#E8ECF1] bg-[#FAFBFF] px-3 py-2.5 text-[14px] text-[#2D3436] placeholder-[#B2BEC3] focus:border-[#6C5CE7] focus:outline-none focus:ring-2 focus:ring-[#6C5CE7]/20 resize-none"
+                    placeholder="הזן תשובה..."
+                  />
+                </div>
+              ))}
+              <button
+                onClick={submitRequirements}
+                disabled={submittingReqs || order.gig.requirements.filter((r) => r.required).some((r) => !reqAnswers[r.id]?.trim())}
+                className="rounded-[12px] bg-[#6C5CE7] px-5 py-2.5 text-[14px] font-semibold text-white transition-all hover:bg-[#5A4BD1] disabled:opacity-40 disabled:cursor-not-allowed"
+              >
+                {submittingReqs ? "שולח..." : "שלח דרישות"}
+              </button>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {order.gig.requirements.map((req) => (
+                <div key={req.id} className="rounded-[10px] bg-[#FAFBFF] p-3">
+                  <p className="text-[13px] font-semibold text-[#2D3436] mb-1">{req.question}</p>
+                  <p className="text-[14px] text-[#636E72]">
+                    {reqAnswers[req.id] || <span className="text-[#B2BEC3] italic">לא נענה</span>}
+                  </p>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
 
       {/* New Midrag-style Review Form */}
       {reviewOpen && (

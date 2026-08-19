@@ -9,3 +9,7 @@ resources:
   - app-deployment.yaml
   - app-service.yaml
   - app-route.yaml
+  - users-deployment.yaml
+  - gigs-deployment.yaml
+  - orders-deployment.yaml
+  - requests-deployment.yaml

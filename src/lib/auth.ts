@@ -1,10 +1,15 @@
 import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
-import { compare } from "bcryptjs";
-import { prisma } from "./prisma";
+import Google from "next-auth/providers/google";
+
+const USERS_SERVICE = process.env.USERS_SERVICE_URL || "http://localhost:4001";
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [
+    Google({
+      clientId: process.env.GOOGLE_CLIENT_ID,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+    }),
     Credentials({
       credentials: {
         email: { label: "Email", type: "email" },
@@ -15,21 +20,44 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         const password = credentials?.password as string;
         if (!email || !password) return null;
 
-        const user = await prisma.user.findUnique({ where: { email } });
-        if (!user) return null;
+        const res = await fetch(`${USERS_SERVICE}/login`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, password }),
+        });
 
-        const valid = await compare(password, user.passwordHash);
-        if (!valid) return null;
+        if (!res.ok) return null;
 
+        const user = await res.json();
         return { id: user.id, email: user.email, name: user.name, role: user.role };
       },
     }),
   ],
   callbacks: {
+    async signIn({ user, account }) {
+      if (account?.provider === "google") {
+        const res = await fetch(`${USERS_SERVICE}/oauth`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            email: user.email,
+            name: user.name,
+            avatar: user.image,
+          }),
+        });
+
+        if (!res.ok) return false;
+
+        const dbUser = await res.json();
+        user.id = dbUser.id;
+        (user as { role?: string }).role = dbUser.role;
+      }
+      return true;
+    },
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
-        token.role = (user as { role: string }).role;
+        token.role = (user as { role?: string }).role;
       }
       return token;
     },

@@ -1,16 +1,6 @@
 import { NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
 import { auth } from "@/lib/auth";
-
-async function resolveUserId(session: { user: { id?: string; email?: string | null } }) {
-  const user = await prisma.user.findUnique({ where: { id: session.user.id } });
-  if (user) return user.id;
-  if (session.user.email) {
-    const byEmail = await prisma.user.findUnique({ where: { email: session.user.email } });
-    if (byEmail) return byEmail.id;
-  }
-  return null;
-}
+import { proxyRequest, GIGS_SERVICE, ORDERS_SERVICE } from "@/lib/gateway";
 
 export async function POST(request: Request, { params }: { params: Promise<{ id: string }> }) {
   const { id: orderId } = await params;
@@ -19,30 +9,20 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const userId = await resolveUserId(session);
-  if (!userId) {
-    return NextResponse.json({ error: "User not found" }, { status: 404 });
-  }
+  const user = session.user as { id: string; email: string; name: string; role: string };
 
-  const order = await prisma.order.findUnique({
-    where: { id: orderId },
-    include: { review: true },
-  });
+  const { data: order, status: orderStatus } = await proxyRequest(ORDERS_SERVICE, `/orders/${orderId}`, { user });
 
-  if (!order) {
+  if (orderStatus !== 200) {
     return NextResponse.json({ error: "Order not found" }, { status: 404 });
   }
 
-  if (order.buyerId !== userId) {
+  if (order.buyerId !== user.id) {
     return NextResponse.json({ error: "Only the buyer can review" }, { status: 403 });
   }
 
   if (order.status !== "COMPLETED") {
     return NextResponse.json({ error: "Order must be completed" }, { status: 400 });
-  }
-
-  if (order.review) {
-    return NextResponse.json({ error: "Already reviewed" }, { status: 409 });
   }
 
   const { comment, ratingAttitude, ratingTimeliness, ratingPrice, ratingQuality } = await request.json();
@@ -62,19 +42,20 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
 
   const overall = Math.round((attitude + timeliness + price + quality) / 4);
 
-  const review = await prisma.review.create({
-    data: {
+  const { data, status } = await proxyRequest(GIGS_SERVICE, "/reviews", {
+    method: "POST",
+    body: {
+      orderId,
+      gigId: order.gigId,
       rating: overall,
       comment,
       ratingAttitude: attitude,
       ratingTimeliness: timeliness,
       ratingPrice: price,
       ratingQuality: quality,
-      orderId,
-      gigId: order.gigId,
-      userId,
     },
+    user,
   });
 
-  return NextResponse.json(review, { status: 201 });
+  return NextResponse.json(data, { status });
 }

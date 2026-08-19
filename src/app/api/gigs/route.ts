@@ -1,121 +1,64 @@
 import { NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
 import { auth } from "@/lib/auth";
+import { proxyRequest, GIGS_SERVICE, USERS_SERVICE } from "@/lib/gateway";
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
-  const search = searchParams.get("search") || "";
-  const category = searchParams.get("category") || "";
-  const minPrice = parseFloat(searchParams.get("minPrice") || "0");
-  const maxPrice = parseFloat(searchParams.get("maxPrice") || "999999");
-  const sortBy = searchParams.get("sortBy") || "newest";
-  const district = searchParams.get("district");
-  const cityCode = searchParams.get("cityCode");
+  const params = searchParams.toString();
+  const path = params ? `/gigs?${params}` : "/gigs";
+  const { data, status } = await proxyRequest(GIGS_SERVICE, path);
 
-  const orderBy: Record<string, unknown> =
-    sortBy === "price_asc" ? { tiers: { _min: { price: "asc" } } }
-    : sortBy === "price_desc" ? { tiers: { _min: { price: "desc" } } }
-    : sortBy === "popular" ? { reviews: { _count: "desc" } }
-    : { createdAt: "desc" };
-
-  const locationFilter = (district || cityCode) ? {
-    seller: {
-      serviceAreas: {
-        some: {
-          ...(cityCode ? { cityCode: Number(cityCode) } : {}),
-          ...(district && !cityCode ? { districtCode: Number(district) } : {}),
-        },
-      },
-    },
-  } : {};
-
-  const gigs = await prisma.gig.findMany({
-    where: {
-      ...(search && {
-        OR: [
-          { title: { contains: search, mode: "insensitive" as const } },
-          { description: { contains: search, mode: "insensitive" as const } },
-        ],
-      }),
-      ...(category && { category: { slug: category } }),
-      tiers: { some: { price: { gte: minPrice, lte: maxPrice } } },
-      ...locationFilter,
-    },
-    include: {
-      seller: { select: { id: true, name: true, avatar: true, serviceAreas: { select: { districtName: true, cityName: true }, take: 3 } } },
-      category: true,
-      tiers: { orderBy: { price: "asc" as const }, take: 1 },
-      reviews: { select: { rating: true } },
-      _count: { select: { favorites: true } },
-    },
-    orderBy,
-  });
-
-  const gigsWithRating = gigs.map((gig) => {
-    const avgRating =
-      gig.reviews.length > 0
-        ? gig.reviews.reduce((sum, r) => sum + r.rating, 0) / gig.reviews.length
-        : 0;
-    return { ...gig, avgRating, reviewCount: gig.reviews.length, favoriteCount: gig._count.favorites };
-  });
-
-  if (sortBy === "rating") {
-    gigsWithRating.sort((a, b) => b.avgRating - a.avgRating);
+  if (status !== 200 || !data.gigs) {
+    return NextResponse.json(data, { status });
   }
 
-  return NextResponse.json(gigsWithRating);
+  const sellerIds = [...new Set(data.gigs.map((g: { sellerId: string }) => g.sellerId))] as string[];
+
+  const sellerMap: Record<string, { id: string; name: string; avatar: string | null; serviceAreas?: { districtName: string; cityName: string | null }[] }> = {};
+  await Promise.all(
+    sellerIds.map(async (id) => {
+      const { data: seller } = await proxyRequest(USERS_SERVICE, `/sellers/${id}`);
+      if (seller) {
+        sellerMap[id] = {
+          id: seller.id,
+          name: seller.name,
+          avatar: seller.avatar,
+          serviceAreas: seller.serviceAreas,
+        };
+      }
+    })
+  );
+
+  let enriched = data.gigs.map((gig: { sellerId: string }) => ({
+    ...gig,
+    seller: sellerMap[gig.sellerId] || { id: gig.sellerId, name: "משתמש", avatar: null },
+  }));
+
+  const district = searchParams.get("district");
+  if (district) {
+    enriched = enriched.filter((gig: { seller: { serviceAreas?: { districtName: string }[] } }) =>
+      gig.seller.serviceAreas?.some((a: { districtName: string }) => a.districtName === district)
+    );
+  }
+
+  const filteredTotal = district ? enriched.length : data.total;
+  const filteredHasMore = district ? false : data.hasMore;
+
+  return NextResponse.json({ gigs: enriched, total: filteredTotal, hasMore: filteredHasMore });
 }
 
 export async function POST(request: Request) {
   const session = await auth();
-  if (!session?.user || session.user.role !== "SELLER") {
+  if (!session?.user || (session.user as { role: string }).role !== "SELLER") {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const { title, description, image, categoryId, tiers, faqs, requirements } = await request.json();
-
-  if (!title || !description || !categoryId || !tiers?.length) {
-    return NextResponse.json({ error: "Missing fields" }, { status: 400 });
-  }
-
-  const gig = await prisma.gig.create({
-    data: {
-      title,
-      description,
-      image,
-      categoryId,
-      sellerId: session.user.id,
-      tiers: {
-        create: tiers.map((t: { tier: string; title: string; description: string; price: number; deliveryDays: number; revisions: number }) => ({
-          tier: t.tier,
-          title: t.title,
-          description: t.description,
-          price: t.price,
-          deliveryDays: t.deliveryDays,
-          revisions: t.revisions,
-        })),
-      },
-      ...(faqs?.length && {
-        faqs: {
-          create: faqs.map((f: { question: string; answer: string }, i: number) => ({
-            question: f.question,
-            answer: f.answer,
-            order: i,
-          })),
-        },
-      }),
-      ...(requirements?.length && {
-        requirements: {
-          create: requirements.map((r: { question: string; required: boolean }, i: number) => ({
-            question: r.question,
-            required: r.required ?? true,
-            order: i,
-          })),
-        },
-      }),
-    },
-    include: { tiers: true, category: true, faqs: true, requirements: true },
+  const body = await request.json();
+  const user = session.user as { id: string; email: string; name: string; role: string };
+  const { data, status } = await proxyRequest(GIGS_SERVICE, "/gigs", {
+    method: "POST",
+    body,
+    user,
   });
-
-  return NextResponse.json(gig, { status: 201 });
+  return NextResponse.json(data, { status });
 }

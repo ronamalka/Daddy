@@ -1,0 +1,50 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum RequestStatus {
+  OPEN
+  IN_PROGRESS
+  CLOSED
+}
+
+model ServiceRequest {
+  id           String        @id @default(cuid())
+  title        String
+  description  String
+  serviceSlug  String?
+  buyerId      String        // cross-service ref to users-service
+  districtCode Int?
+  districtName String?
+  cityCode     Int?
+  cityName     String?
+  status       RequestStatus @default(OPEN)
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  responses RequestResponse[]
+
+  @@index([buyerId])
+  @@index([status])
+  @@index([districtCode])
+}
+
+model RequestResponse {
+  id            String   @id @default(cuid())
+  requestId     String
+  sellerId      String   // cross-service ref to users-service
+  message       String
+  proposedPrice Float?
+  createdAt     DateTime @default(now())
+
+  request ServiceRequest @relation(fields: [requestId], references: [id], onDelete: Cascade)
+
+  @@unique([requestId, sellerId])
+  @@index([requestId])
+  @@index([sellerId])
+}

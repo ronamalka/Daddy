@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
 import { auth } from "@/lib/auth";
+import { proxyRequest, ORDERS_SERVICE, GIGS_SERVICE, USERS_SERVICE } from "@/lib/gateway";
 
 export async function GET() {
   const session = await auth();
@@ -8,23 +8,42 @@ export async function GET() {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const where =
-    session.user.role === "SELLER"
-      ? { sellerId: session.user.id }
-      : { buyerId: session.user.id };
+  const user = session.user as { id: string; email: string; name: string; role: string };
+  const { data, status } = await proxyRequest(ORDERS_SERVICE, "/orders", { user });
 
-  const orders = await prisma.order.findMany({
-    where,
-    include: {
-      gig: { select: { id: true, title: true, image: true } },
-      buyer: { select: { id: true, name: true } },
-      seller: { select: { id: true, name: true } },
-      review: true,
-    },
-    orderBy: { createdAt: "desc" },
-  });
+  if (status !== 200 || !Array.isArray(data)) {
+    return NextResponse.json(data, { status });
+  }
 
-  return NextResponse.json(orders);
+  const gigIds = [...new Set(data.map((o: { gigId: string }) => o.gigId))] as string[];
+  const userIds = [...new Set(data.flatMap((o: { buyerId: string; sellerId: string }) => [o.buyerId, o.sellerId]))] as string[];
+
+  const gigMap: Record<string, { id: string; title: string; image: string | null }> = {};
+  const userMap: Record<string, { id: string; name: string; avatar: string | null }> = {};
+
+  await Promise.all([
+    ...gigIds.map(async (id) => {
+      const { data: gig } = await proxyRequest(GIGS_SERVICE, `/gigs/${id}`);
+      if (gig) {
+        gigMap[id] = { id: gig.id, title: gig.title, image: gig.image };
+      }
+    }),
+    ...userIds.map(async (id) => {
+      const { data: u } = await proxyRequest(USERS_SERVICE, `/sellers/${id}`);
+      if (u) {
+        userMap[id] = { id: u.id, name: u.name, avatar: u.avatar };
+      }
+    }),
+  ]);
+
+  const enriched = data.map((order: { gigId: string; buyerId: string; sellerId: string }) => ({
+    ...order,
+    gig: gigMap[order.gigId] || { id: order.gigId, title: "שירות", image: null },
+    buyer: userMap[order.buyerId] || { id: order.buyerId, name: "משתמש", avatar: null },
+    seller: userMap[order.sellerId] || { id: order.sellerId, name: "משתמש", avatar: null },
+  }));
+
+  return NextResponse.json(enriched);
 }
 
 export async function POST(request: Request) {
@@ -35,38 +54,27 @@ export async function POST(request: Request) {
 
   const { gigId, tier } = await request.json();
 
-  const gig = await prisma.gig.findUnique({
-    where: { id: gigId },
-    include: { tiers: true },
-  });
-
-  if (!gig) {
+  const { data: gig, status: gigStatus } = await proxyRequest(GIGS_SERVICE, `/gigs/${gigId}`);
+  if (gigStatus !== 200) {
     return NextResponse.json({ error: "Gig not found" }, { status: 404 });
   }
 
-  if (gig.sellerId === session.user.id) {
-    return NextResponse.json({ error: "Cannot order your own gig" }, { status: 400 });
-  }
-
-  const pricingTier = gig.tiers.find((t) => t.tier === tier);
+  const pricingTier = gig.tiers?.find((t: { tier: string }) => t.tier === tier);
   if (!pricingTier) {
     return NextResponse.json({ error: "Invalid tier" }, { status: 400 });
   }
 
-  const dueDate = new Date();
-  dueDate.setDate(dueDate.getDate() + pricingTier.deliveryDays);
-
-  const order = await prisma.order.create({
-    data: {
+  const user = session.user as { id: string; email: string; name: string; role: string };
+  const { data, status } = await proxyRequest(ORDERS_SERVICE, "/orders", {
+    method: "POST",
+    body: {
       gigId,
-      buyerId: session.user.id,
       sellerId: gig.sellerId,
       tier,
       price: pricingTier.price,
-      dueDate,
+      deliveryDays: pricingTier.deliveryDays,
     },
-    include: { gig: true },
+    user,
   });
-
-  return NextResponse.json(order, { status: 201 });
+  return NextResponse.json(data, { status });
 }

@@ -1,0 +1,71 @@
+services:
+  postgres:
+    image: postgres:16
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: daddy
+      POSTGRES_PASSWORD: daddypass123
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./init-databases.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U daddy"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  users-service:
+    build:
+      context: .
+      dockerfile: services/users/Dockerfile
+    ports:
+      - "4001:4001"
+    environment:
+      PORT: "4001"
+      DATABASE_URL: postgres://daddy:daddypass123@postgres:5432/daddy_users
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  gigs-service:
+    build:
+      context: .
+      dockerfile: services/gigs/Dockerfile
+    ports:
+      - "4002:4002"
+    environment:
+      PORT: "4002"
+      DATABASE_URL: postgres://daddy:daddypass123@postgres:5432/daddy_gigs
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  orders-service:
+    build:
+      context: .
+      dockerfile: services/orders/Dockerfile
+    ports:
+      - "4003:4003"
+    environment:
+      PORT: "4003"
+      DATABASE_URL: postgres://daddy:daddypass123@postgres:5432/daddy_orders
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  requests-service:
+    build:
+      context: .
+      dockerfile: services/requests/Dockerfile
+    ports:
+      - "4004:4004"
+    environment:
+      PORT: "4004"
+      DATABASE_URL: postgres://daddy:daddypass123@postgres:5432/daddy_requests
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+volumes:
+  pgdata:

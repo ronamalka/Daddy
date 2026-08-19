@@ -1,0 +1,32 @@
+FROM node:22-alpine AS builder
+
+WORKDIR /app/services/orders
+
+COPY services/orders/package.json services/orders/package-lock.json* ./
+RUN npm install
+
+COPY services/shared/ /app/services/shared/
+COPY services/tsconfig.base.json /app/services/tsconfig.base.json
+COPY services/orders/ ./
+
+RUN DATABASE_URL="postgresql://dummy:dummy@localhost:5432/dummy" npx prisma generate
+RUN npx tsc
+
+FROM node:22-alpine AS runner
+
+WORKDIR /app
+
+ENV NODE_ENV=production
+
+COPY --from=builder /app/services/orders/package.json ./package.json
+COPY --from=builder /app/services/orders/node_modules ./node_modules
+COPY --from=builder /app/services/orders/dist ./dist
+
+RUN addgroup -g 1001 -S nodejs && \
+    adduser -S appuser -u 1001 && \
+    chgrp -R 0 /app && chmod -R g=u /app
+
+USER 1001
+
+EXPOSE 4003
+CMD ["node", "dist/orders/src/index.js"]

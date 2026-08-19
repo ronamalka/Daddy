@@ -1,61 +1,30 @@
 import { NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
+import { proxyRequest, USERS_SERVICE, GIGS_SERVICE, ORDERS_SERVICE } from "@/lib/gateway";
 
 export async function GET() {
-  const sellers = await prisma.user.findMany({
-    where: { role: "SELLER" },
-    select: {
-      id: true,
-      name: true,
-      avatar: true,
-      bio: true,
-      city: true,
-      createdAt: true,
-      userServices: { select: { serviceSlug: true }, take: 5 },
-      serviceAreas: {
-        select: { districtName: true, cityName: true },
-        take: 3,
-      },
-      servicePrices: {
-        select: { serviceSlug: true, price: true },
-        orderBy: { price: "asc" },
-        take: 1,
-      },
-      _count: {
-        select: { ordersAsSeller: true },
-      },
-      gigs: {
-        select: {
-          reviews: { select: { rating: true } },
-        },
-      },
-    },
-    take: 20,
-  });
+  const { data: sellers } = await proxyRequest(USERS_SERVICE, "/featured-daddies");
 
-  const featured = sellers
-    .map((s) => {
-      const allReviews = s.gigs.flatMap((g) => g.reviews);
-      const avgRating =
-        allReviews.length > 0
-          ? allReviews.reduce((sum, r) => sum + r.rating, 0) / allReviews.length
-          : 0;
+  if (!Array.isArray(sellers) || sellers.length === 0) {
+    return NextResponse.json([]);
+  }
+
+  const enriched = await Promise.all(
+    sellers.map(async (s: { id: string; name: string; avatar: string | null; bio: string | null; city: string | null; services: string[]; serviceAreas: unknown[]; startingPrice: number | null }) => {
+      const { data: reviewData } = await proxyRequest(GIGS_SERVICE, `/gigs/reviews/by-seller/${s.id}`);
+      const { data: ordersData } = await proxyRequest(ORDERS_SERVICE, `/orders/count-by-seller/${s.id}`);
+
       return {
-        id: s.id,
-        name: s.name,
-        avatar: s.avatar,
-        bio: s.bio,
-        city: s.city,
-        services: s.userServices.map((us) => us.serviceSlug),
-        serviceAreas: s.serviceAreas,
-        completedOrders: s._count.ordersAsSeller,
-        reviewCount: allReviews.length,
-        avgRating: Math.round(avgRating * 10) / 10,
-        startingPrice: s.servicePrices[0]?.price ?? null,
+        ...s,
+        reviewCount: reviewData?.reviewCount || 0,
+        avgRating: reviewData?.avgRating || 0,
+        completedOrders: ordersData?.completedOrders || 0,
       };
     })
-    .sort((a, b) => b.reviewCount + b.completedOrders - (a.reviewCount + a.completedOrders))
+  );
+
+  const sorted = enriched
+    .sort((a, b) => (b.reviewCount + b.completedOrders) - (a.reviewCount + a.completedOrders))
     .slice(0, 6);
 
-  return NextResponse.json(featured);
+  return NextResponse.json(sorted);
 }

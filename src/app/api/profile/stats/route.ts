@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
 import { auth } from "@/lib/auth";
+import { proxyRequest, ORDERS_SERVICE, GIGS_SERVICE } from "@/lib/gateway";
 
 export async function GET() {
   const session = await auth();
@@ -8,34 +8,25 @@ export async function GET() {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const userId = session.user.id;
+  const user = session.user as { id: string; email: string; name: string; role: string };
 
-  const [ordersBuyer, ordersSeller, reviewsReceived, reviewsGiven, gigsCount, favoritesCount] =
-    await Promise.all([
-      prisma.order.count({ where: { buyerId: userId } }),
-      prisma.order.count({ where: { sellerId: userId } }),
-      prisma.review.findMany({
-        where: { gig: { sellerId: userId } },
-        select: { rating: true },
-      }),
-      prisma.review.count({ where: { userId } }),
-      prisma.gig.count({ where: { sellerId: userId } }),
-      prisma.favorite.count({ where: { userId } }),
-    ]);
+  const [ordersRes, reviewsRes, favoritesRes] = await Promise.all([
+    proxyRequest(ORDERS_SERVICE, "/orders/stats", { user }),
+    proxyRequest(GIGS_SERVICE, `/gigs/reviews/by-seller/${user.id}`),
+    proxyRequest(GIGS_SERVICE, `/gigs/favorites/count/${user.id}`),
+  ]);
 
-  const avgRating =
-    reviewsReceived.length > 0
-      ? reviewsReceived.reduce((sum, r) => sum + r.rating, 0) / reviewsReceived.length
-      : 0;
+  const gigsCountRes = await proxyRequest(GIGS_SERVICE, `/gigs?sellerId=${user.id}`);
+  const gigsCount = Array.isArray(gigsCountRes.data) ? gigsCountRes.data.length : 0;
 
   return NextResponse.json({
-    totalOrders: ordersBuyer + ordersSeller,
-    ordersBuyer,
-    ordersSeller,
-    reviewsReceived: reviewsReceived.length,
-    reviewsGiven,
-    avgRating: Math.round(avgRating * 10) / 10,
+    totalOrders: ordersRes.data.totalOrders || 0,
+    ordersBuyer: ordersRes.data.ordersBuyer || 0,
+    ordersSeller: ordersRes.data.ordersSeller || 0,
+    reviewsReceived: reviewsRes.data.reviewCount || 0,
+    reviewsGiven: 0,
+    avgRating: reviewsRes.data.avgRating || 0,
     gigsCount,
-    favoritesCount,
+    favoritesCount: favoritesRes.data.favoritesCount || 0,
   });
 }

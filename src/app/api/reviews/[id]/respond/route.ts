@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
 import { auth } from "@/lib/auth";
+import { proxyRequest, GIGS_SERVICE } from "@/lib/gateway";
 
 export async function POST(request: Request, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -9,32 +9,12 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const review = await prisma.review.findUnique({
-    where: { id },
-    include: { gig: { select: { sellerId: true } } },
+  const body = await request.json();
+  const user = session.user as { id: string; email: string; name: string; role: string };
+  const { data, status } = await proxyRequest(GIGS_SERVICE, `/reviews/${id}/respond`, {
+    method: "POST",
+    body,
+    user,
   });
-
-  if (!review) {
-    return NextResponse.json({ error: "Review not found" }, { status: 404 });
-  }
-
-  if (review.gig.sellerId !== session.user.id) {
-    return NextResponse.json({ error: "Only the seller can respond" }, { status: 403 });
-  }
-
-  if (review.sellerResponse) {
-    return NextResponse.json({ error: "Already responded" }, { status: 409 });
-  }
-
-  const { response } = await request.json();
-  if (!response?.trim()) {
-    return NextResponse.json({ error: "Response text required" }, { status: 400 });
-  }
-
-  const updated = await prisma.review.update({
-    where: { id },
-    data: { sellerResponse: response, sellerResponseAt: new Date() },
-  });
-
-  return NextResponse.json(updated);
+  return NextResponse.json(data, { status });
 }

@@ -1,37 +1,30 @@
 import { NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
+import { proxyRequest, GIGS_SERVICE, USERS_SERVICE } from "@/lib/gateway";
 
 export async function GET() {
-  const reviews = await prisma.review.findMany({
-    where: { rating: { gte: 4 } },
-    select: {
-      id: true,
-      rating: true,
-      comment: true,
-      ratingAttitude: true,
-      ratingTimeliness: true,
-      ratingPrice: true,
-      ratingQuality: true,
-      createdAt: true,
-      user: { select: { name: true, city: true } },
-      gig: {
-        select: {
-          title: true,
-          seller: { select: { name: true } },
+  const { data: reviews } = await proxyRequest(GIGS_SERVICE, "/recent-reviews");
+
+  if (!Array.isArray(reviews)) {
+    return NextResponse.json([]);
+  }
+
+  const enriched = await Promise.all(
+    reviews.map(async (r: { userId: string; gig: { title: string; sellerId: string }; [key: string]: unknown }) => {
+      const [userRes, sellerRes] = await Promise.all([
+        proxyRequest(USERS_SERVICE, `/sellers/${r.userId}`),
+        proxyRequest(USERS_SERVICE, `/sellers/${r.gig.sellerId}`),
+      ]);
+
+      return {
+        ...r,
+        user: { name: userRes.data?.name || "Unknown", city: userRes.data?.city || null },
+        gig: {
+          title: r.gig.title,
+          user: { name: sellerRes.data?.name || "Unknown" },
         },
-      },
-    },
-    orderBy: { createdAt: "desc" },
-    take: 6,
-  });
+      };
+    })
+  );
 
-  const mapped = reviews.map((r) => ({
-    ...r,
-    gig: {
-      title: r.gig.title,
-      user: { name: r.gig.seller.name },
-    },
-  }));
-
-  return NextResponse.json(mapped);
+  return NextResponse.json(enriched);
 }
