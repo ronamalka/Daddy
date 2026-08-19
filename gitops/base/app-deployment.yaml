@@ -18,7 +18,7 @@ spec:
       initContainers:
         - name: db-migrate
           image: quay.io/rh_ee_rmalka/daddy:latest
-          command: ["node", "node_modules/prisma/build/cli.js", "db", "push"]
+          command: ["sh", "-c", "node node_modules/prisma/build/cli.js db push --url $DATABASE_URL"]
           env:
             - name: DATABASE_URL
               valueFrom:
