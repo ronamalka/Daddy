@@ -43,10 +43,9 @@ passwordResetRoutes.post("/request", async (req: Request, res: Response) => {
     },
   });
 
-  // In production, send email with reset link
-  // For now, log the token for development
-  console.log(`[DEV] Password reset token for ${email}: ${token}`);
-  console.log(`[DEV] Reset link: http://localhost:3000/reset-password?token=${token}`);
+  if (process.env.NODE_ENV !== "production") {
+    console.log(`[DEV] Reset link: http://localhost:3000/reset-password?token=${token}`);
+  }
 
   res.json({ message: "If the email exists, a reset link has been sent" });
 });

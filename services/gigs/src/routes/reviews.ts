@@ -116,6 +116,24 @@ reviewsRoutes.post("/", requireAuth, async (req: Request, res: Response) => {
     return;
   }
 
+  if (typeof rating !== "number" || rating < 1 || rating > 5) {
+    res.status(400).json({ error: "Rating must be between 1 and 5" });
+    return;
+  }
+
+  const subRatings = [ratingAttitude, ratingTimeliness, ratingPrice, ratingQuality];
+  for (const r of subRatings) {
+    if (r !== undefined && r !== null && (typeof r !== "number" || r < 1 || r > 5)) {
+      res.status(400).json({ error: "Sub-ratings must be between 1 and 5" });
+      return;
+    }
+  }
+
+  if (typeof comment !== "string" || comment.trim().length === 0 || comment.length > 2000) {
+    res.status(400).json({ error: "Comment must be between 1 and 2000 characters" });
+    return;
+  }
+
   const existing = await prisma.review.findUnique({ where: { orderId } });
   if (existing) {
     res.status(409).json({ error: "Review already exists for this order" });
@@ -128,7 +146,7 @@ reviewsRoutes.post("/", requireAuth, async (req: Request, res: Response) => {
       gigId,
       userId: req.user!.id,
       rating,
-      comment,
+      comment: comment.trim(),
       ratingAttitude: ratingAttitude ?? null,
       ratingTimeliness: ratingTimeliness ?? null,
       ratingPrice: ratingPrice ?? null,
