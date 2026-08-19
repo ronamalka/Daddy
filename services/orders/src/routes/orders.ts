@@ -12,6 +12,9 @@ ordersRoutes.get("/", requireAuth, async (req: Request, res: Response) => {
 
   const orders = await prisma.order.findMany({
     where,
+    include: {
+      requirements: true,
+    },
     orderBy: { createdAt: "desc" },
   });
 

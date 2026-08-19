@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
-import { proxyRequest, ORDERS_SERVICE, GIGS_SERVICE } from "@/lib/gateway";
+import { proxyRequest, ORDERS_SERVICE, GIGS_SERVICE, USERS_SERVICE } from "@/lib/gateway";
 
 export async function GET() {
   const session = await auth();
@@ -10,7 +10,40 @@ export async function GET() {
 
   const user = session.user as { id: string; email: string; name: string; role: string };
   const { data, status } = await proxyRequest(ORDERS_SERVICE, "/orders", { user });
-  return NextResponse.json(data, { status });
+
+  if (status !== 200 || !Array.isArray(data)) {
+    return NextResponse.json(data, { status });
+  }
+
+  const gigIds = [...new Set(data.map((o: { gigId: string }) => o.gigId))] as string[];
+  const userIds = [...new Set(data.flatMap((o: { buyerId: string; sellerId: string }) => [o.buyerId, o.sellerId]))] as string[];
+
+  const gigMap: Record<string, { id: string; title: string; image: string | null }> = {};
+  const userMap: Record<string, { id: string; name: string; avatar: string | null }> = {};
+
+  await Promise.all([
+    ...gigIds.map(async (id) => {
+      const { data: gig } = await proxyRequest(GIGS_SERVICE, `/gigs/${id}`);
+      if (gig) {
+        gigMap[id] = { id: gig.id, title: gig.title, image: gig.image };
+      }
+    }),
+    ...userIds.map(async (id) => {
+      const { data: u } = await proxyRequest(USERS_SERVICE, `/sellers/${id}`);
+      if (u) {
+        userMap[id] = { id: u.id, name: u.name, avatar: u.avatar };
+      }
+    }),
+  ]);
+
+  const enriched = data.map((order: { gigId: string; buyerId: string; sellerId: string }) => ({
+    ...order,
+    gig: gigMap[order.gigId] || { id: order.gigId, title: "שירות", image: null },
+    buyer: userMap[order.buyerId] || { id: order.buyerId, name: "משתמש", avatar: null },
+    seller: userMap[order.sellerId] || { id: order.sellerId, name: "משתמש", avatar: null },
+  }));
+
+  return NextResponse.json(enriched);
 }
 
 export async function POST(request: Request) {
