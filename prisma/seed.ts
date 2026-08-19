@@ -2,7 +2,7 @@ import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "../src/generated/prisma/client";
 import { hash } from "bcryptjs";
 
-const directUrl = "postgres://postgres:postgres@localhost:51214/template1?sslmode=disable";
+const directUrl = process.env.SEED_DATABASE_URL || "postgres://daddy:daddypass123@localhost:51214/daddy?sslmode=disable";
 const adapter = new PrismaPg({ connectionString: directUrl });
 const prisma = new PrismaClient({ adapter });
 

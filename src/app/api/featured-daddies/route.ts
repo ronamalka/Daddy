@@ -22,10 +22,12 @@ export async function GET() {
         take: 1,
       },
       _count: {
-        select: { ordersAsSeller: true, reviews: true },
+        select: { ordersAsSeller: true },
       },
-      reviews: {
-        select: { rating: true },
+      gigs: {
+        select: {
+          reviews: { select: { rating: true } },
+        },
       },
     },
     take: 20,
@@ -33,9 +35,10 @@ export async function GET() {
 
   const featured = sellers
     .map((s) => {
+      const allReviews = s.gigs.flatMap((g) => g.reviews);
       const avgRating =
-        s.reviews.length > 0
-          ? s.reviews.reduce((sum, r) => sum + r.rating, 0) / s.reviews.length
+        allReviews.length > 0
+          ? allReviews.reduce((sum, r) => sum + r.rating, 0) / allReviews.length
           : 0;
       return {
         id: s.id,
@@ -46,7 +49,7 @@ export async function GET() {
         services: s.userServices.map((us) => us.serviceSlug),
         serviceAreas: s.serviceAreas,
         completedOrders: s._count.ordersAsSeller,
-        reviewCount: s._count.reviews,
+        reviewCount: allReviews.length,
         avgRating: Math.round(avgRating * 10) / 10,
         startingPrice: s.servicePrices[0]?.price ?? null,
       };

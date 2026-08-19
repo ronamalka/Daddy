@@ -784,10 +784,10 @@ export default function HomePage() {
                 }
               </p>
               <Link
-                href={session?.user ? "/gigs/create" : "/register"}
+                href={session?.user ? "/requests/create" : "/register"}
                 className="mt-6 inline-flex items-center gap-2 rounded-xl bg-white px-6 py-3 text-[14px] font-bold text-[#6C5CE7] shadow-[0_4px_16px_rgba(0,0,0,0.15)] transition-all hover:shadow-[0_8px_24px_rgba(0,0,0,0.2)] hover:-translate-y-0.5"
               >
-                {session?.user ? "צור שירות חדש" : "הצטרף עכשיו — בחינם"}
+                {session?.user ? "פרסם בקשה" : "הצטרף עכשיו — בחינם"}
                 <svg className="h-4 w-4 rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
                 </svg>
@@ -797,25 +797,6 @@ export default function HomePage() {
         </section>
       )}
 
-      {/* ===== FOOTER ===== */}
-      <footer className="border-t border-[#E8ECF1] bg-white py-10">
-        <div className="mx-auto max-w-6xl px-4">
-          <div className="flex flex-col items-center gap-4 md:flex-row md:justify-between">
-            <div>
-              <span className="text-gradient-hero text-xl font-extrabold">אבאל׳ה</span>
-              <p className="text-[13px] text-[#B2BEC3] mt-1">שוק השירותים של ישראל</p>
-            </div>
-            <div className="flex items-center gap-6 text-[13px] text-[#636E72]">
-              <Link href="/" className="hover:text-[#6C5CE7] transition-colors">עיון</Link>
-              <Link href="/register" className="hover:text-[#6C5CE7] transition-colors">הרשמה</Link>
-              <Link href="/login" className="hover:text-[#6C5CE7] transition-colors">התחברות</Link>
-            </div>
-            <p className="text-[12px] text-[#B2BEC3]">
-              2024 אבאל׳ה. כל הזכויות שמורות (חוץ מזכות לנוח ביום שישי).
-            </p>
-          </div>
-        </div>
-      </footer>
     </div>
   );
 }
