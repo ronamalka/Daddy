@@ -147,7 +147,10 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npx prisma generate
-      - run: npx prisma db push --force-reset
+      - name: Reset database and push schema
+        run: |
+          PGPASSWORD=postgres psql -h localhost -U postgres -d daddy_test -c "DROP SCHEMA public CASCADE; CREATE SCHEMA public;"
+          npx prisma db push --accept-data-loss
       - run: npm run seed
       - name: Start server and run system tests
         run: |
