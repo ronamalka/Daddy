@@ -54,6 +54,7 @@ export function Navbar() {
         {/* Desktop nav */}
         <div className="hidden items-center gap-1 md:flex">
           <NavLink href="/">עיון</NavLink>
+          <NavLink href="/gigs">שירותים</NavLink>
 
           {session?.user ? (
             <>
@@ -195,6 +196,9 @@ export function Navbar() {
         <div className="px-5 py-4 flex flex-col gap-1">
           <MobileNavLink href="/" onClick={closeMobile}>
             עיון
+          </MobileNavLink>
+          <MobileNavLink href="/gigs" onClick={closeMobile}>
+            שירותים
           </MobileNavLink>
 
           {session?.user ? (

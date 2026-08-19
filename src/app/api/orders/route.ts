@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
 import { auth } from "@/lib/auth";
+import { proxyRequest, ORDERS_SERVICE, GIGS_SERVICE } from "@/lib/gateway";
 
 export async function GET() {
   const session = await auth();
@@ -8,23 +8,9 @@ export async function GET() {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const where =
-    session.user.role === "SELLER"
-      ? { sellerId: session.user.id }
-      : { buyerId: session.user.id };
-
-  const orders = await prisma.order.findMany({
-    where,
-    include: {
-      gig: { select: { id: true, title: true, image: true } },
-      buyer: { select: { id: true, name: true } },
-      seller: { select: { id: true, name: true } },
-      review: true,
-    },
-    orderBy: { createdAt: "desc" },
-  });
-
-  return NextResponse.json(orders);
+  const user = session.user as { id: string; email: string; name: string; role: string };
+  const { data, status } = await proxyRequest(ORDERS_SERVICE, "/orders", { user });
+  return NextResponse.json(data, { status });
 }
 
 export async function POST(request: Request) {
@@ -35,38 +21,27 @@ export async function POST(request: Request) {
 
   const { gigId, tier } = await request.json();
 
-  const gig = await prisma.gig.findUnique({
-    where: { id: gigId },
-    include: { tiers: true },
-  });
-
-  if (!gig) {
+  const { data: gig, status: gigStatus } = await proxyRequest(GIGS_SERVICE, `/gigs/${gigId}`);
+  if (gigStatus !== 200) {
     return NextResponse.json({ error: "Gig not found" }, { status: 404 });
   }
 
-  if (gig.sellerId === session.user.id) {
-    return NextResponse.json({ error: "Cannot order your own gig" }, { status: 400 });
-  }
-
-  const pricingTier = gig.tiers.find((t) => t.tier === tier);
+  const pricingTier = gig.tiers?.find((t: { tier: string }) => t.tier === tier);
   if (!pricingTier) {
     return NextResponse.json({ error: "Invalid tier" }, { status: 400 });
   }
 
-  const dueDate = new Date();
-  dueDate.setDate(dueDate.getDate() + pricingTier.deliveryDays);
-
-  const order = await prisma.order.create({
-    data: {
+  const user = session.user as { id: string; email: string; name: string; role: string };
+  const { data, status } = await proxyRequest(ORDERS_SERVICE, "/orders", {
+    method: "POST",
+    body: {
       gigId,
-      buyerId: session.user.id,
       sellerId: gig.sellerId,
       tier,
       price: pricingTier.price,
-      dueDate,
+      deliveryDays: pricingTier.deliveryDays,
     },
-    include: { gig: true },
+    user,
   });
-
-  return NextResponse.json(order, { status: 201 });
+  return NextResponse.json(data, { status });
 }

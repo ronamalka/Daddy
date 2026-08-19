@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
 import { auth } from "@/lib/auth";
-import type { OrderStatus } from "@/generated/prisma/client";
+import { proxyRequest, ORDERS_SERVICE } from "@/lib/gateway";
 
 export async function GET(_request: Request, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -10,29 +9,9 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const order = await prisma.order.findUnique({
-    where: { id },
-    include: {
-      gig: { include: { tiers: true } },
-      buyer: { select: { id: true, name: true, avatar: true } },
-      seller: { select: { id: true, name: true, avatar: true } },
-      messages: {
-        include: { sender: { select: { id: true, name: true, avatar: true } } },
-        orderBy: { createdAt: "asc" },
-      },
-      review: true,
-    },
-  });
-
-  if (!order) {
-    return NextResponse.json({ error: "Order not found" }, { status: 404 });
-  }
-
-  if (order.buyerId !== session.user.id && order.sellerId !== session.user.id && session.user.role !== "ADMIN") {
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-  }
-
-  return NextResponse.json(order);
+  const user = session.user as { id: string; email: string; name: string; role: string };
+  const { data, status } = await proxyRequest(ORDERS_SERVICE, `/orders/${id}`, { user });
+  return NextResponse.json(data, { status });
 }
 
 export async function PATCH(request: Request, { params }: { params: Promise<{ id: string }> }) {
@@ -42,38 +21,12 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const { status } = await request.json();
-
-  const order = await prisma.order.findUnique({ where: { id } });
-  if (!order) {
-    return NextResponse.json({ error: "Order not found" }, { status: 404 });
-  }
-
-  const allowed: Record<string, { by: string; from: OrderStatus[] }> = {
-    IN_PROGRESS: { by: "seller", from: ["PENDING"] },
-    DELIVERED: { by: "seller", from: ["IN_PROGRESS"] },
-    COMPLETED: { by: "buyer", from: ["DELIVERED"] },
-    CANCELLED: { by: "buyer", from: ["PENDING"] },
-  };
-
-  const rule = allowed[status];
-  if (!rule) {
-    return NextResponse.json({ error: "Invalid status" }, { status: 400 });
-  }
-
-  const isAllowed =
-    (rule.by === "seller" && order.sellerId === session.user.id) ||
-    (rule.by === "buyer" && order.buyerId === session.user.id) ||
-    session.user.role === "ADMIN";
-
-  if (!isAllowed || !rule.from.includes(order.status)) {
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-  }
-
-  const updated = await prisma.order.update({
-    where: { id },
-    data: { status },
+  const body = await request.json();
+  const user = session.user as { id: string; email: string; name: string; role: string };
+  const { data, status } = await proxyRequest(ORDERS_SERVICE, `/orders/${id}`, {
+    method: "PATCH",
+    body,
+    user,
   });
-
-  return NextResponse.json(updated);
+  return NextResponse.json(data, { status });
 }

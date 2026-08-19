@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
 import { auth } from "@/lib/auth";
+import { proxyRequest, GIGS_SERVICE } from "@/lib/gateway";
 
 export async function GET() {
   const session = await auth();
@@ -8,30 +8,9 @@ export async function GET() {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const favorites = await prisma.favorite.findMany({
-    where: { userId: session.user.id },
-    include: {
-      gig: {
-        include: {
-          seller: { select: { name: true, avatar: true } },
-          category: true,
-          tiers: { orderBy: { price: "asc" }, take: 1 },
-          reviews: { select: { rating: true } },
-        },
-      },
-    },
-    orderBy: { createdAt: "desc" },
-  });
-
-  const gigs = favorites.map((f) => {
-    const g = f.gig;
-    const avgRating = g.reviews.length > 0
-      ? g.reviews.reduce((sum, r) => sum + r.rating, 0) / g.reviews.length
-      : 0;
-    return { ...g, avgRating, reviewCount: g.reviews.length };
-  });
-
-  return NextResponse.json(gigs);
+  const user = session.user as { id: string; email: string; name: string; role: string };
+  const { data, status } = await proxyRequest(GIGS_SERVICE, "/favorites", { user });
+  return NextResponse.json(data, { status });
 }
 
 export async function POST(request: Request) {
@@ -40,23 +19,12 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const { gigId } = await request.json();
-  if (!gigId) {
-    return NextResponse.json({ error: "gigId required" }, { status: 400 });
-  }
-
-  const existing = await prisma.favorite.findUnique({
-    where: { userId_gigId: { userId: session.user.id, gigId } },
+  const body = await request.json();
+  const user = session.user as { id: string; email: string; name: string; role: string };
+  const { data, status } = await proxyRequest(GIGS_SERVICE, "/favorites", {
+    method: "POST",
+    body,
+    user,
   });
-
-  if (existing) {
-    await prisma.favorite.delete({ where: { id: existing.id } });
-    return NextResponse.json({ favorited: false });
-  }
-
-  await prisma.favorite.create({
-    data: { userId: session.user.id, gigId },
-  });
-
-  return NextResponse.json({ favorited: true });
+  return NextResponse.json(data, { status });
 }

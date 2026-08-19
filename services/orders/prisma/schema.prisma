@@ -1,0 +1,68 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum OrderStatus {
+  PENDING
+  IN_PROGRESS
+  DELIVERED
+  COMPLETED
+  CANCELLED
+}
+
+enum GigTier {
+  BASIC
+  STANDARD
+  PREMIUM
+}
+
+model Order {
+  id        String      @id @default(cuid())
+  gigId     String      // cross-service ref to gigs-service
+  buyerId   String      // cross-service ref to users-service
+  sellerId  String      // cross-service ref to users-service
+  tier      GigTier
+  price     Float
+  status    OrderStatus @default(PENDING)
+  dueDate   DateTime?
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+
+  messages     Message[]
+  requirements OrderRequirement[]
+
+  @@index([buyerId])
+  @@index([sellerId])
+  @@index([gigId])
+}
+
+model OrderRequirement {
+  id            String @id @default(cuid())
+  orderId       String
+  requirementId String // cross-service ref to gigs-service GigRequirement
+  answer        String
+
+  order Order @relation(fields: [orderId], references: [id])
+
+  @@unique([orderId, requirementId])
+}
+
+model Message {
+  id         String   @id @default(cuid())
+  content    String
+  orderId    String?
+  senderId   String   // cross-service ref to users-service
+  receiverId String   // cross-service ref to users-service
+  createdAt  DateTime @default(now())
+
+  order Order? @relation(fields: [orderId], references: [id])
+
+  @@index([orderId])
+  @@index([senderId])
+  @@index([receiverId])
+}

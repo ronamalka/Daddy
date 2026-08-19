@@ -1,0 +1,129 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum GigTier {
+  BASIC
+  STANDARD
+  PREMIUM
+}
+
+model Category {
+  id   String @id @default(cuid())
+  name String @unique
+  slug String @unique
+  gigs Gig[]
+}
+
+model Gig {
+  id          String   @id @default(cuid())
+  title       String
+  description String
+  image       String?
+  categoryId  String
+  sellerId    String   // cross-service ref to users-service
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  category     Category         @relation(fields: [categoryId], references: [id])
+  tiers        GigPricingTier[]
+  images       GigImage[]
+  faqs         GigFaq[]
+  favorites    Favorite[]
+  requirements GigRequirement[]
+  reviews      Review[]
+
+  @@index([categoryId])
+  @@index([sellerId])
+}
+
+model GigPricingTier {
+  id           String  @id @default(cuid())
+  gigId        String
+  tier         GigTier
+  title        String
+  description  String
+  price        Float
+  deliveryDays Int
+  revisions    Int
+
+  gig Gig @relation(fields: [gigId], references: [id], onDelete: Cascade)
+
+  @@unique([gigId, tier])
+}
+
+model GigImage {
+  id    String @id @default(cuid())
+  gigId String
+  url   String
+  order Int    @default(0)
+
+  gig Gig @relation(fields: [gigId], references: [id], onDelete: Cascade)
+
+  @@index([gigId])
+}
+
+model GigFaq {
+  id       String @id @default(cuid())
+  gigId    String
+  question String
+  answer   String
+  order    Int    @default(0)
+
+  gig Gig @relation(fields: [gigId], references: [id], onDelete: Cascade)
+
+  @@index([gigId])
+}
+
+model GigRequirement {
+  id       String  @id @default(cuid())
+  gigId    String
+  question String
+  required Boolean @default(true)
+  order    Int     @default(0)
+
+  gig Gig @relation(fields: [gigId], references: [id], onDelete: Cascade)
+
+  @@index([gigId])
+}
+
+model Favorite {
+  id        String   @id @default(cuid())
+  userId    String   // cross-service ref to users-service
+  gigId     String
+  createdAt DateTime @default(now())
+
+  gig Gig @relation(fields: [gigId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, gigId])
+  @@index([userId])
+}
+
+model Review {
+  id                  String    @id @default(cuid())
+  rating              Int
+  comment             String
+  ratingAttitude      Int?
+  ratingTimeliness    Int?
+  ratingPrice         Int?
+  ratingQuality       Int?
+  communicationRating Int?
+  qualityRating       Int?
+  timelinessRating    Int?
+  sellerResponse      String?
+  sellerResponseAt    DateTime?
+  orderId             String    @unique  // cross-service ref to orders-service
+  gigId               String
+  userId              String    // cross-service ref to users-service
+  createdAt           DateTime  @default(now())
+
+  gig Gig @relation(fields: [gigId], references: [id])
+
+  @@index([gigId])
+  @@index([userId])
+}

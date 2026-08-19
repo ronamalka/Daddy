@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: daddy-app
-          image: quay.io/rh_ee_rmalka/daddy:latest
+          image: quay.io/rh_ee_rmalka/daddy-app:latest
           ports:
             - containerPort: 3000
           env:
@@ -36,6 +36,14 @@ spec:
                 secretKeyRef:
                   name: daddy-app-secret
                   key: AUTH_URL
+            - name: USERS_SERVICE_URL
+              value: "http://users-service:4001"
+            - name: GIGS_SERVICE_URL
+              value: "http://gigs-service:4002"
+            - name: ORDERS_SERVICE_URL
+              value: "http://orders-service:4003"
+            - name: REQUESTS_SERVICE_URL
+              value: "http://requests-service:4004"
           resources:
             requests:
               memory: "128Mi"

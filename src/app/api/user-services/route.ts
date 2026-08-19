@@ -1,16 +1,6 @@
 import { NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
 import { auth } from "@/lib/auth";
-
-async function resolveUserId(session: { user: { id?: string; email?: string | null } }) {
-  const user = await prisma.user.findUnique({ where: { id: session.user.id } });
-  if (user) return user.id;
-  if (session.user.email) {
-    const byEmail = await prisma.user.findUnique({ where: { email: session.user.email } });
-    if (byEmail) return byEmail.id;
-  }
-  return null;
-}
+import { proxyRequest, USERS_SERVICE } from "@/lib/gateway";
 
 export async function GET() {
   const session = await auth();
@@ -18,15 +8,9 @@ export async function GET() {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const userId = await resolveUserId(session);
-  if (!userId) return NextResponse.json([], { status: 200 });
-
-  const services = await prisma.userService.findMany({
-    where: { userId },
-    select: { serviceSlug: true },
-  });
-
-  return NextResponse.json(services.map((s) => s.serviceSlug));
+  const user = session.user as { id: string; email: string; name: string; role: string };
+  const { data, status } = await proxyRequest(USERS_SERVICE, "/user-services", { user });
+  return NextResponse.json(data, { status });
 }
 
 export async function POST(request: Request) {
@@ -35,29 +19,12 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const userId = await resolveUserId(session);
-  if (!userId) {
-    return NextResponse.json({ error: "User not found" }, { status: 404 });
-  }
-
-  const { services } = await request.json();
-
-  if (!Array.isArray(services)) {
-    return NextResponse.json({ error: "Invalid services" }, { status: 400 });
-  }
-
-  await prisma.userService.deleteMany({ where: { userId } });
-
-  if (services.length > 0) {
-    await prisma.userService.createMany({
-      data: services.map((slug: string) => ({ userId, serviceSlug: slug })),
-    });
-  }
-
-  const saved = await prisma.userService.findMany({
-    where: { userId },
-    select: { serviceSlug: true },
+  const body = await request.json();
+  const user = session.user as { id: string; email: string; name: string; role: string };
+  const { data, status } = await proxyRequest(USERS_SERVICE, "/user-services", {
+    method: "POST",
+    body,
+    user,
   });
-
-  return NextResponse.json(saved.map((s) => s.serviceSlug));
+  return NextResponse.json(data, { status });
 }

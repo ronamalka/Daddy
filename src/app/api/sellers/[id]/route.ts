@@ -1,60 +1,36 @@
 import { NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
+import { proxyRequest, USERS_SERVICE, GIGS_SERVICE, ORDERS_SERVICE } from "@/lib/gateway";
+
+interface GigReview {
+  rating: number;
+  ratingAttitude?: number | null;
+  ratingTimeliness?: number | null;
+  ratingPrice?: number | null;
+  ratingQuality?: number | null;
+  [key: string]: unknown;
+}
+
+interface GigWithReviews {
+  reviews?: GigReview[];
+  [key: string]: unknown;
+}
 
 export async function GET(_request: Request, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
 
-  const seller = await prisma.user.findUnique({
-    where: { id },
-    select: {
-      id: true,
-      name: true,
-      avatar: true,
-      bio: true,
-      city: true,
-      createdAt: true,
-      role: true,
-      gigs: {
-        include: {
-          category: true,
-          tiers: { orderBy: { price: "asc" }, take: 1 },
-          reviews: {
-            select: {
-              id: true,
-              rating: true,
-              comment: true,
-              ratingAttitude: true,
-              ratingTimeliness: true,
-              ratingPrice: true,
-              ratingQuality: true,
-              sellerResponse: true,
-              sellerResponseAt: true,
-              createdAt: true,
-              user: { select: { id: true, name: true, city: true } },
-            },
-            orderBy: { createdAt: "desc" },
-          },
-        },
-      },
-      serviceAreas: {
-        select: { districtCode: true, districtName: true, cityCode: true, cityName: true },
-        orderBy: [{ districtName: "asc" }, { cityName: "asc" }],
-      },
-      userServices: {
-        select: { serviceSlug: true },
-      },
-      servicePrices: {
-        select: { serviceSlug: true, price: true, description: true },
-        orderBy: { createdAt: "asc" },
-      },
-    },
-  });
+  const [sellerRes, gigsRes, ordersRes] = await Promise.all([
+    proxyRequest(USERS_SERVICE, `/sellers/${id}`),
+    proxyRequest(GIGS_SERVICE, `/gigs/by-seller/${id}`),
+    proxyRequest(ORDERS_SERVICE, `/orders/count-by-seller/${id}`),
+  ]);
 
-  if (!seller) {
+  if (sellerRes.status === 404) {
     return NextResponse.json({ error: "Seller not found" }, { status: 404 });
   }
 
-  const allReviews = seller.gigs.flatMap((g) => g.reviews);
+  const seller = sellerRes.data;
+  const gigs: GigWithReviews[] = Array.isArray(gigsRes.data) ? gigsRes.data : [];
+  const allReviews: GigReview[] = gigs.flatMap((g) => g.reviews || []);
 
   const avgRating = allReviews.length > 0
     ? allReviews.reduce((sum, r) => sum + r.rating, 0) / allReviews.length
@@ -66,25 +42,14 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
 
   const ratingBreakdown = reviewsWithDimensions.length > 0
     ? {
-        attitude: reviewsWithDimensions.reduce((s, r) => s + (r.ratingAttitude ?? 0), 0) / reviewsWithDimensions.length,
-        timeliness: reviewsWithDimensions.reduce((s, r) => s + (r.ratingTimeliness ?? 0), 0) / reviewsWithDimensions.length,
-        price: reviewsWithDimensions.reduce((s, r) => s + (r.ratingPrice ?? 0), 0) / reviewsWithDimensions.length,
-        quality: reviewsWithDimensions.reduce((s, r) => s + (r.ratingQuality ?? 0), 0) / reviewsWithDimensions.length,
+        attitude: reviewsWithDimensions.reduce((s, r) => s + (r.ratingAttitude as number), 0) / reviewsWithDimensions.length,
+        timeliness: reviewsWithDimensions.reduce((s, r) => s + (r.ratingTimeliness as number), 0) / reviewsWithDimensions.length,
+        price: reviewsWithDimensions.reduce((s, r) => s + (r.ratingPrice as number), 0) / reviewsWithDimensions.length,
+        quality: reviewsWithDimensions.reduce((s, r) => s + (r.ratingQuality as number), 0) / reviewsWithDimensions.length,
         overall: reviewsWithDimensions.reduce((s, r) => s + r.rating, 0) / reviewsWithDimensions.length,
         count: reviewsWithDimensions.length,
       }
     : null;
-
-  const completedOrders = await prisma.order.count({
-    where: { sellerId: id, status: "COMPLETED" },
-  });
-
-  const gigs = seller.gigs.map((g) => {
-    const gigAvg = g.reviews.length > 0
-      ? g.reviews.reduce((sum, r) => sum + r.rating, 0) / g.reviews.length
-      : 0;
-    return { ...g, avgRating: gigAvg, reviewCount: g.reviews.length };
-  });
 
   return NextResponse.json({
     ...seller,
@@ -92,7 +57,7 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
     allReviews,
     avgRating: Math.round(avgRating * 100) / 100,
     totalReviews: allReviews.length,
-    completedOrders,
+    completedOrders: ordersRes.data?.completedOrders || 0,
     ratingBreakdown,
   });
 }

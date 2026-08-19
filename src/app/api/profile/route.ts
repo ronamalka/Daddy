@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
 import { auth } from "@/lib/auth";
+import { proxyRequest, USERS_SERVICE } from "@/lib/gateway";
 
 export async function GET() {
   const session = await auth();
@@ -8,22 +8,10 @@ export async function GET() {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const user = await prisma.user.findUnique({
-    where: { id: session.user.id },
-    select: {
-      id: true,
-      name: true,
-      email: true,
-      role: true,
-      avatar: true,
-      bio: true,
-      phone: true,
-      city: true,
-      createdAt: true,
-    },
+  const { data, status } = await proxyRequest(USERS_SERVICE, "/profile", {
+    user: session.user as { id: string; email: string; name: string; role: string },
   });
-
-  return NextResponse.json(user);
+  return NextResponse.json(data, { status });
 }
 
 export async function PUT(request: Request) {
@@ -32,28 +20,11 @@ export async function PUT(request: Request) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const { name, bio, phone, city, avatar } = await request.json();
-
-  const updated = await prisma.user.update({
-    where: { id: session.user.id },
-    data: {
-      ...(name && { name }),
-      ...(bio !== undefined && { bio }),
-      ...(phone !== undefined && { phone }),
-      ...(city !== undefined && { city }),
-      ...(avatar !== undefined && { avatar }),
-    },
-    select: {
-      id: true,
-      name: true,
-      email: true,
-      role: true,
-      avatar: true,
-      bio: true,
-      phone: true,
-      city: true,
-    },
+  const body = await request.json();
+  const { data, status } = await proxyRequest(USERS_SERVICE, "/profile", {
+    method: "PUT",
+    body,
+    user: session.user as { id: string; email: string; name: string; role: string },
   });
-
-  return NextResponse.json(updated);
+  return NextResponse.json(data, { status });
 }
