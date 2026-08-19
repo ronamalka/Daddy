@@ -62,7 +62,7 @@ ordersRoutes.get("/stats", requireAuth, async (req: Request, res: Response) => {
   res.json({ ordersBuyer, ordersSeller, totalOrders: ordersBuyer + ordersSeller });
 });
 
-ordersRoutes.get("/stats/admin", async (_req: Request, res: Response) => {
+ordersRoutes.get("/stats/admin", requireAuth, async (_req: Request, res: Response) => {
   const orderCount = await prisma.order.count();
 
   const completedOrders = await prisma.order.findMany({

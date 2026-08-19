@@ -16,10 +16,11 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
     return NextResponse.json(data, { status });
   }
 
-  const [gigRes, buyerRes, sellerRes] = await Promise.all([
+  const [gigRes, buyerRes, sellerRes, reviewRes] = await Promise.all([
     proxyRequest(GIGS_SERVICE, `/gigs/${data.gigId}`),
     proxyRequest(USERS_SERVICE, `/sellers/${data.buyerId}`),
     proxyRequest(USERS_SERVICE, `/sellers/${data.sellerId}`),
+    proxyRequest(GIGS_SERVICE, `/reviews/by-order/${id}`),
   ]);
 
   const gig = gigRes.data;
@@ -42,6 +43,7 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
     buyer: { id: data.buyerId, name: buyerRes.data?.name || "משתמש", avatar: buyerRes.data?.avatar || null },
     seller: { id: data.sellerId, name: sellerRes.data?.name || "משתמש", avatar: sellerRes.data?.avatar || null },
     messages: enrichedMessages,
+    review: reviewRes.status === 200 ? reviewRes.data : null,
   };
 
   return NextResponse.json(enriched);

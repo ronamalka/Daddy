@@ -1,9 +1,9 @@
 import express from "express";
-import cors from "cors";
 import pg from "pg";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "./generated/prisma/client";
 import { extractUser } from "../../shared/middleware";
+import { applySecurity, authRateLimit, passwordResetRateLimit, generalRateLimit } from "../../shared/security";
 import { registerRoutes } from "./routes/register";
 import { profileRoutes } from "./routes/profile";
 import { adminRoutes } from "./routes/admin";
@@ -24,18 +24,19 @@ export const prisma = new PrismaClient({ adapter });
 const app = express();
 const PORT = Number(process.env.PORT) || 4001;
 
-app.use(cors());
-app.use(express.json());
+applySecurity(app);
+app.use(express.json({ limit: "1mb" }));
 app.use(extractUser);
+app.use(generalRateLimit);
 
 app.get("/health", (_req, res) => {
   res.json({ status: "ok", service: "users" });
 });
 
-app.use("/register", registerRoutes);
-app.use("/login", loginRoutes);
-app.use("/oauth", oauthRoutes);
-app.use("/password-reset", passwordResetRoutes);
+app.use("/register", authRateLimit, registerRoutes);
+app.use("/login", authRateLimit, loginRoutes);
+app.use("/oauth", authRateLimit, oauthRoutes);
+app.use("/password-reset", passwordResetRateLimit, passwordResetRoutes);
 app.use("/profile", profileRoutes);
 app.use("/admin", adminRoutes);
 app.use("/providers", providersRoutes);

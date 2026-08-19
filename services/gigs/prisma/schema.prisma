@@ -105,7 +105,7 @@ model Favorite {
 }
 
 model Review {
-  id                  String    @id @default(cuid())
+  id                  String       @id @default(cuid())
   rating              Int
   comment             String
   ratingAttitude      Int?
@@ -117,13 +117,27 @@ model Review {
   timelinessRating    Int?
   sellerResponse      String?
   sellerResponseAt    DateTime?
-  orderId             String    @unique  // cross-service ref to orders-service
+  orderId             String       @unique // cross-service ref to orders-service
   gigId               String
-  userId              String    // cross-service ref to users-service
-  createdAt           DateTime  @default(now())
+  userId              String       // cross-service ref to users-service
+  createdAt           DateTime     @default(now())
 
-  gig Gig @relation(fields: [gigId], references: [id])
+  gig   Gig          @relation(fields: [gigId], references: [id])
+  flags ReviewFlag[]
 
   @@index([gigId])
   @@index([userId])
+}
+
+model ReviewFlag {
+  id        String   @id @default(cuid())
+  reviewId  String
+  userId    String   // who flagged
+  reason    String
+  createdAt DateTime @default(now())
+
+  review Review @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+
+  @@unique([reviewId, userId])
+  @@index([reviewId])
 }

@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useSession, signOut } from "next-auth/react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Menu,
   ShoppingBag,
@@ -46,6 +46,20 @@ export function Navbar() {
   const { data: session } = useSession();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
+
+  useEffect(() => {
+    if (!session?.user) return;
+    function fetchUnread() {
+      fetch("/api/messages/unread-count")
+        .then((r) => r.json())
+        .then((d) => setUnreadCount(d.count ?? 0))
+        .catch(() => {});
+    }
+    fetchUnread();
+    const interval = setInterval(fetchUnread, 30000);
+    return () => clearInterval(interval);
+  }, [session]);
 
   return (
     <nav className="sticky top-0 z-50 glass-strong">
@@ -69,7 +83,16 @@ export function Navbar() {
               )}
               <NavLink href="/orders" icon={<ShoppingBag className="h-4 w-4" />}>הזמנות</NavLink>
               <NavLink href="/favorites" icon={<Heart className="h-4 w-4" />}>מועדפים</NavLink>
-              <NavLink href="/inbox" icon={<MessageSquare className="h-4 w-4" />}>הודעות</NavLink>
+              <NavLink href="/inbox" icon={<MessageSquare className="h-4 w-4" />}>
+                <span className="relative">
+                  הודעות
+                  {unreadCount > 0 && (
+                    <span className="absolute -top-2 -end-4 flex h-5 min-w-5 items-center justify-center rounded-full bg-[rgb(var(--color-error))] px-1 text-[10px] font-bold text-white">
+                      {unreadCount > 99 ? "99+" : unreadCount}
+                    </span>
+                  )}
+                </span>
+              </NavLink>
               {session.user.role === "ADMIN" && (
                 <NavLink href="/admin" icon={<Shield className="h-4 w-4" />}>ניהול</NavLink>
               )}
@@ -184,7 +207,14 @@ export function Navbar() {
                 מועדפים
               </MobileNavLink>
               <MobileNavLink href="/inbox" onClick={() => setMobileOpen(false)} icon={<MessageSquare className="h-4 w-4" />}>
-                הודעות
+                <span className="flex items-center gap-2">
+                  הודעות
+                  {unreadCount > 0 && (
+                    <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-[rgb(var(--color-error))] px-1 text-[10px] font-bold text-white">
+                      {unreadCount > 99 ? "99+" : unreadCount}
+                    </span>
+                  )}
+                </span>
               </MobileNavLink>
               {session.user.role === "ADMIN" && (
                 <MobileNavLink href="/admin" onClick={() => setMobileOpen(false)} icon={<Shield className="h-4 w-4" />}>

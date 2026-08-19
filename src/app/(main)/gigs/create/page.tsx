@@ -43,6 +43,7 @@ export default function CreateGigPage() {
   });
   const [faqs, setFaqs] = useState<FaqData[]>([]);
   const [requirements, setRequirements] = useState<RequirementData[]>([]);
+  const [showPreview, setShowPreview] = useState(false);
 
   if (!session || session.user.role !== "SELLER") {
     return (
@@ -62,18 +63,28 @@ export default function CreateGigPage() {
     setTiers((prev) => ({ ...prev, [tier]: { ...prev[tier], [field]: value } }));
   }
 
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    setLoading(true);
-    setError("");
-
-    const tierData = TIERS.filter((t) => tiers[t].price).map((t) => ({
+  function getValidTiers() {
+    return TIERS.filter((t) => tiers[t].price).map((t) => ({
       tier: t, title: tiers[t].title, description: tiers[t].description,
       price: parseFloat(tiers[t].price), deliveryDays: parseInt(tiers[t].deliveryDays) || 1,
       revisions: parseInt(tiers[t].revisions) || 1,
     }));
+  }
 
-    if (tierData.length === 0) { setError("נדרשת לפחות חבילת מחיר אחת"); setLoading(false); return; }
+  function handlePreview(e: React.FormEvent) {
+    e.preventDefault();
+    setError("");
+    if (!title || !description || !categoryId) { setError("מלא את כל השדות החובה"); return; }
+    const tierData = getValidTiers();
+    if (tierData.length === 0) { setError("נדרשת לפחות חבילת מחיר אחת"); return; }
+    setShowPreview(true);
+  }
+
+  async function handlePublish() {
+    setLoading(true);
+    setError("");
+
+    const tierData = getValidTiers();
 
     const res = await fetch("/api/gigs", {
       method: "POST",
@@ -111,7 +122,7 @@ export default function CreateGigPage() {
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="space-y-6">
+      <form onSubmit={handlePreview} className="space-y-6">
         {/* Basic Info */}
         <div className="rounded-[16px] border border-[#E8ECF1] bg-[#FFFFFF] p-6 shadow-[0_2px_8px_rgba(108,92,231,0.06)]">
           <h2 className="mb-5 text-[16px] font-bold text-[#2D3436]">מידע בסיסי</h2>
@@ -187,10 +198,111 @@ export default function CreateGigPage() {
           ))}
         </div>
 
-        <button type="submit" disabled={loading} className="w-full rounded-[12px] bg-[#6C5CE7] py-4 text-[15px] font-semibold text-white shadow-[0_4px_16px_rgba(108,92,231,0.3)] transition-all hover:bg-[#5A4BD1] hover:shadow-[0_6px_20px_rgba(108,92,231,0.4)] disabled:opacity-40 disabled:cursor-not-allowed disabled:shadow-none">
-          {loading ? <span className="flex items-center justify-center gap-2"><div className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />מפרסם...</span> : "פרסם שירות"}
+        <button type="submit" className="w-full rounded-[12px] bg-[#6C5CE7] py-4 text-[15px] font-semibold text-white shadow-[0_4px_16px_rgba(108,92,231,0.3)] transition-all hover:bg-[#5A4BD1] hover:shadow-[0_6px_20px_rgba(108,92,231,0.4)]">
+          תצוגה מקדימה
         </button>
       </form>
+
+      {showPreview && (
+        <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/50 p-4 pt-12 pb-12">
+          <div className="w-full max-w-3xl rounded-[16px] bg-white shadow-2xl">
+            <div className="sticky top-0 z-10 flex items-center justify-between rounded-t-[16px] border-b border-[#E8ECF1] bg-white px-6 py-4">
+              <h2 className="text-[18px] font-bold text-[#2D3436]">תצוגה מקדימה</h2>
+              <button onClick={() => setShowPreview(false)} className="rounded-[8px] border border-[#E8ECF1] px-4 py-2 text-[13px] font-medium text-[#636E72] hover:bg-[#FAFBFF]">
+                חזור לעריכה
+              </button>
+            </div>
+
+            <div className="p-6 space-y-6">
+              {image && (
+                <img src={image} alt={title} className="w-full h-56 rounded-[12px] object-cover" />
+              )}
+
+              <div>
+                <h1 className="text-[24px] font-bold text-[#2D3436]">{title}</h1>
+                {categoryId && (
+                  <span className="mt-2 inline-block rounded-[9999px] bg-[#6C5CE7]/10 px-3 py-1 text-[12px] font-medium text-[#6C5CE7]">
+                    {CATEGORIES.find((c) => c.id === categoryId)?.name}
+                  </span>
+                )}
+                <p className="mt-3 text-[14px] leading-relaxed text-[#636E72] whitespace-pre-wrap">{description}</p>
+              </div>
+
+              <div>
+                <h3 className="mb-3 text-[16px] font-bold text-[#2D3436]">חבילות מחיר</h3>
+                <div className="grid gap-4 sm:grid-cols-3">
+                  {getValidTiers().map((t) => {
+                    const colors = TIER_COLORS[t.tier];
+                    return (
+                      <div key={t.tier} className="relative overflow-hidden rounded-[12px] border border-[#E8ECF1] p-4">
+                        <div className={`absolute top-0 left-0 right-0 h-1 bg-gradient-to-r ${colors.gradient}`} />
+                        <p className="text-[12px] font-semibold text-[#B2BEC3]">{colors.label}</p>
+                        <p className="text-[14px] font-bold text-[#2D3436]">{t.title}</p>
+                        <p className="mt-2 text-[20px] font-bold text-[#6C5CE7]">₪{t.price}</p>
+                        <div className="mt-2 space-y-1 text-[12px] text-[#636E72]">
+                          <p>אספקה: {t.deliveryDays} ימים</p>
+                          <p>תיקונים: {t.revisions}</p>
+                        </div>
+                        {t.description && <p className="mt-2 text-[12px] text-[#636E72]">{t.description}</p>}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {faqs.filter((f) => f.question && f.answer).length > 0 && (
+                <div>
+                  <h3 className="mb-3 text-[16px] font-bold text-[#2D3436]">שאלות נפוצות</h3>
+                  <div className="space-y-3">
+                    {faqs.filter((f) => f.question && f.answer).map((faq, i) => (
+                      <div key={i} className="rounded-[12px] bg-[#FAFBFF] p-4">
+                        <p className="text-[14px] font-semibold text-[#2D3436]">{faq.question}</p>
+                        <p className="mt-1 text-[13px] text-[#636E72]">{faq.answer}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {requirements.filter((r) => r.question).length > 0 && (
+                <div>
+                  <h3 className="mb-3 text-[16px] font-bold text-[#2D3436]">דרישות מהקונה</h3>
+                  <div className="space-y-2">
+                    {requirements.filter((r) => r.question).map((req, i) => (
+                      <div key={i} className="flex items-center gap-2 text-[14px] text-[#636E72]">
+                        <span className="text-[#6C5CE7]">•</span>
+                        {req.question}
+                        {req.required && <span className="text-[11px] text-[#E17055]">(חובה)</span>}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <div className="sticky bottom-0 flex items-center gap-3 rounded-b-[16px] border-t border-[#E8ECF1] bg-white px-6 py-4">
+              <button
+                onClick={() => setShowPreview(false)}
+                className="flex-1 rounded-[12px] border border-[#E8ECF1] py-3 text-[14px] font-semibold text-[#636E72] hover:bg-[#FAFBFF] transition-all"
+              >
+                חזור לעריכה
+              </button>
+              <button
+                onClick={handlePublish}
+                disabled={loading}
+                className="flex-1 rounded-[12px] bg-[#6C5CE7] py-3 text-[14px] font-semibold text-white shadow-[0_4px_16px_rgba(108,92,231,0.3)] transition-all hover:bg-[#5A4BD1] disabled:opacity-40 disabled:cursor-not-allowed"
+              >
+                {loading ? (
+                  <span className="flex items-center justify-center gap-2">
+                    <div className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
+                    מפרסם...
+                  </span>
+                ) : "פרסם שירות"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

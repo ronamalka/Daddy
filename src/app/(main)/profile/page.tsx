@@ -102,6 +102,17 @@ export default function ProfilePage() {
                 </svg>
                 מחירון
               </Link>
+              {session.user.role === "SELLER" && (
+                <Link
+                  href="/profile/gigs"
+                  className="rounded-[9999px] border border-[#E8ECF1] px-4 py-1.5 text-[13px] font-semibold text-[#636E72] hover:border-[#6C5CE7] hover:text-[#6C5CE7] transition-all flex items-center gap-1.5"
+                >
+                  <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 12h16.5m-16.5 3.75h16.5M3.75 19.5h16.5M5.625 4.5h12.75a1.875 1.875 0 010 3.75H5.625a1.875 1.875 0 010-3.75z" />
+                  </svg>
+                  השירותים שלי
+                </Link>
+              )}
             </div>
           </div>
 

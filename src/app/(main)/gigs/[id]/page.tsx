@@ -52,6 +52,23 @@ export default function GigDetailPage() {
   const [openFaq, setOpenFaq] = useState<string | null>(null);
   const [related, setRelated] = useState<RelatedGig[]>([]);
   const [activeImage, setActiveImage] = useState(0);
+  const [flaggingReviewId, setFlaggingReviewId] = useState<string | null>(null);
+  const [flagReason, setFlagReason] = useState("");
+  const [flaggedReviews, setFlaggedReviews] = useState<Set<string>>(new Set());
+
+  async function flagReview(reviewId: string) {
+    if (!flagReason.trim()) return;
+    const res = await fetch(`/api/reviews/${reviewId}/flag`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ reason: flagReason }),
+    });
+    if (res.ok) {
+      setFlaggedReviews((prev) => new Set(prev).add(reviewId));
+      setFlaggingReviewId(null);
+      setFlagReason("");
+    }
+  }
 
   useEffect(() => {
     fetch(`/api/gigs/${params.id}`)
@@ -280,6 +297,45 @@ export default function GigDetailPage() {
                         <p className="text-[12px] font-semibold text-[#6C5CE7] mb-1">תגובת המוכר:</p>
                         <p className="text-[13px] leading-relaxed text-[#636E72]">{review.sellerResponse}</p>
                       </div>
+                    )}
+
+                    {/* Flag review */}
+                    {session && gig.seller.id !== (session.user as { id: string }).id && !flaggedReviews.has(review.id) && (
+                      <div className="mt-2">
+                        {flaggingReviewId !== review.id ? (
+                          <button
+                            onClick={() => setFlaggingReviewId(review.id)}
+                            className="text-[11px] text-[#B2BEC3] hover:text-[#E17055] transition-colors"
+                          >
+                            🚩 דווח
+                          </button>
+                        ) : (
+                          <div className="flex gap-2 mt-1">
+                            <input
+                              value={flagReason}
+                              onChange={(e) => setFlagReason(e.target.value)}
+                              placeholder="סיבת הדיווח..."
+                              className="flex-1 rounded-[8px] border border-[#E8ECF1] bg-white px-3 py-1.5 text-[12px] focus:border-[#E17055] focus:outline-none"
+                            />
+                            <button
+                              onClick={() => flagReview(review.id)}
+                              disabled={!flagReason.trim()}
+                              className="rounded-[8px] bg-[#E17055] px-3 py-1.5 text-[12px] font-semibold text-white hover:bg-[#D63031] disabled:opacity-40"
+                            >
+                              דווח
+                            </button>
+                            <button
+                              onClick={() => { setFlaggingReviewId(null); setFlagReason(""); }}
+                              className="rounded-[8px] border border-[#E8ECF1] px-2 py-1.5 text-[12px] text-[#636E72] hover:bg-[#F8F9FA]"
+                            >
+                              ביטול
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                    {flaggedReviews.has(review.id) && (
+                      <p className="mt-2 text-[11px] text-[#00B894]">✓ הדיווח נשלח</p>
                     )}
                   </div>
                 ))}
