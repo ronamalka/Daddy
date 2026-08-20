@@ -2,19 +2,19 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { Search, Eye, Smartphone, Star, FileText, Mail, Wrench, Trophy, ShoppingCart, ChevronDown } from "lucide-react";
-import type { LucideIcon } from "lucide-react";
+import { MagnifyingGlass, Eye, DeviceMobile, Star, FileText, Envelope, Wrench, Trophy, ShoppingCart, CaretDown } from "@phosphor-icons/react";
+import type { Icon as PhosphorIcon } from "@phosphor-icons/react";
 
-const BUYER_STEPS: { step: string; title: string; desc: string; Icon: LucideIcon }[] = [
-  { step: "01", title: "ספר מה צריך", desc: "חפש שירות מתוך 38 אפשרויות, או פרסם בקשה חופשית. בלי טפסים ארוכים, בלי בירוקרטיה — פשוט כתוב מה אתה צריך.", Icon: Search },
+const BUYER_STEPS: { step: string; title: string; desc: string; Icon: PhosphorIcon }[] = [
+  { step: "01", title: "ספר מה צריך", desc: "חפש שירות מתוך 38 אפשרויות, או פרסם בקשה חופשית. בלי טפסים ארוכים, בלי בירוקרטיה — פשוט כתוב מה אתה צריך.", Icon: MagnifyingGlass },
   { step: "02", title: "בחר אבאל׳ה", desc: "עיין בפרופילים, קרא ביקורות אמיתיות עם דירוג אמין (איכות, יחס, זמנים, מחיר), והשווה מחירים.", Icon: Eye },
-  { step: "03", title: "תאם וסגור", desc: "שלח הודעה ישירות לאבאל׳ה, תאם זמן שנוח לשניכם, וסגור עסקה. בלי מתווכים.", Icon: Smartphone },
+  { step: "03", title: "תאם וסגור", desc: "שלח הודעה ישירות לאבאל׳ה, תאם זמן שנוח לשניכם, וסגור עסקה. בלי מתווכים.", Icon: DeviceMobile },
   { step: "04", title: "דרג ושתף", desc: "העבודה הסתיימה? תן ביקורת מפורטת ועזור לאחרים לבחור נכון. הדירוג שלך עוזר לכולם.", Icon: Star },
 ];
 
-const DADDY_STEPS: { step: string; title: string; desc: string; Icon: LucideIcon }[] = [
+const DADDY_STEPS: { step: string; title: string; desc: string; Icon: PhosphorIcon }[] = [
   { step: "01", title: "צור פרופיל", desc: "הרשם בחינם, ספר מה אתה יודע לעשות, הגדר אזורי שירות ומחירים. תוך 5 דקות אתה באוויר.", Icon: FileText },
-  { step: "02", title: "קבל פניות", desc: "לקוחות מחפשים שירותים באזור שלך — הם ימצאו אותך בחיפוש או ישלחו בקשה ישירה.", Icon: Mail },
+  { step: "02", title: "קבל פניות", desc: "לקוחות מחפשים שירותים באזור שלך — הם ימצאו אותך בחיפוש או ישלחו בקשה ישירה.", Icon: Envelope },
   { step: "03", title: "עשה את העבודה", desc: "תגיע בזמן, תעשה עבודה טובה, ותשאיר רושם. כמו אבא אמיתי — אמין, מקצועי, ועם חיוך.", Icon: Wrench },
   { step: "04", title: "בנה מוניטין", desc: "ביקורות טובות = יותר עבודה = יותר הכנסה. המוניטין שלך הוא הנכס הכי חשוב.", Icon: Trophy },
 ];
@@ -103,7 +103,7 @@ export default function HowItWorksPage() {
                 className="flex w-full items-center justify-between p-5 text-right"
               >
                 <span className="text-[15px] font-bold text-[rgb(var(--color-text))]">{item.q}</span>
-                <ChevronDown className={`h-5 w-5 text-[rgb(var(--color-primary))] transition-transform ${openFaq === i ? "rotate-180" : ""}`} />
+                <CaretDown className={`h-5 w-5 text-[rgb(var(--color-primary))] transition-transform ${openFaq === i ? "rotate-180" : ""}`} />
               </button>
               {openFaq === i && (
                 <div className="border-t border-[rgb(var(--color-border))] px-5 pb-5 pt-3">

@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
-import { Lock, MapPin, Box, DollarSign, Star, User, Mail, Shield } from "lucide-react";
+import { Lock, MapPin, Package, CurrencyDollar, Star, User, Envelope, Shield } from "@phosphor-icons/react";
 
 interface Stats {
   totalOrders: number;
@@ -84,14 +84,14 @@ export default function ProfilePage() {
                 href="/profile/services"
                 className="rounded-full border border-[rgb(var(--color-border))] px-4 py-1.5 text-[13px] font-semibold text-[rgb(var(--color-text-secondary))] hover:border-[rgb(var(--color-primary))] hover:text-[rgb(var(--color-primary))] transition-all flex items-center gap-1.5"
               >
-                <Box className="h-3.5 w-3.5" />
+                <Package className="h-3.5 w-3.5" />
                 שירותים
               </Link>
               <Link
                 href="/profile/prices"
                 className="rounded-full border border-[rgb(var(--color-border))] px-4 py-1.5 text-[13px] font-semibold text-[rgb(var(--color-text-secondary))] hover:border-[rgb(var(--color-accent-yellow))] hover:text-[rgb(var(--color-warning))] transition-all flex items-center gap-1.5"
               >
-                <DollarSign className="h-3.5 w-3.5" />
+                <CurrencyDollar className="h-3.5 w-3.5" />
                 מחירון
               </Link>
               {session.user.role === "SELLER" && (
@@ -122,7 +122,7 @@ export default function ProfilePage() {
               <div className="flex items-center justify-center gap-1">
                 {stats?.avgRating ? (
                   <>
-                    <Star className="h-5 w-5 text-[rgb(var(--color-accent-yellow))]" fill="currentColor" />
+                    <Star className="h-5 w-5 text-[rgb(var(--color-accent-yellow))]" weight="fill" />
                     <p className="text-[24px] font-bold text-[rgb(var(--color-accent-yellow))]">{stats.avgRating}</p>
                   </>
                 ) : (
@@ -168,7 +168,7 @@ export default function ProfilePage() {
 }
 
 function AccountRow({ icon, label, value }: { icon: string; label: string; value: string }) {
-  const IconComponent = icon === "user" ? User : icon === "email" ? Mail : Shield;
+  const IconComponent = icon === "user" ? User : icon === "email" ? Envelope : Shield;
   return (
     <div className="flex items-center gap-3">
       <div className="rounded-lg bg-[rgba(var(--color-primary),0.1)] p-2">

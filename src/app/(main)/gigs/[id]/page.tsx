@@ -5,7 +5,7 @@ import { useSession } from "next-auth/react";
 import { useRouter, useParams } from "next/navigation";
 import Link from "next/link";
 import { GigCard } from "@/components/gig-card";
-import { Heart, Star, Clock, RefreshCw, MessageCircle, ChevronDown } from "lucide-react";
+import { Heart, Star, Clock, ArrowsClockwise, ChatCircle, CaretDown } from "@phosphor-icons/react";
 
 interface GigDetail {
   id: string;
@@ -151,8 +151,8 @@ export default function GigDetailPage() {
             </h1>
             <button onClick={toggleFavorite} className="flex-shrink-0 mt-1 transition-transform hover:scale-110">
               <Heart
-                className={`h-6 w-6 ${favorited ? "text-[rgb(var(--color-error))] fill-[rgb(var(--color-error))]" : "text-[rgb(var(--color-text-muted))]"}`}
-                fill={favorited ? "currentColor" : "none"}
+                className={`h-6 w-6 ${favorited ? "text-[rgb(var(--color-error))] " : "text-[rgb(var(--color-text-muted))]"}`}
+                weight={favorited ? "fill" : "regular"}
               />
             </button>
           </div>
@@ -166,7 +166,7 @@ export default function GigDetailPage() {
               <p className="font-semibold text-[rgb(var(--color-text))] group-hover:text-[rgb(var(--color-primary))] transition-colors">{gig.seller.name}</p>
               <div className="flex items-center gap-2 text-[13px]">
                 <div className="flex items-center gap-1">
-                  <Star className="h-4 w-4 text-[rgb(var(--color-accent-yellow))] fill-[rgb(var(--color-accent-yellow))]" />
+                  <Star className="h-4 w-4 text-[rgb(var(--color-accent-yellow))] " weight="fill" />
                   <span className="font-bold text-[rgb(var(--color-text))]">{gig.avgRating.toFixed(1)}</span>
                 </div>
                 <span className="text-[rgb(var(--color-text-muted))]">({gig.reviewCount} ביקורות)</span>
@@ -222,7 +222,7 @@ export default function GigDetailPage() {
                       className="flex w-full items-center justify-between px-6 py-4 text-right transition-colors hover:bg-[rgb(var(--color-surface-elevated))]"
                     >
                       <span className="text-[14px] font-semibold text-[rgb(var(--color-text))]">{faq.question}</span>
-                      <ChevronDown
+                      <CaretDown
                         className={`h-5 w-5 flex-shrink-0 text-[rgb(var(--color-text-muted))] transition-transform ${openFaq === faq.id ? "rotate-180" : ""}`}
                       />
                     </button>
@@ -241,7 +241,7 @@ export default function GigDetailPage() {
           {gig.reviews.length > 0 && (
             <div className="mb-8 rounded-2xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] overflow-hidden">
               <div className="flex items-center gap-2 border-b border-[rgb(var(--color-border))] px-6 py-4">
-                <Star className="h-5 w-5 text-[rgb(var(--color-accent-yellow))] fill-[rgb(var(--color-accent-yellow))]" />
+                <Star className="h-5 w-5 text-[rgb(var(--color-accent-yellow))] " weight="fill" />
                 <h2 className="text-[16px] font-bold text-[rgb(var(--color-text))]">ביקורות</h2>
                 <span className="rounded-full bg-[rgba(var(--color-accent-yellow),0.15)] px-2.5 py-0.5 text-[12px] font-semibold text-[rgb(var(--color-warning))]">
                   {gig.reviewCount}
@@ -260,8 +260,8 @@ export default function GigDetailPage() {
                           {Array.from({ length: 5 }, (_, i) => (
                             <Star
                               key={i}
-                              className={`h-3.5 w-3.5 ${i < review.rating ? "text-[rgb(var(--color-accent-yellow))] fill-[rgb(var(--color-accent-yellow))]" : "text-[rgb(var(--color-border))]"}`}
-                              fill={i < review.rating ? "currentColor" : "none"}
+                              className={`h-3.5 w-3.5 ${i < review.rating ? "text-[rgb(var(--color-accent-yellow))]" : "text-[rgb(var(--color-border))]"}`}
+                              weight={i < review.rating ? "fill" : "regular"}
                             />
                           ))}
                         </div>
@@ -400,7 +400,7 @@ export default function GigDetailPage() {
                     {currentTier.deliveryDays} {currentTier.deliveryDays > 1 ? "ימי אספקה" : "יום אספקה"}
                   </span>
                   <span className="flex items-center gap-1.5">
-                    <RefreshCw className="h-4 w-4 text-[rgb(var(--color-primary-light))]" />
+                    <ArrowsClockwise className="h-4 w-4 text-[rgb(var(--color-primary-light))]" />
                     {currentTier.revisions} {currentTier.revisions > 1 ? "תיקונים" : "תיקון"}
                   </span>
                 </div>
@@ -423,7 +423,7 @@ export default function GigDetailPage() {
                     href={`/sellers/${gig.seller.id}`}
                     className="mt-3 flex w-full items-center justify-center gap-2 rounded-xl border border-[rgb(var(--color-border))] py-3 text-[14px] font-medium text-[rgb(var(--color-text-secondary))] transition-all hover:border-[rgba(var(--color-primary-light),0.3)] hover:text-[rgb(var(--color-primary))]"
                   >
-                    <MessageCircle className="h-4 w-4" />
+                    <ChatCircle className="h-4 w-4" />
                     צור קשר עם המוכר
                   </Link>
                 )}

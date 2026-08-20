@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { getServiceBySlug, ALL_SERVICES } from "@/lib/services";
-import { Check } from "lucide-react";
+import { Check } from "@phosphor-icons/react";
 import { CategoryIcon } from "@/components/ui/category-icon";
 
 interface PriceEntry {

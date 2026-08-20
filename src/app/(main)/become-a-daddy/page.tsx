@@ -1,19 +1,19 @@
 import Link from "next/link";
-import { Gift, Coins, Star, Clock, MapPin, Sparkles, FileText, Settings, Rocket, Wrench } from "lucide-react";
-import type { LucideIcon } from "lucide-react";
+import { Gift, Coins, Star, Clock, MapPin, Sparkle, FileText, GearSix, Rocket, Wrench } from "@phosphor-icons/react/dist/ssr";
+import type { Icon as PhosphorIcon } from "@phosphor-icons/react";
 
-const BENEFITS: { title: string; desc: string; Icon: LucideIcon }[] = [
+const BENEFITS: { title: string; desc: string; Icon: PhosphorIcon }[] = [
   { title: "הרשמה חינם", desc: "אין דמי הצטרפות, אין מנויים חודשיים. נרשמת, מתחיל לעבוד.", Icon: Gift },
   { title: "אתה קובע מחיר", desc: "אין לנו מחירון. אתה מגדיר כמה אתה גובה — לפי שעה, לפי פרויקט, לפי מה שמתאים לך.", Icon: Coins },
   { title: "בנה מוניטין", desc: "כל עבודה טובה = ביקורת טובה = יותר לקוחות. המוניטין שלך נשאר איתך.", Icon: Star },
   { title: "גמישות מלאה", desc: "עובד מתי שאתה רוצה, איפה שאתה רוצה, כמה שאתה רוצה. בלי בוס, בלי משמרות.", Icon: Clock },
   { title: "לקוחות מהשכונה", desc: "אנשים מהאזור שלך מחפשים בדיוק את מה שאתה יודע לעשות. בלי נסיעות מיותרות.", Icon: MapPin },
-  { title: "פלטפורמה פשוטה", desc: "פרופיל, הודעות, ביקורות. בלי אפליקציות מסובכות, בלי הכשרות חובה. פשוט עובד.", Icon: Sparkles },
+  { title: "פלטפורמה פשוטה", desc: "פרופיל, הודעות, ביקורות. בלי אפליקציות מסובכות, בלי הכשרות חובה. פשוט עובד.", Icon: Sparkle },
 ];
 
-const STEPS: { step: string; title: string; desc: string; Icon: LucideIcon; color: string }[] = [
+const STEPS: { step: string; title: string; desc: string; Icon: PhosphorIcon; color: string }[] = [
   { step: "01", title: "צור חשבון", desc: "הרשם עם אימייל, בחר ׳אני נותן שירות׳, ומלא את הפרטים הבסיסיים. לוקח דקה.", Icon: FileText, color: "from-[rgb(var(--color-primary))] to-[rgb(var(--color-primary-light))]" },
-  { step: "02", title: "הגדר שירותים", desc: "בחר מה אתה יודע לעשות (אינסטלציה? חשמל? הובלות?), הגדר אזורי שירות ומחירים. תוך 5 דקות אתה באוויר.", Icon: Settings, color: "from-[rgb(var(--color-success))] to-[rgb(var(--color-accent))]" },
+  { step: "02", title: "הגדר שירותים", desc: "בחר מה אתה יודע לעשות (אינסטלציה? חשמל? הובלות?), הגדר אזורי שירות ומחירים. תוך 5 דקות אתה באוויר.", Icon: GearSix, color: "from-[rgb(var(--color-success))] to-[rgb(var(--color-accent))]" },
   { step: "03", title: "התחל לעבוד", desc: "לקוחות ימצאו אותך בחיפוש או ישלחו בקשות. הגב, תאם, ועשה את מה שאתה הכי טוב בו.", Icon: Rocket, color: "from-[rgb(var(--color-accent-yellow))] to-[rgb(var(--color-error))]" },
 ];
 
@@ -96,7 +96,7 @@ export default function BecomeADaddyPage() {
               <div className="absolute -top-3 right-6 flex h-8 w-8 items-center justify-center rounded-full bg-[rgb(var(--color-accent))] text-[14px] font-bold text-white shadow-sm">&ldquo;</div>
               <div className="flex gap-0.5 mb-3 mt-1">
                 {Array.from({ length: t.rating }).map((_, j) => (
-                  <Star key={j} className="h-4 w-4 text-[rgb(var(--color-accent-yellow))] fill-[rgb(var(--color-accent-yellow))]" />
+                  <Star key={j} className="h-4 w-4 text-[rgb(var(--color-accent-yellow))] " weight="fill" />
                 ))}
               </div>
               <p className="text-[14px] leading-relaxed text-[rgb(var(--color-text))] mb-4">{t.text}</p>

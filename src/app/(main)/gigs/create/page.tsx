@@ -3,7 +3,7 @@
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { Ban, X } from "lucide-react";
+import { Prohibit, X } from "@phosphor-icons/react";
 
 const CATEGORIES = [
   { id: "home-maintenance", name: "תיקונים ותחזוקת הבית" },
@@ -50,7 +50,7 @@ export default function CreateGigPage() {
     return (
       <div className="flex flex-col items-center justify-center py-20">
         <div className="rounded-full bg-[rgba(var(--color-error),0.1)] p-4 mb-4">
-          <Ban className="h-8 w-8 text-[rgb(var(--color-error))]" />
+          <Prohibit className="h-8 w-8 text-[rgb(var(--color-error))]" />
         </div>
         <p className="text-[16px] font-medium text-[rgb(var(--color-text))]">גישה למוכרים בלבד</p>
         <p className="mt-1 text-[14px] text-[rgb(var(--color-text-muted))]">רק מוכרים יכולים ליצור שירותים</p>

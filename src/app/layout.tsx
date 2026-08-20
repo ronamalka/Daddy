@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Heebo } from "next/font/google";
 import { SessionProvider } from "@/components/session-provider";
-import { ThemeProvider } from "@/components/theme-provider";
 import "./globals.css";
 
 const heebo = Heebo({
@@ -17,11 +16,9 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="he" dir="rtl" className={`${heebo.variable} ${heebo.className} antialiased`} suppressHydrationWarning>
+    <html lang="he" dir="rtl" className={`${heebo.variable} ${heebo.className} antialiased`}>
       <body className="min-h-screen flex flex-col">
-        <ThemeProvider>
-          <SessionProvider>{children}</SessionProvider>
-        </ThemeProvider>
+        <SessionProvider>{children}</SessionProvider>
       </body>
     </html>
   );

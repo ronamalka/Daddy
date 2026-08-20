@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { GigCard } from "@/components/gig-card";
-import { Heart } from "lucide-react";
+import { Heart } from "@phosphor-icons/react";
 
 interface Gig {
   id: string;

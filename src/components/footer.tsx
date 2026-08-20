@@ -1,5 +1,7 @@
+"use client";
+
 import Link from "next/link";
-import { Wrench, FileText, Shield } from "lucide-react";
+import { Wrench, FileText, Shield } from "@phosphor-icons/react";
 
 export function Footer() {
   return (

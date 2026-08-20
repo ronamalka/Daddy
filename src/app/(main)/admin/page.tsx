@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
-import { Users, Briefcase, ShoppingBag, DollarSign, Ban } from "lucide-react";
+import { Users, Briefcase, Bag, CurrencyDollar, Prohibit } from "@phosphor-icons/react";
 import type { ReactNode } from "react";
 
 interface Stats {
@@ -44,14 +44,14 @@ const STAT_CARDS: {
   {
     label: "הזמנות",
     key: "orders",
-    icon: <ShoppingBag className="h-6 w-6 text-[rgb(var(--color-error))]" />,
+    icon: <Bag className="h-6 w-6 text-[rgb(var(--color-error))]" />,
     gradient: "from-[rgb(var(--color-error))] to-[rgb(var(--color-accent-yellow))]",
     format: (v: number) => v.toString(),
   },
   {
     label: "הכנסות",
     key: "revenue",
-    icon: <DollarSign className="h-6 w-6 text-[rgb(var(--color-accent-yellow))]" />,
+    icon: <CurrencyDollar className="h-6 w-6 text-[rgb(var(--color-accent-yellow))]" />,
     gradient: "from-[rgb(var(--color-accent-yellow))] to-[rgb(var(--color-error))]",
     format: (v: number) => `₪${v.toFixed(2)}`,
   },
@@ -86,7 +86,7 @@ export default function AdminPage() {
     return (
       <div className="flex flex-col items-center justify-center py-20">
         <div className="rounded-full bg-[rgba(var(--color-error),0.1)] p-4 mb-4">
-          <Ban className="h-8 w-8 text-[rgb(var(--color-error))]" />
+          <Prohibit className="h-8 w-8 text-[rgb(var(--color-error))]" />
         </div>
         <p className="text-[16px] font-medium text-[rgb(var(--color-text))]">הגישה נדחתה</p>
         <p className="mt-1 text-[14px] text-[rgb(var(--color-text-muted))]">אתה צריך הרשאות מנהל כדי לצפות בדף הזה</p>

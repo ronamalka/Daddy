@@ -4,7 +4,7 @@ import { useEffect, useState, useCallback, useRef, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { GigCard } from "@/components/gig-card";
-import { Search, LayoutGrid, List, MapPin, Star, Loader2 } from "lucide-react";
+import { MagnifyingGlass, SquaresFour, ListBullets, MapPin, Star, CircleNotch } from "@phosphor-icons/react";
 import { CategoryIcon } from "@/components/ui/category-icon";
 
 interface GigItem {
@@ -194,7 +194,7 @@ function GigsContent() {
                   type="submit"
                   className="rounded-lg bg-[rgb(var(--color-primary))] px-3 py-2.5 text-white transition-colors hover:bg-[rgb(var(--color-primary-hover))]"
                 >
-                  <Search className="h-4 w-4" />
+                  <MagnifyingGlass className="h-4 w-4" />
                 </button>
               </form>
             </div>
@@ -312,14 +312,14 @@ function GigsContent() {
                   className={`p-2 transition-colors ${viewMode === "grid" ? "bg-[rgb(var(--color-primary))] text-white" : "bg-[rgb(var(--color-surface-elevated))] text-[rgb(var(--color-text-secondary))] hover:bg-[rgba(var(--color-primary),0.1)]"}`}
                   aria-label="תצוגת רשת"
                 >
-                  <LayoutGrid className="h-4 w-4" />
+                  <SquaresFour className="h-4 w-4" />
                 </button>
                 <button
                   onClick={() => setViewMode("list")}
                   className={`p-2 transition-colors ${viewMode === "list" ? "bg-[rgb(var(--color-primary))] text-white" : "bg-[rgb(var(--color-surface-elevated))] text-[rgb(var(--color-text-secondary))] hover:bg-[rgba(var(--color-primary),0.1)]"}`}
                   aria-label="תצוגת רשימה"
                 >
-                  <List className="h-4 w-4" />
+                  <ListBullets className="h-4 w-4" />
                 </button>
               </div>
             </div>
@@ -345,7 +345,7 @@ function GigsContent() {
           ) : gigs.length === 0 ? (
             <div className="flex flex-col items-center justify-center rounded-xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] py-20">
               <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-[rgba(var(--color-primary),0.1)]">
-                <Search className="h-8 w-8 text-[rgb(var(--color-primary-light))]" />
+                <MagnifyingGlass className="h-8 w-8 text-[rgb(var(--color-primary-light))]" />
               </div>
               <h3 className="mb-1 text-[16px] font-bold text-[rgb(var(--color-text))]">לא נמצאו שירותים</h3>
               <p className="mb-4 text-[14px] text-[rgb(var(--color-text-secondary))]">נסה לשנות את הסינון או לחפש משהו אחר</p>
@@ -395,7 +395,7 @@ function GigsContent() {
               <div ref={sentinelRef} className="mt-8 flex items-center justify-center py-4">
                 {loadingMore && (
                   <div className="flex items-center gap-3 text-[14px] text-[rgb(var(--color-text-secondary))]">
-                    <Loader2 className="h-6 w-6 animate-spin text-[rgb(var(--color-primary))]" />
+                    <CircleNotch className="h-6 w-6 animate-spin text-[rgb(var(--color-primary))]" />
                     טוען עוד...
                   </div>
                 )}
@@ -471,7 +471,7 @@ function GigListItem({
         </div>
         <div className="mt-3 flex items-center justify-between border-t border-[rgb(var(--color-border-light))] pt-3">
           <div className="flex items-center gap-1.5">
-            <Star className="h-4 w-4 text-[rgb(var(--color-accent-yellow))] fill-[rgb(var(--color-accent-yellow))]" />
+            <Star className="h-4 w-4 text-[rgb(var(--color-accent-yellow))]" weight="fill" />
             <span className="text-[13px] font-bold text-[rgb(var(--color-text))]">{avgRating.toFixed(1)}</span>
             <span className="text-[13px] text-[rgb(var(--color-text-muted))]">({reviewCount})</span>
           </div>

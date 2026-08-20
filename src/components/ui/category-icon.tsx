@@ -1,17 +1,19 @@
+"use client";
+
 import {
-  Wrench, Home, Package, Leaf, Monitor, Car, Phone, PartyPopper,
-} from "lucide-react";
+  Wrench, House, Package, Leaf, Monitor, Car, Phone, Confetti,
+} from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
 
 const ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
   "assembly-and-installation": Wrench,
-  "home-maintenance": Home,
+  "home-maintenance": House,
   "moving-and-organization": Package,
   "garden-and-outdoor": Leaf,
   "tech-support": Monitor,
   "car-and-errands": Car,
   "admin-and-bureaucracy": Phone,
-  "events-and-family": PartyPopper,
+  "events-and-family": Confetti,
 };
 
 export function CategoryIcon({
@@ -28,13 +30,13 @@ export function CategoryIcon({
 export function getCategoryIconName(slug: string): string {
   const names: Record<string, string> = {
     "assembly-and-installation": "wrench",
-    "home-maintenance": "home",
+    "home-maintenance": "house",
     "moving-and-organization": "package",
     "garden-and-outdoor": "leaf",
     "tech-support": "monitor",
     "car-and-errands": "car",
     "admin-and-bureaucracy": "phone",
-    "events-and-family": "party-popper",
+    "events-and-family": "confetti",
   };
   return names[slug] || "wrench";
 }

@@ -1,15 +1,15 @@
 import Link from "next/link";
-import { Handshake, Scale, Building2, CheckCircle, Wrench, FolderOpen, MapPin, Star, Target } from "lucide-react";
-import type { LucideIcon } from "lucide-react";
+import { Handshake, Scales, Buildings, CheckCircle, Wrench, FolderOpen, MapPin, Star, Target } from "@phosphor-icons/react/dist/ssr";
+import type { Icon as PhosphorIcon } from "@phosphor-icons/react";
 
-const VALUES: { title: string; desc: string; Icon: LucideIcon }[] = [
+const VALUES: { title: string; desc: string; Icon: PhosphorIcon }[] = [
   { title: "אמינות", desc: "ביקורות אמיתיות, פרופילים שקופים, דירוגים שלא ניתן לעריכה. מה שאתה רואה — זה מה שאתה מקבל.", Icon: Handshake },
-  { title: "הוגנות", desc: "ללא עמלות נסתרות, ללא דמי תיווך. האבאל׳ה מגדיר מחיר, אתה משלם את המחיר. נקודה.", Icon: Scale },
-  { title: "קהילה", desc: "לא פלטפורמה — משפחה. אנשים עוזרים לאנשים, שכונה שכונה, עיר עיר.", Icon: Building2 },
+  { title: "הוגנות", desc: "ללא עמלות נסתרות, ללא דמי תיווך. האבאל׳ה מגדיר מחיר, אתה משלם את המחיר. נקודה.", Icon: Scales },
+  { title: "קהילה", desc: "לא פלטפורמה — משפחה. אנשים עוזרים לאנשים, שכונה שכונה, עיר עיר.", Icon: Buildings },
   { title: "איכות", desc: "דירוג אמין עם 4 קריטריונים מבטיח שהטובים עולים למעלה. אין קיצורי דרך.", Icon: CheckCircle },
 ];
 
-const STATS: { value: string; label: string; Icon: LucideIcon }[] = [
+const STATS: { value: string; label: string; Icon: PhosphorIcon }[] = [
   { value: "38", label: "שירותים", Icon: Wrench },
   { value: "8", label: "קטגוריות", Icon: FolderOpen },
   { value: "7", label: "מחוזות", Icon: MapPin },

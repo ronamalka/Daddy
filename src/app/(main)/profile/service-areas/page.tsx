@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { LocationPicker } from "@/components/location-picker";
-import { Check } from "lucide-react";
+import { Check } from "@phosphor-icons/react";
 
 interface ServiceAreaEntry {
   districtCode: number;

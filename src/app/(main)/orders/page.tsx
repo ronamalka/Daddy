@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
-import { Lock, Archive } from "lucide-react";
+import { Lock, Archive } from "@phosphor-icons/react";
 
 interface Order {
   id: string;
