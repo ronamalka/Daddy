@@ -10,8 +10,10 @@ export async function GET() {
 
   const enriched = await Promise.all(
     sellers.map(async (s: { id: string; name: string; avatar: string | null; bio: string | null; city: string | null; services: string[]; serviceAreas: unknown[]; startingPrice: number | null }) => {
-      const { data: reviewData } = await proxyRequest(GIGS_SERVICE, `/gigs/reviews/by-seller/${s.id}`);
-      const { data: ordersData } = await proxyRequest(ORDERS_SERVICE, `/orders/count-by-seller/${s.id}`);
+      const [{ data: reviewData }, { data: ordersData }] = await Promise.all([
+        proxyRequest(GIGS_SERVICE, `/gigs/reviews/by-seller/${s.id}`).catch(() => ({ data: null, status: 502 })),
+        proxyRequest(ORDERS_SERVICE, `/orders/count-by-seller/${s.id}`).catch(() => ({ data: null, status: 502 })),
+      ]);
 
       return {
         ...s,

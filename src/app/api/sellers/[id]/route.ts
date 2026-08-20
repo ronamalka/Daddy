@@ -18,15 +18,16 @@ interface GigWithReviews {
 export async function GET(_request: Request, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
 
-  const [sellerRes, gigsRes, ordersRes] = await Promise.all([
-    proxyRequest(USERS_SERVICE, `/sellers/${id}`),
-    proxyRequest(GIGS_SERVICE, `/gigs/by-seller/${id}`),
-    proxyRequest(ORDERS_SERVICE, `/orders/count-by-seller/${id}`),
-  ]);
+  const sellerRes = await proxyRequest(USERS_SERVICE, `/sellers/${id}`);
 
-  if (sellerRes.status === 404) {
+  if (sellerRes.status === 404 || !sellerRes.data || sellerRes.data.error) {
     return NextResponse.json({ error: "Seller not found" }, { status: 404 });
   }
+
+  const [gigsRes, ordersRes] = await Promise.all([
+    proxyRequest(GIGS_SERVICE, `/gigs/by-seller/${id}`).catch(() => ({ data: null, status: 502 })),
+    proxyRequest(ORDERS_SERVICE, `/orders/count-by-seller/${id}`).catch(() => ({ data: null, status: 502 })),
+  ]);
 
   const seller = sellerRes.data;
   const gigs: GigWithReviews[] = Array.isArray(gigsRes.data) ? gigsRes.data : [];

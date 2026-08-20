@@ -1,6 +1,7 @@
 import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import Google from "next-auth/providers/google";
+import { checkLockout, recordFailedAttempt, resetAttempts } from "./account-lockout";
 
 const USERS_SERVICE = process.env.USERS_SERVICE_URL || "http://localhost:4001";
 
@@ -20,14 +21,24 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         const password = credentials?.password as string;
         if (!email || !password) return null;
 
+        const lockout = await checkLockout(email);
+        if (!lockout.allowed) {
+          console.warn(`[auth] Login blocked for ${email}: ${lockout.reason}`);
+          return null;
+        }
+
         const res = await fetch(`${USERS_SERVICE}/login`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ email, password }),
         });
 
-        if (!res.ok) return null;
+        if (!res.ok) {
+          await recordFailedAttempt(email);
+          return null;
+        }
 
+        await resetAttempts(email);
         const user = await res.json();
         return { id: user.id, email: user.email, name: user.name, role: user.role };
       },

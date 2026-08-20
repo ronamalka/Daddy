@@ -6,6 +6,9 @@ export async function GET(request: NextRequest) {
   const params = request.nextUrl.searchParams.toString();
   const path = params ? `/service-requests?${params}` : "/service-requests";
   const { data, status } = await proxyRequest(REQUESTS_SERVICE, path);
+  if (status >= 500 || !data) {
+    return NextResponse.json([], { status: 200 });
+  }
   return NextResponse.json(data, { status });
 }
 

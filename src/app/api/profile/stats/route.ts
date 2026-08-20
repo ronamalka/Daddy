@@ -20,13 +20,13 @@ export async function GET() {
   const gigsCount = Array.isArray(gigsCountRes.data) ? gigsCountRes.data.length : 0;
 
   return NextResponse.json({
-    totalOrders: ordersRes.data.totalOrders || 0,
-    ordersBuyer: ordersRes.data.ordersBuyer || 0,
-    ordersSeller: ordersRes.data.ordersSeller || 0,
-    reviewsReceived: reviewsRes.data.reviewCount || 0,
+    totalOrders: ordersRes.data?.totalOrders || 0,
+    ordersBuyer: ordersRes.data?.ordersBuyer || 0,
+    ordersSeller: ordersRes.data?.ordersSeller || 0,
+    reviewsReceived: reviewsRes.data?.reviewCount || 0,
     reviewsGiven: 0,
-    avgRating: reviewsRes.data.avgRating || 0,
+    avgRating: reviewsRes.data?.avgRating || 0,
     gigsCount,
-    favoritesCount: favoritesRes.data.favoritesCount || 0,
+    favoritesCount: favoritesRes.data?.favoritesCount || 0,
   });
 }

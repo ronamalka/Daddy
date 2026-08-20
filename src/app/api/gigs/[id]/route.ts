@@ -10,8 +10,8 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
 
   const { data, status } = await proxyRequest(GIGS_SERVICE, `/gigs/${id}`, { user });
 
-  if (status !== 200) {
-    return NextResponse.json(data, { status });
+  if (status !== 200 || !data) {
+    return NextResponse.json(data ?? { error: "Not found" }, { status: status === 502 ? 404 : status });
   }
 
   if (data.sellerId) {

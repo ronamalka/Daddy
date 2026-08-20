@@ -17,9 +17,9 @@ export async function GET() {
   ]);
 
   return NextResponse.json({
-    users: usersRes.data.users || 0,
-    gigs: gigsRes.data.gigs || 0,
-    orders: ordersRes.data.orders || 0,
-    revenue: ordersRes.data.revenue || 0,
+    users: usersRes.data?.users || 0,
+    gigs: gigsRes.data?.gigs || 0,
+    orders: ordersRes.data?.orders || 0,
+    revenue: ordersRes.data?.revenue || 0,
   });
 }
