@@ -3,9 +3,17 @@
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { useParams } from "next/navigation";
+import Link from "next/link";
+import Image from "next/image";
+import { motion, AnimatePresence } from "framer-motion";
 import { GigCard } from "@/components/gig-card";
+import { AnimatedCounter } from "@/components/home/animated-counter";
 import { getServiceBySlug } from "@/lib/services";
-import { MapPin, Star, Handshake, Clock, Coins } from "@phosphor-icons/react";
+import {
+  MapPin, Star, Handshake, Clock, Coins, CaretRight,
+  House, SealCheck, ChatCircleDots, PaperPlaneTilt,
+  CalendarBlank, ShieldCheck, CheckCircle,
+} from "@phosphor-icons/react";
 import { CategoryIcon } from "@/components/ui/category-icon";
 
 interface ReviewData {
@@ -55,6 +63,14 @@ interface SellerProfile {
   }[];
 }
 
+const TABS = [
+  { key: "reviews" as const, label: "חוות דעת" },
+  { key: "prices" as const, label: "מחירון" },
+  { key: "gigs" as const, label: "שירותים" },
+] as const;
+
+type TabKey = (typeof TABS)[number]["key"];
+
 function RatingBar({ label, value, icon }: { label: string; value: number; icon: React.ReactNode }) {
   const pct = (value / 10) * 100;
   const color = value >= 8 ? "rgb(var(--color-success))" : value >= 6 ? "rgb(var(--color-accent-yellow))" : value >= 4 ? "rgb(var(--color-warning))" : "rgb(var(--color-error))";
@@ -64,9 +80,50 @@ function RatingBar({ label, value, icon }: { label: string; value: number; icon:
       <span className="w-6 text-center text-[rgb(var(--color-primary))]">{icon}</span>
       <span className="w-16 text-[13px] font-medium text-[rgb(var(--color-text-secondary))]">{label}</span>
       <div className="flex-1 h-2.5 rounded-full bg-[rgb(var(--color-border-light))] overflow-hidden">
-        <div className="h-full rounded-full transition-all duration-500" style={{ width: `${pct}%`, backgroundColor: color }} />
+        <motion.div
+          className="h-full rounded-full"
+          style={{ backgroundColor: color }}
+          initial={{ width: 0 }}
+          animate={{ width: `${pct}%` }}
+          transition={{ duration: 0.8, ease: "easeOut" }}
+        />
       </div>
       <span className="w-10 text-left text-[15px] font-bold" style={{ color }}>{value.toFixed(1)}</span>
+    </div>
+  );
+}
+
+function SellerSkeleton() {
+  return (
+    <div className="mx-auto max-w-5xl px-4 py-8">
+      <div className="mb-4 h-4 w-48 animate-pulse rounded bg-[rgba(var(--color-primary),0.08)]" />
+      <div className="mb-6 overflow-hidden rounded-2xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))]">
+        <div className="h-40 animate-pulse bg-[rgba(var(--color-primary),0.08)]" />
+        <div className="px-8 pb-8">
+          <div className="-mt-14 flex flex-col items-center sm:flex-row sm:items-end sm:gap-6">
+            <div className="h-28 w-28 animate-pulse rounded-full bg-[rgba(var(--color-primary),0.12)]" />
+            <div className="mt-4 flex-1 space-y-3 sm:mt-0">
+              <div className="h-6 w-40 animate-pulse rounded bg-[rgba(var(--color-primary),0.08)]" />
+              <div className="h-4 w-56 animate-pulse rounded bg-[rgba(var(--color-primary),0.08)]" />
+            </div>
+          </div>
+          <div className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-4">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <div key={i} className="h-24 animate-pulse rounded-xl bg-[rgba(var(--color-primary),0.05)]" />
+            ))}
+          </div>
+        </div>
+      </div>
+      <div className="mb-6 flex gap-4">
+        {Array.from({ length: 3 }).map((_, i) => (
+          <div key={i} className="h-10 w-24 animate-pulse rounded bg-[rgba(var(--color-primary),0.08)]" />
+        ))}
+      </div>
+      <div className="space-y-4">
+        {Array.from({ length: 3 }).map((_, i) => (
+          <div key={i} className="h-32 animate-pulse rounded-xl bg-[rgba(var(--color-primary),0.05)]" />
+        ))}
+      </div>
     </div>
   );
 }
@@ -77,7 +134,8 @@ export default function SellerProfilePage() {
   const [seller, setSeller] = useState<SellerProfile | null>(null);
   const [msgText, setMsgText] = useState("");
   const [msgSent, setMsgSent] = useState(false);
-  const [activeTab, setActiveTab] = useState<"reviews" | "prices" | "gigs">("reviews");
+  const [msgSending, setMsgSending] = useState(false);
+  const [activeTab, setActiveTab] = useState<TabKey>("reviews");
 
   useEffect(() => {
     fetch(`/api/sellers/${params.id}`)
@@ -87,7 +145,8 @@ export default function SellerProfilePage() {
 
   async function sendMessage(e: React.FormEvent) {
     e.preventDefault();
-    if (!msgText.trim()) return;
+    if (!msgText.trim() || msgSending) return;
+    setMsgSending(true);
     const res = await fetch("/api/messages", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -97,38 +156,122 @@ export default function SellerProfilePage() {
       setMsgSent(true);
       setMsgText("");
     }
+    setMsgSending(false);
   }
 
-  if (!seller) {
-    return <div className="flex items-center justify-center py-20"><div className="h-10 w-10 animate-spin rounded-full border-4 border-[rgba(var(--color-primary),0.1)] border-t-[rgb(var(--color-primary))]" /></div>;
-  }
+  if (!seller) return <SellerSkeleton />;
 
   const memberSince = new Date(seller.createdAt).toLocaleDateString("he-IL", { month: "long", year: "numeric" });
   const rb = seller.ratingBreakdown;
+  const tabCounts: Record<TabKey, number> = {
+    reviews: seller.totalReviews,
+    prices: seller.servicePrices.length,
+    gigs: seller.gigs.length,
+  };
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-8">
-      {/* Profile Header */}
-      <div className="mb-6 overflow-hidden rounded-xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] shadow-[0_4px_16px_rgba(var(--color-primary),0.08)]">
-        <div className="relative h-32 bg-gradient-to-r from-[rgb(var(--color-primary))] via-[rgb(var(--color-primary-light))] to-[rgb(var(--color-accent))]">
+      {/* Breadcrumb */}
+      <nav className="mb-5 flex items-center gap-1.5 text-[13px] text-[rgb(var(--color-text-muted))]">
+        <Link href="/" className="flex items-center gap-1 transition-colors hover:text-[rgb(var(--color-primary))]">
+          <House className="h-3.5 w-3.5" />
+          ראשי
+        </Link>
+        <CaretRight className="h-3 w-3" />
+        <Link href="/gigs" className="transition-colors hover:text-[rgb(var(--color-primary))]">שירותים</Link>
+        <CaretRight className="h-3 w-3" />
+        <span className="font-medium text-[rgb(var(--color-text))]">{seller.name}</span>
+      </nav>
+
+      {/* Hero Header */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="mb-6 overflow-hidden rounded-2xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] shadow-[0_4px_16px_rgba(var(--color-primary),0.08)]"
+      >
+        <div className="relative h-40 bg-gradient-to-r from-[rgb(var(--color-primary))] via-[rgb(var(--color-primary-light))] to-[rgb(var(--color-accent))]">
           <div className="absolute inset-0 overflow-hidden">
-            <div className="absolute -top-10 -right-10 h-40 w-40 rounded-full bg-white/10" />
+            <div className="absolute -top-16 -right-16 h-56 w-56 rounded-full bg-white/10" />
+            <div className="absolute -bottom-10 -left-10 h-40 w-40 rounded-full bg-white/5" />
+            <div className="absolute top-1/2 left-1/3 h-20 w-20 rounded-full bg-white/5" />
           </div>
         </div>
-        <div className="relative px-8 pb-8">
+
+        <div className="relative px-6 pb-8 sm:px-8">
           <div className="flex flex-col items-center -mt-14 sm:flex-row sm:items-end sm:gap-6">
-            <div className="flex h-28 w-28 items-center justify-center rounded-full border-4 border-[rgb(var(--color-surface))] bg-gradient-to-br from-[rgb(var(--color-primary))] to-[rgb(var(--color-primary-light))] text-4xl font-bold text-white shadow-lg">
-              {seller.name[0]}
+            {/* Avatar */}
+            <div className="relative">
+              <div className="flex h-28 w-28 items-center justify-center rounded-full border-4 border-[rgb(var(--color-surface))] bg-gradient-to-br from-[rgb(var(--color-primary))] to-[rgb(var(--color-primary-light))] text-4xl font-bold text-white shadow-[0_4px_16px_rgba(var(--color-primary),0.25)]">
+                {seller.avatar ? (
+                  <Image src={seller.avatar} alt={seller.name} fill className="rounded-full object-cover" unoptimized />
+                ) : (
+                  seller.name[0]
+                )}
+              </div>
+              {/* Verified badge */}
+              {seller.completedOrders >= 5 && (
+                <div className="absolute -bottom-1 -end-1 flex h-8 w-8 items-center justify-center rounded-full bg-[rgb(var(--color-surface))] shadow-sm">
+                  <SealCheck className="h-6 w-6 text-[rgb(var(--color-primary))]" weight="fill" />
+                </div>
+              )}
             </div>
+
             <div className="mt-4 text-center sm:mt-0 sm:text-right flex-1">
-              <h1 className="text-[24px] font-bold text-[rgb(var(--color-text))]">{seller.name}</h1>
-              <div className="mt-1 flex flex-wrap items-center justify-center sm:justify-start gap-3 text-[14px] text-[rgb(var(--color-text-secondary))]">
-                {seller.city && <span>{seller.city}</span>}
-                <span>חבר מאז {memberSince}</span>
+              <div className="flex items-center justify-center gap-2 sm:justify-start">
+                <h1 className="text-[26px] font-bold text-[rgb(var(--color-text))]">{seller.name}</h1>
+                {seller.completedOrders >= 5 && (
+                  <span className="rounded-full bg-[rgba(var(--color-primary),0.1)] px-2.5 py-0.5 text-[11px] font-semibold text-[rgb(var(--color-primary))]">
+                    מאומת
+                  </span>
+                )}
+              </div>
+              <div className="mt-1.5 flex flex-wrap items-center justify-center sm:justify-start gap-3 text-[13px] text-[rgb(var(--color-text-secondary))]">
+                {seller.city && (
+                  <span className="flex items-center gap-1">
+                    <MapPin className="h-3.5 w-3.5" />
+                    {seller.city}
+                  </span>
+                )}
+                <span className="flex items-center gap-1">
+                  <CalendarBlank className="h-3.5 w-3.5" />
+                  חבר מאז {memberSince}
+                </span>
+                {seller.avgRating > 0 && (
+                  <span className="flex items-center gap-1">
+                    <Star className="h-3.5 w-3.5 text-[rgb(var(--color-accent-yellow))]" weight="fill" />
+                    {seller.avgRating.toFixed(1)} ({seller.totalReviews})
+                  </span>
+                )}
               </div>
             </div>
           </div>
-          {seller.bio && <p className="mt-4 text-[14px] leading-relaxed text-[rgb(var(--color-text-secondary))]">{seller.bio}</p>}
+
+          {seller.bio && (
+            <p className="mt-5 text-[14px] leading-relaxed text-[rgb(var(--color-text-secondary))]">{seller.bio}</p>
+          )}
+
+          {/* Trust Indicators */}
+          <div className="mt-5 flex flex-wrap gap-3">
+            {seller.completedOrders >= 5 && (
+              <span className="flex items-center gap-1.5 rounded-full bg-[rgba(var(--color-success),0.1)] px-3 py-1.5 text-[12px] font-medium text-[rgb(var(--color-success))]">
+                <ShieldCheck className="h-3.5 w-3.5" />
+                בעל מקצוע מאומת
+              </span>
+            )}
+            {seller.completedOrders >= 10 && (
+              <span className="flex items-center gap-1.5 rounded-full bg-[rgba(var(--color-primary),0.1)] px-3 py-1.5 text-[12px] font-medium text-[rgb(var(--color-primary))]">
+                <CheckCircle className="h-3.5 w-3.5" />
+                {seller.completedOrders}+ הזמנות שהושלמו
+              </span>
+            )}
+            {seller.avgRating >= 9 && (
+              <span className="flex items-center gap-1.5 rounded-full bg-[rgba(var(--color-accent-yellow),0.15)] px-3 py-1.5 text-[12px] font-medium text-[rgb(var(--color-warning))]">
+                <Star className="h-3.5 w-3.5" weight="fill" />
+                מדורג גבוה
+              </span>
+            )}
+          </div>
 
           {/* Service areas */}
           {seller.serviceAreas.length > 0 && (
@@ -158,44 +301,79 @@ export default function SellerProfilePage() {
             </div>
           )}
 
-          {/* Stats row */}
-          <div className="mt-6 grid grid-cols-3 gap-4">
-            <div className="rounded-xl bg-[rgb(var(--color-bg))] border border-[rgb(var(--color-border-light))] p-4 text-center">
-              <p className="text-[24px] font-bold text-[rgb(var(--color-primary))]">{seller.completedOrders}</p>
+          {/* Stats row with animated counters */}
+          <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1 }}
+              className="rounded-xl bg-[rgb(var(--color-bg))] border border-[rgb(var(--color-border-light))] p-4 text-center"
+            >
+              <p className="text-[28px] font-bold text-[rgb(var(--color-primary))]">
+                <AnimatedCounter value={seller.completedOrders} />
+              </p>
               <p className="mt-1 text-[12px] font-medium text-[rgb(var(--color-text-muted))]">הזמנות שהושלמו</p>
-            </div>
-            <div className="rounded-xl bg-[rgb(var(--color-bg))] border border-[rgb(var(--color-border-light))] p-4 text-center">
-              <p className="text-[24px] font-bold text-[rgb(var(--color-accent))]">{seller.totalReviews}</p>
+            </motion.div>
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+              className="rounded-xl bg-[rgb(var(--color-bg))] border border-[rgb(var(--color-border-light))] p-4 text-center"
+            >
+              <p className="text-[28px] font-bold text-[rgb(var(--color-accent))]">
+                <AnimatedCounter value={seller.totalReviews} />
+              </p>
               <p className="mt-1 text-[12px] font-medium text-[rgb(var(--color-text-muted))]">חוות דעת</p>
-            </div>
-            <div className="rounded-xl bg-[rgb(var(--color-bg))] border border-[rgb(var(--color-border-light))] p-4 text-center">
+            </motion.div>
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3 }}
+              className="rounded-xl bg-[rgb(var(--color-bg))] border border-[rgb(var(--color-border-light))] p-4 text-center"
+            >
               <div className="flex items-center justify-center gap-1">
-                <Star className="h-5 w-5 text-[rgb(var(--color-accent-yellow))] " weight="fill" />
-                <p className="text-[24px] font-bold text-[rgb(var(--color-accent-yellow))]">{seller.avgRating || "--"}</p>
+                <Star className="h-5 w-5 text-[rgb(var(--color-accent-yellow))]" weight="fill" />
+                <p className="text-[28px] font-bold text-[rgb(var(--color-accent-yellow))]">
+                  {seller.avgRating ? <AnimatedCounter value={seller.avgRating} /> : "--"}
+                </p>
               </div>
               <p className="mt-1 text-[12px] font-medium text-[rgb(var(--color-text-muted))]">דירוג כללי</p>
-            </div>
+            </motion.div>
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.4 }}
+              className="rounded-xl bg-[rgb(var(--color-bg))] border border-[rgb(var(--color-border-light))] p-4 text-center"
+            >
+              <p className="text-[28px] font-bold text-[rgb(var(--color-success))]">
+                {seller.userServices.length}
+              </p>
+              <p className="mt-1 text-[12px] font-medium text-[rgb(var(--color-text-muted))]">סוגי שירות</p>
+            </motion.div>
           </div>
         </div>
-      </div>
+      </motion.div>
 
-      {/* Rating Breakdown — Midrag style */}
+      {/* Rating Breakdown */}
       {rb && (
-        <div className="mb-6 rounded-xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] p-6 shadow-[0_2px_8px_rgba(var(--color-primary),0.06)]">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2, duration: 0.5 }}
+          className="mb-6 rounded-2xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] p-6 shadow-[0_2px_8px_rgba(var(--color-primary),0.06)]"
+        >
           <div className="flex items-center justify-between mb-5">
             <h2 className="text-[18px] font-bold text-[rgb(var(--color-text))]">דירוג מפורט</h2>
             <span className="text-[13px] text-[rgb(var(--color-text-muted))]">מבוסס על {rb.count} חוות דעת</span>
           </div>
-
           <div className="flex flex-col md:flex-row gap-6">
-            {/* Big score */}
             <div className="flex flex-col items-center justify-center rounded-xl bg-gradient-to-br from-[rgb(var(--color-primary))] to-[rgb(var(--color-primary-light))] p-6 text-white min-w-[140px]">
-              <p className="text-[42px] font-bold leading-none">{rb.overall.toFixed(1)}</p>
+              <p className="text-[42px] font-bold leading-none">
+                <AnimatedCounter value={rb.overall} />
+              </p>
               <p className="mt-1 text-[13px] text-white/70">מתוך 10</p>
               <p className="mt-2 text-[12px] font-semibold">דירוג כללי</p>
             </div>
-
-            {/* Rating bars */}
             <div className="flex-1 space-y-3">
               <RatingBar label="איכות" value={rb.quality} icon={<Star className="h-4 w-4" />} />
               <RatingBar label="יחס" value={rb.attitude} icon={<Handshake className="h-4 w-4" />} />
@@ -203,185 +381,237 @@ export default function SellerProfilePage() {
               <RatingBar label="מחיר" value={rb.price} icon={<Coins className="h-4 w-4" />} />
             </div>
           </div>
-        </div>
+        </motion.div>
       )}
 
-      {/* Contact Form */}
+      {/* Contact CTA — Glass Morphism */}
       {session?.user && session.user.id !== seller.id && (
-        <div className="mb-6 rounded-xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] p-6">
-          <h2 className="mb-4 text-[16px] font-bold text-[rgb(var(--color-text))]">שלח הודעה ל{seller.name}</h2>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3, duration: 0.5 }}
+          className="mb-6 rounded-2xl border border-[rgba(var(--color-primary),0.2)] bg-[rgba(var(--color-primary),0.04)] p-6 backdrop-blur-sm"
+        >
+          <div className="flex items-center gap-2 mb-4">
+            <ChatCircleDots className="h-5 w-5 text-[rgb(var(--color-primary))]" />
+            <h2 className="text-[16px] font-bold text-[rgb(var(--color-text))]">שלח הודעה ל{seller.name}</h2>
+          </div>
           {msgSent ? (
-            <div className="rounded-xl bg-[rgba(var(--color-success),0.1)] px-4 py-3 text-[14px] text-[rgb(var(--color-success))] font-medium">ההודעה נשלחה בהצלחה!</div>
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="flex items-center gap-2 rounded-xl bg-[rgba(var(--color-success),0.1)] px-4 py-3 text-[14px] text-[rgb(var(--color-success))] font-medium"
+            >
+              <CheckCircle className="h-5 w-5" weight="fill" />
+              ההודעה נשלחה בהצלחה!
+            </motion.div>
           ) : (
             <form onSubmit={sendMessage} className="flex gap-3">
               <input
                 value={msgText}
                 onChange={(e) => setMsgText(e.target.value)}
                 placeholder="היי, אני מתעניין בשירות שלך..."
-                className="flex-1 rounded-xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-bg))] px-4 py-3 text-[14px] text-[rgb(var(--color-text))] placeholder-[rgb(var(--color-text-muted))] focus:border-[rgb(var(--color-primary))] focus:outline-none focus:ring-2 focus:ring-[rgba(var(--color-primary),0.2)]"
+                className="flex-1 rounded-xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] px-4 py-3 text-[14px] text-[rgb(var(--color-text))] placeholder-[rgb(var(--color-text-muted))] focus:border-[rgb(var(--color-primary))] focus:outline-none focus:ring-2 focus:ring-[rgba(var(--color-primary),0.2)]"
               />
-              <button type="submit" disabled={!msgText.trim()} className="rounded-xl bg-[rgb(var(--color-primary))] px-6 py-3 text-[14px] font-semibold text-white transition-all hover:bg-[rgb(var(--color-primary-hover))] disabled:opacity-40">שלח</button>
+              <button
+                type="submit"
+                disabled={!msgText.trim() || msgSending}
+                className="flex items-center gap-2 rounded-xl bg-[rgb(var(--color-primary))] px-6 py-3 text-[14px] font-semibold text-white transition-all hover:bg-[rgb(var(--color-primary-hover))] hover:shadow-[0_4px_16px_rgba(var(--color-primary),0.25)] disabled:opacity-40"
+              >
+                <PaperPlaneTilt className="h-4 w-4" />
+                שלח
+              </button>
             </form>
           )}
-        </div>
+        </motion.div>
       )}
 
-      {/* Tabs: Reviews / Price List / Gigs */}
+      {/* Tabs */}
       <div className="mb-6 flex border-b border-[rgb(var(--color-border))]">
-        {[
-          { key: "reviews" as const, label: "חוות דעת", count: seller.totalReviews },
-          { key: "prices" as const, label: "מחירון", count: seller.servicePrices.length },
-          { key: "gigs" as const, label: "שירותים", count: seller.gigs.length },
-        ].map((tab) => (
+        {TABS.map((tab) => (
           <button
             key={tab.key}
             onClick={() => setActiveTab(tab.key)}
-            className={`px-5 py-3 text-[14px] font-semibold border-b-2 transition-all ${
+            className={`relative px-5 py-3 text-[14px] font-semibold transition-all ${
               activeTab === tab.key
-                ? "border-[rgb(var(--color-primary))] text-[rgb(var(--color-primary))]"
-                : "border-transparent text-[rgb(var(--color-text-muted))] hover:text-[rgb(var(--color-text-secondary))]"
+                ? "text-[rgb(var(--color-primary))]"
+                : "text-[rgb(var(--color-text-muted))] hover:text-[rgb(var(--color-text-secondary))]"
             }`}
           >
-            {tab.label} {tab.count > 0 && <span className="text-[12px] opacity-60">({tab.count})</span>}
+            {tab.label}
+            {tabCounts[tab.key] > 0 && (
+              <span className="ms-1.5 text-[12px] opacity-60">({tabCounts[tab.key]})</span>
+            )}
+            {activeTab === tab.key && (
+              <motion.div
+                layoutId="seller-tab-indicator"
+                className="absolute bottom-0 inset-x-0 h-0.5 bg-[rgb(var(--color-primary))] rounded-full"
+                transition={{ type: "spring", stiffness: 400, damping: 30 }}
+              />
+            )}
           </button>
         ))}
       </div>
 
-      {/* Reviews Tab */}
-      {activeTab === "reviews" && (
-        <div className="space-y-4">
-          {seller.allReviews.length === 0 ? (
-            <div className="rounded-xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] p-8 text-center">
-              <p className="text-[16px] font-medium text-[rgb(var(--color-text))]">אין חוות דעת עדיין</p>
-              <p className="mt-1 text-[14px] text-[rgb(var(--color-text-muted))]">היה הראשון לכתוב חוות דעת</p>
+      {/* Tab Content with AnimatePresence */}
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={activeTab}
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -8 }}
+          transition={{ duration: 0.2 }}
+        >
+          {activeTab === "reviews" && <ReviewsTab reviews={seller.allReviews} />}
+          {activeTab === "prices" && <PricesTab prices={seller.servicePrices} />}
+          {activeTab === "gigs" && <GigsTab gigs={seller.gigs} sellerName={seller.name} sellerAvatar={seller.avatar} />}
+        </motion.div>
+      </AnimatePresence>
+    </div>
+  );
+}
+
+function ReviewsTab({ reviews }: { reviews: ReviewData[] }) {
+  if (reviews.length === 0) {
+    return (
+      <div className="rounded-2xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] p-12 text-center">
+        <ChatCircleDots className="mx-auto mb-3 h-10 w-10 text-[rgb(var(--color-text-muted))]" />
+        <p className="text-[16px] font-medium text-[rgb(var(--color-text))]">אין חוות דעת עדיין</p>
+        <p className="mt-1 text-[14px] text-[rgb(var(--color-text-muted))]">היה הראשון לכתוב חוות דעת</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-4">
+      {reviews.map((review, index) => (
+        <motion.div
+          key={review.id}
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: index * 0.05 }}
+          className="rounded-2xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] p-5 transition-all hover:shadow-[0_2px_8px_rgba(var(--color-primary),0.06)]"
+        >
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[rgba(var(--color-primary),0.1)] text-[14px] font-bold text-[rgb(var(--color-primary))]">
+                {review.user.name[0]}
+              </div>
+              <div>
+                <p className="text-[14px] font-semibold text-[rgb(var(--color-text))]">{review.user.name}</p>
+                <p className="text-[12px] text-[rgb(var(--color-text-muted))]">
+                  {review.user.city && `${review.user.city} · `}
+                  {new Date(review.createdAt).toLocaleDateString("he-IL")}
+                </p>
+              </div>
             </div>
-          ) : (
-            seller.allReviews.map((review) => (
-              <div key={review.id} className="rounded-xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] p-5 transition-all hover:shadow-[0_2px_8px_rgba(var(--color-primary),0.06)]">
-                <div className="flex items-center justify-between mb-3">
-                  <div className="flex items-center gap-3">
-                    <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[rgba(var(--color-primary),0.1)] text-[13px] font-bold text-[rgb(var(--color-primary))]">
-                      {review.user.name[0]}
-                    </div>
-                    <div>
-                      <p className="text-[14px] font-semibold text-[rgb(var(--color-text))]">{review.user.name}</p>
-                      <p className="text-[12px] text-[rgb(var(--color-text-muted))]">
-                        {review.user.city && `${review.user.city} · `}
-                        {new Date(review.createdAt).toLocaleDateString("he-IL")}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-1 rounded-full bg-[rgba(var(--color-accent-yellow),0.15)] px-3 py-1">
-                    <Star className="h-3.5 w-3.5 text-[rgb(var(--color-accent-yellow))] " weight="fill" />
-                    <span className="text-[13px] font-bold text-[rgb(var(--color-warning))]">{review.rating}</span>
-                  </div>
+            <div className="flex items-center gap-1 rounded-full bg-[rgba(var(--color-accent-yellow),0.15)] px-3 py-1.5">
+              <Star className="h-3.5 w-3.5 text-[rgb(var(--color-accent-yellow))]" weight="fill" />
+              <span className="text-[13px] font-bold text-[rgb(var(--color-warning))]">{review.rating}</span>
+            </div>
+          </div>
+
+          <p className="text-[14px] leading-relaxed text-[rgb(var(--color-text-secondary))] mb-3">{review.comment}</p>
+
+          {review.ratingAttitude != null && (
+            <div className="flex flex-wrap gap-2 text-[12px] border-t border-[rgb(var(--color-border-light))] pt-3">
+              <span className="flex items-center gap-1 rounded-lg bg-[rgb(var(--color-bg))] px-2.5 py-1.5 text-[rgb(var(--color-text-secondary))]">
+                <Star className="h-3.5 w-3.5 text-[rgb(var(--color-accent-yellow))]" /> איכות: <b className="text-[rgb(var(--color-text))]">{review.ratingQuality}</b>
+              </span>
+              <span className="flex items-center gap-1 rounded-lg bg-[rgb(var(--color-bg))] px-2.5 py-1.5 text-[rgb(var(--color-text-secondary))]">
+                <Handshake className="h-3.5 w-3.5 text-[rgb(var(--color-primary))]" /> יחס: <b className="text-[rgb(var(--color-text))]">{review.ratingAttitude}</b>
+              </span>
+              <span className="flex items-center gap-1 rounded-lg bg-[rgb(var(--color-bg))] px-2.5 py-1.5 text-[rgb(var(--color-text-secondary))]">
+                <Clock className="h-3.5 w-3.5 text-[rgb(var(--color-accent))]" /> זמנים: <b className="text-[rgb(var(--color-text))]">{review.ratingTimeliness}</b>
+              </span>
+              <span className="flex items-center gap-1 rounded-lg bg-[rgb(var(--color-bg))] px-2.5 py-1.5 text-[rgb(var(--color-text-secondary))]">
+                <Coins className="h-3.5 w-3.5 text-[rgb(var(--color-success))]" /> מחיר: <b className="text-[rgb(var(--color-text))]">{review.ratingPrice}</b>
+              </span>
+            </div>
+          )}
+
+          {review.sellerResponse && (
+            <div className="mt-3 rounded-xl bg-[rgba(var(--color-primary),0.06)] border border-[rgba(var(--color-primary),0.1)] p-4">
+              <p className="text-[12px] font-semibold text-[rgb(var(--color-primary))] mb-1">תגובת בעל המקצוע:</p>
+              <p className="text-[13px] text-[rgb(var(--color-text-secondary))]">{review.sellerResponse}</p>
+            </div>
+          )}
+        </motion.div>
+      ))}
+    </div>
+  );
+}
+
+function PricesTab({ prices }: { prices: SellerProfile["servicePrices"] }) {
+  if (prices.length === 0) {
+    return (
+      <div className="rounded-2xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] p-12 text-center">
+        <Coins className="mx-auto mb-3 h-10 w-10 text-[rgb(var(--color-text-muted))]" />
+        <p className="text-[16px] font-medium text-[rgb(var(--color-text))]">המחירון עדיין לא עודכן</p>
+        <p className="mt-1 text-[14px] text-[rgb(var(--color-text-muted))]">בעל המקצוע טרם הוסיף מחירים</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="rounded-2xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] overflow-hidden">
+      <div className="px-6 py-4 bg-[rgb(var(--color-bg))] border-b border-[rgb(var(--color-border-light))]">
+        <h3 className="text-[16px] font-bold text-[rgb(var(--color-text))]">המחירון שלי</h3>
+        <p className="text-[12px] text-[rgb(var(--color-text-muted))] mt-0.5">המחירים למקרים סטנדרטיים בלבד</p>
+      </div>
+      <div className="divide-y divide-[rgb(var(--color-border-light))]">
+        {prices.map((sp, i) => {
+          const svc = getServiceBySlug(sp.serviceSlug);
+          return (
+            <motion.div
+              key={sp.serviceSlug}
+              initial={{ opacity: 0, x: -10 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: i * 0.05 }}
+              className="flex items-center justify-between px-6 py-4 transition-colors hover:bg-[rgba(var(--color-primary),0.03)]"
+            >
+              <div className="flex items-center gap-3">
+                {svc && <CategoryIcon slug={svc.category} className="h-5 w-5 text-[rgb(var(--color-primary))]" />}
+                <div>
+                  <p className="text-[14px] font-medium text-[rgb(var(--color-text))]">{svc?.nameHe || sp.serviceSlug}</p>
+                  {sp.description && (
+                    <p className="mt-0.5 text-[12px] text-[rgb(var(--color-text-muted))]">{sp.description}</p>
+                  )}
                 </div>
-
-                <p className="text-[14px] leading-relaxed text-[rgb(var(--color-text-secondary))] mb-3">{review.comment}</p>
-
-                {/* Per-dimension ratings */}
-                {review.ratingAttitude != null && (
-                  <div className="flex flex-wrap gap-3 text-[12px] border-t border-[rgb(var(--color-border-light))] pt-3">
-                    <span className="flex items-center gap-1 rounded-lg bg-[rgb(var(--color-bg))] px-2.5 py-1 text-[rgb(var(--color-text-secondary))]">
-                      <Star className="h-3.5 w-3.5 text-[rgb(var(--color-accent-yellow))]" /> איכות: <b className="text-[rgb(var(--color-text))]">{review.ratingQuality}</b>
-                    </span>
-                    <span className="flex items-center gap-1 rounded-lg bg-[rgb(var(--color-bg))] px-2.5 py-1 text-[rgb(var(--color-text-secondary))]">
-                      <Handshake className="h-3.5 w-3.5 text-[rgb(var(--color-primary))]" /> יחס: <b className="text-[rgb(var(--color-text))]">{review.ratingAttitude}</b>
-                    </span>
-                    <span className="flex items-center gap-1 rounded-lg bg-[rgb(var(--color-bg))] px-2.5 py-1 text-[rgb(var(--color-text-secondary))]">
-                      <Clock className="h-3.5 w-3.5 text-[rgb(var(--color-accent))]" /> זמנים: <b className="text-[rgb(var(--color-text))]">{review.ratingTimeliness}</b>
-                    </span>
-                    <span className="flex items-center gap-1 rounded-lg bg-[rgb(var(--color-bg))] px-2.5 py-1 text-[rgb(var(--color-text-secondary))]">
-                      <Coins className="h-3.5 w-3.5 text-[rgb(var(--color-success))]" /> מחיר: <b className="text-[rgb(var(--color-text))]">{review.ratingPrice}</b>
-                    </span>
-                  </div>
-                )}
-
-                {/* Seller response */}
-                {review.sellerResponse && (
-                  <div className="mt-3 rounded-xl bg-[rgba(var(--color-primary),0.1)] p-4">
-                    <p className="text-[12px] font-semibold text-[rgb(var(--color-primary))] mb-1">תגובת בעל המקצוע:</p>
-                    <p className="text-[13px] text-[rgb(var(--color-text-secondary))]">{review.sellerResponse}</p>
-                  </div>
-                )}
               </div>
-            ))
-          )}
-        </div>
-      )}
+              <span className="text-[17px] font-bold text-[rgb(var(--color-primary))]">₪{sp.price}</span>
+            </motion.div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
 
-      {/* Prices Tab */}
-      {activeTab === "prices" && (
-        <div className="rounded-xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] overflow-hidden">
-          {seller.servicePrices.length === 0 ? (
-            <div className="p-8 text-center">
-              <p className="text-[16px] font-medium text-[rgb(var(--color-text))]">המחירון עדיין לא עודכן</p>
-              <p className="mt-1 text-[14px] text-[rgb(var(--color-text-muted))]">בעל המקצוע טרם הוסיף מחירים</p>
-            </div>
-          ) : (
-            <>
-              <div className="px-6 py-4 bg-[rgb(var(--color-bg))] border-b border-[rgb(var(--color-border-light))]">
-                <h3 className="text-[16px] font-bold text-[rgb(var(--color-text))]">המחירון שלי</h3>
-                <p className="text-[12px] text-[rgb(var(--color-text-muted))] mt-0.5">המחירים למקרים סטנדרטיים בלבד</p>
-              </div>
-              <table className="w-full">
-                <thead>
-                  <tr className="border-b border-[rgb(var(--color-border-light))]">
-                    <th className="px-6 py-3 text-right text-[12px] font-semibold text-[rgb(var(--color-text-muted))] uppercase tracking-wider">שירות</th>
-                    <th className="px-6 py-3 text-right text-[12px] font-semibold text-[rgb(var(--color-text-muted))] uppercase tracking-wider">פירוט</th>
-                    <th className="px-6 py-3 text-left text-[12px] font-semibold text-[rgb(var(--color-text-muted))] uppercase tracking-wider">מחיר</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {seller.servicePrices.map((sp, i) => {
-                    const svc = getServiceBySlug(sp.serviceSlug);
-                    return (
-                      <tr key={sp.serviceSlug} className={i < seller.servicePrices.length - 1 ? "border-b border-[rgb(var(--color-border-light))]" : ""}>
-                        <td className="px-6 py-4">
-                          <div className="flex items-center gap-2">
-                            {svc && <CategoryIcon slug={svc.category} className="h-4 w-4 text-[rgb(var(--color-primary))]" />}
-                            <span className="text-[14px] font-medium text-[rgb(var(--color-text))]">{svc?.nameHe || sp.serviceSlug}</span>
-                          </div>
-                        </td>
-                        <td className="px-6 py-4 text-[13px] text-[rgb(var(--color-text-secondary))]">{sp.description || "—"}</td>
-                        <td className="px-6 py-4">
-                          <span className="text-[15px] font-bold text-[rgb(var(--color-primary))]">₪{sp.price}</span>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </>
-          )}
-        </div>
-      )}
+function GigsTab({ gigs, sellerName, sellerAvatar }: { gigs: SellerProfile["gigs"]; sellerName: string; sellerAvatar: string | null }) {
+  if (gigs.length === 0) {
+    return (
+      <div className="rounded-2xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] p-12 text-center">
+        <p className="text-[16px] font-medium text-[rgb(var(--color-text))]">אין שירותים עדיין</p>
+        <p className="mt-1 text-[14px] text-[rgb(var(--color-text-muted))]">בעל המקצוע טרם הוסיף שירותים</p>
+      </div>
+    );
+  }
 
-      {/* Gigs Tab */}
-      {activeTab === "gigs" && (
-        <>
-          {seller.gigs.length === 0 ? (
-            <div className="rounded-xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] p-8 text-center">
-              <p className="text-[14px] text-[rgb(var(--color-text-muted))]">אין שירותים עדיין</p>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-              {seller.gigs.map((g) => (
-                <GigCard
-                  key={g.id}
-                  id={g.id}
-                  title={g.title}
-                  image={g.image}
-                  seller={{ name: seller.name, avatar: seller.avatar }}
-                  startingPrice={g.tiers[0]?.price || 0}
-                  avgRating={g.avgRating}
-                  reviewCount={g.reviewCount}
-                />
-              ))}
-            </div>
-          )}
-        </>
-      )}
+  return (
+    <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+      {gigs.map((g) => (
+        <GigCard
+          key={g.id}
+          id={g.id}
+          title={g.title}
+          image={g.image}
+          seller={{ name: sellerName, avatar: sellerAvatar }}
+          startingPrice={g.tiers[0]?.price || 0}
+          avgRating={g.avgRating}
+          reviewCount={g.reviewCount}
+        />
+      ))}
     </div>
   );
 }

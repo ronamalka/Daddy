@@ -2,9 +2,9 @@
 
 import { useEffect, useState, useCallback, useRef, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import Link from "next/link";
-import { GigCard } from "@/components/gig-card";
-import { MagnifyingGlass, SquaresFour, ListBullets, MapPin, Star, CircleNotch } from "@phosphor-icons/react";
+import { AnimatePresence, LayoutGroup } from "framer-motion";
+import { GigCard, GigCardSkeleton } from "@/components/gig-card";
+import { MagnifyingGlass, SquaresFour, ListBullets, CircleNotch } from "@phosphor-icons/react";
 import { CategoryIcon } from "@/components/ui/category-icon";
 
 interface GigItem {
@@ -47,13 +47,6 @@ const SORT_OPTIONS = [
 ];
 
 const PAGE_SIZE = 12;
-
-const AVATAR_GRADIENTS = [
-  "from-[rgb(var(--color-primary))] to-[rgb(var(--color-primary-light))]",
-  "from-[rgb(var(--color-accent))] to-[rgb(var(--color-success))]",
-  "from-[rgb(var(--color-error))] to-[rgb(var(--color-accent-yellow))]",
-  "from-[rgb(var(--color-primary-light))] to-[rgb(var(--color-accent))]",
-];
 
 function GigsContent() {
   const searchParams = useSearchParams();
@@ -306,7 +299,7 @@ function GigsContent() {
                   ))}
                 </select>
               </div>
-              <div className="flex rounded-lg border border-[rgb(var(--color-border))] overflow-hidden">
+              <div className="flex overflow-hidden rounded-lg border border-[rgb(var(--color-border))]">
                 <button
                   onClick={() => setViewMode("grid")}
                   className={`p-2 transition-colors ${viewMode === "grid" ? "bg-[rgb(var(--color-primary))] text-white" : "bg-[rgb(var(--color-surface-elevated))] text-[rgb(var(--color-text-secondary))] hover:bg-[rgba(var(--color-primary),0.1)]"}`}
@@ -328,18 +321,9 @@ function GigsContent() {
 
           {/* Gig grid */}
           {loading ? (
-            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3">
+            <div className={viewMode === "grid" ? "grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3" : "flex flex-col gap-4"}>
               {Array.from({ length: 6 }).map((_, i) => (
-                <div key={i} className="animate-pulse rounded-xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))]">
-                  <div className="aspect-video w-full bg-[rgba(var(--color-primary),0.1)]" />
-                  <div className="space-y-3 p-4">
-                    <div className="h-4 w-1/3 rounded bg-[rgba(var(--color-primary),0.1)]" />
-                    <div className="h-4 w-full rounded bg-[rgba(var(--color-primary),0.1)]" />
-                    <div className="h-4 w-2/3 rounded bg-[rgba(var(--color-primary),0.1)]" />
-                    <div className="h-px bg-[rgb(var(--color-border-light))]" />
-                    <div className="h-5 w-1/4 rounded bg-[rgba(var(--color-primary),0.1)]" />
-                  </div>
-                </div>
+                <GigCardSkeleton key={i} variant={viewMode} />
               ))}
             </div>
           ) : gigs.length === 0 ? (
@@ -358,38 +342,25 @@ function GigsContent() {
             </div>
           ) : (
             <>
-              {viewMode === "grid" ? (
-                <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3">
-                  {gigs.map((gig) => (
-                    <GigCard
-                      key={gig.id}
-                      id={gig.id}
-                      title={gig.title}
-                      image={gig.image}
-                      seller={gig.seller}
-                      startingPrice={gig.tiers[0]?.price || 0}
-                      avgRating={gig.avgRating}
-                      reviewCount={gig.reviewCount}
-                    />
-                  ))}
-                </div>
-              ) : (
-                <div className="flex flex-col gap-4">
-                  {gigs.map((gig) => (
-                    <GigListItem
-                      key={gig.id}
-                      id={gig.id}
-                      title={gig.title}
-                      image={gig.image}
-                      seller={gig.seller}
-                      startingPrice={gig.tiers[0]?.price || 0}
-                      avgRating={gig.avgRating}
-                      reviewCount={gig.reviewCount}
-                      category={gig.category}
-                    />
-                  ))}
-                </div>
-              )}
+              <LayoutGroup>
+                <AnimatePresence mode="popLayout">
+                  <div className={viewMode === "grid" ? "grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3" : "flex flex-col gap-4"}>
+                    {gigs.map((gig) => (
+                      <GigCard
+                        key={gig.id}
+                        id={gig.id}
+                        title={gig.title}
+                        image={gig.image}
+                        seller={gig.seller}
+                        startingPrice={gig.tiers[0]?.price || 0}
+                        avgRating={gig.avgRating}
+                        reviewCount={gig.reviewCount}
+                        variant={viewMode}
+                      />
+                    ))}
+                  </div>
+                </AnimatePresence>
+              </LayoutGroup>
 
               {/* Infinite scroll sentinel */}
               <div ref={sentinelRef} className="mt-8 flex items-center justify-center py-4">
@@ -408,80 +379,6 @@ function GigsContent() {
         </div>
       </div>
     </div>
-  );
-}
-
-function GigListItem({
-  id,
-  title,
-  image,
-  seller,
-  startingPrice,
-  avgRating,
-  reviewCount,
-  category,
-}: {
-  id: string;
-  title: string;
-  image: string | null;
-  seller: { name: string; avatar: string | null; serviceAreas?: { districtName: string; cityName: string | null }[] };
-  startingPrice: number;
-  avgRating: number;
-  reviewCount: number;
-  category: { name: string; slug: string };
-}) {
-  const gradientIndex = seller.name.charCodeAt(0) % AVATAR_GRADIENTS.length;
-
-  return (
-    <Link
-      href={`/gigs/${id}`}
-      className="group flex overflow-hidden rounded-xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] transition-all hover:shadow-lg hover:border-[rgba(var(--color-primary),0.3)]"
-    >
-      <div className="w-[200px] shrink-0 overflow-hidden bg-[rgba(var(--color-primary),0.1)] sm:w-[240px]">
-        {image ? (
-          <img src={image} alt={title} className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105" />
-        ) : (
-          <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-[rgb(var(--color-primary))] via-[rgb(var(--color-primary-light))] to-[rgb(var(--color-accent))]">
-            <span className="text-4xl font-bold text-white/30">א</span>
-          </div>
-        )}
-      </div>
-      <div className="flex flex-1 flex-col justify-between p-4">
-        <div>
-          <div className="mb-2 flex items-center gap-2">
-            <span className="rounded-full bg-[rgba(var(--color-primary),0.1)] px-2.5 py-0.5 text-[11px] font-medium text-[rgb(var(--color-primary))]">
-              {category.name}
-            </span>
-          </div>
-          <h3 className="mb-2 text-[15px] font-semibold leading-snug text-[rgb(var(--color-text))] transition-colors group-hover:text-[rgb(var(--color-primary))]">
-            {title}
-          </h3>
-          <div className="flex items-center gap-2.5">
-            <div className={`flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-br ${AVATAR_GRADIENTS[gradientIndex]} text-[11px] font-bold text-white`}>
-              {seller.name[0]}
-            </div>
-            <span className="text-[13px] text-[rgb(var(--color-text-secondary))]">{seller.name}</span>
-            {seller.serviceAreas && seller.serviceAreas.length > 0 && (
-              <span className="flex items-center gap-1 text-[11px] text-[rgb(var(--color-text-muted))]">
-                <MapPin className="h-3 w-3" />
-                {seller.serviceAreas.slice(0, 3).map((a) => a.cityName || a.districtName).join(", ")}
-              </span>
-            )}
-          </div>
-        </div>
-        <div className="mt-3 flex items-center justify-between border-t border-[rgb(var(--color-border-light))] pt-3">
-          <div className="flex items-center gap-1.5">
-            <Star className="h-4 w-4 text-[rgb(var(--color-accent-yellow))]" weight="fill" />
-            <span className="text-[13px] font-bold text-[rgb(var(--color-text))]">{avgRating.toFixed(1)}</span>
-            <span className="text-[13px] text-[rgb(var(--color-text-muted))]">({reviewCount})</span>
-          </div>
-          <div>
-            <span className="text-[12px] text-[rgb(var(--color-text-muted))]">החל מ-</span>
-            <span className="text-[18px] font-bold text-[rgb(var(--color-text))]">₪{startingPrice}</span>
-          </div>
-        </div>
-      </div>
-    </Link>
   );
 }
 
