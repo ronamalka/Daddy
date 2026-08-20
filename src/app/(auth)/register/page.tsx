@@ -102,15 +102,15 @@ export default function RegisterPage() {
   const inputClass = "w-full rounded-xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface-elevated))] px-4 py-3 text-[16px] text-[rgb(var(--color-text))] placeholder-[rgb(var(--color-text-muted))] transition-all focus:border-[rgb(var(--color-primary))] focus:outline-none focus:ring-2 focus:ring-[rgba(var(--color-primary),0.2)]";
 
   const stepTitles = [
-    "צור חשבון חדש",
-    "איפה אתה נמצא?",
+    "בוא נכיר",
+    "איפה אתה פועל?",
     "מה אתה יודע לעשות?",
   ];
 
   const stepDescs = [
-    "הצטרף לקהילה והתחל את המסע שלך",
-    role === "SELLER" ? "בחר את האזורים בהם אתה נותן שירות" : "בחר את העיר שלך כדי למצוא אבאל׳ות קרובים",
-    "בחר את השירותים שאתה מציע ללקוחות",
+    "הצטרף למשפחת האבאל׳ות — זה לוקח דקה, ואף ארון לא ייפגע",
+    role === "SELLER" ? "סמן את האזורים שבהם אתה מוכן להגיע ולסדר" : "ספר לנו איפה אתה כדי שנמצא לך אבאל׳ה בשכונה",
+    "סמן מה אתה יודע לתקן, להרכיב, או לחסוך — ונחבר אותך ללקוחות",
   ];
 
   return (
@@ -250,7 +250,7 @@ export default function RegisterPage() {
 
             <div className="flex gap-3">
               <button type="button" onClick={() => setStep(1)} className="flex-1 rounded-xl border border-[rgb(var(--color-border))] py-3.5 text-[16px] font-semibold text-[rgb(var(--color-text-secondary))] transition-all hover:bg-[rgb(var(--color-surface-elevated))]">
-                חזרה
+                רגע, חושב שנית
               </button>
               <button
                 type="button"
@@ -282,7 +282,7 @@ export default function RegisterPage() {
 
             <div className="flex gap-3">
               <button type="button" onClick={() => setStep(2)} className="flex-1 rounded-xl border border-[rgb(var(--color-border))] py-3.5 text-[16px] font-semibold text-[rgb(var(--color-text-secondary))] transition-all hover:bg-[rgb(var(--color-surface-elevated))]">
-                חזרה
+                רגע, חושב שנית
               </button>
               <button
                 type="button"
@@ -310,7 +310,7 @@ export default function RegisterPage() {
 
         <div className="mt-6 text-center">
           <p className="text-[14px] text-[rgb(var(--color-text-secondary))]">
-            כבר חבר?{" "}
+            כבר במשפחה?{" "}
             <Link href="/login" className="font-semibold text-[rgb(var(--color-primary))] transition-colors hover:text-[rgb(var(--color-primary-hover))]">
               התחבר
             </Link>
