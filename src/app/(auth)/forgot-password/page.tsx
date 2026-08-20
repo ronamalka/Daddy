@@ -1,13 +1,18 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useRef, useCallback } from "react";
+import { TurnstileWidget } from "@/components/turnstile-widget";
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [sent, setSent] = useState(false);
   const [error, setError] = useState("");
+  const [turnstileToken, setTurnstileToken] = useState("");
+  const formLoadedAtRef = useRef(Date.now());
+  const handleTurnstileVerify = useCallback((token: string) => setTurnstileToken(token), []);
+  const handleTurnstileExpire = useCallback(() => setTurnstileToken(""), []);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -18,7 +23,7 @@ export default function ForgotPasswordPage() {
       const res = await fetch("/api/password-reset?action=request", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email }),
+        body: JSON.stringify({ email, turnstileToken, _hp_field: "", _formLoadedAt: formLoadedAtRef.current }),
       });
 
       if (!res.ok) {
@@ -104,6 +109,11 @@ export default function ForgotPasswordPage() {
                   className={inputClass}
                 />
               </div>
+              <div aria-hidden="true" className="absolute -left-[9999px] -top-[9999px]">
+                <label htmlFor="hp-forgot">Leave empty</label>
+                <input id="hp-forgot" type="text" name="_hp_field" tabIndex={-1} autoComplete="off" />
+              </div>
+              <TurnstileWidget onVerify={handleTurnstileVerify} onExpire={handleTurnstileExpire} />
               <button
                 type="submit"
                 disabled={loading}

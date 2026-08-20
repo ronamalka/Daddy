@@ -2,17 +2,22 @@
 
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useRef, useCallback } from "react";
 import Link from "next/link";
 import { SERVICE_CATEGORIES } from "@/lib/services";
 import { DISTRICTS } from "@/lib/districts";
 import { UserCircle } from "@phosphor-icons/react";
+import { TurnstileWidget } from "@/components/turnstile-widget";
 
 export default function CreateRequestPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [turnstileToken, setTurnstileToken] = useState("");
+  const formLoadedAtRef = useRef(Date.now());
+  const handleTurnstileVerify = useCallback((token: string) => setTurnstileToken(token), []);
+  const handleTurnstileExpire = useCallback(() => setTurnstileToken(""), []);
 
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -58,6 +63,9 @@ export default function CreateRequestPage() {
         serviceSlug: serviceSlug || undefined,
         districtCode: districtCode ? Number(districtCode) : undefined,
         districtName,
+        turnstileToken,
+        _hp_field: "",
+        _formLoadedAt: formLoadedAtRef.current,
       }),
     });
 
@@ -145,6 +153,13 @@ export default function CreateRequestPage() {
             </div>
           </div>
         </div>
+
+        <div aria-hidden="true" className="absolute -left-[9999px] -top-[9999px]">
+          <label htmlFor="hp-request">Leave empty</label>
+          <input id="hp-request" type="text" name="_hp_field" tabIndex={-1} autoComplete="off" />
+        </div>
+
+        <TurnstileWidget onVerify={handleTurnstileVerify} onExpire={handleTurnstileExpire} />
 
         <button
           type="submit"

@@ -58,7 +58,11 @@ function checkRateLimit(request: NextRequest, pathname: string): NextResponse | 
   if (!tier) return null;
 
   const ip = getClientIp(request);
-  const key = `${ip}:${tier.limit}`;
+  const sessionToken = request.cookies.get("authjs.session-token")?.value
+    || request.cookies.get("__Secure-authjs.session-token")?.value
+    || "";
+  const sessionSuffix = sessionToken ? `:s${sessionToken.slice(0, 8)}` : "";
+  const key = `${ip}${sessionSuffix}:${tier.limit}`;
   const now = Date.now();
 
   let entry = store.get(key);

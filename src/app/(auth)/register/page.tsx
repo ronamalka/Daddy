@@ -3,10 +3,11 @@
 import { signIn } from "next-auth/react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useRef, useCallback } from "react";
 import { LocationPicker } from "@/components/location-picker";
 import { ServicePicker } from "@/components/service-picker";
 import { PasswordStrength } from "@/components/password-strength";
+import { TurnstileWidget } from "@/components/turnstile-widget";
 
 interface ServiceAreaEntry {
   districtCode: number;
@@ -29,6 +30,10 @@ export default function RegisterPage() {
   const [selectedCity, setSelectedCity] = useState<{ cityCode: number; cityName: string; districtCode: number; districtName: string } | null>(null);
   const [serviceAreas, setServiceAreas] = useState<ServiceAreaEntry[]>([]);
   const [selectedServices, setSelectedServices] = useState<string[]>([]);
+  const [turnstileToken, setTurnstileToken] = useState("");
+  const formLoadedAtRef = useRef(Date.now());
+  const handleTurnstileVerify = useCallback((token: string) => setTurnstileToken(token), []);
+  const handleTurnstileExpire = useCallback(() => setTurnstileToken(""), []);
 
   const totalSteps = role === "SELLER" ? 3 : 2;
 
@@ -49,6 +54,9 @@ export default function RegisterPage() {
         districtCode: selectedCity?.districtCode,
         serviceAreas: role === "SELLER" ? serviceAreas : [],
         services: role === "SELLER" ? selectedServices : [],
+        turnstileToken,
+        _hp_field: "",
+        _formLoadedAt: formLoadedAtRef.current,
       }),
     });
 
@@ -215,6 +223,11 @@ export default function RegisterPage() {
                 </label>
               </div>
             </div>
+            <div aria-hidden="true" className="absolute -left-[9999px] -top-[9999px]">
+              <label htmlFor="hp-reg">Leave empty</label>
+              <input id="hp-reg" type="text" name="_hp_field" tabIndex={-1} autoComplete="off" />
+            </div>
+            <TurnstileWidget onVerify={handleTurnstileVerify} onExpire={handleTurnstileExpire} />
             <button type="submit" className="w-full rounded-xl bg-[rgb(var(--color-primary))] py-3.5 text-[16px] font-semibold text-white shadow-[0_4px_16px_rgba(var(--color-primary),0.08)] transition-all hover:bg-[rgb(var(--color-primary-hover))] active:scale-[0.98]">
               המשך
             </button>
