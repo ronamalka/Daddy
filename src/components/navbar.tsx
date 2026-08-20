@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useSession, signOut } from "next-auth/react";
 import { useState, useEffect } from "react";
 import {
@@ -65,7 +66,8 @@ export function Navbar() {
       <div className="mx-auto flex max-w-7xl items-center justify-between px-5 py-3 lg:px-8">
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2 select-none">
-          <span className="text-gradient-hero text-2xl font-extrabold tracking-tight">
+          <Image src="/logo.jpeg" alt="אבאל׳ה" width={40} height={40} className="rounded-full" />
+          <span className="text-gradient-hero text-xl font-extrabold tracking-tight hidden sm:inline">
             אבאל׳ה
           </span>
         </Link>

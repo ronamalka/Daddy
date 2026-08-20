@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Heebo } from "next/font/google";
 import { SessionProvider } from "@/components/session-provider";
-import { AccessibilityToolbar } from "@/components/accessibility-toolbar";
+import { AccessibilityToolbar, A11Y_BOOTSTRAP_SCRIPT } from "@/components/accessibility-toolbar";
 import "./globals.css";
 
 const heebo = Heebo({
@@ -22,6 +22,10 @@ export const metadata: Metadata = {
   authors: [{ name: "אבאל׳ה" }],
   metadataBase: new URL(BASE_URL),
   alternates: { canonical: "/" },
+  icons: {
+    icon: "/logo.jpeg",
+    apple: "/logo.jpeg",
+  },
   openGraph: {
     type: "website",
     locale: "he_IL",
@@ -29,6 +33,7 @@ export const metadata: Metadata = {
     siteName: "אבאל׳ה",
     title: "אבאל׳ה — שוק שירותים ופרילנסרים",
     description: "מצא לך אבאל׳ה שיעזור עם מה שאתה צריך היום",
+    images: [{ url: "/logo.jpeg", width: 1792, height: 2390, alt: "אבאל׳ה" }],
   },
   twitter: {
     card: "summary_large_image",
@@ -43,6 +48,7 @@ const jsonLd = {
   "@type": "Organization",
   name: "אבאל׳ה",
   url: BASE_URL,
+  logo: `${BASE_URL}/logo.jpeg`,
   description: "שוק שירותים ופרילנסרים — מצא בעלי מקצוע מנוסים בישראל",
   areaServed: {
     "@type": "Country",
@@ -55,6 +61,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="he" dir="rtl" className={`${heebo.variable} ${heebo.className} antialiased`}>
       <head>
+        <script dangerouslySetInnerHTML={{ __html: A11Y_BOOTSTRAP_SCRIPT }} />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}

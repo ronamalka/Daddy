@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { Wrench, FileText, Shield } from "@phosphor-icons/react";
 
 export function Footer() {
@@ -9,7 +10,10 @@ export function Footer() {
       <div className="mx-auto max-w-6xl px-4 py-12">
         <div className="flex flex-col gap-8 md:flex-row md:justify-between">
           <div>
-            <span className="text-gradient-hero text-xl font-extrabold">אבאל׳ה</span>
+            <div className="flex items-center gap-2 mb-2">
+              <Image src="/logo.jpeg" alt="אבאל׳ה" width={36} height={36} className="rounded-full" />
+              <span className="text-gradient-hero text-xl font-extrabold">אבאל׳ה</span>
+            </div>
             <p className="text-sm text-[rgb(var(--color-text-muted))] mt-2 max-w-xs">
               שוק השירותים של ישראל. בעלי מקצוע מנוסים, דירוגים אמיתיים, מחירים הוגנים.
             </p>

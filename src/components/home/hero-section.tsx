@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { motion } from "framer-motion";
 import { MagnifyingGlass, X, Wrench, CaretLeft, Sparkle } from "@phosphor-icons/react";
 import { ALL_SERVICES } from "@/lib/services";
@@ -29,14 +30,19 @@ export function HeroSection({
       <div className="relative mx-auto max-w-5xl px-4 pt-20 pb-24 md:pt-32 md:pb-32">
         <div className="text-center">
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.5 }}
+            className="mb-6"
           >
-            <Badge variant="outline" className="mb-6 gap-1.5 px-4 py-1.5">
-              <Sparkle className="h-3.5 w-3.5 text-[rgb(var(--color-primary))]" />
-              <span>שוק השירותים הכי ישראלי שיש</span>
-            </Badge>
+            <Image
+              src="/logo.jpeg"
+              alt="אבאל׳ה"
+              width={160}
+              height={160}
+              className="mx-auto rounded-full shadow-xl"
+              priority
+            />
           </motion.div>
 
           <motion.h1
@@ -45,9 +51,7 @@ export function HeroSection({
             transition={{ duration: 0.5, delay: 0.1 }}
             className="mb-6 text-4xl font-extrabold leading-tight tracking-tight text-[rgb(var(--color-text))] md:text-6xl"
           >
-            כל אחד צריך
-            <br />
-            <span className="text-gradient-hero">אבאל׳ה טוב</span>
+            <span className="text-gradient-hero">כל אחד צריך אבאל׳ה</span>
           </motion.h1>
 
           <motion.p

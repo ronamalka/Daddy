@@ -62,17 +62,20 @@ export function ReviewForm({ orderId, sellerName, onSubmitted }: ReviewFormProps
 
       <div className="space-y-5">
         {CRITERIA.map((c) => (
-          <div key={c.key}>
-            <div className="flex items-center gap-2 mb-2">
-              <span className="text-[rgb(var(--color-primary))]">{c.icon}</span>
+          <fieldset key={c.key}>
+            <legend className="flex items-center gap-2 mb-2">
+              <span className="text-[rgb(var(--color-primary))]" aria-hidden="true">{c.icon}</span>
               <span className="text-[14px] font-semibold text-[rgb(var(--color-text))]">{c.label}</span>
               <span className="text-[12px] text-[rgb(var(--color-text-muted))]">— {c.desc}</span>
-            </div>
-            <div className="flex gap-1.5">
+            </legend>
+            <div className="flex gap-1.5" role="radiogroup" aria-label={`דירוג ${c.label}`}>
               {Array.from({ length: 10 }, (_, i) => i + 1).map((n) => (
                 <button
                   key={n}
                   onClick={() => setRatings((prev) => ({ ...prev, [c.key]: n }))}
+                  role="radio"
+                  aria-checked={ratings[c.key] === n}
+                  aria-label={`${c.label}: ${n} מתוך 10`}
                   className={cn(
                     "h-9 w-9 rounded-lg text-[13px] font-semibold transition-all",
                     ratings[c.key] === n
@@ -86,16 +89,16 @@ export function ReviewForm({ orderId, sellerName, onSubmitted }: ReviewFormProps
                 </button>
               ))}
               {ratings[c.key] > 0 && (
-                <span className="flex items-center px-2 text-[14px] font-bold text-[rgb(var(--color-primary))]">{ratings[c.key]}/10</span>
+                <span className="flex items-center px-2 text-[14px] font-bold text-[rgb(var(--color-primary))]" aria-live="polite">{ratings[c.key]}/10</span>
               )}
             </div>
-          </div>
+          </fieldset>
         ))}
       </div>
 
       {avg && (
         <div className="mt-5 flex items-center gap-3 rounded-xl bg-gradient-to-r from-[rgba(var(--color-primary),0.1)] to-[rgba(var(--color-accent),0.1)] p-4">
-          <div className="text-[28px] font-bold text-[rgb(var(--color-primary))]">{avg}</div>
+          <div className="text-[28px] font-bold text-[rgb(var(--color-primary))]" aria-label={`ציון כללי: ${avg} מתוך 10`}>{avg}</div>
           <div>
             <p className="text-[13px] font-semibold text-[rgb(var(--color-text))]">ציון כללי</p>
             <p className="text-[11px] text-[rgb(var(--color-text-muted))]">ממוצע של כל הקריטריונים</p>
@@ -103,15 +106,22 @@ export function ReviewForm({ orderId, sellerName, onSubmitted }: ReviewFormProps
         </div>
       )}
 
-      <textarea
-        value={comment}
-        onChange={(e) => setComment(e.target.value)}
-        placeholder="ספר על החוויה שלך — מה היה טוב, מה אפשר לשפר..."
-        rows={4}
-        className="mt-5 w-full rounded-xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface-elevated))] px-4 py-3 text-[14px] text-[rgb(var(--color-text))] placeholder-[rgb(var(--color-text-muted))] focus:border-[rgb(var(--color-primary))] focus:outline-none resize-none"
-      />
+      <div className="mt-5">
+        <label htmlFor="review-comment" className="mb-1.5 block text-[14px] font-medium text-[rgb(var(--color-text))]">
+          חוות דעת
+        </label>
+        <textarea
+          id="review-comment"
+          value={comment}
+          onChange={(e) => setComment(e.target.value)}
+          placeholder="ספר על החוויה שלך — מה היה טוב, מה אפשר לשפר..."
+          rows={4}
+          aria-required="true"
+          className="w-full rounded-xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface-elevated))] px-4 py-3 text-[14px] text-[rgb(var(--color-text))] placeholder-[rgb(var(--color-text-muted))] focus:border-[rgb(var(--color-primary))] focus:outline-none resize-none"
+        />
+      </div>
 
-      {error && <p className="mt-2 text-[13px] text-[rgb(var(--color-error))]">{error}</p>}
+      {error && <p role="alert" className="mt-2 text-[13px] text-[rgb(var(--color-error))]">{error}</p>}
 
       <div className="mt-4 flex items-center gap-3">
         <button
