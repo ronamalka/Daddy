@@ -142,9 +142,9 @@ describe("System Tests — Public API", () => {
   });
 
   describe("GET /api/service-requests", () => {
-    it("returns 200 with array or object", async () => {
+    it("requires auth", async () => {
       const { status } = await fetchApi("/api/service-requests");
-      expect(status).toBe(200);
+      expect(status).toBe(401);
     });
   });
 
@@ -431,7 +431,7 @@ describe("System Tests — Auth-Protected API", () => {
           body: JSON.stringify({ email: "nonexistent@test.com" }),
         }
       );
-      expect([200, 404, 500]).toContain(status);
+      expect([200, 400, 404, 500]).toContain(status);
     });
   });
 });

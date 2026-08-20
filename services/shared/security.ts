@@ -32,7 +32,7 @@ export const authRateLimit = rateLimit({
 
 export const passwordResetRateLimit = rateLimit({
   windowMs: 60 * 60 * 1000,
-  max: 5,
+  max: parseInt(process.env.PASSWORD_RESET_RATE_LIMIT_MAX || "5", 10),
   message: { error: "Too many reset attempts, please try again later" },
   standardHeaders: true,
   legacyHeaders: false,
@@ -40,7 +40,7 @@ export const passwordResetRateLimit = rateLimit({
 
 export const generalRateLimit = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 300,
+  max: parseInt(process.env.GENERAL_RATE_LIMIT_MAX || "300", 10),
   standardHeaders: true,
   legacyHeaders: false,
 });

@@ -37,7 +37,7 @@ test.describe("Auth Flow", () => {
     await page.goto("/register");
     await page.getByPlaceholder("ישראל ישראלי").fill("Test User");
     await page.getByPlaceholder("you@example.com").fill("admin@daddy.com");
-    await page.getByPlaceholder("לפחות 6 תווים").fill("password123");
+    await page.getByPlaceholder("לפחות 8 תווים, אות גדולה, ספרה ותו מיוחד").fill("Test@1234!");
 
     await page.getByRole("button", { name: "המשך" }).click();
     await expect(
