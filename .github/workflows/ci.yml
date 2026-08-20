@@ -12,6 +12,28 @@ env:
   IMAGE_NAME: ${{ secrets.QUAY_USER }}/daddy
 
 jobs:
+  security-audit:
+    name: Dependency Security Audit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Audit BFF dependencies
+        run: npm audit --audit-level=high
+        continue-on-error: true
+      - name: Audit service dependencies
+        run: |
+          for svc in users gigs orders requests; do
+            echo "=== Auditing $svc ==="
+            cd services/$svc && npm install && npm audit --audit-level=high || true
+            cd ../..
+          done
+        continue-on-error: true
+
   typecheck-gateway:
     name: Type Check Gateway
     runs-on: ubuntu-latest
