@@ -14,7 +14,7 @@ const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "https://daddy-app-daddy-de
 
 export const metadata: Metadata = {
   title: {
-    default: "אבאל׳ה — שוק שירותים ופרילנסרים",
+    default: "אבאל׳ה — מצא לך היום אבאל׳ה שיעזור עם מה שאתה צריך",
     template: "%s | אבאל׳ה",
   },
   description: "מצא לך אבאל׳ה שיעזור עם מה שאתה צריך היום — הובלות, הרכבות, שיפוצים, ניקיון ועוד",
@@ -31,14 +31,14 @@ export const metadata: Metadata = {
     locale: "he_IL",
     url: BASE_URL,
     siteName: "אבאל׳ה",
-    title: "אבאל׳ה — שוק שירותים ופרילנסרים",
-    description: "מצא לך אבאל׳ה שיעזור עם מה שאתה צריך היום",
+    title: "אבאל׳ה — מצא לך היום אבאל׳ה שיעזור עם מה שאתה צריך",
+    description: "מצא לך היום אבאל׳ה שיעזור עם מה שאתה צריך",
     images: [{ url: "/logo.jpeg", width: 1792, height: 2390, alt: "אבאל׳ה" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "אבאל׳ה — שוק שירותים ופרילנסרים",
-    description: "מצא לך אבאל׳ה שיעזור עם מה שאתה צריך היום",
+    title: "אבאל׳ה — מצא לך היום אבאל׳ה שיעזור עם מה שאתה צריך",
+    description: "מצא לך היום אבאל׳ה שיעזור עם מה שאתה צריך",
   },
   robots: { index: true, follow: true },
 };

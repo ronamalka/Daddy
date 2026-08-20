@@ -1,5 +1,8 @@
 import { Request, Response, NextFunction } from "express";
+import crypto from "crypto";
 import { AuthUser } from "./types";
+
+const INTER_SERVICE_SECRET = process.env.INTER_SERVICE_SECRET || "dev-secret-change-in-production";
 
 declare global {
   namespace Express {
@@ -9,13 +12,30 @@ declare global {
   }
 }
 
-export function extractUser(req: Request, _res: Response, next: NextFunction) {
+function verifySignature(payload: string, signature: string): boolean {
+  const expected = crypto.createHmac("sha256", INTER_SERVICE_SECRET).update(payload).digest("hex");
+  return crypto.timingSafeEqual(Buffer.from(expected), Buffer.from(signature));
+}
+
+export function extractUser(req: Request, res: Response, next: NextFunction) {
   const header = req.headers["x-user"] as string | undefined;
+  const signature = req.headers["x-user-signature"] as string | undefined;
+
   if (header) {
+    if (!signature) {
+      res.status(403).json({ error: "Missing request signature" });
+      return;
+    }
+
     try {
+      if (!verifySignature(header, signature)) {
+        res.status(403).json({ error: "Invalid request signature" });
+        return;
+      }
       req.user = JSON.parse(header) as AuthUser;
     } catch {
-      // invalid header, proceed without user
+      res.status(403).json({ error: "Invalid request signature" });
+      return;
     }
   }
   next();

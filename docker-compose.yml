@@ -1,3 +1,7 @@
+# Microservice ports are NOT exposed to the host.
+# All traffic must go through the Next.js BFF (port 3000).
+# Only PostgreSQL is exposed for local dev tooling (psql, pgAdmin).
+
 services:
   postgres:
     image: postgres:16
@@ -14,58 +18,69 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
+    networks:
+      - daddy-net
 
   users-service:
     build:
       context: .
       dockerfile: services/users/Dockerfile
-    ports:
-      - "4001:4001"
+    # No ports exposed — reachable only via internal network
     environment:
       PORT: "4001"
       DATABASE_URL: postgres://daddy:daddypass123@postgres:5432/daddy_users
+      INTER_SERVICE_SECRET: ${INTER_SERVICE_SECRET:-dev-secret-change-in-production}
     depends_on:
       postgres:
         condition: service_healthy
+    networks:
+      - daddy-net
 
   gigs-service:
     build:
       context: .
       dockerfile: services/gigs/Dockerfile
-    ports:
-      - "4002:4002"
     environment:
       PORT: "4002"
       DATABASE_URL: postgres://daddy:daddypass123@postgres:5432/daddy_gigs
+      INTER_SERVICE_SECRET: ${INTER_SERVICE_SECRET:-dev-secret-change-in-production}
     depends_on:
       postgres:
         condition: service_healthy
+    networks:
+      - daddy-net
 
   orders-service:
     build:
       context: .
       dockerfile: services/orders/Dockerfile
-    ports:
-      - "4003:4003"
     environment:
       PORT: "4003"
       DATABASE_URL: postgres://daddy:daddypass123@postgres:5432/daddy_orders
+      INTER_SERVICE_SECRET: ${INTER_SERVICE_SECRET:-dev-secret-change-in-production}
     depends_on:
       postgres:
         condition: service_healthy
+    networks:
+      - daddy-net
 
   requests-service:
     build:
       context: .
       dockerfile: services/requests/Dockerfile
-    ports:
-      - "4004:4004"
     environment:
       PORT: "4004"
       DATABASE_URL: postgres://daddy:daddypass123@postgres:5432/daddy_requests
+      INTER_SERVICE_SECRET: ${INTER_SERVICE_SECRET:-dev-secret-change-in-production}
     depends_on:
       postgres:
         condition: service_healthy
+    networks:
+      - daddy-net
 
 volumes:
   pgdata:
+
+networks:
+  daddy-net:
+    driver: bridge
