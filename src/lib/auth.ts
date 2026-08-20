@@ -5,6 +5,7 @@ import crypto from "crypto";
 import { checkLockout, recordFailedAttempt, resetAttempts } from "./account-lockout";
 import { getRedis } from "./redis";
 import { logSecurityEvent } from "./security-logger";
+import { isPasswordWeak } from "./password-policy";
 
 const USERS_SERVICE = process.env.USERS_SERVICE_URL || "http://localhost:4001";
 
@@ -61,7 +62,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           userId: user.id,
           outcome: "success",
         });
-        return { id: user.id, email: user.email, name: user.name, role: user.role };
+        const weakPassword = isPasswordWeak(password);
+        return { id: user.id, email: user.email, name: user.name, role: user.role, weakPassword };
       },
     }),
   ],
@@ -90,6 +92,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       if (user) {
         token.id = user.id;
         token.role = (user as { role?: string }).role;
+        token.weakPassword = (user as { weakPassword?: boolean }).weakPassword || false;
         token.jti = crypto.randomUUID();
         token.iat = Math.floor(Date.now() / 1000);
 
@@ -133,6 +136,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       if (session.user) {
         session.user.id = token.id as string;
         (session.user as { role: string }).role = token.role as string;
+        (session.user as unknown as { weakPassword: boolean }).weakPassword = (token.weakPassword as boolean) || false;
       }
       return session;
     },

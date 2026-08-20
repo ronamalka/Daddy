@@ -22,6 +22,11 @@ export const passwordSchema = z
     message: "הסיסמה נפוצה מדי, בחר סיסמה אחרת",
   });
 
+export function isPasswordWeak(password: string): boolean {
+  const result = passwordSchema.safeParse(password);
+  return !result.success;
+}
+
 export async function checkBreachedPassword(password: string): Promise<boolean> {
   try {
     const sha1 = crypto.createHash("sha1").update(password).digest("hex").toUpperCase();
