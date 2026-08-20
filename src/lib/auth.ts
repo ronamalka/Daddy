@@ -1,9 +1,15 @@
 import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import Google from "next-auth/providers/google";
+import crypto from "crypto";
 import { checkLockout, recordFailedAttempt, resetAttempts } from "./account-lockout";
+import { getRedis } from "./redis";
 
 const USERS_SERVICE = process.env.USERS_SERVICE_URL || "http://localhost:4001";
+
+const SESSION_MAX_AGE = 24 * 60 * 60;
+const ROTATION_WINDOW = SESSION_MAX_AGE * 0.25;
+const JTI_PREFIX = "session_jti:";
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [
@@ -69,7 +75,43 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       if (user) {
         token.id = user.id;
         token.role = (user as { role?: string }).role;
+        token.jti = crypto.randomUUID();
+        token.iat = Math.floor(Date.now() / 1000);
+
+        try {
+          const redis = getRedis();
+          await redis.set(
+            `${JTI_PREFIX}${token.id}:${token.jti}`,
+            "1",
+            "EX",
+            SESSION_MAX_AGE
+          );
+        } catch {}
       }
+
+      const now = Math.floor(Date.now() / 1000);
+      const issuedAt = (token.iat as number) || now;
+      const elapsed = now - issuedAt;
+
+      if (elapsed > SESSION_MAX_AGE - ROTATION_WINDOW) {
+        const oldJti = token.jti as string;
+        token.jti = crypto.randomUUID();
+        token.iat = now;
+
+        try {
+          const redis = getRedis();
+          if (oldJti && token.id) {
+            await redis.del(`${JTI_PREFIX}${token.id}:${oldJti}`);
+          }
+          await redis.set(
+            `${JTI_PREFIX}${token.id}:${token.jti}`,
+            "1",
+            "EX",
+            SESSION_MAX_AGE
+          );
+        } catch {}
+      }
+
       return token;
     },
     async session({ session, token }) {
@@ -82,5 +124,20 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   },
   pages: {
     signIn: "/login",
+  },
+  session: {
+    strategy: "jwt" as const,
+    maxAge: SESSION_MAX_AGE,
+  },
+  cookies: {
+    sessionToken: {
+      name: process.env.NODE_ENV === "production" ? "__Secure-authjs.session-token" : "authjs.session-token",
+      options: {
+        httpOnly: true,
+        sameSite: "lax" as const,
+        path: "/",
+        secure: process.env.NODE_ENV === "production",
+      },
+    },
   },
 });
