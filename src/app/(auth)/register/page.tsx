@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { LocationPicker } from "@/components/location-picker";
 import { ServicePicker } from "@/components/service-picker";
+import { PasswordStrength } from "@/components/password-strength";
 
 interface ServiceAreaEntry {
   districtCode: number;
@@ -184,7 +185,8 @@ export default function RegisterPage() {
             </div>
             <div>
               <label htmlFor="password" className="mb-1.5 block text-[14px] font-medium text-[rgb(var(--color-text))]">סיסמה</label>
-              <input id="password" type="password" required minLength={6} placeholder="לפחות 6 תווים" value={password} onChange={(e) => setPassword(e.target.value)} className={inputClass} />
+              <input id="password" type="password" required minLength={8} placeholder="לפחות 8 תווים, אות גדולה, ספרה ותו מיוחד" value={password} onChange={(e) => setPassword(e.target.value)} className={inputClass} />
+              <PasswordStrength password={password} />
             </div>
             <div>
               <label className="mb-1.5 block text-[14px] font-medium text-[rgb(var(--color-text))]">אני רוצה</label>

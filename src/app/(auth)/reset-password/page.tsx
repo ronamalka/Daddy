@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useState, useEffect, Suspense } from "react";
+import { PasswordStrength } from "@/components/password-strength";
 
 function ResetPasswordForm() {
   const searchParams = useSearchParams();
@@ -46,8 +47,13 @@ function ResetPasswordForm() {
       return;
     }
 
-    if (password.length < 6) {
-      setError("הסיסמה חייבת להכיל לפחות 6 תווים");
+    if (password.length < 8) {
+      setError("הסיסמה חייבת להכיל לפחות 8 תווים");
+      return;
+    }
+
+    if (!/[a-z]/.test(password) || !/[A-Z]/.test(password) || !/[0-9]/.test(password) || !/[^a-zA-Z0-9]/.test(password)) {
+      setError("הסיסמה חייבת להכיל אות גדולה, אות קטנה, ספרה ותו מיוחד");
       return;
     }
 
@@ -164,12 +170,13 @@ function ResetPasswordForm() {
             id="password"
             type="password"
             required
-            minLength={6}
-            placeholder="לפחות 6 תווים"
+            minLength={8}
+            placeholder="לפחות 8 תווים, אות גדולה, ספרה ותו מיוחד"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             className={inputClass}
           />
+          <PasswordStrength password={password} />
         </div>
         <div>
           <label htmlFor="confirmPassword" className="mb-1.5 block text-[14px] font-medium text-[rgb(var(--color-text))]">
@@ -179,7 +186,7 @@ function ResetPasswordForm() {
             id="confirmPassword"
             type="password"
             required
-            minLength={6}
+            minLength={8}
             placeholder="הזן את הסיסמה שוב"
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
