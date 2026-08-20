@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { Accessibility, X, ZoomIn, ZoomOut, Contrast, MousePointer2, Type, Pause } from "lucide-react";
+import { WheelchairMotion, X, MagnifyingGlassPlus, MagnifyingGlassMinus, HighlighterCircle, Cursor, TextT, Pause } from "@phosphor-icons/react";
 
 interface A11yState {
   fontSize: number;
@@ -59,7 +59,7 @@ export function AccessibilityToolbar() {
         aria-expanded={open}
         aria-controls="a11y-panel"
       >
-        <Accessibility className="h-7 w-7" />
+        <WheelchairMotion className="h-7 w-7" />
       </button>
 
       {open && (
@@ -83,7 +83,7 @@ export function AccessibilityToolbar() {
           <div className="space-y-3">
             <div className="flex items-center justify-between">
               <span className="text-sm font-medium text-[rgb(var(--color-text))]">
-                <Type className="inline h-4 w-4 me-1.5" aria-hidden="true" />
+                <TextT className="inline h-4 w-4 me-1.5" aria-hidden="true" />
                 גודל טקסט ({state.fontSize}%)
               </span>
               <div className="flex gap-1">
@@ -91,33 +91,33 @@ export function AccessibilityToolbar() {
                   onClick={() => update("fontSize", Math.max(80, state.fontSize - 10))}
                   label="הקטן טקסט"
                 >
-                  <ZoomOut className="h-4 w-4" />
+                  <MagnifyingGlassMinus className="h-4 w-4" />
                 </ToolbarButton>
                 <ToolbarButton
                   onClick={() => update("fontSize", Math.min(200, state.fontSize + 10))}
                   label="הגדל טקסט"
                 >
-                  <ZoomIn className="h-4 w-4" />
+                  <MagnifyingGlassPlus className="h-4 w-4" />
                 </ToolbarButton>
               </div>
             </div>
 
             <ToggleOption
-              icon={<Contrast className="h-4 w-4" />}
+              icon={<HighlighterCircle className="h-4 w-4" />}
               label="ניגודיות גבוהה"
               active={state.highContrast}
               onToggle={() => update("highContrast", !state.highContrast)}
             />
 
             <ToggleOption
-              icon={<MousePointer2 className="h-4 w-4" />}
+              icon={<Cursor className="h-4 w-4" />}
               label="סמן מוגדל"
               active={state.largerCursor}
               onToggle={() => update("largerCursor", !state.largerCursor)}
             />
 
             <ToggleOption
-              icon={<Type className="h-4 w-4" />}
+              icon={<TextT className="h-4 w-4" />}
               label="הדגשת קישורים"
               active={state.highlightLinks}
               onToggle={() => update("highlightLinks", !state.highlightLinks)}
@@ -131,7 +131,7 @@ export function AccessibilityToolbar() {
             />
 
             <ToggleOption
-              icon={<Type className="h-4 w-4" />}
+              icon={<TextT className="h-4 w-4" />}
               label="מרווח שורות מוגדל"
               active={state.lineHeight}
               onToggle={() => update("lineHeight", !state.lineHeight)}
