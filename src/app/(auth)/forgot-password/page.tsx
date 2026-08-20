@@ -63,10 +63,10 @@ export default function ForgotPasswordPage() {
               </svg>
             </div>
             <h1 className="mb-2 text-[24px] font-bold tracking-[-0.01em] text-[rgb(var(--color-text))]">
-              בדוק את האימייל שלך
+              שלחנו לך מכתב אבהי
             </h1>
             <p className="mb-6 text-[14px] text-[rgb(var(--color-text-secondary))] leading-relaxed">
-              אם קיים חשבון עם האימייל <strong dir="ltr">{email}</strong>, שלחנו לך קישור לאיפוס הסיסמה.
+              אם יש חשבון עם <strong dir="ltr">{email}</strong>, קישור לאיפוס כבר בדרך. תבדוק גם בספאם — לפעמים הוא מתחבא שם.
             </p>
             <Link
               href="/login"
@@ -78,10 +78,10 @@ export default function ForgotPasswordPage() {
         ) : (
           <>
             <h1 className="mb-2 text-center text-[24px] font-bold tracking-[-0.01em] text-[rgb(var(--color-text))]">
-              שכחת סיסמה?
+              אבא לא שוכח. אבל אם כן...
             </h1>
             <p className="mb-6 text-center text-[14px] text-[rgb(var(--color-text-secondary))]">
-              הזן את האימייל שלך ונשלח לך קישור לאיפוס הסיסמה
+              קורה לכולם. תכתוב את האימייל ונשלח קישור מהיר לאיפוס
             </p>
 
             {error && (

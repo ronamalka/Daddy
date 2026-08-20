@@ -53,10 +53,10 @@ export default function LoginPage() {
 
       <div className="rounded-2xl bg-[rgb(var(--color-surface))] p-8 shadow-[0_4px_16px_rgba(var(--color-primary),0.08)]">
         <h1 className="mb-2 text-center text-[24px] font-bold tracking-[-0.01em] text-[rgb(var(--color-text))]">
-          ברוך הבא חזרה
+          שוב פה? יופי, חיכינו לך
         </h1>
         <p className="mb-6 text-center text-[14px] text-[rgb(var(--color-text-secondary))]">
-          התחבר כדי להמשיך לחשבון שלך
+          התחבר וחזור לסדר דברים
         </p>
 
         {error && (
@@ -129,7 +129,7 @@ export default function LoginPage() {
               href="/forgot-password"
               className="text-[13px] text-[rgb(var(--color-primary))] transition-colors hover:text-[rgb(var(--color-primary-hover))]"
             >
-              שכחת סיסמה?
+              אבא לא שוכח. אבל אם כן...
             </Link>
           </div>
           <button
@@ -153,7 +153,7 @@ export default function LoginPage() {
 
         <div className="mt-6 text-center">
           <p className="text-[14px] text-[rgb(var(--color-text-secondary))]">
-            עדיין לא חבר?{" "}
+            עדיין לא במשפחה?{" "}
             <Link
               href="/register"
               className="font-semibold text-[rgb(var(--color-primary))] transition-colors hover:text-[rgb(var(--color-primary-hover))]"

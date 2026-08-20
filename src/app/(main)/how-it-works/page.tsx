@@ -122,8 +122,8 @@ export default function HowItWorksPage() {
       {/* CTA */}
       <section className="bg-gradient-to-br from-[rgb(var(--color-primary))] to-[rgb(var(--color-primary-light))] py-16 text-center text-white">
         <div className="mx-auto max-w-3xl px-4">
-          <h2 className="text-[28px] font-extrabold md:text-[32px]">מוכן להתחיל?</h2>
-          <p className="mt-3 text-[16px] text-white/80">אלפי ישראלים כבר מצאו אבאל׳ה. מה אתה מחכה?</p>
+          <h2 className="text-[28px] font-extrabold md:text-[32px]">נו, אז מה אומרים?</h2>
+          <p className="mt-3 text-[16px] text-white/80">אלפי ישראלים כבר מצאו אבאל׳ה. אתה עדיין מנסה לבד?</p>
           <div className="mt-8 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
             <Link href="/register" className="rounded-xl bg-white px-8 py-3.5 text-[15px] font-bold text-[rgb(var(--color-primary))] shadow-[0_4px_16px_rgba(0,0,0,0.15)] transition-all hover:shadow-[0_8px_24px_rgba(0,0,0,0.2)] hover:-translate-y-0.5">
               אני מחפש שירות
