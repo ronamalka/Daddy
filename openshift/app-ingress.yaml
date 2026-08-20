@@ -7,6 +7,18 @@ metadata:
     app: daddy-app
   annotations:
     nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    # Rate limiting — per client IP
+    nginx.ingress.kubernetes.io/limit-rps: "50"
+    nginx.ingress.kubernetes.io/limit-connections: "20"
+    nginx.ingress.kubernetes.io/limit-burst-multiplier: "3"
+    # Timeout protection against slowloris
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "30"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "30"
+    nginx.ingress.kubernetes.io/proxy-connect-timeout: "10"
+    # Body size limit
+    nginx.ingress.kubernetes.io/proxy-body-size: "5m"
+    # Use real client IP behind proxy
+    nginx.ingress.kubernetes.io/use-forwarded-headers: "true"
 spec:
   ingressClassName: nginx
   rules:
