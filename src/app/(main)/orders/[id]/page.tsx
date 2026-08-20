@@ -4,7 +4,8 @@ import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { useParams } from "next/navigation";
 import { ReviewForm } from "@/components/review-form";
-import { Star, Handshake, Clock, Coins, Tag, ClipboardText, ChatCircle, PaperPlaneTilt } from "@phosphor-icons/react";
+import { Star, Handshake, Clock, Coins, Tag, ClipboardText, ChatCircle, PaperPlaneTilt, ArrowsClockwise, Warning } from "@phosphor-icons/react";
+import { Dialog } from "@/components/ui/dialog";
 
 interface GigRequirement {
   id: string;
@@ -47,6 +48,7 @@ const STATUS_STYLE: Record<string, { bg: string; text: string; label: string }> 
   IN_PROGRESS: { bg: "bg-[rgba(var(--color-primary),0.1)]", text: "text-[rgb(var(--color-primary))]", label: "בעבודה" },
   DELIVERED: { bg: "bg-[rgba(var(--color-primary-light),0.15)]", text: "text-[rgb(var(--color-primary-hover))]", label: "נמסר" },
   COMPLETED: { bg: "bg-[rgba(var(--color-success),0.15)]", text: "text-[rgb(var(--color-success))]", label: "הושלם" },
+  REVISION: { bg: "bg-[rgba(var(--color-accent-yellow),0.15)]", text: "text-[rgb(var(--color-warning))]", label: "תיקון" },
   CANCELLED: { bg: "bg-[rgba(var(--color-error),0.1)]", text: "text-[rgb(var(--color-error))]", label: "בוטל" },
 };
 
@@ -65,6 +67,11 @@ export default function OrderDetailPage() {
   const [flagReason, setFlagReason] = useState("");
   const [showFlagForm, setShowFlagForm] = useState(false);
   const [flagSubmitted, setFlagSubmitted] = useState(false);
+  const [revisionOpen, setRevisionOpen] = useState(false);
+  const [revisionReason, setRevisionReason] = useState("");
+  const [revisionSubmitting, setRevisionSubmitting] = useState(false);
+  const [cancelOpen, setCancelOpen] = useState(false);
+  const [cancelSubmitting, setCancelSubmitting] = useState(false);
 
   useEffect(() => {
     fetch(`/api/orders/${params.id}`)
@@ -188,6 +195,46 @@ export default function OrderDetailPage() {
     setSubmittingReqs(false);
   }
 
+  async function submitRevision() {
+    if (!revisionReason.trim()) return;
+    setRevisionSubmitting(true);
+    await fetch(`/api/orders/${params.id}/messages`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ content: `📝 בקשת תיקון: ${revisionReason}` }),
+    });
+    const res = await fetch(`/api/orders/${params.id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ status: "REVISION" }),
+    });
+    if (res.ok) {
+      const updated = await res.json();
+      setOrder((prev) => prev ? { ...prev, status: updated.status } : prev);
+      fetch(`/api/orders/${params.id}`)
+        .then((r) => r.json())
+        .then((data) => { if (data.messages) setOrder((prev) => prev ? { ...prev, messages: data.messages } : prev); });
+    }
+    setRevisionReason("");
+    setRevisionOpen(false);
+    setRevisionSubmitting(false);
+  }
+
+  async function confirmCancel() {
+    setCancelSubmitting(true);
+    const res = await fetch(`/api/orders/${params.id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ status: "CANCELLED" }),
+    });
+    if (res.ok) {
+      const updated = await res.json();
+      setOrder((prev) => prev ? { ...prev, status: updated.status } : prev);
+    }
+    setCancelOpen(false);
+    setCancelSubmitting(false);
+  }
+
   const [now] = useState(() => Date.now());
 
   if (!order) {
@@ -247,20 +294,23 @@ export default function OrderDetailPage() {
           {isSeller && order.status === "PENDING" && (
             <>
               <button onClick={() => updateStatus("IN_PROGRESS")} className="flex items-center gap-2 rounded-xl bg-[rgb(var(--color-primary))] px-5 py-2.5 text-[14px] font-semibold text-white transition-all hover:bg-[rgb(var(--color-primary-hover))]">קבל הזמנה</button>
-              <button onClick={() => updateStatus("CANCELLED")} className="flex items-center gap-2 rounded-xl border-2 border-[rgba(var(--color-error),0.2)] bg-[rgba(var(--color-error),0.05)] px-5 py-2.5 text-[14px] font-semibold text-[rgb(var(--color-error))] transition-all hover:bg-[rgba(var(--color-error),0.1)]">דחה הזמנה</button>
+              <button onClick={() => setCancelOpen(true)} className="flex items-center gap-2 rounded-xl border-2 border-[rgba(var(--color-error),0.2)] bg-[rgba(var(--color-error),0.05)] px-5 py-2.5 text-[14px] font-semibold text-[rgb(var(--color-error))] transition-all hover:bg-[rgba(var(--color-error),0.1)]">דחה הזמנה</button>
             </>
           )}
-          {isSeller && order.status === "IN_PROGRESS" && (
+          {isSeller && (order.status === "IN_PROGRESS" || order.status === "REVISION") && (
             <button onClick={() => updateStatus("DELIVERED")} className="flex items-center gap-2 rounded-xl bg-[rgb(var(--color-primary))] px-5 py-2.5 text-[14px] font-semibold text-white transition-all hover:bg-[rgb(var(--color-primary-hover))]">סמן כנמסר</button>
           )}
           {isBuyer && order.status === "DELIVERED" && (
             <>
               <button onClick={() => updateStatus("COMPLETED")} className="flex items-center gap-2 rounded-xl bg-[rgb(var(--color-success))] px-5 py-2.5 text-[14px] font-semibold text-white transition-all hover:opacity-90">אשר קבלה</button>
-              <button onClick={() => updateStatus("REVISION")} className="flex items-center gap-2 rounded-xl border-2 border-[rgba(var(--color-accent-yellow),0.3)] bg-[rgba(var(--color-accent-yellow),0.1)] px-5 py-2.5 text-[14px] font-semibold text-[rgb(var(--color-warning))] transition-all hover:bg-[rgba(var(--color-accent-yellow),0.2)]">בקש תיקון</button>
+              <button onClick={() => setRevisionOpen(true)} className="flex items-center gap-2 rounded-xl border-2 border-[rgba(var(--color-accent-yellow),0.3)] bg-[rgba(var(--color-accent-yellow),0.1)] px-5 py-2.5 text-[14px] font-semibold text-[rgb(var(--color-warning))] transition-all hover:bg-[rgba(var(--color-accent-yellow),0.2)]">
+                <ArrowsClockwise className="h-4 w-4" />
+                בקש תיקון
+              </button>
             </>
           )}
           {isBuyer && order.status === "PENDING" && (
-            <button onClick={() => updateStatus("CANCELLED")} className="flex items-center gap-2 rounded-xl border-2 border-[rgba(var(--color-error),0.2)] bg-[rgba(var(--color-error),0.05)] px-5 py-2.5 text-[14px] font-semibold text-[rgb(var(--color-error))] transition-all hover:bg-[rgba(var(--color-error),0.1)]">בטל הזמנה</button>
+            <button onClick={() => setCancelOpen(true)} className="flex items-center gap-2 rounded-xl border-2 border-[rgba(var(--color-error),0.2)] bg-[rgba(var(--color-error),0.05)] px-5 py-2.5 text-[14px] font-semibold text-[rgb(var(--color-error))] transition-all hover:bg-[rgba(var(--color-error),0.1)]">בטל הזמנה</button>
           )}
           {isBuyer && order.status === "COMPLETED" && !order.review && (
             <button onClick={() => setReviewOpen(true)} className="flex items-center gap-2 rounded-xl bg-[rgb(var(--color-accent-yellow))] px-5 py-2.5 text-[14px] font-semibold text-[rgb(var(--color-text))] transition-all hover:opacity-80">כתוב חוות דעת</button>
@@ -482,6 +532,99 @@ export default function OrderDetailPage() {
           </button>
         </form>
       </div>
+
+      {/* Revision Request Modal */}
+      <Dialog open={revisionOpen} onOpenChange={setRevisionOpen}>
+        <div className="pt-2">
+          <div className="mb-4 flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[rgba(var(--color-accent-yellow),0.15)]">
+              <ArrowsClockwise className="h-5 w-5 text-[rgb(var(--color-warning))]" />
+            </div>
+            <div>
+              <h3 className="text-[16px] font-bold text-[rgb(var(--color-text))]">בקשת תיקון</h3>
+              <p className="text-[13px] text-[rgb(var(--color-text-secondary))]">פרט מה צריך לתקן כדי שבעל המקצוע יוכל לטפל</p>
+            </div>
+          </div>
+          <textarea
+            value={revisionReason}
+            onChange={(e) => setRevisionReason(e.target.value)}
+            rows={4}
+            placeholder="תאר את מה שצריך לתקן או לשנות..."
+            className="mb-4 w-full rounded-xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface-elevated))] px-4 py-3 text-[14px] text-[rgb(var(--color-text))] placeholder-[rgb(var(--color-text-muted))] focus:border-[rgb(var(--color-primary))] focus:outline-none focus:ring-2 focus:ring-[rgba(var(--color-primary),0.2)] resize-none"
+            autoFocus
+          />
+          <div className="flex gap-3">
+            <button
+              onClick={submitRevision}
+              disabled={revisionSubmitting || !revisionReason.trim()}
+              className="flex-1 rounded-xl bg-[rgb(var(--color-warning))] px-5 py-2.5 text-[14px] font-semibold text-white transition-all hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed"
+            >
+              {revisionSubmitting ? "שולח..." : "שלח בקשת תיקון"}
+            </button>
+            <button
+              onClick={() => { setRevisionOpen(false); setRevisionReason(""); }}
+              className="rounded-xl border border-[rgb(var(--color-border))] px-5 py-2.5 text-[14px] font-medium text-[rgb(var(--color-text-secondary))] transition-colors hover:bg-[rgb(var(--color-surface-elevated))]"
+            >
+              ביטול
+            </button>
+          </div>
+        </div>
+      </Dialog>
+
+      {/* Cancellation Confirmation Modal */}
+      <Dialog open={cancelOpen} onOpenChange={setCancelOpen}>
+        <div className="pt-2">
+          <div className="mb-4 flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[rgba(var(--color-error),0.1)]">
+              <Warning className="h-5 w-5 text-[rgb(var(--color-error))]" weight="fill" />
+            </div>
+            <div>
+              <h3 className="text-[16px] font-bold text-[rgb(var(--color-text))]">
+                {isSeller ? "דחיית הזמנה" : "ביטול הזמנה"}
+              </h3>
+              <p className="text-[13px] text-[rgb(var(--color-text-secondary))]">פעולה זו אינה ניתנת לביטול</p>
+            </div>
+          </div>
+
+          <div className="mb-5 rounded-xl bg-[rgb(var(--color-surface-elevated))] p-4 space-y-2">
+            <div className="flex items-center justify-between text-[14px]">
+              <span className="text-[rgb(var(--color-text-secondary))]">שירות</span>
+              <span className="font-medium text-[rgb(var(--color-text))]">{order.gig.title}</span>
+            </div>
+            <div className="flex items-center justify-between text-[14px]">
+              <span className="text-[rgb(var(--color-text-secondary))]">סכום ההזמנה</span>
+              <span className="font-bold text-[rgb(var(--color-text))]">₪{order.price}</span>
+            </div>
+            {isBuyer && order.status === "PENDING" && (
+              <div className="border-t border-[rgb(var(--color-border-light))] pt-2 mt-2">
+                <div className="flex items-center justify-between text-[14px]">
+                  <span className="text-[rgb(var(--color-success))] font-semibold">החזר כספי</span>
+                  <span className="font-bold text-[rgb(var(--color-success))]">₪{order.price} (מלא)</span>
+                </div>
+                <p className="mt-1 text-[12px] text-[rgb(var(--color-text-muted))]">
+                  ביטול לפני תחילת העבודה — החזר מלא
+                </p>
+              </div>
+            )}
+          </div>
+
+          <div className="flex gap-3">
+            <button
+              onClick={confirmCancel}
+              disabled={cancelSubmitting}
+              className="flex-1 rounded-xl bg-[rgb(var(--color-error))] px-5 py-2.5 text-[14px] font-semibold text-white transition-all hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed"
+            >
+              {cancelSubmitting ? "מבטל..." : isSeller ? "אשר דחייה" : "אשר ביטול"}
+            </button>
+            <button
+              onClick={() => setCancelOpen(false)}
+              className="rounded-xl border border-[rgb(var(--color-border))] px-5 py-2.5 text-[14px] font-medium text-[rgb(var(--color-text-secondary))] transition-colors hover:bg-[rgb(var(--color-surface-elevated))]"
+            >
+              חזור
+            </button>
+          </div>
+        </div>
+      </Dialog>
     </div>
   );
 }

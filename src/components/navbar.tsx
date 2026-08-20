@@ -16,6 +16,7 @@ import {
   Briefcase,
   MagnifyingGlass,
 } from "@phosphor-icons/react";
+import { NotificationBell } from "@/components/notification-bell";
 import { Button } from "@/components/ui/button";
 import { Sheet } from "@/components/ui/sheet";
 import {
@@ -98,6 +99,7 @@ export function Navbar() {
                 <NavLink href="/admin" icon={<Shield className="h-4 w-4" />}>ניהול</NavLink>
               )}
 
+              <NotificationBell />
               <div className="mx-2 h-5 w-px bg-[rgb(var(--color-border))]" />
 
               <DropdownMenu
@@ -157,6 +159,7 @@ export function Navbar() {
 
         {/* Mobile */}
         <div className="flex items-center gap-2 md:hidden">
+          {session?.user && <NotificationBell />}
           <button
             className="flex h-10 w-10 items-center justify-center rounded-lg text-[rgb(var(--color-text-secondary))] hover:bg-[rgb(var(--color-surface-elevated))] transition-colors"
             onClick={() => setMobileOpen(true)}

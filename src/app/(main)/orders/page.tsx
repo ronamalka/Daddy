@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
+import Image from "next/image";
 import { Lock, Archive } from "@phosphor-icons/react";
 
 interface Order {
@@ -21,7 +22,17 @@ const STATUS_COLORS: Record<string, { bg: string; text: string; dot: string }> =
   IN_PROGRESS: { bg: "bg-[rgba(var(--color-primary),0.1)]", text: "text-[rgb(var(--color-primary))]", dot: "bg-[rgb(var(--color-primary))]" },
   DELIVERED: { bg: "bg-[rgba(var(--color-primary-light),0.15)]", text: "text-[rgb(var(--color-primary-hover))]", dot: "bg-[rgb(var(--color-primary-light))]" },
   COMPLETED: { bg: "bg-[rgba(var(--color-success),0.15)]", text: "text-[rgb(var(--color-success))]", dot: "bg-[rgb(var(--color-success))]" },
+  REVISION: { bg: "bg-[rgba(var(--color-accent-yellow),0.15)]", text: "text-[rgb(var(--color-warning))]", dot: "bg-[rgb(var(--color-accent-yellow))]" },
   CANCELLED: { bg: "bg-[rgba(var(--color-error),0.1)]", text: "text-[rgb(var(--color-error))]", dot: "bg-[rgb(var(--color-error))]" },
+};
+
+const STATUS_LABELS: Record<string, string> = {
+  PENDING: "ממתין",
+  IN_PROGRESS: "בעבודה",
+  DELIVERED: "נמסר",
+  COMPLETED: "הושלם",
+  REVISION: "תיקון",
+  CANCELLED: "בוטל",
 };
 
 export default function OrdersPage() {
@@ -84,12 +95,12 @@ export default function OrdersPage() {
                 href={`/orders/${order.id}`}
                 className="group flex items-center gap-4 rounded-2xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] p-5 transition-all hover:shadow-[0_4px_16px_rgba(var(--color-primary),0.08)] hover:border-[rgba(var(--color-primary-light),0.3)]"
               >
-                <div className="h-16 w-16 flex-shrink-0 overflow-hidden rounded-xl bg-[rgba(var(--color-primary),0.1)]">
+                <div className="relative h-16 w-16 flex-shrink-0 overflow-hidden rounded-xl bg-[rgba(var(--color-primary),0.1)]">
                   {order.gig.image ? (
-                    <img src={order.gig.image} alt="" className="h-full w-full object-cover" />
+                    <Image src={order.gig.image} alt="" fill className="object-cover" sizes="64px" unoptimized />
                   ) : (
                     <div className="flex h-full w-full items-center justify-center text-[20px] font-bold text-[rgb(var(--color-primary))]">
-                      D
+                      א
                     </div>
                   )}
                 </div>
@@ -107,7 +118,7 @@ export default function OrdersPage() {
                 </div>
                 <span className={`flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-[12px] font-semibold ${colors.bg} ${colors.text}`}>
                   <span className={`h-1.5 w-1.5 rounded-full ${colors.dot}`} />
-                  {order.status.replace("_", " ")}
+                  {STATUS_LABELS[order.status] || order.status}
                 </span>
               </Link>
             );
