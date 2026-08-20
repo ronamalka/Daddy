@@ -60,7 +60,7 @@ export function HeroSection({
             transition={{ duration: 0.5, delay: 0.2 }}
             className="mx-auto mb-10 max-w-xl text-base leading-relaxed text-[rgb(var(--color-text-secondary))] md:text-lg"
           >
-            בעלי מקצוע מנוסים שיסדרו לך הכל — מהרכבת ארון ועד הוזלת חשבונות. בלי פילטרים, בלי בולשיט.
+            אבא תמיד יודע לסדר. גם אם הוא לא שלך. מהרכבת ארון שסירב להתרכב ועד הוזלת חשבונות שגרמו לך לבכות.
           </motion.p>
 
           <motion.div
@@ -76,7 +76,7 @@ export function HeroSection({
                   <input
                     type="text"
                     aria-label="חיפוש שירותים"
-                    placeholder='מה אתה צריך? נסה "הרכבת רהיטים" או "תליית טלוויזיה"'
+                    placeholder='מה נשבר הפעם? נסה "הרכבת רהיטים" או "תליית טלוויזיה"'
                     value={serviceSearch}
                     onChange={(e) => {
                       setServiceSearch(e.target.value);
@@ -116,7 +116,7 @@ export function HeroSection({
 
             <div className="mt-5 flex flex-wrap items-center justify-center gap-2 text-sm">
               <span className="text-[rgb(var(--color-text-muted))]">פופולרי:</span>
-              {["הרכבת רהיטים", "תליית טלוויזיה", "הוזלת חשבונות", "עזרה בהובלה"].map((tag) => (
+              {["ברז שלא מפסיק לבכות", "ארון שמסרב להתרכב", "הוזלת חשבונות", "טלוויזיה שצריכה לעלות על הקיר"].map((tag) => (
                 <button
                   key={tag}
                   onClick={() => {
