@@ -1,6 +1,13 @@
 import { NextResponse } from "next/server";
+import { z } from "zod";
 import { auth } from "@/lib/auth";
 import { proxyRequest, ORDERS_SERVICE, GIGS_SERVICE, USERS_SERVICE } from "@/lib/gateway";
+import { validateBody } from "@/lib/validate";
+
+const createOrderSchema = z.object({
+  gigId: z.string().uuid(),
+  tier: z.string().min(1).max(50),
+}).strict();
 
 export async function GET() {
   const session = await auth();
@@ -52,10 +59,13 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const { gigId, tier } = await request.json();
+  const result = await validateBody(request, createOrderSchema);
+  if ("error" in result) return result.error;
+
+  const { gigId, tier } = result.data;
 
   const { data: gig, status: gigStatus } = await proxyRequest(GIGS_SERVICE, `/gigs/${gigId}`);
-  if (gigStatus !== 200) {
+  if (gigStatus !== 200 || !gig) {
     return NextResponse.json({ error: "Gig not found" }, { status: 404 });
   }
 

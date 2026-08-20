@@ -1,6 +1,12 @@
 import { NextResponse } from "next/server";
+import { z } from "zod";
 import { auth } from "@/lib/auth";
 import { proxyRequest, ORDERS_SERVICE, GIGS_SERVICE, USERS_SERVICE } from "@/lib/gateway";
+import { validateBody } from "@/lib/validate";
+
+const updateOrderSchema = z.object({
+  status: z.enum(["accepted", "rejected", "in_progress", "delivered", "completed", "cancelled"]),
+}).strict();
 
 export async function GET(_request: Request, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -12,8 +18,8 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
   const user = session.user as { id: string; email: string; name: string; role: string };
   const { data, status } = await proxyRequest(ORDERS_SERVICE, `/orders/${id}`, { user });
 
-  if (status !== 200) {
-    return NextResponse.json(data, { status });
+  if (status !== 200 || !data) {
+    return NextResponse.json(data ?? { error: "Order not found" }, { status });
   }
 
   const [gigRes, buyerRes, sellerRes, reviewRes] = await Promise.all([
@@ -56,11 +62,13 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const body = await request.json();
+  const result = await validateBody(request, updateOrderSchema);
+  if ("error" in result) return result.error;
+
   const user = session.user as { id: string; email: string; name: string; role: string };
   const { data, status } = await proxyRequest(ORDERS_SERVICE, `/orders/${id}`, {
     method: "PATCH",
-    body,
+    body: result.data,
     user,
   });
   return NextResponse.json(data, { status });

@@ -1,6 +1,26 @@
 import { NextResponse } from "next/server";
+import { z } from "zod";
 import { auth } from "@/lib/auth";
 import { proxyRequest, GIGS_SERVICE, USERS_SERVICE } from "@/lib/gateway";
+import { validateBody } from "@/lib/validate";
+
+const tierSchema = z.object({
+  tier: z.string().min(1).max(50),
+  price: z.number().positive().max(100000),
+  deliveryDays: z.number().int().positive().max(365),
+  description: z.string().max(1000).optional(),
+});
+
+const createGigSchema = z.object({
+  title: z.string().min(1).max(200),
+  description: z.string().min(1).max(5000),
+  category: z.string().min(1).max(100),
+  subcategory: z.string().max(100).optional(),
+  image: z.string().url().max(500).optional().nullable(),
+  tiers: z.array(tierSchema).min(1).max(5),
+  requirements: z.array(z.string().max(500)).max(20).optional(),
+  tags: z.array(z.string().max(50)).max(10).optional(),
+}).strict();
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
@@ -8,8 +28,8 @@ export async function GET(request: Request) {
   const path = params ? `/gigs?${params}` : "/gigs";
   const { data, status } = await proxyRequest(GIGS_SERVICE, path);
 
-  if (status !== 200 || !data.gigs) {
-    return NextResponse.json(data, { status });
+  if (status !== 200 || !data?.gigs) {
+    return NextResponse.json(data ?? { gigs: [], total: 0, hasMore: false }, { status });
   }
 
   const sellerIds = [...new Set(data.gigs.map((g: { sellerId: string }) => g.sellerId))] as string[];
@@ -53,11 +73,13 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const body = await request.json();
+  const result = await validateBody(request, createGigSchema);
+  if ("error" in result) return result.error;
+
   const user = session.user as { id: string; email: string; name: string; role: string };
   const { data, status } = await proxyRequest(GIGS_SERVICE, "/gigs", {
     method: "POST",
-    body,
+    body: result.data,
     user,
   });
   return NextResponse.json(data, { status });
