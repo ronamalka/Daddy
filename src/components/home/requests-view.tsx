@@ -48,7 +48,7 @@ export function RequestsView({
         {loadingRequests ? (
           <div className="flex flex-col items-center justify-center py-20">
             <div className="h-10 w-10 animate-spin rounded-full border-4 border-[rgb(var(--color-border))] border-t-[rgb(var(--color-primary))]" />
-            <p className="mt-4 text-sm text-[rgb(var(--color-text-muted))]">טוען בקשות...</p>
+            <p className="mt-4 text-sm text-[rgb(var(--color-text-muted))]">אבא מחפש לך בקשות...</p>
           </div>
         ) : requests.length > 0 ? (
           <div className="space-y-3">
@@ -80,8 +80,8 @@ export function RequestsView({
         ) : (
           <div className="rounded-xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] p-12 text-center">
             <Chat className="h-10 w-10 text-[rgb(var(--color-text-muted))] mx-auto mb-3" />
-            <p className="text-base font-bold text-[rgb(var(--color-text))]">אין בקשות פתוחות כרגע</p>
-            <p className="mt-1 text-sm text-[rgb(var(--color-text-muted))]">בדוק שוב מאוחר יותר</p>
+            <p className="text-base font-bold text-[rgb(var(--color-text))]">אף אחד לא צריך עזרה? לא ייתכן.</p>
+            <p className="mt-1 text-sm text-[rgb(var(--color-text-muted))]">כנראה שכולם סידרו הכל. תבדוק שוב עוד כמה דקות.</p>
           </div>
         )}
       </div>

@@ -82,8 +82,8 @@ export default function OrdersPage() {
           <div className="rounded-full bg-[rgba(var(--color-primary),0.1)] p-5 mb-4">
             <Archive className="h-10 w-10 text-[rgb(var(--color-primary-light))]" />
           </div>
-          <p className="text-[16px] font-medium text-[rgb(var(--color-text))]">אין הזמנות עדיין</p>
-          <p className="mt-1 text-[14px] text-[rgb(var(--color-text-muted))]">ההזמנות שלך יופיעו כאן</p>
+          <p className="text-[16px] font-medium text-[rgb(var(--color-text))]">שקט פה. בטח כולם כבר סידרו הכל.</p>
+          <p className="mt-1 text-[14px] text-[rgb(var(--color-text-muted))]">כשתזמין אבאל׳ה — ההזמנה תופיע כאן</p>
         </div>
       ) : (
         <div className="space-y-3">

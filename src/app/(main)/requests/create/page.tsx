@@ -169,9 +169,9 @@ export default function CreateRequestPage() {
           {loading ? (
             <span className="flex items-center justify-center gap-2">
               <div className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
-              שולח...
+              שולח לאבאל׳ות...
             </span>
-          ) : "פרסם בקשה"}
+          ) : "פרסם בקשה — אבאל׳ות יחזרו אליך"}
         </button>
       </form>
     </div>

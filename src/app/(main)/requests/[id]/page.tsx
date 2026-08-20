@@ -225,7 +225,7 @@ export default function RequestDetailPage() {
 
       {submitted && (
         <div className="mt-6 rounded-xl bg-[rgba(var(--color-success),0.1)] px-4 py-3 text-center text-[14px] font-medium text-[rgb(var(--color-success))]">
-          ההצעה נשלחה בהצלחה! הלקוח יוכל ליצור איתך קשר.
+          יופי! ההצעה בדרך. הלקוח יחזור אליך בקרוב.
         </div>
       )}
     </div>

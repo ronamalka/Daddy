@@ -57,8 +57,8 @@ export default function FavoritesPage() {
           <div className="rounded-full bg-[rgba(var(--color-error),0.1)] p-5 mb-4">
             <Heart className="h-10 w-10 text-[rgb(var(--color-error))]" />
           </div>
-          <p className="text-[16px] font-medium text-[rgb(var(--color-text))]">אין מועדפים עדיין</p>
-          <p className="mt-1 text-[14px] text-[rgb(var(--color-text-muted))]">לחץ על הלב בשירותים שאהבת כדי לשמור אותם</p>
+          <p className="text-[16px] font-medium text-[rgb(var(--color-text))]">הלב ריק. בוא נמלא אותו.</p>
+          <p className="mt-1 text-[14px] text-[rgb(var(--color-text-muted))]">לחץ על הלב באבאל׳ות שאהבת כדי לשמור אותם לפעם הבאה</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">

@@ -164,7 +164,7 @@ function GigsContent() {
           {activeCategory ? activeCategory.name : search ? `תוצאות חיפוש: "${search}"` : "כל השירותים"}
         </h1>
         <p className="mt-1 text-[14px] text-[rgb(var(--color-text-secondary))]">
-          {total > 0 ? `${total} שירותים נמצאו` : loading ? "טוען..." : "לא נמצאו שירותים"}
+          {total > 0 ? `${total} שירותים נמצאו` : loading ? "רגע, בודק את ארגז הכלים..." : "לא נמצאו שירותים"}
         </p>
       </div>
 
@@ -331,8 +331,8 @@ function GigsContent() {
               <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-[rgba(var(--color-primary),0.1)]">
                 <MagnifyingGlass className="h-8 w-8 text-[rgb(var(--color-primary-light))]" />
               </div>
-              <h3 className="mb-1 text-[16px] font-bold text-[rgb(var(--color-text))]">לא נמצאו שירותים</h3>
-              <p className="mb-4 text-[14px] text-[rgb(var(--color-text-secondary))]">נסה לשנות את הסינון או לחפש משהו אחר</p>
+              <h3 className="mb-1 text-[16px] font-bold text-[rgb(var(--color-text))]">גם אבא לא מצא. נסה מילים אחרות?</h3>
+              <p className="mb-4 text-[14px] text-[rgb(var(--color-text-secondary))]">שנה את הסינון, חפש משהו אחר, או פשוט תראה הכל</p>
               <button
                 onClick={handleClearFilters}
                 className="rounded-lg bg-[rgb(var(--color-primary))] px-5 py-2.5 text-[14px] font-semibold text-white transition-colors hover:bg-[rgb(var(--color-primary-hover))]"
@@ -367,11 +367,11 @@ function GigsContent() {
                 {loadingMore && (
                   <div className="flex items-center gap-3 text-[14px] text-[rgb(var(--color-text-secondary))]">
                     <CircleNotch className="h-6 w-6 animate-spin text-[rgb(var(--color-primary))]" />
-                    טוען עוד...
+                    מחפש עוד אבאל׳ות...
                   </div>
                 )}
                 {!hasMore && gigs.length > 0 && (
-                  <p className="text-[13px] text-[rgb(var(--color-text-muted))]">הגעת לסוף הרשימה</p>
+                  <p className="text-[13px] text-[rgb(var(--color-text-muted))]">זהו, ראית את כולם. אבא מתרשם.</p>
                 )}
               </div>
             </>

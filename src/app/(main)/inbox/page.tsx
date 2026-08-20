@@ -80,8 +80,8 @@ export default function InboxPage() {
           <div className="rounded-full bg-[rgba(var(--color-primary),0.1)] p-5 mb-4">
             <ChatCircle className="h-10 w-10 text-[rgb(var(--color-primary-light))]" />
           </div>
-          <p className="text-[16px] font-medium text-[rgb(var(--color-text))]">אין שיחות עדיין</p>
-          <p className="mt-1 text-[14px] text-[rgb(var(--color-text-muted))]">הודעות מההזמנות שלך יופיעו כאן</p>
+          <p className="text-[16px] font-medium text-[rgb(var(--color-text))]">שקט פה. שקט מדי.</p>
+          <p className="mt-1 text-[14px] text-[rgb(var(--color-text-muted))]">כשתזמין אבאל׳ה או תקבל הודעה — היא תופיע כאן</p>
         </div>
       ) : (
         <div className="space-y-2">
