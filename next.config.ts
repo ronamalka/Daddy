@@ -9,6 +9,15 @@ const nextConfig: NextConfig = {
   async headers() {
     return [
       {
+        source: "/uploads/:path*",
+        headers: [
+          { key: "Content-Security-Policy", value: "default-src 'none'; img-src 'self'; style-src 'none'; script-src 'none'" },
+          { key: "X-Content-Type-Options", value: "nosniff" },
+          { key: "Content-Disposition", value: "inline" },
+          { key: "Cache-Control", value: "public, max-age=31536000, immutable" },
+        ],
+      },
+      {
         source: "/(.*)",
         headers: [
           { key: "X-Frame-Options", value: "DENY" },
@@ -23,11 +32,12 @@ const nextConfig: NextConfig = {
             key: "Content-Security-Policy",
             value: [
               "default-src 'self'",
-              "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
+              "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://challenges.cloudflare.com",
               "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
               "img-src 'self' data: blob: https:",
               "font-src 'self' https://fonts.gstatic.com",
-              "connect-src 'self' https://accounts.google.com",
+              "connect-src 'self' https://accounts.google.com https://challenges.cloudflare.com",
+              "frame-src https://challenges.cloudflare.com",
               "frame-ancestors 'none'",
               "base-uri 'self'",
               "form-action 'self'",
