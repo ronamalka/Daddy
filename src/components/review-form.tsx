@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useCallback } from "react";
 import { Star, Handshake, Clock, Coins } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
+import { TurnstileWidget } from "@/components/turnstile-widget";
 
 const CRITERIA = [
   { key: "ratingQuality", label: "איכות", icon: <Star className="h-4 w-4" />, desc: "איכות העבודה והתוצאה הסופית" },
@@ -27,6 +28,10 @@ export function ReviewForm({ orderId, sellerName, onSubmitted }: ReviewFormProps
   const [comment, setComment] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
+  const [turnstileToken, setTurnstileToken] = useState("");
+  const formLoadedAtRef = useRef(Date.now());
+  const handleTurnstileVerify = useCallback((token: string) => setTurnstileToken(token), []);
+  const handleTurnstileExpire = useCallback(() => setTurnstileToken(""), []);
 
   const allRated = Object.values(ratings).every((v) => v > 0);
   const avg = allRated
@@ -41,7 +46,7 @@ export function ReviewForm({ orderId, sellerName, onSubmitted }: ReviewFormProps
       const res = await fetch(`/api/orders/${orderId}/review`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ comment, ...ratings }),
+        body: JSON.stringify({ comment, ...ratings, turnstileToken, _hp_field: "", _formLoadedAt: formLoadedAtRef.current }),
       });
       if (res.ok) {
         onSubmitted();
@@ -122,6 +127,13 @@ export function ReviewForm({ orderId, sellerName, onSubmitted }: ReviewFormProps
       </div>
 
       {error && <p role="alert" className="mt-2 text-[13px] text-[rgb(var(--color-error))]">{error}</p>}
+
+      <div aria-hidden="true" className="absolute -left-[9999px] -top-[9999px]">
+        <label htmlFor="hp-review">Leave empty</label>
+        <input id="hp-review" type="text" name="_hp_field" tabIndex={-1} autoComplete="off" />
+      </div>
+
+      <TurnstileWidget onVerify={handleTurnstileVerify} onExpire={handleTurnstileExpire} />
 
       <div className="mt-4 flex items-center gap-3">
         <button
