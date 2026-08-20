@@ -11,21 +11,25 @@ const store = new Map<string, RateLimitEntry>();
 
 const WINDOW_MS = 60_000;
 
+const RATE_LIMIT_AUTH = parseInt(process.env.RATE_LIMIT_AUTH || "10", 10);
+const RATE_LIMIT_POST = parseInt(process.env.RATE_LIMIT_POST || "30", 10);
+const RATE_LIMIT_DEFAULT = parseInt(process.env.RATE_LIMIT_DEFAULT || "120", 10);
+
 const TIERS: { match: (path: string, method: string) => boolean; limit: number }[] = [
   {
     match: (path) =>
       path.startsWith("/api/auth") ||
       path.startsWith("/api/register") ||
       path.startsWith("/api/password-reset"),
-    limit: 10,
+    limit: RATE_LIMIT_AUTH,
   },
   {
     match: (_path, method) => method === "POST",
-    limit: 30,
+    limit: RATE_LIMIT_POST,
   },
   {
     match: () => true,
-    limit: 120,
+    limit: RATE_LIMIT_DEFAULT,
   },
 ];
 

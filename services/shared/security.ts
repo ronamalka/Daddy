@@ -24,7 +24,7 @@ export function applySecurity(app: Express) {
 
 export const authRateLimit = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 20,
+  max: parseInt(process.env.AUTH_RATE_LIMIT_MAX || "20", 10),
   message: { error: "Too many attempts, please try again later" },
   standardHeaders: true,
   legacyHeaders: false,
