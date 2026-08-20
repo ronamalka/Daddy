@@ -3,24 +3,24 @@ import { Gift, Coins, Star, Clock, MapPin, Sparkle, FileText, GearSix, Rocket, W
 import type { Icon as PhosphorIcon } from "@phosphor-icons/react";
 
 const BENEFITS: { title: string; desc: string; Icon: PhosphorIcon }[] = [
-  { title: "הרשמה חינם", desc: "אין דמי הצטרפות, אין מנויים חודשיים. נרשמת, מתחיל לעבוד.", Icon: Gift },
-  { title: "אתה קובע מחיר", desc: "אין לנו מחירון. אתה מגדיר כמה אתה גובה — לפי שעה, לפי פרויקט, לפי מה שמתאים לך.", Icon: Coins },
-  { title: "בנה מוניטין", desc: "כל עבודה טובה = ביקורת טובה = יותר לקוחות. המוניטין שלך נשאר איתך.", Icon: Star },
-  { title: "גמישות מלאה", desc: "עובד מתי שאתה רוצה, איפה שאתה רוצה, כמה שאתה רוצה. בלי בוס, בלי משמרות.", Icon: Clock },
-  { title: "לקוחות מהשכונה", desc: "אנשים מהאזור שלך מחפשים בדיוק את מה שאתה יודע לעשות. בלי נסיעות מיותרות.", Icon: MapPin },
-  { title: "פלטפורמה פשוטה", desc: "פרופיל, הודעות, ביקורות. בלי אפליקציות מסובכות, בלי הכשרות חובה. פשוט עובד.", Icon: Sparkle },
+  { title: "שמור על הקצב", desc: "פרישה לא אומרת לשבת בבית. תשאיר את הידיים עסוקות, את הראש חד, ואת הארנק מרוצה.", Icon: Gift },
+  { title: "אתה קובע הכל", desc: "מתי, איפה, כמה, ובכמה. בלי בוס, בלי משמרות. אתה האבא של העסק שלך.", Icon: Coins },
+  { title: "תעשה מה שאתה אוהב", desc: "30 שנה תיקנת כי היית חייב. עכשיו תתקן כי אתה רוצה — ותקבל על זה תודה (וכסף).", Icon: Star },
+  { title: "לקוחות מהשכונה", desc: "אנשים מהאזור שלך צריכים בדיוק את מה שאתה יודע. בלי נסיעות ארוכות, בלי פקקים.", Icon: MapPin },
+  { title: "תלמד את הדור הבא", desc: "הלקוח שלך בן 28 ולא יודע מה זה מפתח אלן. תראה לו. תלמד אותו. תרוויח מזה.", Icon: Clock },
+  { title: "פשוט כמו שיחת טלפון", desc: "פרופיל, הודעות, ביקורות. בלי אפליקציות מסובכות. אם אתה יודע לשלוח וואטסאפ — אתה יודע להשתמש באבאל׳ה.", Icon: Sparkle },
 ];
 
 const STEPS: { step: string; title: string; desc: string; Icon: PhosphorIcon; color: string }[] = [
-  { step: "01", title: "צור חשבון", desc: "הרשם עם אימייל, בחר ׳אני נותן שירות׳, ומלא את הפרטים הבסיסיים. לוקח דקה.", Icon: FileText, color: "from-[rgb(var(--color-primary))] to-[rgb(var(--color-primary-light))]" },
-  { step: "02", title: "הגדר שירותים", desc: "בחר מה אתה יודע לעשות (אינסטלציה? חשמל? הובלות?), הגדר אזורי שירות ומחירים. תוך 5 דקות אתה באוויר.", Icon: GearSix, color: "from-[rgb(var(--color-success))] to-[rgb(var(--color-accent))]" },
-  { step: "03", title: "התחל לעבוד", desc: "לקוחות ימצאו אותך בחיפוש או ישלחו בקשות. הגב, תאם, ועשה את מה שאתה הכי טוב בו.", Icon: Rocket, color: "from-[rgb(var(--color-accent-yellow))] to-[rgb(var(--color-error))]" },
+  { step: "01", title: "ספר מה אתה יודע", desc: "הרשם עם אימייל וספר על עצמך. 30 שנות ניסיון? תכתוב את זה. לקוחות אוהבים לדעת שמגיע אליהם מישהו שעשה את זה אלף פעם.", Icon: FileText, color: "from-[rgb(var(--color-primary))] to-[rgb(var(--color-primary-light))]" },
+  { step: "02", title: "הגדר שירותים", desc: "בחר מה אתה עושה — אינסטלציה, חשמל, הובלות, או כל דבר אחר שאתה טוב בו. הגדר מחירים שמתאימים לך.", Icon: GearSix, color: "from-[rgb(var(--color-success))] to-[rgb(var(--color-accent))]" },
+  { step: "03", title: "תתחיל לקבל טלפונים", desc: "לקוחות מהאזור שלך ימצאו אותך וישלחו הודעות. תגיע, תסדר, ותרוויח. כמו פעם, רק עם יותר ׳תודה רבה׳.", Icon: Rocket, color: "from-[rgb(var(--color-accent-yellow))] to-[rgb(var(--color-error))]" },
 ];
 
 const TESTIMONIALS = [
-  { name: "משה כהן", city: "באר שבע", service: "אינסטלציה", text: "תוך שבוע מההרשמה כבר היו לי 3 עבודות. המערכת פשוטה, הלקוחות מגיעים לבד, ואני סוגר את החודש עם הכנסה נוספת יפה.", rating: 5 },
-  { name: "יוסי לוי", city: "חיפה", service: "חשמל", text: "עבדתי שנים בלי פרסום — רק דרך מכרים. מאז שנרשמתי לאבאל׳ה, הטלפון לא מפסיק. וזה חינם! אין סיבה לא להירשם.", rating: 5 },
-  { name: "אבי ישראלי", city: "תל אביב", service: "הרכבת רהיטים", text: "אני עושה את זה כהכנסה נוספת אחרי העבודה. 2-3 הזמנות בשבוע, הכל מהאזור, בלי לנסוע רחוק. מושלם בשבילי.", rating: 5 },
+  { name: "משה כהן, 62", city: "באר שבע", service: "אינסטלציה", text: "פרשתי מחברת החשמל לפני שנתיים. ישבתי בבית, השתגעתי. עכשיו אני עושה 3-4 עבודות בשבוע ומרגיש שוב שימושי. והנכדים חושבים שאני גיבור.", rating: 5 },
+  { name: "יוסי לוי, 58", city: "חיפה", service: "חשמל", text: "הילדים עפו מהבית, הבית שקט מדי. התחלתי לתקן דברים לשכנים, ואז נרשמתי לאבאל׳ה. הטלפון לא מפסיק. אני שוב מרגיש שצריכים אותי.", rating: 5 },
+  { name: "אבי ישראלי, 55", city: "תל אביב", service: "הרכבת רהיטים", text: "30 שנה בנגרות. אמרו לי ׳תנוח, מגיע לך׳. אבל מה אני אעשה — אשב מול הטלוויזיה? עכשיו אני מרכיב ארונות לזוגות צעירים, ותמיד יוצא עם בדיחה טובה.", rating: 5 },
 ];
 
 export default function BecomeADaddyPage() {
@@ -35,7 +35,7 @@ export default function BecomeADaddyPage() {
           </span>
           <h1 className="text-[36px] font-extrabold md:text-[48px]">הפוך לאבאל׳ה</h1>
           <p className="mt-4 text-[18px] text-white/70 max-w-2xl mx-auto">
-            יש לך ידיים טובות? ניסיון? כלי עבודה? הגיע הזמן להרוויח מזה. הצטרף לפלטפורמה שמחברת בין אנשים שצריכים עזרה לאנשים שיודעים לתת אותה.
+            הילדים גדלו, יש לך 30 שנות ניסיון, והידיים עדיין זוכרות הכל. הגיע הזמן שמישהו ייהנה מזה — ושאתה תרוויח מזה.
           </p>
           <Link href="/register" className="mt-8 inline-block rounded-xl bg-gradient-to-r from-[rgb(var(--color-success))] to-[rgb(var(--color-accent))] px-8 py-4 text-[16px] font-bold text-white shadow-[0_4px_16px_rgba(var(--color-success),0.3)] transition-all hover:shadow-[0_8px_24px_rgba(var(--color-success),0.4)] hover:-translate-y-0.5">
             הירשם עכשיו — בחינם
@@ -46,8 +46,8 @@ export default function BecomeADaddyPage() {
       {/* Benefits */}
       <section className="mx-auto max-w-6xl px-4 py-16">
         <div className="mb-10 text-center">
-          <h2 className="text-[28px] font-extrabold text-[rgb(var(--color-text))] md:text-[32px]">למה להצטרף?</h2>
-          <p className="mt-2 text-[15px] text-[rgb(var(--color-text-secondary))]">6 סיבות טובות (חוץ מזה שזה חינם)</p>
+          <h2 className="text-[28px] font-extrabold text-[rgb(var(--color-text))] md:text-[32px]">למה שווה להצטרף?</h2>
+          <p className="mt-2 text-[15px] text-[rgb(var(--color-text-secondary))]">כי יש דברים שרק ניסיון של שנים יודע לפתור</p>
         </div>
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {BENEFITS.map((item, i) => (
@@ -88,7 +88,7 @@ export default function BecomeADaddyPage() {
       <section className="mx-auto max-w-6xl px-4 py-16">
         <div className="mb-10 text-center">
           <h2 className="text-[28px] font-extrabold text-[rgb(var(--color-text))] md:text-[32px]">אבאל׳ות מספרים</h2>
-          <p className="mt-2 text-[15px] text-[rgb(var(--color-text-secondary))]">מה אומרים נותני השירות שכבר הצטרפו</p>
+          <p className="mt-2 text-[15px] text-[rgb(var(--color-text-secondary))]">אבות שחזרו למשחק — ולא מתכוונים לעצור</p>
         </div>
         <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
           {TESTIMONIALS.map((t, i) => (
@@ -118,8 +118,8 @@ export default function BecomeADaddyPage() {
       {/* CTA */}
       <section className="bg-gradient-to-br from-[rgb(var(--color-success))] to-[rgb(var(--color-accent))] py-16 text-center text-white">
         <div className="mx-auto max-w-3xl px-4">
-          <h2 className="text-[28px] font-extrabold md:text-[32px]">מוכן להתחיל?</h2>
-          <p className="mt-3 text-[16px] text-white/80">ההרשמה לוקחת דקה. אפס עלות. אפס התחייבות.</p>
+          <h2 className="text-[28px] font-extrabold md:text-[32px]">הידיים שלך עוד זוכרות</h2>
+          <p className="mt-3 text-[16px] text-white/80">הגיע הזמן שמישהו ייהנה מזה. הרשמה בדקה, בלי עלות, בלי התחייבות.</p>
           <Link href="/register" className="mt-8 inline-block rounded-xl bg-white px-8 py-4 text-[16px] font-bold text-[rgb(var(--color-success))] shadow-[0_4px_16px_rgba(0,0,0,0.15)] transition-all hover:shadow-[0_8px_24px_rgba(0,0,0,0.2)] hover:-translate-y-0.5">
             הירשם כאבאל׳ה עכשיו
           </Link>
