@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { useParams } from "next/navigation";
 import { ReviewForm } from "@/components/review-form";
-import { Star, Handshake, Clock, Coins, Tag, ClipboardList, MessageCircle, Send } from "lucide-react";
+import { Star, Handshake, Clock, Coins, Tag, ClipboardText, ChatCircle, PaperPlaneTilt } from "@phosphor-icons/react";
 
 interface GigRequirement {
   id: string;
@@ -365,7 +365,7 @@ export default function OrderDetailPage() {
       {order.gig.requirements.length > 0 && (
         <div className="mb-6 rounded-2xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] p-6 shadow-[0_2px_8px_rgba(var(--color-primary),0.06)]">
           <div className="flex items-center gap-2 mb-4">
-            <ClipboardList className="h-5 w-5 text-[rgb(var(--color-primary))]" />
+            <ClipboardText className="h-5 w-5 text-[rgb(var(--color-primary))]" />
             <h2 className="text-[16px] font-bold text-[rgb(var(--color-text))]">דרישות ההזמנה</h2>
             {reqsSubmitted && (
               <span className="rounded-full bg-[rgba(var(--color-success),0.15)] px-2.5 py-0.5 text-[11px] font-semibold text-[rgb(var(--color-success))]">נשלח</span>
@@ -427,7 +427,7 @@ export default function OrderDetailPage() {
       {/* Messages Section */}
       <div className="rounded-2xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] shadow-[0_2px_8px_rgba(var(--color-primary),0.06)] overflow-hidden">
         <div className="flex items-center gap-2 border-b border-[rgb(var(--color-border))] px-6 py-4">
-          <MessageCircle className="h-5 w-5 text-[rgb(var(--color-primary))]" />
+          <ChatCircle className="h-5 w-5 text-[rgb(var(--color-primary))]" />
           <h2 className="text-[16px] font-bold text-[rgb(var(--color-text))]">הודעות</h2>
           <span className="rounded-full bg-[rgba(var(--color-primary),0.1)] px-2.5 py-0.5 text-[12px] font-semibold text-[rgb(var(--color-primary))]">{order.messages.length}</span>
         </div>
@@ -478,7 +478,7 @@ export default function OrderDetailPage() {
             className="flex-1 rounded-xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface-elevated))] px-4 py-3 text-[14px] text-[rgb(var(--color-text))] placeholder-[rgb(var(--color-text-muted))] focus:border-[rgb(var(--color-primary))] focus:outline-none focus:ring-2 focus:ring-[rgba(var(--color-primary),0.2)]"
           />
           <button type="submit" disabled={sending || !message.trim()} className="flex items-center justify-center rounded-xl bg-[rgb(var(--color-primary))] p-3 text-white hover:bg-[rgb(var(--color-primary-hover))] disabled:opacity-40 disabled:cursor-not-allowed">
-            <Send className="h-5 w-5" />
+            <PaperPlaneTilt className="h-5 w-5" />
           </button>
         </form>
       </div>

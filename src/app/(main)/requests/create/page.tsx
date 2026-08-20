@@ -6,7 +6,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { SERVICE_CATEGORIES } from "@/lib/services";
 import { DISTRICTS } from "@/lib/districts";
-import { UserCircle } from "lucide-react";
+import { UserCircle } from "@phosphor-icons/react";
 
 export default function CreateRequestPage() {
   const { data: session, status } = useSession();

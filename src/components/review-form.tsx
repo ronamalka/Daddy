@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Star, Handshake, Clock, Coins } from "lucide-react";
+import { Star, Handshake, Clock, Coins } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
 
 const CRITERIA = [

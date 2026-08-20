@@ -1,5 +1,7 @@
+"use client";
+
 import Link from "next/link";
-import { Star, MapPin } from "lucide-react";
+import { Star, MapPin } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
 
 interface GigCardProps {
@@ -58,7 +60,7 @@ export function GigCard({ id, title, image, seller, startingPrice, avgRating, re
           {title}
         </h3>
         <div className="mb-3 flex items-center gap-1.5">
-          <Star className="h-4 w-4 text-[rgb(var(--color-accent-yellow))] fill-[rgb(var(--color-accent-yellow))]" />
+          <Star className="h-4 w-4 text-[rgb(var(--color-accent-yellow))] " weight="fill" />
           <span className="text-[13px] font-bold text-[rgb(var(--color-text))]">{avgRating.toFixed(1)}</span>
           <span className="text-[13px] text-[rgb(var(--color-text-muted))]">({reviewCount})</span>
         </div>

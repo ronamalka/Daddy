@@ -4,17 +4,17 @@ import Link from "next/link";
 import { useSession, signOut } from "next-auth/react";
 import { useState, useEffect } from "react";
 import {
-  Menu,
-  ShoppingBag,
+  List as MenuIcon,
+  Bag,
   Heart,
-  MessageSquare,
+  Chat,
   User,
-  LogOut,
+  SignOut,
   Plus,
   Shield,
   Briefcase,
-  Search,
-} from "lucide-react";
+  MagnifyingGlass,
+} from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
 import { Sheet } from "@/components/ui/sheet";
 import {
@@ -23,7 +23,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuLabel,
 } from "@/components/ui/dropdown-menu";
-import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { cn } from "@/lib/utils";
 
 function UserAvatar({ name, size = "sm" }: { name: string; size?: "sm" | "md" }) {
@@ -73,7 +72,7 @@ export function Navbar() {
 
         {/* Desktop nav */}
         <div className="hidden items-center gap-1 md:flex">
-          <NavLink href="/" icon={<Search className="h-4 w-4" />}>עיון</NavLink>
+          <NavLink href="/" icon={<MagnifyingGlass className="h-4 w-4" />}>עיון</NavLink>
           <NavLink href="/gigs" icon={<Briefcase className="h-4 w-4" />}>שירותים</NavLink>
 
           {session?.user ? (
@@ -81,9 +80,9 @@ export function Navbar() {
               {session.user.role === "SELLER" && (
                 <NavLink href="/gigs/create" icon={<Plus className="h-4 w-4" />}>צור שירות</NavLink>
               )}
-              <NavLink href="/orders" icon={<ShoppingBag className="h-4 w-4" />}>הזמנות</NavLink>
+              <NavLink href="/orders" icon={<Bag className="h-4 w-4" />}>הזמנות</NavLink>
               <NavLink href="/favorites" icon={<Heart className="h-4 w-4" />}>מועדפים</NavLink>
-              <NavLink href="/inbox" icon={<MessageSquare className="h-4 w-4" />}>
+              <NavLink href="/inbox" icon={<Chat className="h-4 w-4" />}>
                 <span className="relative">
                   הודעות
                   {unreadCount > 0 && (
@@ -98,7 +97,6 @@ export function Navbar() {
               )}
 
               <div className="mx-2 h-5 w-px bg-[rgb(var(--color-border))]" />
-              <ThemeToggle />
 
               <DropdownMenu
                 open={profileOpen}
@@ -126,7 +124,7 @@ export function Navbar() {
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => setProfileOpen(false)}>
                   <Link href="/orders" className="flex items-center gap-2 w-full">
-                    <ShoppingBag className="h-4 w-4" />
+                    <Bag className="h-4 w-4" />
                     ההזמנות שלי
                   </Link>
                 </DropdownMenuItem>
@@ -138,14 +136,13 @@ export function Navbar() {
                     signOut();
                   }}
                 >
-                  <LogOut className="h-4 w-4" />
+                  <SignOut className="h-4 w-4" />
                   התנתק
                 </DropdownMenuItem>
               </DropdownMenu>
             </>
           ) : (
             <div className="flex items-center gap-3 me-3">
-              <ThemeToggle />
               <Button variant="ghost" size="sm" asChild>
                 <Link href="/login">התחברות</Link>
               </Button>
@@ -158,13 +155,12 @@ export function Navbar() {
 
         {/* Mobile */}
         <div className="flex items-center gap-2 md:hidden">
-          <ThemeToggle />
           <button
             className="flex h-10 w-10 items-center justify-center rounded-lg text-[rgb(var(--color-text-secondary))] hover:bg-[rgb(var(--color-surface-elevated))] transition-colors"
             onClick={() => setMobileOpen(true)}
             aria-label="פתח תפריט"
           >
-            <Menu className="h-5 w-5" />
+            <MenuIcon className="h-5 w-5" />
           </button>
         </div>
       </div>
@@ -186,7 +182,7 @@ export function Navbar() {
             </div>
           )}
 
-          <MobileNavLink href="/" onClick={() => setMobileOpen(false)} icon={<Search className="h-4 w-4" />}>
+          <MobileNavLink href="/" onClick={() => setMobileOpen(false)} icon={<MagnifyingGlass className="h-4 w-4" />}>
             עיון
           </MobileNavLink>
           <MobileNavLink href="/gigs" onClick={() => setMobileOpen(false)} icon={<Briefcase className="h-4 w-4" />}>
@@ -200,13 +196,13 @@ export function Navbar() {
                   צור שירות
                 </MobileNavLink>
               )}
-              <MobileNavLink href="/orders" onClick={() => setMobileOpen(false)} icon={<ShoppingBag className="h-4 w-4" />}>
+              <MobileNavLink href="/orders" onClick={() => setMobileOpen(false)} icon={<Bag className="h-4 w-4" />}>
                 הזמנות
               </MobileNavLink>
               <MobileNavLink href="/favorites" onClick={() => setMobileOpen(false)} icon={<Heart className="h-4 w-4" />}>
                 מועדפים
               </MobileNavLink>
-              <MobileNavLink href="/inbox" onClick={() => setMobileOpen(false)} icon={<MessageSquare className="h-4 w-4" />}>
+              <MobileNavLink href="/inbox" onClick={() => setMobileOpen(false)} icon={<Chat className="h-4 w-4" />}>
                 <span className="flex items-center gap-2">
                   הודעות
                   {unreadCount > 0 && (
@@ -233,7 +229,7 @@ export function Navbar() {
                 }}
                 className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-[rgb(var(--color-error))] hover:bg-[rgba(var(--color-error),0.05)] transition-colors"
               >
-                <LogOut className="h-4 w-4" />
+                <SignOut className="h-4 w-4" />
                 התנתק
               </button>
             </>

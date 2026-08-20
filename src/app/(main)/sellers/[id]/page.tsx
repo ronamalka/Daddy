@@ -5,7 +5,7 @@ import { useSession } from "next-auth/react";
 import { useParams } from "next/navigation";
 import { GigCard } from "@/components/gig-card";
 import { getServiceBySlug } from "@/lib/services";
-import { MapPin, Star, Handshake, Clock, Coins } from "lucide-react";
+import { MapPin, Star, Handshake, Clock, Coins } from "@phosphor-icons/react";
 import { CategoryIcon } from "@/components/ui/category-icon";
 
 interface ReviewData {
@@ -170,7 +170,7 @@ export default function SellerProfilePage() {
             </div>
             <div className="rounded-xl bg-[rgb(var(--color-bg))] border border-[rgb(var(--color-border-light))] p-4 text-center">
               <div className="flex items-center justify-center gap-1">
-                <Star className="h-5 w-5 text-[rgb(var(--color-accent-yellow))] fill-[rgb(var(--color-accent-yellow))]" />
+                <Star className="h-5 w-5 text-[rgb(var(--color-accent-yellow))] " weight="fill" />
                 <p className="text-[24px] font-bold text-[rgb(var(--color-accent-yellow))]">{seller.avgRating || "--"}</p>
               </div>
               <p className="mt-1 text-[12px] font-medium text-[rgb(var(--color-text-muted))]">דירוג כללי</p>
@@ -272,7 +272,7 @@ export default function SellerProfilePage() {
                     </div>
                   </div>
                   <div className="flex items-center gap-1 rounded-full bg-[rgba(var(--color-accent-yellow),0.15)] px-3 py-1">
-                    <Star className="h-3.5 w-3.5 text-[rgb(var(--color-accent-yellow))] fill-[rgb(var(--color-accent-yellow))]" />
+                    <Star className="h-3.5 w-3.5 text-[rgb(var(--color-accent-yellow))] " weight="fill" />
                     <span className="text-[13px] font-bold text-[rgb(var(--color-warning))]">{review.rating}</span>
                   </div>
                 </div>

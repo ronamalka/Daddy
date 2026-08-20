@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
-import { Lock, Mail, MessageCircle, ChevronLeft } from "lucide-react";
+import { Lock, Envelope, ChatCircle, CaretLeft } from "@phosphor-icons/react";
 
 interface Order {
   id: string;
@@ -67,7 +67,7 @@ export default function InboxPage() {
     <div className="mx-auto max-w-3xl px-4 py-8">
       <div className="mb-8 flex items-center gap-3">
         <div className="rounded-xl bg-[rgba(var(--color-primary),0.1)] p-2.5">
-          <Mail className="h-6 w-6 text-[rgb(var(--color-primary))]" />
+          <Envelope className="h-6 w-6 text-[rgb(var(--color-primary))]" />
         </div>
         <div>
           <h1 className="text-[32px] font-bold tracking-[-0.01em] text-[rgb(var(--color-text))]">הודעות</h1>
@@ -78,7 +78,7 @@ export default function InboxPage() {
       {orders.length === 0 ? (
         <div className="flex flex-col items-center justify-center rounded-2xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] py-16">
           <div className="rounded-full bg-[rgba(var(--color-primary),0.1)] p-5 mb-4">
-            <MessageCircle className="h-10 w-10 text-[rgb(var(--color-primary-light))]" />
+            <ChatCircle className="h-10 w-10 text-[rgb(var(--color-primary-light))]" />
           </div>
           <p className="text-[16px] font-medium text-[rgb(var(--color-text))]">אין שיחות עדיין</p>
           <p className="mt-1 text-[14px] text-[rgb(var(--color-text-muted))]">הודעות מההזמנות שלך יופיעו כאן</p>
@@ -118,7 +118,7 @@ export default function InboxPage() {
                 </div>
 
                 {/* Arrow */}
-                <ChevronLeft className="h-5 w-5 flex-shrink-0 text-[rgb(var(--color-text-muted))] group-hover:text-[rgb(var(--color-primary))] transition-colors" />
+                <CaretLeft className="h-5 w-5 flex-shrink-0 text-[rgb(var(--color-text-muted))] group-hover:text-[rgb(var(--color-primary))] transition-colors" />
               </Link>
             );
           })}

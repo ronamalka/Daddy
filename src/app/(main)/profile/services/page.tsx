@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { ServicePicker } from "@/components/service-picker";
-import { Check } from "lucide-react";
+import { Check } from "@phosphor-icons/react";
 
 export default function ProfileServicesPage() {
   const { data: session } = useSession();

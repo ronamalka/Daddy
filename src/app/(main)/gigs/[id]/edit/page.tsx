@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter, useParams } from "next/navigation";
-import { X } from "lucide-react";
+import { X } from "@phosphor-icons/react";
 
 const CATEGORIES = [
   { id: "home-maintenance", name: "תיקונים ותחזוקת הבית" },
