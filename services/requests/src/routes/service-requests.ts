@@ -4,15 +4,25 @@ import { prisma } from "../index";
 
 export const serviceRequestsRoutes = Router();
 
-serviceRequestsRoutes.get("/", async (req: Request, res: Response) => {
+serviceRequestsRoutes.get("/", requireAuth, async (req: Request, res: Response) => {
   const district = req.query.district as string | undefined;
   const status = (req.query.status as string) || "OPEN";
+  const user = req.user!;
+
+  const baseWhere: Record<string, unknown> = {
+    status: status as "OPEN" | "IN_PROGRESS" | "CLOSED",
+    ...(district ? { districtCode: Number(district) } : {}),
+  };
+
+  if (user.role === "BUYER") {
+    baseWhere.buyerId = user.id;
+  } else if (user.role === "SELLER") {
+    // Sellers see all open requests (marketplace visibility for providers)
+  }
+  // ADMIN sees all — no additional filter
 
   const requests = await prisma.serviceRequest.findMany({
-    where: {
-      status: status as "OPEN" | "IN_PROGRESS" | "CLOSED",
-      ...(district ? { districtCode: Number(district) } : {}),
-    },
+    where: baseWhere,
     include: {
       _count: { select: { responses: true } },
     },
@@ -50,8 +60,9 @@ serviceRequestsRoutes.post("/", requireAuth, async (req: Request, res: Response)
   res.json(created);
 });
 
-serviceRequestsRoutes.get("/:id", async (req: Request, res: Response) => {
+serviceRequestsRoutes.get("/:id", requireAuth, async (req: Request, res: Response) => {
   const id = req.params.id as string;
+  const user = req.user!;
 
   const serviceRequest = await prisma.serviceRequest.findUnique({
     where: { id },
@@ -63,6 +74,11 @@ serviceRequestsRoutes.get("/:id", async (req: Request, res: Response) => {
   });
 
   if (!serviceRequest) {
+    res.status(404).json({ error: "Request not found" });
+    return;
+  }
+
+  if (user.role === "BUYER" && serviceRequest.buyerId !== user.id) {
     res.status(404).json({ error: "Request not found" });
     return;
   }
