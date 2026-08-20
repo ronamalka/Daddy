@@ -1,11 +1,28 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, beforeAll } from "vitest";
 
 const BASE_URL = process.env.TEST_BASE_URL || "http://localhost:3000";
 
+let csrfToken = "";
+
+beforeAll(async () => {
+  const res = await fetch(`${BASE_URL}/`);
+  const setCookie = res.headers.get("set-cookie") || "";
+  const match = setCookie.match(/csrf_token=([^;]+)/);
+  csrfToken = match?.[1] || "";
+});
+
 async function fetchApi(path: string, options?: RequestInit) {
+  const headers: Record<string, string> = {
+    "Content-Type": "application/json",
+    ...(options?.headers as Record<string, string>),
+  };
+  if (csrfToken && options?.method && ["POST", "PUT", "PATCH", "DELETE"].includes(options.method)) {
+    headers["x-csrf-token"] = csrfToken;
+    headers["cookie"] = `csrf_token=${csrfToken}`;
+  }
   const res = await fetch(`${BASE_URL}${path}`, {
     ...options,
-    headers: { "Content-Type": "application/json", ...options?.headers },
+    headers,
   });
   const body = await res.json().catch(() => null);
   return { status: res.status, body, headers: res.headers };

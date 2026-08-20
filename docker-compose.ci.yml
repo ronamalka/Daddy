@@ -1,0 +1,36 @@
+services:
+  users-service:
+    ports:
+      - "4001:4001"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:4001/health || exit 1"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  gigs-service:
+    ports:
+      - "4002:4002"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:4002/health || exit 1"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  orders-service:
+    ports:
+      - "4003:4003"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:4003/health || exit 1"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  requests-service:
+    ports:
+      - "4004:4004"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:4004/health || exit 1"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
