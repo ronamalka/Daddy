@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "הצהרת נגישות",
-  description: "הצהרת הנגישות של אתר אבאל׳ה בהתאם לתקנות שוויון זכויות לאנשים עם מוגבלות ותקן IS 5568",
+  description: "אבאל׳ה נגיש לכולם. הצהרת נגישות לפי תקן IS 5568 ותקנות שוויון זכויות לאנשים עם מוגבלות.",
 };
 
 export default function AccessibilityPage() {

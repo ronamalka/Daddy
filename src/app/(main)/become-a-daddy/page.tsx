@@ -1,6 +1,16 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { Gift, Coins, Star, Clock, MapPin, Sparkle, FileText, GearSix, Rocket, Wrench } from "@phosphor-icons/react/dist/ssr";
 import type { Icon as PhosphorIcon } from "@phosphor-icons/react";
+
+export const metadata: Metadata = {
+  title: "הפוך לאבאל׳ה — הידיים שלך עדיין זוכרות",
+  description: "הילדים גדלו, יש לך 30 שנות ניסיון, והידיים עדיין זוכרות. הצטרף כאבאל׳ה ותעזור למי שצריך — ותרוויח מזה.",
+  openGraph: {
+    title: "הפוך לאבאל׳ה — הידיים שלך עדיין זוכרות",
+    description: "הצטרף כאבאל׳ה ותעזור למי שצריך. בלי בוס, בלי משמרות. אתה האבא של העסק שלך.",
+  },
+};
 
 const BENEFITS: { title: string; desc: string; Icon: PhosphorIcon }[] = [
   { title: "שמור על הקצב", desc: "פרישה לא אומרת לשבת בבית. תשאיר את הידיים עסוקות, את הראש חד, ואת הארנק מרוצה.", Icon: Gift },

@@ -1,4 +1,10 @@
+import type { Metadata } from "next";
 import Link from "next/link";
+
+export const metadata: Metadata = {
+  title: "מדיניות פרטיות",
+  description: "מדיניות הפרטיות של אבאל׳ה — איך אנחנו שומרים על המידע שלך. בשקיפות מלאה, בלי אותיות קטנות.",
+};
 
 const SECTIONS = [
   {
