@@ -19,6 +19,9 @@ metadata:
     nginx.ingress.kubernetes.io/proxy-body-size: "5m"
     # Use real client IP behind proxy
     nginx.ingress.kubernetes.io/use-forwarded-headers: "true"
+    # IP blocklist — references ip-blocklist ConfigMap
+    nginx.ingress.kubernetes.io/server-snippet: |
+      include /etc/nginx/conf.d/blocklist.conf;
 spec:
   ingressClassName: nginx
   rules:
