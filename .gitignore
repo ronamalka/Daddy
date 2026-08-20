@@ -12,6 +12,7 @@ node_modules
 
 # testing
 /coverage
+/test-results
 
 # next.js
 /.next/
@@ -43,6 +44,9 @@ next-env.d.ts
 /src/generated/prisma
 services/*/src/generated/
 services/*/dist/
+
+# user uploads
+/public/uploads/
 
 # AI tool configs
 .agents/
