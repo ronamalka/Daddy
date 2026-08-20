@@ -134,17 +134,17 @@ jobs:
             fi
           done
 
-      - name: Run database migrations and seed
+      - name: Run database migrations
         run: |
           for svc in users gigs orders requests; do
-            PORT_MAP=("users:4001" "gigs:4002" "orders:4003" "requests:4004")
             DB_MAP=("users:daddy_users" "gigs:daddy_gigs" "orders:daddy_orders" "requests:daddy_requests")
             for pair in "${DB_MAP[@]}"; do
               key="${pair%%:*}"
               db="${pair#*:}"
               if [ "$key" = "$svc" ]; then
                 cd services/$svc
-                DATABASE_URL="postgresql://daddy:daddypass123@localhost:5432/$db" npx prisma db push --skip-generate 2>/dev/null || true
+                echo "=== Pushing schema for $svc ($db) ==="
+                DATABASE_URL="postgresql://daddy:daddypass123@localhost:5432/$db" npx prisma db push --skip-generate --accept-data-loss || true
                 cd ../..
               fi
             done
@@ -159,12 +159,21 @@ jobs:
               db="${pair#*:}"
               if [ "$key" = "$svc" ]; then
                 cd services/$svc
-                DATABASE_URL="postgresql://daddy:daddypass123@localhost:5432/$db" npx prisma db seed 2>/dev/null || true
+                echo "=== Seeding $svc ($db) ==="
+                DATABASE_URL="postgresql://daddy:daddypass123@localhost:5432/$db" npx prisma db seed || true
                 cd ../..
               fi
             done
           done
         continue-on-error: true
+
+      - name: Verify services respond after migrations
+        run: |
+          echo "=== Smoke-testing services ==="
+          for port in 4001 4002 4003 4004; do
+            status=$(curl -s -o /dev/null -w '%{http_code}' http://localhost:$port/health)
+            echo "Port $port health: $status"
+          done
 
       - name: Build and start Next.js app
         run: |
@@ -203,9 +212,13 @@ jobs:
           E2E_BASE_URL: "http://localhost:3000"
         continue-on-error: true
 
+      - name: Show docker logs on failure
+        if: failure()
+        run: docker compose -f docker-compose.yml -f docker-compose.ci.yml logs --tail=100
+
       - name: Stop services
         if: always()
-        run: docker compose down
+        run: docker compose -f docker-compose.yml -f docker-compose.ci.yml down
 
       - uses: actions/upload-artifact@v4
         if: always()

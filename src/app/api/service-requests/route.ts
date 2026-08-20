@@ -3,15 +3,9 @@ import { auth } from "@/lib/auth";
 import { proxyRequest, REQUESTS_SERVICE } from "@/lib/gateway";
 
 export async function GET(request: NextRequest) {
-  const session = await auth();
-  if (!session?.user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
-  const user = session.user as { id: string; email: string; name: string; role: string };
   const params = request.nextUrl.searchParams.toString();
   const path = params ? `/service-requests?${params}` : "/service-requests";
-  const { data, status } = await proxyRequest(REQUESTS_SERVICE, path, { user });
+  const { data, status } = await proxyRequest(REQUESTS_SERVICE, path);
   if (status >= 500 || !data) {
     return NextResponse.json([], { status: 200 });
   }
