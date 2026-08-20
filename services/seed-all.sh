@@ -7,7 +7,7 @@ echo ""
 echo "--- Pushing schemas ---"
 for svc in users gigs orders requests; do
   echo "Pushing schema for $svc..."
-  (cd "$(dirname "$0")/$svc" && npx prisma db push --skip-generate 2>&1 | tail -1)
+  (cd "$(dirname "$0")/$svc" && npx prisma db push --accept-data-loss 2>&1 | tail -1)
 done
 
 echo ""
