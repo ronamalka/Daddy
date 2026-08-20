@@ -1,0 +1,119 @@
+apiVersion: logging.openshift.io/v1
+kind: ClusterLogForwarder
+metadata:
+  name: daddy-security-logs
+  namespace: daddy
+spec:
+  inputs:
+    - name: security-events
+      application:
+        namespaces:
+          - daddy
+        selector:
+          matchLabels:
+            app: daddy-app
+  filters:
+    - name: security-only
+      type: grep
+      grep:
+        - message: /\[SECURITY\]/
+  pipelines:
+    - name: security-pipeline
+      inputRefs:
+        - security-events
+      filterRefs:
+        - security-only
+      outputRefs:
+        - security-log-store
+  outputs:
+    - name: security-log-store
+      type: elasticsearch
+      elasticsearch:
+        indexName: security-events
+        indexPrefix: daddy
+      # Alternative: forward to external SIEM
+      # type: syslog
+      # syslog:
+      #   rfc: RFC5424
+      #   severity: informational
+      #   facility: auth
+      #   url: tls://siem.example.com:6514
+---
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: daddy-security-alerts
+  namespace: daddy
+  labels:
+    app.kubernetes.io/part-of: daddy
+spec:
+  groups:
+    - name: security-events
+      rules:
+        - alert: HighLoginFailureRate
+          expr: |
+            count_over_time({namespace="daddy", container="daddy-app"} |= "[SECURITY]" |= "login_failure" [5m]) > 5
+          for: 1m
+          labels:
+            severity: warning
+            team: security
+          annotations:
+            summary: ">5 failed logins for same account in 5 minutes"
+            description: "Possible brute-force or credential stuffing attack"
+            runbook: "Check security logs, consider IP blocklist"
+
+        - alert: MassLoginFailures
+          expr: |
+            count_over_time({namespace="daddy", container="daddy-app"} |= "[SECURITY]" |= "login_failure" [5m]) > 50
+          for: 1m
+          labels:
+            severity: critical
+            team: security
+          annotations:
+            summary: ">50 failed logins across any account in 5 minutes"
+            description: "Large-scale credential stuffing attack detected"
+            runbook: "Enable Cloudflare Under Attack mode, review IP patterns"
+
+        - alert: AccountLockout
+          expr: |
+            count_over_time({namespace="daddy", container="daddy-app"} |= "[SECURITY]" |= "login_lockout" [5m]) > 0
+          for: 0m
+          labels:
+            severity: warning
+            team: security
+          annotations:
+            summary: "Account lockout triggered"
+            description: "An account has been locked due to repeated failures"
+
+        - alert: CSRFViolation
+          expr: |
+            count_over_time({namespace="daddy", container="daddy-app"} |= "[SECURITY]" |= "csrf_violation" [5m]) > 3
+          for: 1m
+          labels:
+            severity: warning
+            team: security
+          annotations:
+            summary: "Multiple CSRF violations detected"
+            description: "Possible CSRF attack or misconfigured client"
+
+        - alert: AdminAction
+          expr: |
+            count_over_time({namespace="daddy", container="daddy-app"} |= "[SECURITY]" |= "admin_action" [1m]) > 0
+          for: 0m
+          labels:
+            severity: info
+            team: security
+          annotations:
+            summary: "Admin action performed"
+            description: "An admin action was logged — review for compliance"
+
+        - alert: SessionRevocation
+          expr: |
+            count_over_time({namespace="daddy", container="daddy-app"} |= "[SECURITY]" |= "session_revoked" [5m]) > 5
+          for: 1m
+          labels:
+            severity: warning
+            team: security
+          annotations:
+            summary: "Multiple session revocations"
+            description: "Possible compromised account or mass sign-out event"
