@@ -1,4 +1,10 @@
+import type { Metadata } from "next";
 import Link from "next/link";
+
+export const metadata: Metadata = {
+  title: "תנאי שימוש",
+  description: "תנאי השימוש של אבאל׳ה — הכללים פשוטים: תהיה הוגן, תעשה עבודה טובה, ואל תהיה חתיכת ארון.",
+};
 
 const SECTIONS = [
   {

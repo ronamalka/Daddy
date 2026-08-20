@@ -15,11 +15,11 @@ const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "https://daddy-app-daddy-de
 
 export const metadata: Metadata = {
   title: {
-    default: "אבאל׳ה — מצא לך היום אבאל׳ה שיעזור עם מה שאתה צריך",
+    default: "אבאל׳ה — אבא תמיד יודע לסדר. גם אם הוא לא שלך.",
     template: "%s | אבאל׳ה",
   },
-  description: "מצא לך אבאל׳ה שיעזור עם מה שאתה צריך היום — הובלות, הרכבות, שיפוצים, ניקיון ועוד",
-  keywords: ["פרילנסרים", "שירותים", "הובלות", "שיפוצים", "הרכבת רהיטים", "ניקיון", "אבאלה", "ישראל"],
+  description: "אבא תמיד יודע לסדר. גם אם הוא לא שלך. מצא אבאל׳ה מנוסה שיעזור עם הרכבות, תיקונים, הובלות, הוזלת חשבונות ועוד.",
+  keywords: ["אבאלה", "שירותים לבית", "הרכבת רהיטים", "תיקונים", "הובלות", "הוזלת חשבונות", "בעלי מקצוע", "ישראל"],
   authors: [{ name: "אבאל׳ה" }],
   metadataBase: new URL(BASE_URL),
   alternates: { canonical: "/" },
@@ -32,14 +32,14 @@ export const metadata: Metadata = {
     locale: "he_IL",
     url: BASE_URL,
     siteName: "אבאל׳ה",
-    title: "אבאל׳ה — מצא לך היום אבאל׳ה שיעזור עם מה שאתה צריך",
-    description: "מצא לך היום אבאל׳ה שיעזור עם מה שאתה צריך",
-    images: [{ url: "/logo.jpeg", width: 1792, height: 2390, alt: "אבאל׳ה" }],
+    title: "אבאל׳ה — אבא תמיד יודע לסדר. גם אם הוא לא שלך.",
+    description: "מצא אבאל׳ה מנוסה שיסדר לך הכל — מהרכבת ארון ועד הוזלת חשבונות. בלי מתווכים, בלי הפתעות.",
+    images: [{ url: "/logo.jpeg", width: 1792, height: 2390, alt: "אבאל׳ה — כל אחד צריך אבאל׳ה" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "אבאל׳ה — מצא לך היום אבאל׳ה שיעזור עם מה שאתה צריך",
-    description: "מצא לך היום אבאל׳ה שיעזור עם מה שאתה צריך",
+    title: "אבאל׳ה — אבא תמיד יודע לסדר. גם אם הוא לא שלך.",
+    description: "מצא אבאל׳ה מנוסה שיסדר לך הכל — מהרכבת ארון ועד הוזלת חשבונות.",
   },
   robots: { index: true, follow: true },
 };
@@ -50,7 +50,7 @@ const jsonLd = {
   name: "אבאל׳ה",
   url: BASE_URL,
   logo: `${BASE_URL}/logo.jpeg`,
-  description: "שוק שירותים ופרילנסרים — מצא בעלי מקצוע מנוסים בישראל",
+  description: "אבא תמיד יודע לסדר. מצא אבאל׳ה מנוסה לכל מה שצריך — תיקונים, הרכבות, הובלות ועוד.",
   areaServed: {
     "@type": "Country",
     name: "Israel",
