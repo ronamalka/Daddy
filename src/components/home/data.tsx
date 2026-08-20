@@ -21,10 +21,10 @@ export const CATEGORY_ICONS: Record<string, React.ReactNode> = {
 };
 
 export const STATS = [
-  { number: 1200, suffix: "+", label: "אבאל׳ות רשומים", icon: <Users className="h-5 w-5" /> },
-  { number: 8500, suffix: "+", label: "עבודות שהושלמו", icon: <CheckCircle className="h-5 w-5" /> },
-  { number: 4.8, suffix: "", label: "דירוג ממוצע", icon: <Star className="h-5 w-5" /> },
-  { number: 38, suffix: "", label: "שירותים שונים", icon: <Wrench className="h-5 w-5" /> },
+  { number: 1200, suffix: "+", label: "אבאל׳ות שיודעים לסדר", icon: <Users className="h-5 w-5" /> },
+  { number: 8500, suffix: "+", label: "ארונות שעומדים עד היום", icon: <CheckCircle className="h-5 w-5" /> },
+  { number: 4.8, suffix: "", label: "כוכבים (אבא היה גאה)", icon: <Star className="h-5 w-5" /> },
+  { number: 38, suffix: "", label: "שירותים (כן, גם מדפים)", icon: <Wrench className="h-5 w-5" /> },
 ];
 
 export const BUYER_STEPS = [
@@ -42,16 +42,18 @@ export const DADDY_STEPS = [
 ];
 
 export const WHY_CHOOSE = [
-  { title: "אבאל׳ות אמיתיים", desc: "לא חברות ענק. אנשים אמיתיים עם ידיים טובות, ניסיון, ורצון לעזור.", icon: <Users className="h-6 w-6" /> },
-  { title: "דירוג אמין", desc: "4 קריטריונים: איכות, יחס, זמנים, מחיר. תדע בדיוק מה אתה מקבל.", icon: <ChartBar className="h-6 w-6" /> },
-  { title: "מחירים הוגנים", desc: "ללא עמלות נסתרות. המחיר שאתה רואה — זה המחיר שאתה משלם.", icon: <Coins className="h-6 w-6" /> },
-  { title: "כל השירותים", desc: "מהרכבת ארון ועד הוזלת חשבונות. 38 שירותים ב-8 קטגוריות.", icon: <Wrench className="h-6 w-6" /> },
-  { title: "לפי אזור", desc: "מצא אבאל׳ה בשכונה שלך. 7 מחוזות, עשרות ערים.", icon: <MapPin className="h-6 w-6" /> },
-  { title: "מהיר ופשוט", desc: "חפש, בחר, שלח הודעה. בתוך דקות יש לך אבאל׳ה.", icon: <Lightning className="h-6 w-6" /> },
+  { title: "אבאל׳ות אמיתיים", desc: "לא חברות ענק עם מוקדנים שקוראים מדף. אנשים אמיתיים שיגיעו, יסדרו, ואולי גם יספרו בדיחה.", icon: <Users className="h-6 w-6" /> },
+  { title: "ביקורות אמיתיות", desc: "לא חבר של חבר שאמר שהוא בסדר. 4 קריטריונים, דירוגים אמיתיים, בלי פוליטיקה.", icon: <ChartBar className="h-6 w-6" /> },
+  { title: "בלי הפתעות בחשבון", desc: "המחיר שסיכמתם — זה המחיר שתשלמו. בלי ׳אה, שכחתי להגיד...׳", icon: <Coins className="h-6 w-6" /> },
+  { title: "38 סוגי שירות", desc: "מברז שמטפטף ועד ארון שמסרב להתרכב. אם זה נשבר, יש לנו אבאל׳ה לזה.", icon: <Wrench className="h-6 w-6" /> },
+  { title: "אבאל׳ה בשכונה", desc: "7 מחוזות, עשרות ערים. כן, גם באר שבע. בטח שגם באר שבע.", icon: <MapPin className="h-6 w-6" /> },
+  { title: "בדקות, לא בימים", desc: "חפש, בחר, שלח הודעה. עד שתסיים את הקפה — יש לך אבאל׳ה.", icon: <Lightning className="h-6 w-6" /> },
 ];
 
 export const FALLBACK_TESTIMONIALS = [
   { name: "נועם ג׳", text: "הזמנתי הרכבת ארון מאיקאה. האבאל׳ה הגיע עם ארגז כלים, בדיחות יבשות, ושוקולד. הארון עומד עד היום, הבדיחות פחות.", service: "הרכבת רהיטים", daddyName: "משה כ׳", rating: 5 },
-  { name: "שירה מ׳", text: "אבא שלי לא מבין בטכנולוגיה אז הזמנתי לו אבאל׳ה שילמד אותו וואטסאפ. עכשיו הוא שולח לי מימס בלי הפסקה.", service: "עזרה טכנית", daddyName: "דוד ל׳", rating: 5 },
+  { name: "שירה מ׳", text: "אבא שלי לא מבין בטכנולוגיה אז הזמנתי לו אבאל׳ה שילמד אותו וואטסאפ. עכשיו הוא שולח לי מימס בלי הפסקה. מה עשיתי.", service: "עזרה טכנית", daddyName: "דוד ל׳", rating: 5 },
   { name: "עידו ק׳", text: "חיפשתי מישהו שיוריד לי את חשבון הסלולר. האבאל׳ה חסך לי 80 שקל בחודש. קוראים לזה ROI של אבא.", service: "הוזלת חשבונות", daddyName: "יוסי ב׳", rating: 5 },
+  { name: "מיכל א׳", text: "הטלוויזיה הייתה על הרצפה שלושה חודשים כי ׳אני אתלה אותה בשבת׳. הזמנתי אבאל׳ה, תוך שעה היא על הקיר. בעלי עדיין לא שם לב.", service: "תליית טלוויזיה", daddyName: "אבי ר׳", rating: 5 },
+  { name: "יונתן ד׳", text: "הברז בשירותים טפטף חצי שנה. אמרתי ׳זה מוסיף אווירה׳. האבאל׳ה תיקן את זה ב-20 דקות ושבר לי את האשליה.", service: "אינסטלציה", daddyName: "חיים ש׳", rating: 5 },
 ];
