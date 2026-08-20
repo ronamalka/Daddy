@@ -43,10 +43,6 @@ passwordResetRoutes.post("/request", async (req: Request, res: Response) => {
     },
   });
 
-  if (process.env.NODE_ENV !== "production") {
-    console.log(`[DEV] Reset link: http://localhost:3000/reset-password?token=${token}`);
-  }
-
   res.json({ message: "If the email exists, a reset link has been sent" });
 });
 

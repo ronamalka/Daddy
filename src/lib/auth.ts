@@ -4,6 +4,7 @@ import Google from "next-auth/providers/google";
 import crypto from "crypto";
 import { checkLockout, recordFailedAttempt, resetAttempts } from "./account-lockout";
 import { getRedis } from "./redis";
+import { logSecurityEvent } from "./security-logger";
 
 const USERS_SERVICE = process.env.USERS_SERVICE_URL || "http://localhost:4001";
 
@@ -29,7 +30,11 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 
         const lockout = await checkLockout(email);
         if (!lockout.allowed) {
-          console.warn(`[auth] Login blocked for ${email}: ${lockout.reason}`);
+          logSecurityEvent("login_lockout", {
+            email,
+            outcome: "blocked",
+            metadata: { reason: lockout.reason },
+          });
           return null;
         }
 
@@ -40,12 +45,22 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         });
 
         if (!res.ok) {
-          await recordFailedAttempt(email);
+          const attempts = await recordFailedAttempt(email);
+          logSecurityEvent("login_failure", {
+            email,
+            outcome: "failure",
+            metadata: { attempts },
+          });
           return null;
         }
 
         await resetAttempts(email);
         const user = await res.json();
+        logSecurityEvent("login_success", {
+          email,
+          userId: user.id,
+          outcome: "success",
+        });
         return { id: user.id, email: user.email, name: user.name, role: user.role };
       },
     }),
