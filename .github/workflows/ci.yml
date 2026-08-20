@@ -110,21 +110,28 @@ jobs:
           DATABASE_URL: "postgresql://dummy:dummy@localhost:5432/dummy"
 
       - name: Start services with docker-compose
-        run: docker compose -f docker-compose.yml -f docker-compose.ci.yml up -d --build --wait
+        run: docker compose -f docker-compose.yml -f docker-compose.ci.yml up -d --build
         timeout-minutes: 10
 
       - name: Wait for services to be healthy
         run: |
           echo "Waiting for services to be ready..."
           for port in 4001 4002 4003 4004; do
+            ready=false
             for i in $(seq 1 30); do
               if curl -sf http://localhost:$port/health > /dev/null 2>&1; then
                 echo "Service on port $port is ready"
+                ready=true
                 break
               fi
               echo "Waiting for port $port... ($i/30)"
               sleep 2
             done
+            if [ "$ready" = false ]; then
+              echo "ERROR: Service on port $port did not start in time"
+              docker compose -f docker-compose.yml -f docker-compose.ci.yml logs
+              exit 1
+            fi
           done
 
       - name: Run database migrations and seed
