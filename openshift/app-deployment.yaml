@@ -16,6 +16,8 @@ spec:
       labels:
         app: daddy-app
     spec:
+      serviceAccountName: daddy-app
+      automountServiceAccountToken: false
       securityContext:
         runAsNonRoot: true
       containers:
