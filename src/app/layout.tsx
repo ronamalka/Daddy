@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Heebo } from "next/font/google";
 import { SessionProvider } from "@/components/session-provider";
 import { AccessibilityToolbar, A11Y_BOOTSTRAP_SCRIPT } from "@/components/accessibility-toolbar";
+import { CsrfProvider } from "@/components/csrf-provider";
 import "./globals.css";
 
 const heebo = Heebo({
@@ -75,6 +76,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           דלג לתוכן הראשי
         </a>
         <SessionProvider>
+          <CsrfProvider />
           {children}
           <AccessibilityToolbar />
         </SessionProvider>

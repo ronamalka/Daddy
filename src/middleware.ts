@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
+// --- Rate Limiting ---
+
 interface RateLimitEntry {
   count: number;
   resetAt: number;
@@ -46,16 +48,10 @@ function getClientIp(request: NextRequest): string {
   return "unknown";
 }
 
-export function middleware(request: NextRequest) {
-  const { pathname } = request.nextUrl;
-
-  if (!pathname.startsWith("/api/")) {
-    return NextResponse.next();
-  }
-
+function checkRateLimit(request: NextRequest, pathname: string): NextResponse | null {
   const method = request.method;
   const tier = TIERS.find((t) => t.match(pathname, method));
-  if (!tier) return NextResponse.next();
+  if (!tier) return null;
 
   const ip = getClientIp(request);
   const key = `${ip}:${tier.limit}`;
@@ -89,13 +85,101 @@ export function middleware(request: NextRequest) {
     );
   }
 
+  return null;
+}
+
+function setRateLimitHeaders(response: NextResponse, request: NextRequest, pathname: string) {
+  const method = request.method;
+  const tier = TIERS.find((t) => t.match(pathname, method));
+  if (!tier) return;
+
+  const ip = getClientIp(request);
+  const key = `${ip}:${tier.limit}`;
+  const entry = store.get(key);
+  if (entry) {
+    response.headers.set("X-RateLimit-Limit", String(tier.limit));
+    response.headers.set("X-RateLimit-Remaining", String(Math.max(0, tier.limit - entry.count)));
+    response.headers.set("X-RateLimit-Reset", String(Math.ceil(entry.resetAt / 1000)));
+  }
+}
+
+// --- CSRF Protection (Double-Submit Cookie) ---
+
+const CSRF_COOKIE = "csrf_token";
+const CSRF_HEADER = "x-csrf-token";
+const MUTATION_METHODS = new Set(["POST", "PUT", "PATCH", "DELETE"]);
+
+const CSRF_EXEMPT = [
+  "/api/auth",
+];
+
+function generateToken(): string {
+  const array = new Uint8Array(32);
+  crypto.getRandomValues(array);
+  return Array.from(array, (b) => b.toString(16).padStart(2, "0")).join("");
+}
+
+function isCsrfExempt(pathname: string): boolean {
+  return CSRF_EXEMPT.some((prefix) => pathname.startsWith(prefix));
+}
+
+// --- Main Middleware ---
+
+export function middleware(request: NextRequest) {
+  const { pathname } = request.nextUrl;
+  const isApi = pathname.startsWith("/api/");
+
+  // Non-API routes: only seed the CSRF cookie
+  if (!isApi) {
+    if (request.cookies.get(CSRF_COOKIE)) {
+      return NextResponse.next();
+    }
+    const response = NextResponse.next();
+    response.cookies.set(CSRF_COOKIE, generateToken(), {
+      httpOnly: false,
+      sameSite: "strict",
+      secure: process.env.NODE_ENV === "production",
+      path: "/",
+    });
+    return response;
+  }
+
+  // Rate limiting
+  const rateLimited = checkRateLimit(request, pathname);
+  if (rateLimited) return rateLimited;
+
+  // CSRF validation for mutations
+  if (MUTATION_METHODS.has(request.method) && !isCsrfExempt(pathname)) {
+    const cookieToken = request.cookies.get(CSRF_COOKIE)?.value;
+    const headerToken = request.headers.get(CSRF_HEADER);
+
+    if (!cookieToken || !headerToken || cookieToken !== headerToken) {
+      console.warn(
+        `[csrf] Rejected ${request.method} ${pathname} from ${getClientIp(request)}`
+      );
+      return new NextResponse(
+        JSON.stringify({ error: "Invalid or missing CSRF token" }),
+        { status: 403, headers: { "Content-Type": "application/json" } }
+      );
+    }
+  }
+
   const response = NextResponse.next();
-  response.headers.set("X-RateLimit-Limit", String(tier.limit));
-  response.headers.set("X-RateLimit-Remaining", String(tier.limit - entry.count));
-  response.headers.set("X-RateLimit-Reset", String(Math.ceil(entry.resetAt / 1000)));
+  setRateLimitHeaders(response, request, pathname);
+
+  // Set CSRF cookie if missing
+  if (!request.cookies.get(CSRF_COOKIE)) {
+    response.cookies.set(CSRF_COOKIE, generateToken(), {
+      httpOnly: false,
+      sameSite: "strict",
+      secure: process.env.NODE_ENV === "production",
+      path: "/",
+    });
+  }
+
   return response;
 }
 
 export const config = {
-  matcher: "/api/:path*",
+  matcher: ["/api/:path*", "/((?!_next/static|_next/image|favicon.ico|logo.jpeg).*)"],
 };
