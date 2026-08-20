@@ -88,7 +88,7 @@ export function ResultsView({
             <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-xl bg-[rgba(var(--color-primary),0.1)]">
               <MagnifyingGlass className="h-7 w-7 text-[rgb(var(--color-primary))]" />
             </div>
-            <p className="text-lg font-bold text-[rgb(var(--color-text))] mb-2">לא נמצאו אבאל׳ות לשירות הזה</p>
+            <p className="text-lg font-bold text-[rgb(var(--color-text))] mb-2">גם אבא לא מצא. אבל אל תוותר.</p>
             <p className="text-sm text-[rgb(var(--color-text-secondary))] mb-8 max-w-sm mx-auto">
               {selectedDistrict ? "נסה לחפש בכל הארץ, או פרסם בקשה ואבאל׳ות ייצרו איתך קשר" : "פרסם בקשה ואבאל׳ות באזור שלך ייצרו איתך קשר"}
             </p>

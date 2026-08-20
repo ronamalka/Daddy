@@ -94,7 +94,7 @@ export default function ProfileServicesPage() {
             {saved && (
               <span className="flex items-center gap-1.5 text-[14px] font-medium text-[rgb(var(--color-success))]">
                 <Check className="h-4 w-4" />
-                נשמר בהצלחה
+                מעולה. השירותים עודכנו.
               </span>
             )}
             {error && <span className="text-[14px] font-medium text-[rgb(var(--color-error))]">{error}</span>}

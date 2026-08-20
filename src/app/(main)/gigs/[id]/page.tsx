@@ -339,7 +339,7 @@ export default function GigDetailPage() {
                       </div>
                     )}
                     {flaggedReviews.has(review.id) && (
-                      <p className="mt-2 text-[11px] text-[#00B894]">✓ הדיווח נשלח</p>
+                      <p className="mt-2 text-[11px] text-[#00B894]">✓ תודה! הדיווח נשלח. אנחנו בודקים.</p>
                     )}
                   </div>
                 ))}

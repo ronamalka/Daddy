@@ -112,7 +112,7 @@ export default function CreateGigPage() {
     <div className="mx-auto max-w-3xl px-4 py-8">
       <div className="mb-8">
         <h1 className="text-[32px] font-bold tracking-[-0.01em] text-[rgb(var(--color-text))]">צור שירות חדש</h1>
-        <p className="mt-1 text-[14px] text-[rgb(var(--color-text-secondary))]">מלא את הפרטים כדי לפרסם את השירות שלך</p>
+        <p className="mt-1 text-[14px] text-[rgb(var(--color-text-secondary))]">ספר ללקוחות מה אתה יודע לעשות — ותן להם סיבה לבחור בך</p>
       </div>
 
       {error && (
