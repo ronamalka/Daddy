@@ -176,7 +176,7 @@ export default function AdminPage() {
                       </span>
                     </td>
                     <td className="px-6 py-4 text-[14px] text-[rgb(var(--color-text-secondary))]">
-                      {new Date(user.createdAt).toLocaleDateString()}
+                      {new Date(user.createdAt).toLocaleDateString("he-IL")}
                     </td>
                   </tr>
                 );

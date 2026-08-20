@@ -41,6 +41,7 @@ export function Footer() {
               </span>
               <FooterLink href="/terms">תנאי שימוש</FooterLink>
               <FooterLink href="/privacy">מדיניות פרטיות</FooterLink>
+              <FooterLink href="/accessibility">נגישות</FooterLink>
             </div>
           </div>
         </div>

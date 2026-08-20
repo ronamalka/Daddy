@@ -71,6 +71,7 @@ export function HeroSection({
                   <MagnifyingGlass className="h-5 w-5 flex-shrink-0 text-[rgb(var(--color-text-muted))]" />
                   <input
                     type="text"
+                    aria-label="חיפוש שירותים"
                     placeholder='מה אתה צריך? נסה "הרכבת רהיטים" או "תליית טלוויזיה"'
                     value={serviceSearch}
                     onChange={(e) => {
@@ -81,7 +82,7 @@ export function HeroSection({
                   />
                 </div>
                 {serviceSearch && (
-                  <button onClick={() => { setServiceSearch(""); setView("browse"); setSelectedService(""); }} className="px-4 text-[rgb(var(--color-text-muted))] hover:text-[rgb(var(--color-text))] transition-colors">
+                  <button aria-label="נקה חיפוש" onClick={() => { setServiceSearch(""); setView("browse"); setSelectedService(""); }} className="px-4 text-[rgb(var(--color-text-muted))] hover:text-[rgb(var(--color-text))] transition-colors">
                     <X className="h-5 w-5" />
                   </button>
                 )}

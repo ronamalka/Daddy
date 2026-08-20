@@ -179,7 +179,7 @@ export default function HomePage() {
 
       {fetchError && (
         <div className="mx-auto max-w-4xl px-4 mt-8">
-          <div className="rounded-lg border border-[rgba(var(--color-error),0.2)] bg-[rgba(var(--color-error),0.05)] px-5 py-4 text-center text-sm text-[rgb(var(--color-error))]">
+          <div role="alert" className="rounded-lg border border-[rgba(var(--color-error),0.2)] bg-[rgba(var(--color-error),0.05)] px-5 py-4 text-center text-sm text-[rgb(var(--color-error))]">
             {fetchError}
           </div>
         </div>

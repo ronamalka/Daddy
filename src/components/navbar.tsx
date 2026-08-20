@@ -61,7 +61,7 @@ export function Navbar() {
   }, [session]);
 
   return (
-    <nav className="sticky top-0 z-50 glass-strong">
+    <nav className="sticky top-0 z-50 glass-strong" aria-label="ניווט ראשי">
       <div className="mx-auto flex max-w-7xl items-center justify-between px-5 py-3 lg:px-8">
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2 select-none">
@@ -263,7 +263,7 @@ function NavLink({
       href={href}
       className="flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium text-[rgb(var(--color-text-secondary))] transition-colors duration-200 hover:bg-[rgb(var(--color-surface-elevated))] hover:text-[rgb(var(--color-text))]"
     >
-      {icon}
+      <span aria-hidden="true">{icon}</span>
       {children}
     </Link>
   );
@@ -286,7 +286,7 @@ function MobileNavLink({
       onClick={onClick}
       className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-[rgb(var(--color-text-secondary))] transition-colors duration-150 hover:bg-[rgb(var(--color-surface-elevated))] hover:text-[rgb(var(--color-text))]"
     >
-      {icon}
+      <span aria-hidden="true">{icon}</span>
       {children}
     </Link>
   );

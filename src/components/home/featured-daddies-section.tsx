@@ -62,9 +62,9 @@ export function FeaturedDaddiesSection({ featuredDaddies }: FeaturedDaddiesSecti
                         </p>
                       )}
                       {d.avgRating > 0 && (
-                        <div className="flex items-center gap-1 mt-1">
+                        <div className="flex items-center gap-1 mt-1" aria-label={`דירוג ${d.avgRating.toFixed(1)} מתוך 5, ${d.reviewCount} ביקורות`}>
                           {Array.from({ length: 5 }).map((_, j) => (
-                            <Star key={j} className={cn("h-3 w-3", j < Math.round(d.avgRating) ? "text-[rgb(var(--color-accent-yellow))]" : "text-[rgb(var(--color-border))]")} weight={j < Math.round(d.avgRating) ? "fill" : "regular"} />
+                            <Star key={j} aria-hidden="true" className={cn("h-3 w-3", j < Math.round(d.avgRating) ? "text-[rgb(var(--color-accent-yellow))]" : "text-[rgb(var(--color-border))]")} weight={j < Math.round(d.avgRating) ? "fill" : "regular"} />
                           ))}
                           <span className="text-xs text-[rgb(var(--color-text-muted))] mr-1">({d.reviewCount})</span>
                         </div>

@@ -98,15 +98,19 @@ export default function HowItWorksPage() {
         <div className="space-y-3">
           {FAQ.map((item, i) => (
             <div key={i} className="rounded-2xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] overflow-hidden">
-              <button
-                onClick={() => setOpenFaq(openFaq === i ? null : i)}
-                className="flex w-full items-center justify-between p-5 text-right"
-              >
-                <span className="text-[15px] font-bold text-[rgb(var(--color-text))]">{item.q}</span>
-                <CaretDown className={`h-5 w-5 text-[rgb(var(--color-primary))] transition-transform ${openFaq === i ? "rotate-180" : ""}`} />
-              </button>
+              <h3>
+                <button
+                  onClick={() => setOpenFaq(openFaq === i ? null : i)}
+                  aria-expanded={openFaq === i}
+                  aria-controls={`faq-hiw-${i}`}
+                  className="flex w-full items-center justify-between p-5 text-right"
+                >
+                  <span className="text-[15px] font-bold text-[rgb(var(--color-text))]">{item.q}</span>
+                  <CaretDown aria-hidden="true" className={`h-5 w-5 text-[rgb(var(--color-primary))] transition-transform ${openFaq === i ? "rotate-180" : ""}`} />
+                </button>
+              </h3>
               {openFaq === i && (
-                <div className="border-t border-[rgb(var(--color-border))] px-5 pb-5 pt-3">
+                <div id={`faq-hiw-${i}`} role="region" aria-label={item.q} className="border-t border-[rgb(var(--color-border))] px-5 pb-5 pt-3">
                   <p className="text-[14px] leading-relaxed text-[rgb(var(--color-text-secondary))]">{item.a}</p>
                 </div>
               )}

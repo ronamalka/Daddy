@@ -114,7 +114,7 @@ export function ResultsView({
         )}
 
         {submitted && (
-          <div className="mt-4 rounded-lg bg-[rgba(var(--color-success),0.1)] border border-[rgba(var(--color-success),0.2)] px-5 py-4 text-sm font-medium text-[rgb(var(--color-success))] text-center">
+          <div role="alert" className="mt-4 rounded-lg bg-[rgba(var(--color-success),0.1)] border border-[rgba(var(--color-success),0.2)] px-5 py-4 text-sm font-medium text-[rgb(var(--color-success))] text-center">
             הבקשה פורסמה בהצלחה! אבאל׳ות באזור שלך יוכלו ליצור איתך קשר.
           </div>
         )}

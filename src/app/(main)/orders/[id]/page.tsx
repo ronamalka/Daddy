@@ -214,7 +214,7 @@ export default function OrderDetailPage() {
               <span className="text-[rgb(var(--color-border))]">|</span>
               <span className="font-semibold text-[rgb(var(--color-text))]">₪{order.price}</span>
               <span className="text-[rgb(var(--color-border))]">|</span>
-              <span>{new Date(order.createdAt).toLocaleDateString()}</span>
+              <span>{new Date(order.createdAt).toLocaleDateString("he-IL")}</span>
             </div>
           </div>
           <span className={`rounded-full px-4 py-1.5 text-[13px] font-semibold ${statusInfo.bg} ${statusInfo.text}`}>
@@ -237,7 +237,7 @@ export default function OrderDetailPage() {
                `${daysLeft} ימים לאספקה`}
             </span>
             <span className="text-[12px] text-[rgb(var(--color-text-muted))] ms-auto">
-              עד {new Date(order.dueDate!).toLocaleDateString()}
+              עד {new Date(order.dueDate!).toLocaleDateString("he-IL")}
             </span>
           </div>
         )}

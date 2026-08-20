@@ -56,6 +56,7 @@ export default function GigDetailPage() {
   const [flaggingReviewId, setFlaggingReviewId] = useState<string | null>(null);
   const [flagReason, setFlagReason] = useState("");
   const [flaggedReviews, setFlaggedReviews] = useState<Set<string>>(new Set());
+  const [orderError, setOrderError] = useState<string | null>(null);
 
   async function flagReview(reviewId: string) {
     if (!flagReason.trim()) return;
@@ -110,7 +111,7 @@ export default function GigDetailPage() {
       router.push(`/orders/${order.id}`);
     } else {
       const data = await res.json();
-      alert(data.error || "ביצוע ההזמנה נכשל");
+      setOrderError(data.error || "ביצוע ההזמנה נכשל");
       setOrdering(false);
     }
   }
@@ -149,7 +150,7 @@ export default function GigDetailPage() {
             <h1 className="text-[24px] font-bold leading-tight tracking-[-0.01em] text-[rgb(var(--color-text))] md:text-[28px]">
               {gig.title}
             </h1>
-            <button onClick={toggleFavorite} className="flex-shrink-0 mt-1 transition-transform hover:scale-110">
+            <button onClick={toggleFavorite} aria-label={favorited ? "הסר ממועדפים" : "הוסף למועדפים"} className="flex-shrink-0 mt-1 transition-transform hover:scale-110">
               <Heart
                 className={`h-6 w-6 ${favorited ? "text-[rgb(var(--color-error))] " : "text-[rgb(var(--color-text-muted))]"}`}
                 weight={favorited ? "fill" : "regular"}
@@ -217,17 +218,22 @@ export default function GigDetailPage() {
               <div className="divide-y divide-[rgb(var(--color-border))]/50">
                 {gig.faqs.map((faq) => (
                   <div key={faq.id}>
-                    <button
-                      onClick={() => setOpenFaq(openFaq === faq.id ? null : faq.id)}
-                      className="flex w-full items-center justify-between px-6 py-4 text-right transition-colors hover:bg-[rgb(var(--color-surface-elevated))]"
-                    >
-                      <span className="text-[14px] font-semibold text-[rgb(var(--color-text))]">{faq.question}</span>
-                      <CaretDown
-                        className={`h-5 w-5 flex-shrink-0 text-[rgb(var(--color-text-muted))] transition-transform ${openFaq === faq.id ? "rotate-180" : ""}`}
-                      />
-                    </button>
+                    <h3>
+                      <button
+                        onClick={() => setOpenFaq(openFaq === faq.id ? null : faq.id)}
+                        aria-expanded={openFaq === faq.id}
+                        aria-controls={`faq-${faq.id}`}
+                        className="flex w-full items-center justify-between px-6 py-4 text-right transition-colors hover:bg-[rgb(var(--color-surface-elevated))]"
+                      >
+                        <span className="text-[14px] font-semibold text-[rgb(var(--color-text))]">{faq.question}</span>
+                        <CaretDown
+                          aria-hidden="true"
+                          className={`h-5 w-5 flex-shrink-0 text-[rgb(var(--color-text-muted))] transition-transform ${openFaq === faq.id ? "rotate-180" : ""}`}
+                        />
+                      </button>
+                    </h3>
                     {openFaq === faq.id && (
-                      <div className="px-6 pb-4">
+                      <div id={`faq-${faq.id}`} role="region" aria-label={faq.question} className="px-6 pb-4">
                         <p className="text-[14px] leading-relaxed text-[rgb(var(--color-text-secondary))]">{faq.answer}</p>
                       </div>
                     )}
@@ -267,7 +273,7 @@ export default function GigDetailPage() {
                         </div>
                       </div>
                       <span className="text-[12px] text-[rgb(var(--color-text-muted))]">
-                        {new Date(review.createdAt).toLocaleDateString()}
+                        {new Date(review.createdAt).toLocaleDateString("he-IL")}
                       </span>
                     </div>
 
@@ -312,6 +318,7 @@ export default function GigDetailPage() {
                               value={flagReason}
                               onChange={(e) => setFlagReason(e.target.value)}
                               placeholder="סיבת הדיווח..."
+                              aria-label="סיבת הדיווח על ביקורת"
                               className="flex-1 rounded-[8px] border border-[#E8ECF1] bg-white px-3 py-1.5 text-[12px] focus:border-[#E17055] focus:outline-none"
                             />
                             <button
@@ -412,6 +419,12 @@ export default function GigDetailPage() {
                 >
                   {ordering ? "מבצע הזמנה..." : `המשך (₪${currentTier.price})`}
                 </button>
+
+                {orderError && (
+                  <div role="alert" className="mt-3 rounded-lg bg-[rgba(var(--color-error),0.1)] px-4 py-2.5 text-center text-[13px] text-[rgb(var(--color-error))]">
+                    {orderError}
+                  </div>
+                )}
 
                 {gig.seller.id === session?.user?.id && (
                   <p className="mt-3 text-center text-[12px] text-[rgb(var(--color-text-muted))]">אי אפשר להזמין את השירות של עצמך</p>
