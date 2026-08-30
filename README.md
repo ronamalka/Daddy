@@ -80,7 +80,7 @@ Open [http://localhost:3000](http://localhost:3000).
 | [`openshift/`](openshift/README.md) | Extra cluster files (network policy, TLS notes) |
 | [`scripts/`](scripts/README.md) | Backup and cluster helper scripts |
 | [`public/`](public/README.md) | Static files (logo, icons) |
-| [`.github/`](.github/README.md) | GitHub Actions and Dependabot |
+| [`.github/workflows/`](.github/workflows/README.md) | GitHub Actions and Dependabot |
 
 Every source folder has its own `README.md` with a short explanation.
 
@@ -98,7 +98,7 @@ Code goes **feature branch → `dev` → `stg` → tagged production**. Do not o
 
 CI builds container images, pushes them to Quay, and updates tags in `gitops/`. Argo CD (`daddy-dev` and the other apps) syncs those manifests. Do not change a Deployment image by hand with `oc set image`.
 
-Details: [`gitops/README.md`](gitops/README.md) and [`.github/README.md`](.github/README.md).
+Details: [`gitops/README.md`](gitops/README.md) and [`.github/workflows/README.md`](.github/workflows/README.md).
 
 ## Tests
 
