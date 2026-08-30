@@ -27,7 +27,7 @@ jobs:
         continue-on-error: true
       - name: Audit service dependencies
         run: |
-          for svc in users gigs orders requests; do
+          for svc in users gigs orders requests chat; do
             echo "=== Auditing $svc ==="
             cd services/$svc && npm install && npm audit --audit-level=high || true
             cd ../..
@@ -56,7 +56,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        service: [users, gigs, orders, requests]
+        service: [users, gigs, orders, requests, chat]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -116,7 +116,7 @@ jobs:
       - name: Wait for services to be healthy
         run: |
           echo "Waiting for services to be ready..."
-          for port in 4001 4002 4003 4004; do
+          for port in 4001 4002 4003 4004 4005; do
             ready=false
             for i in $(seq 1 30); do
               if curl -sf http://localhost:$port/health > /dev/null 2>&1; then
@@ -137,15 +137,15 @@ jobs:
       - name: Install service dependencies for migrations
         run: |
           cd services/shared && npm install && cd ../..
-          for svc in users gigs orders requests; do
+          for svc in users gigs orders requests chat; do
             echo "=== Installing deps for $svc ==="
             cd services/$svc && npm install && cd ../..
           done
 
       - name: Run database migrations
         run: |
-          for svc in users gigs orders requests; do
-            DB_MAP=("users:daddy_users" "gigs:daddy_gigs" "orders:daddy_orders" "requests:daddy_requests")
+          for svc in users gigs orders requests chat; do
+            DB_MAP=("users:daddy_users" "gigs:daddy_gigs" "orders:daddy_orders" "requests:daddy_requests" "chat:daddy_chat")
             for pair in "${DB_MAP[@]}"; do
               key="${pair%%:*}"
               db="${pair#*:}"
@@ -160,8 +160,8 @@ jobs:
 
       - name: Generate Prisma clients and seed databases
         run: |
-          for svc in users gigs orders requests; do
-            DB_MAP=("users:daddy_users" "gigs:daddy_gigs" "orders:daddy_orders" "requests:daddy_requests")
+          for svc in users gigs orders requests chat; do
+            DB_MAP=("users:daddy_users" "gigs:daddy_gigs" "orders:daddy_orders" "requests:daddy_requests" "chat:daddy_chat")
             for pair in "${DB_MAP[@]}"; do
               key="${pair%%:*}"
               db="${pair#*:}"
@@ -179,7 +179,7 @@ jobs:
       - name: Verify services respond after migrations
         run: |
           echo "=== Smoke-testing services ==="
-          for port in 4001 4002 4003 4004; do
+          for port in 4001 4002 4003 4004 4005; do
             status=$(curl -s -o /dev/null -w '%{http_code}' http://localhost:$port/health)
             echo "Port $port health: $status"
           done
@@ -206,6 +206,7 @@ jobs:
           GIGS_SERVICE_URL: "http://localhost:4002"
           ORDERS_SERVICE_URL: "http://localhost:4003"
           REQUESTS_SERVICE_URL: "http://localhost:4004"
+          CHAT_SERVICE_URL: "http://localhost:4005"
 
       - name: Run system tests
         run: npm run test:system
@@ -262,6 +263,9 @@ jobs:
           - service: requests-service
             dockerfile: services/requests/Dockerfile
             context: .
+          - service: chat-service
+            dockerfile: services/chat/Dockerfile
+            context: .
     steps:
       - uses: actions/checkout@v4
 
@@ -313,7 +317,7 @@ jobs:
           sed -i "s|image: .*daddy-app:.*|image: ${BASE}-app:${SHORT_SHA}|g" gitops/base/app-deployment.yaml
 
           # Update service deployments
-          for svc in users gigs orders requests; do
+          for svc in users gigs orders requests chat; do
             sed -i "s|image: .*daddy-${svc}-service:.*|image: ${BASE}-${svc}-service:${SHORT_SHA}|g" gitops/base/${svc}-deployment.yaml
           done
 
@@ -360,10 +364,11 @@ jobs:
           oc set image deployment/gigs-service gigs-service=${BASE}-gigs-service:${TAG} -n ${NS}
           oc set image deployment/orders-service orders-service=${BASE}-orders-service:${TAG} -n ${NS}
           oc set image deployment/requests-service requests-service=${BASE}-requests-service:${TAG} -n ${NS}
+          oc set image deployment/chat-service chat-service=${BASE}-chat-service:${TAG} -n ${NS}
 
       - name: Wait for rollouts
         run: |
           NS="${{ secrets.OPENSHIFT_NAMESPACE }}"
-          for dep in daddy-app users-service gigs-service orders-service requests-service; do
+          for dep in daddy-app users-service gigs-service orders-service requests-service chat-service; do
             oc rollout status deployment/${dep} -n ${NS} --timeout=120s
           done

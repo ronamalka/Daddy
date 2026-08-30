@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
-import { proxyRequest, ORDERS_SERVICE } from "@/lib/gateway";
+import { proxyRequest, ORDERS_SERVICE, CHAT_SERVICE } from "@/lib/gateway";
 import { validateBody } from "@/lib/validate";
 import { orderMessageSchema, attachSender } from "@/lib/message-validation";
 
@@ -15,9 +15,20 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
   if ("error" in result) return result.error;
 
   const user = session.user as { id: string; email: string; name: string; role: string; image?: string | null };
-  const { data, status } = await proxyRequest(ORDERS_SERVICE, `/orders/${id}/messages`, {
+  const { data: order, status: orderStatus } = await proxyRequest(ORDERS_SERVICE, `/orders/${id}`, { user });
+
+  if (orderStatus !== 200 || !order) {
+    return NextResponse.json(order ?? { error: "Order not found" }, { status: orderStatus });
+  }
+
+  if (order.buyerId !== user.id && order.sellerId !== user.id) {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
+
+  const receiverId = user.id === order.buyerId ? order.sellerId : order.buyerId;
+  const { data, status } = await proxyRequest(CHAT_SERVICE, "/messages", {
     method: "POST",
-    body: result.data,
+    body: { content: result.data.content, orderId: id, receiverId },
     user,
   });
 

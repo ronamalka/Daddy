@@ -11,9 +11,6 @@ orderDetailRoutes.get("/:id", requireAuth, async (req: Request, res: Response) =
   const order = await prisma.order.findUnique({
     where: { id },
     include: {
-      messages: {
-        orderBy: { createdAt: "asc" },
-      },
       requirements: true,
     },
   });
@@ -127,41 +124,3 @@ orderDetailRoutes.post("/:id/requirements", requireAuth, async (req: Request, re
   res.status(201).json({ count: created.count });
 });
 
-orderDetailRoutes.post("/:id/messages", requireAuth, async (req: Request, res: Response) => {
-  const orderId = req.params.id as string;
-
-  const order = await prisma.order.findUnique({ where: { id: orderId } });
-  if (!order) {
-    res.status(404).json({ error: "Order not found" });
-    return;
-  }
-
-  if (order.buyerId !== req.user!.id && order.sellerId !== req.user!.id) {
-    res.status(403).json({ error: "Forbidden" });
-    return;
-  }
-
-  const { content } = req.body;
-  const trimmed = typeof content === "string" ? content.trim() : "";
-  if (!trimmed) {
-    res.status(400).json({ error: "Message cannot be empty" });
-    return;
-  }
-  if (trimmed.length > 5000) {
-    res.status(400).json({ error: "Message too long" });
-    return;
-  }
-
-  const receiverId = req.user!.id === order.buyerId ? order.sellerId : order.buyerId;
-
-  const message = await prisma.message.create({
-    data: {
-      content: trimmed,
-      orderId,
-      senderId: req.user!.id,
-      receiverId,
-    },
-  });
-
-  res.status(201).json(message);
-});

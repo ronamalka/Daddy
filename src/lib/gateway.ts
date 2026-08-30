@@ -4,10 +4,11 @@ const USERS_SERVICE = process.env.USERS_SERVICE_URL || "http://localhost:4001";
 const GIGS_SERVICE = process.env.GIGS_SERVICE_URL || "http://localhost:4002";
 const ORDERS_SERVICE = process.env.ORDERS_SERVICE_URL || "http://localhost:4003";
 const REQUESTS_SERVICE = process.env.REQUESTS_SERVICE_URL || "http://localhost:4004";
+const CHAT_SERVICE = process.env.CHAT_SERVICE_URL || "http://localhost:4005";
 
 const INTER_SERVICE_SECRET = process.env.INTER_SERVICE_SECRET || "dev-secret-change-in-production";
 
-export { USERS_SERVICE, GIGS_SERVICE, ORDERS_SERVICE, REQUESTS_SERVICE };
+export { USERS_SERVICE, GIGS_SERVICE, ORDERS_SERVICE, REQUESTS_SERVICE, CHAT_SERVICE };
 
 export function signPayload(payload: string): string {
   return crypto.createHmac("sha256", INTER_SERVICE_SECRET).update(payload).digest("hex");

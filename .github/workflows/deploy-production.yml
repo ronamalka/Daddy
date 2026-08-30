@@ -29,7 +29,7 @@ jobs:
 
       - name: Verify images exist
         run: |
-          for svc in app users-service gigs-service orders-service requests-service; do
+          for svc in app users-service gigs-service orders-service requests-service chat-service; do
             echo "Checking ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-${svc}:${{ inputs.image_tag }}"
           done
 
@@ -55,7 +55,7 @@ jobs:
           fi
 
           sed -i "s|image: .*daddy-app:.*|image: ${BASE}-app:${TAG}|g" gitops/base/app-deployment.yaml
-          for svc in users gigs orders requests; do
+          for svc in users gigs orders requests chat; do
             sed -i "s|image: .*daddy-${svc}-service:.*|image: ${BASE}-${svc}-service:${TAG}|g" gitops/base/${svc}-deployment.yaml
           done
 

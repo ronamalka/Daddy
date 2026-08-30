@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
-import { proxyRequest, ORDERS_SERVICE } from "@/lib/gateway";
+import { proxyRequest, CHAT_SERVICE } from "@/lib/gateway";
 import { validateBody } from "@/lib/validate";
 import { markReadSchema } from "@/lib/message-validation";
 
@@ -14,7 +14,7 @@ export async function POST(request: Request) {
   if ("error" in result) return result.error;
 
   const user = session.user as { id: string; email: string; name: string; role: string };
-  const { data, status } = await proxyRequest(ORDERS_SERVICE, "/messages/mark-read", {
+  const { data, status } = await proxyRequest(CHAT_SERVICE, "/messages/mark-read", {
     method: "POST",
     body: result.data,
     user,
