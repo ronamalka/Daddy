@@ -8,7 +8,7 @@ export function WeakPasswordBanner() {
   const { data: session } = useSession();
   const [dismissed, setDismissed] = useState(false);
 
-  const weakPassword = (session?.user as { weakPassword?: boolean } | undefined)?.weakPassword;
+  const weakPassword = session?.user?.weakPassword;
 
   if (!weakPassword || dismissed) return null;
 
@@ -19,7 +19,7 @@ export function WeakPasswordBanner() {
           <span className="font-medium">⚠️ הסיסמה שלך חלשה.</span>
           <span>מומלץ לעדכן אותה כדי לשמור על אבטחת החשבון.</span>
           <Link
-            href="/reset-password"
+            href="/profile/password"
             className="underline font-medium hover:text-amber-900"
           >
             עדכן סיסמה

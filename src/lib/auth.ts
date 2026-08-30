@@ -6,6 +6,7 @@ import { checkLockout, recordFailedAttempt, resetAttempts } from "./account-lock
 import { getRedis } from "./redis";
 import { logSecurityEvent } from "./security-logger";
 import { isPasswordWeak } from "./password-policy";
+import "./auth-types";
 
 const USERS_SERVICE = process.env.USERS_SERVICE_URL || "http://localhost:4001";
 
@@ -88,7 +89,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       }
       return true;
     },
-    async jwt({ token, user }) {
+    async jwt({ token, user, trigger, session }) {
       if (user) {
         token.id = user.id;
         token.role = (user as { role?: string }).role;
@@ -105,6 +106,13 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             SESSION_MAX_AGE
           );
         } catch {}
+      }
+
+      if (trigger === "update" && session) {
+        const update = session as { weakPassword?: boolean };
+        if (typeof update.weakPassword === "boolean") {
+          token.weakPassword = update.weakPassword;
+        }
       }
 
       const now = Math.floor(Date.now() / 1000);
@@ -135,8 +143,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     async session({ session, token }) {
       if (session.user) {
         session.user.id = token.id as string;
-        (session.user as { role: string }).role = token.role as string;
-        (session.user as unknown as { weakPassword: boolean }).weakPassword = (token.weakPassword as boolean) || false;
+        session.user.role = token.role as string;
+        session.user.weakPassword = (token.weakPassword as boolean) || false;
       }
       return session;
     },
