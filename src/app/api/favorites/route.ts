@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { proxyRequest, GIGS_SERVICE } from "@/lib/gateway";
 
+/** Returns the signed-in user's favorite gigs. */
 export async function GET() {
   const session = await auth();
   if (!session?.user) {
@@ -13,6 +14,7 @@ export async function GET() {
   return NextResponse.json(data, { status });
 }
 
+/** Adds or removes a gig from the signed-in user's favorites. */
 export async function POST(request: Request) {
   const session = await auth();
   if (!session?.user) {

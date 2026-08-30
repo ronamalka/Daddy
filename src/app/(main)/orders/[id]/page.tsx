@@ -57,6 +57,7 @@ const STATUS_STYLE: Record<string, { bg: string; text: string; label: string }> 
   CANCELLED: { bg: "bg-[rgba(var(--color-error),0.1)]", text: "text-[rgb(var(--color-error))]", label: "בוטל" },
 };
 
+/** Shows one order's status, messages, and review form. */
 export default function OrderDetailPage() {
   const params = useParams();
   const { data: session } = useSession();
@@ -117,6 +118,7 @@ export default function OrderDetailPage() {
     return () => clearInterval(interval);
   }, [params.id, order?.messages?.length]);
 
+  /** Sends a message on this order. */
   async function sendMessage(e: React.FormEvent) {
     e.preventDefault();
     if (!message.trim()) return;
@@ -134,6 +136,7 @@ export default function OrderDetailPage() {
     setSending(false);
   }
 
+  /** Changes the status of this order. */
   async function updateStatus(status: string) {
     const res = await fetch(`/api/orders/${params.id}`, {
       method: "PATCH",
@@ -146,6 +149,7 @@ export default function OrderDetailPage() {
     }
   }
 
+  /** Posts the seller's reply to the buyer's review. */
   async function submitSellerResponse() {
     if (!order?.review || !sellerResponseText.trim()) return;
     setRespondingTo(true);
@@ -161,6 +165,7 @@ export default function OrderDetailPage() {
     setRespondingTo(false);
   }
 
+  /** Reports the review on this order. */
   async function flagReview() {
     if (!order?.review || !flagReason.trim()) return;
     const res = await fetch(`/api/reviews/${order.review.id}/flag`, {
@@ -175,6 +180,7 @@ export default function OrderDetailPage() {
     }
   }
 
+  /** Reloads the order after a review is posted. */
   function handleReviewSubmitted() {
     fetch(`/api/orders/${params.id}`)
       .then((r) => r.json())
@@ -182,6 +188,7 @@ export default function OrderDetailPage() {
     setReviewOpen(false);
   }
 
+  /** Sends the buyer's answers to the order questions. */
   async function submitRequirements() {
     if (!order) return;
     const answers = Object.entries(reqAnswers)
@@ -200,6 +207,7 @@ export default function OrderDetailPage() {
     setSubmittingReqs(false);
   }
 
+  /** Asks for a revision and marks the order as in revision. */
   async function submitRevision() {
     if (!revisionReason.trim()) return;
     setRevisionSubmitting(true);
@@ -225,6 +233,7 @@ export default function OrderDetailPage() {
     setRevisionSubmitting(false);
   }
 
+  /** Cancels the order after the user confirms. */
   async function confirmCancel() {
     setCancelSubmitting(true);
     const res = await fetch(`/api/orders/${params.id}`, {

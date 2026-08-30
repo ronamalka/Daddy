@@ -1,8 +1,10 @@
 import { Router, Request, Response } from "express";
 import { prisma } from "../index";
 
+/** Routes for a short list of featured sellers. */
 export const featuredRoutes = Router();
 
+/** Return up to six sellers who currently take jobs. */
 featuredRoutes.get("/", async (_req: Request, res: Response) => {
   const sellers = await prisma.user.findMany({
     where: { role: "SELLER", acceptingJobs: true },

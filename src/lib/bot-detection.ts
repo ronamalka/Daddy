@@ -11,6 +11,7 @@ interface BotCheckResult {
   reason?: string;
 }
 
+/** Checks honeypot, submit speed, and headers. Returns whether this looks like a bot and why. */
 export function detectBot(input: BotCheckInput): BotCheckResult {
   if (input.honeypot) {
     return { isBot: true, reason: "honeypot_filled" };

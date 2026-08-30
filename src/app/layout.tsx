@@ -59,6 +59,7 @@ const jsonLd = {
   inLanguage: "he",
 };
 
+/** Wraps every page with fonts, session, cookies, and shared UI. */
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="he" dir="rtl" className={`${heebo.variable} ${heebo.className} antialiased`}>

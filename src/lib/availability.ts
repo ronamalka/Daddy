@@ -58,6 +58,7 @@ const WEEKDAY_TO_DOW: Record<string, number> = {
   Sat: 6,
 };
 
+/** Breaks a date into year, month, day, hour, minute, and weekday for a time zone. */
 function formatToPartsMap(date: Date, timeZone = JERUSALEM_TZ): Record<string, string> {
   const dtf =
     timeZone === JERUSALEM_TZ
@@ -79,6 +80,7 @@ function formatToPartsMap(date: Date, timeZone = JERUSALEM_TZ): Record<string, s
   return map;
 }
 
+/** Returns date and time parts in Jerusalem time (or another zone). */
 export function zonedParts(date: Date, timeZone = JERUSALEM_TZ): JerusalemParts {
   const map = formatToPartsMap(date, timeZone);
   return {
@@ -91,17 +93,20 @@ export function zonedParts(date: Date, timeZone = JERUSALEM_TZ): JerusalemParts 
   };
 }
 
+/** Returns YYYY-MM-DD for a date in Jerusalem time. */
 export function jerusalemDateKey(date: Date): string {
   const parts = zonedParts(date);
   return `${parts.year}-${String(parts.month).padStart(2, "0")}-${String(parts.day).padStart(2, "0")}`;
 }
 
+/** Returns how far this zone's local time is from UTC, in milliseconds. */
 function tzOffsetMs(date: Date, timeZone: string): number {
   const parts = zonedParts(date, timeZone);
   const asUtc = Date.UTC(parts.year, parts.month - 1, parts.day, parts.hour, parts.minute, 0);
   return asUtc - date.getTime();
 }
 
+/** Converts a Jerusalem calendar date and minutes-from-midnight into a UTC Date. */
 export function jerusalemLocalToUtc(
   year: number,
   month: number,
@@ -117,6 +122,7 @@ export function jerusalemLocalToUtc(
   return date;
 }
 
+/** Adds days to a calendar date and returns the new year, month, and day. */
 export function addLocalDays(year: number, month: number, day: number, days: number): {
   year: number;
   month: number;
@@ -130,21 +136,25 @@ export function addLocalDays(year: number, month: number, day: number, days: num
   };
 }
 
+/** Turns minutes from midnight into an HH:MM string. */
 export function minutesToTimeLabel(min: number): string {
   const hours = Math.floor(min / 60);
   const minutes = min % 60;
   return `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}`;
 }
 
+/** Parses an HH:MM string into minutes from midnight. */
 export function parseTimeToMinutes(hhmm: string): number {
   const [hours, minutes] = hhmm.split(":").map(Number);
   return hours * 60 + (minutes || 0);
 }
 
+/** Returns true if two time ranges overlap. */
 export function slotsOverlap(aStart: Date, aEnd: Date, bStart: Date, bEnd: Date): boolean {
   return aStart < bEnd && bStart < aEnd;
 }
 
+/** Returns true if start and end are a two-hour window on the same Jerusalem day. */
 export function isTwoHourLocalWindow(start: Date, end: Date): boolean {
   if (Number.isNaN(start.getTime()) || Number.isNaN(end.getTime()) || end <= start) {
     return false;
@@ -164,10 +174,12 @@ export function isTwoHourLocalWindow(start: Date, end: Date): boolean {
   );
 }
 
+/** Builds a set of YYYY-MM-DD dates the seller is off. */
 function timeOffSet(timeOff: Array<string | TimeOffDate>): Set<string> {
   return new Set(timeOff.map((entry) => (typeof entry === "string" ? entry : entry.date)));
 }
 
+/** Returns true if the slot is two hours, not on a day off, and inside weekly hours. */
 export function slotFitsSchedule(
   start: Date,
   end: Date,
@@ -184,6 +196,7 @@ export function slotFitsSchedule(
   return startMin >= hours.startMin && endMin <= hours.endMin;
 }
 
+/** Builds bookable two-hour slots for the next days, skipping booked times and days off. */
 export function generateAvailableSlots(opts: {
   weeklyHours: WeeklyHours[];
   timeOff: Array<string | TimeOffDate>;
@@ -239,6 +252,7 @@ export function generateAvailableSlots(opts: {
   return slots;
 }
 
+/** Formats a slot as a Hebrew weekday, date, and time range. */
 export function formatVisitWindow(start: Date, end: Date): string {
   const startParts = zonedParts(start);
   const endParts = zonedParts(end);
@@ -248,6 +262,7 @@ export function formatVisitWindow(start: Date, end: Date): string {
   )}–${minutesToTimeLabel(endParts.hour * 60 + endParts.minute)}`;
 }
 
+/** Parses start and end ISO strings into Dates, or null if invalid. */
 export function parseSlotIso(
   startIso: string,
   endIso: string
@@ -260,6 +275,7 @@ export function parseSlotIso(
 
 const DATE_KEY = /^\d{4}-\d{2}-\d{2}$/;
 
+/** Returns true if the string is a real YYYY-MM-DD date in Jerusalem time. */
 export function isDateKey(value: string): boolean {
   if (!DATE_KEY.test(value)) return false;
   const [year, month, day] = value.split("-").map(Number);

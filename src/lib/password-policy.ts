@@ -22,11 +22,13 @@ export const passwordSchema = z
     message: "הסיסמה נפוצה מדי, בחר סיסמה אחרת",
   });
 
+/** Returns true if the password fails the strength rules. */
 export function isPasswordWeak(password: string): boolean {
   const result = passwordSchema.safeParse(password);
   return !result.success;
 }
 
+/** Checks Have I Been Pwned. Returns true if this password showed up in a known leak. */
 export async function checkBreachedPassword(password: string): Promise<boolean> {
   try {
     const sha1 = crypto.createHash("sha1").update(password).digest("hex").toUpperCase();

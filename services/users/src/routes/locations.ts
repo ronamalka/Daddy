@@ -12,8 +12,10 @@ let cachedCities: { code: number; name: string; districtCode: number; districtNa
 let cacheTime = 0;
 const CACHE_TTL = 1000 * 60 * 60 * 24;
 
+/** Routes for Israeli districts and cities. */
 export const locationsRoutes = Router();
 
+/** Return districts and cities, using a cached government city list. */
 locationsRoutes.get("/", async (req: Request, res: Response) => {
   const district = req.query.district as string | undefined;
 

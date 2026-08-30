@@ -49,10 +49,12 @@ export interface CookieConsentState {
   version: number;
 }
 
+/** Returns true if cookie consent is older than one year. */
 export function isConsentExpired(state: CookieConsentState, now = Date.now()): boolean {
   return now - state.ts > COOKIE_CONSENT_MAX_AGE_MS;
 }
 
+/** Parses stored cookie-consent JSON. Returns null if missing, invalid, or expired. */
 export function parseCookieConsent(raw: string | null): CookieConsentState | null {
   if (!raw) return null;
   try {

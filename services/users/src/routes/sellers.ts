@@ -1,8 +1,10 @@
 import { Router, Request, Response } from "express";
 import { prisma } from "../index";
 
+/** Routes for public seller profiles. */
 export const sellerRoutes = Router();
 
+/** Return one seller's public profile, areas, services, and prices. */
 sellerRoutes.get("/:id", async (req: Request, res: Response) => {
   const id = req.params.id as string;
 

@@ -1,5 +1,6 @@
 import { MetadataRoute } from "next";
 
+/** Returns the web app manifest used when the site is installed on a phone. */
 export default function manifest(): MetadataRoute.Manifest {
   return {
     name: "אבאל׳ה — שוק פרילנסרים",

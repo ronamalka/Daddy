@@ -12,11 +12,13 @@ declare global {
   }
 }
 
+/** Return true if the signature matches this payload. */
 function verifySignature(payload: string, signature: string): boolean {
   const expected = crypto.createHmac("sha256", INTER_SERVICE_SECRET).update(payload).digest("hex");
   return crypto.timingSafeEqual(Buffer.from(expected), Buffer.from(signature));
 }
 
+/** Read the signed user header and attach the user to the request. */
 export function extractUser(req: Request, res: Response, next: NextFunction) {
   const header = req.headers["x-user"] as string | undefined;
   const signature = req.headers["x-user-signature"] as string | undefined;
@@ -41,6 +43,7 @@ export function extractUser(req: Request, res: Response, next: NextFunction) {
   next();
 }
 
+/** Stop the request if nobody is logged in. */
 export function requireAuth(req: Request, res: Response, next: NextFunction) {
   if (!req.user) {
     res.status(401).json({ error: "Authentication required" });
@@ -49,6 +52,7 @@ export function requireAuth(req: Request, res: Response, next: NextFunction) {
   next();
 }
 
+/** Stop the request unless the user is an admin. */
 export function requireAdmin(req: Request, res: Response, next: NextFunction) {
   if (!req.user || req.user.role !== "ADMIN") {
     res.status(403).json({ error: "Admin access required" });
@@ -57,6 +61,7 @@ export function requireAdmin(req: Request, res: Response, next: NextFunction) {
   next();
 }
 
+/** Stop the request unless the user is a seller. */
 export function requireSeller(req: Request, res: Response, next: NextFunction) {
   if (!req.user || req.user.role !== "SELLER") {
     res.status(403).json({ error: "Seller access required" });

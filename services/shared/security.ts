@@ -4,9 +4,11 @@ import { Express } from "express";
 
 const ALLOWED_ORIGINS = (process.env.ALLOWED_ORIGINS || "http://localhost:3000").split(",");
 
+/** Turn on security headers and allow the known front-end origins. */
 export function applySecurity(app: Express) {
   app.use(helmet());
 
+  /** Set CORS headers and answer browser preflight OPTIONS requests. */
   app.use((_req, res, next) => {
     const origin = _req.headers.origin;
     if (origin && ALLOWED_ORIGINS.includes(origin)) {
@@ -51,5 +53,6 @@ export const generalRateLimit = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
   validate: { xForwardedForHeader: false },
+  /** Skip this limit for health checks so probes do not fill the bucket. */
   skip: (req) => req.path === "/health",
 });

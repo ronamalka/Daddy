@@ -16,6 +16,7 @@ interface GigItem {
   createdAt: string;
 }
 
+/** Shows a list of the user's own gigs. */
 export default function MyGigsPage() {
   const { data: session } = useSession();
   const [gigs, setGigs] = useState<GigItem[]>([]);

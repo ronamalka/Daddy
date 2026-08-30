@@ -4,6 +4,7 @@ import { proxyRequest, CHAT_SERVICE } from "@/lib/gateway";
 import { validateBody } from "@/lib/validate";
 import { directMessageSchema } from "@/lib/message-validation";
 
+/** Sends a direct message from the signed-in user. */
 export async function POST(request: Request) {
   const session = await auth();
   if (!session?.user) {
@@ -22,6 +23,7 @@ export async function POST(request: Request) {
   return NextResponse.json(data ?? { error: "Failed to send message" }, { status });
 }
 
+/** Returns messages for the signed-in user. Query params are passed through to chat. */
 export async function GET(request: Request) {
   const session = await auth();
   if (!session?.user) {

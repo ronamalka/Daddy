@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { getRedis } from "@/lib/redis";
 
+/** Signs the current user out of all sessions by deleting their Redis session keys. */
 export async function POST() {
   const session = await auth();
   if (!session?.user?.id) {

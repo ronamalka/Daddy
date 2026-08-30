@@ -30,6 +30,7 @@ app.use(express.json({ limit: "1mb" }));
 app.use(extractUser);
 app.use(generalRateLimit);
 
+/** Return a simple OK so other systems know the users service is running. */
 app.get("/health", (_req, res) => {
   res.json({ status: "ok", service: "users" });
 });
@@ -49,6 +50,7 @@ app.use("/locations", locationsRoutes);
 app.use("/featured-daddies", featuredRoutes);
 app.use("/availability", availabilityRoutes);
 
+/** Start the users HTTP server. */
 app.listen(PORT, "0.0.0.0", () => {
   console.log(`Users service running on port ${PORT}`);
 });

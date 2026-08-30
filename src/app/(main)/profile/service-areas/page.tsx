@@ -13,6 +13,7 @@ interface ServiceAreaEntry {
   cityName?: string;
 }
 
+/** Shows the form to pick districts and cities the user serves. */
 export default function ServiceAreasPage() {
   const { data: session } = useSession();
   const router = useRouter();
@@ -39,6 +40,7 @@ export default function ServiceAreasPage() {
       .catch(() => setLoading(false));
   }, []);
 
+  /** Saves the seller's service areas. */
   async function handleSave() {
     setSaving(true);
     setSaved(false);

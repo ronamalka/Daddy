@@ -20,11 +20,13 @@ interface TimeOffRow {
 const START_OPTIONS = Array.from({ length: 17 }, (_, i) => (6 + i) * 60);
 const END_OPTIONS = [...START_OPTIONS.filter((min) => min >= 7 * 60), 24 * 60];
 
+/** Returns the default start and end minutes for a weekday. */
 function defaultHoursForDay(dayOfWeek: number): WeeklyHoursRow {
   if (dayOfWeek === 5) return { dayOfWeek, startMin: 8 * 60, endMin: 13 * 60 };
   return { dayOfWeek, startMin: 16 * 60, endMin: 20 * 60 };
 }
 
+/** Shows the form to set weekly hours and time off. */
 export default function ProfileAvailabilityPage() {
   const { data: session } = useSession();
   const router = useRouter();
@@ -56,6 +58,7 @@ export default function ProfileAvailabilityPage() {
       .finally(() => setLoading(false));
   }, []);
 
+  /** Turns a weekday on or off in the weekly hours. */
   function toggleDay(dayOfWeek: number) {
     setHoursByDay((prev) => ({
       ...prev,
@@ -63,6 +66,7 @@ export default function ProfileAvailabilityPage() {
     }));
   }
 
+  /** Changes the start or end time for one weekday. */
   function updateDay(dayOfWeek: number, field: "startMin" | "endMin", value: number) {
     setHoursByDay((prev) => {
       const current = prev[dayOfWeek] ?? defaultHoursForDay(dayOfWeek);
@@ -74,12 +78,14 @@ export default function ProfileAvailabilityPage() {
     });
   }
 
+  /** Adds a date when the seller is not available. */
   function addTimeOff() {
     if (!newOffDate || timeOff.some((row) => row.date === newOffDate)) return;
     setTimeOff((prev) => [...prev, { date: newOffDate }].sort((a, b) => a.date.localeCompare(b.date)));
     setNewOffDate("");
   }
 
+  /** Saves weekly hours and time-off dates. */
   async function handleSave() {
     setSaving(true);
     setSaved(false);

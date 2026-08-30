@@ -1,8 +1,10 @@
 import { Router, Request, Response } from "express";
 import { prisma } from "../index";
 
+/** Routes for searching sellers who take jobs. */
 export const providersRoutes = Router();
 
+/** List sellers, optionally filtered by service, district, or city. */
 providersRoutes.get("/", async (req: Request, res: Response) => {
   const service = req.query.service as string | undefined;
   const district = req.query.district as string | undefined;

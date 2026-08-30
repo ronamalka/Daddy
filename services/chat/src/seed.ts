@@ -10,6 +10,7 @@ const DANA = "seed-user-buyer1";
 const YOSSI = "seed-user-seller1";
 const MICHAL = "seed-user-buyer2";
 
+/** Loads a few demo chat messages if the database is empty. */
 async function main() {
   await prisma.$connect();
 

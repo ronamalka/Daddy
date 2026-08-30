@@ -11,7 +11,9 @@ interface ServicePickerProps {
   onChange: (services: string[]) => void;
 }
 
+/** Lets a seller pick the service types they offer, by category. */
 export function ServicePicker({ selected, onChange }: ServicePickerProps) {
+  /** Adds or removes one service from the selection. */
   function toggle(slug: string) {
     if (selected.includes(slug)) {
       onChange(selected.filter((s) => s !== slug));
@@ -20,6 +22,7 @@ export function ServicePicker({ selected, onChange }: ServicePickerProps) {
     }
   }
 
+  /** Selects or clears every service in a category. */
   function toggleCategory(categorySlug: string) {
     const cat = SERVICE_CATEGORIES.find((c) => c.slug === categorySlug);
     if (!cat) return;

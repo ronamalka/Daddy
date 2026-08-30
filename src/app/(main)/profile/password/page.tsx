@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { PasswordStrength } from "@/components/password-strength";
 
+/** Shows the form to change the user's password. */
 export default function ChangePasswordPage() {
   const { data: session, status, update } = useSession();
   const router = useRouter();
@@ -34,6 +35,7 @@ export default function ChangePasswordPage() {
     );
   }
 
+  /** Updates the password after checking the new one. */
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError("");

@@ -6,6 +6,7 @@ import { ChatCircle } from "@phosphor-icons/react";
 import { AnimatePresence, motion } from "framer-motion";
 import type { Conversation } from "@/components/inbox/messenger";
 
+/** Popup toast when a new chat arrives and the inbox for that person is not open. */
 export function NewMessageToast() {
   const pathname = usePathname();
   const router = useRouter();
@@ -15,12 +16,14 @@ export function NewMessageToast() {
   const primed = useRef(false);
 
   useEffect(() => {
+    /** Shows the toast and hides it after a few seconds. */
     function show(next: { name: string; preview: string; href: string }) {
       setToast(next);
       if (hideTimer.current) clearTimeout(hideTimer.current);
       hideTimer.current = setTimeout(() => setToast(null), 6000);
     }
 
+    /** Checks conversations for new unread messages and pops a toast if needed. */
     async function poll() {
       const res = await fetch("/api/messages/conversations");
       if (!res.ok) return;

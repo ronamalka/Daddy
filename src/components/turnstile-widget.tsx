@@ -21,6 +21,7 @@ interface TurnstileWidgetProps {
 
 const SITE_KEY = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || "";
 
+/** Renders the Cloudflare Turnstile CAPTCHA and reports the token. */
 export function TurnstileWidget({ onVerify, onExpire, onError }: TurnstileWidgetProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const widgetIdRef = useRef<string | null>(null);

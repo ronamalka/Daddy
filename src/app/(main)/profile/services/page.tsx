@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { ServicePicker } from "@/components/service-picker";
 import { Check } from "@phosphor-icons/react";
 
+/** Shows the form to pick which services the user offers. */
 export default function ProfileServicesPage() {
   const { data: session } = useSession();
   const router = useRouter();
@@ -27,6 +28,7 @@ export default function ProfileServicesPage() {
       .catch(() => setLoading(false));
   }, []);
 
+  /** Saves the list of services this seller offers. */
   async function handleSave() {
     setSaving(true);
     setSaved(false);

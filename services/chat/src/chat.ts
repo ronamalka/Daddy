@@ -56,10 +56,12 @@ export interface MessageRepo {
   markRead(args: { userId: string; orderId?: string; senderId?: string }): Promise<number>;
 }
 
+/** Return the other person's id in this message. */
 export function peerId(userId: string, message: Pick<MessageRecord, "senderId" | "receiverId">): string {
   return message.senderId === userId ? message.receiverId : message.senderId;
 }
 
+/** Group messages into one thread per other user, with the last message and unread count. */
 export function groupConversations(userId: string, messages: MessageRecord[]): ConversationPreview[] {
   const byPeer = new Map<string, MessageRecord[]>();
   for (const message of messages) {
@@ -87,10 +89,12 @@ export type ChatResult<T> =
   | { ok: true; status: number; data: T }
   | { ok: false; status: number; error: string };
 
+/** Trim a message body, or return an empty string if it is not text. */
 function trimContent(content: unknown): string {
   return typeof content === "string" ? content.trim() : "";
 }
 
+/** Create a message after checking the receiver and the text. */
 export function sendMessage(repo: MessageRepo, input: SendMessageInput): Promise<ChatResult<MessageRecord>> {
   const content = trimContent(input.content);
   const { senderId, receiverId, orderId } = input;
@@ -116,6 +120,7 @@ export function sendMessage(repo: MessageRepo, input: SendMessageInput): Promise
   }).then((data) => ({ ok: true as const, status: 201, data }));
 }
 
+/** Load messages for this user, optionally filtered by chat partner or order. */
 export function listMessages(repo: MessageRepo, input: ListMessagesInput): Promise<ChatResult<MessageRecord[]>> {
   return repo.findMany({
     userId: input.userId,
@@ -125,6 +130,7 @@ export function listMessages(repo: MessageRepo, input: ListMessagesInput): Promi
   }).then((data) => ({ ok: true as const, status: 200, data }));
 }
 
+/** Load this user's conversation list. */
 export function listConversations(
   repo: MessageRepo,
   userId: string
@@ -132,10 +138,12 @@ export function listConversations(
   return repo.listConversations(userId).then((data) => ({ ok: true as const, status: 200, data }));
 }
 
+/** Count how many unread messages this user has. */
 export function unreadCount(repo: MessageRepo, userId: string): Promise<ChatResult<{ count: number }>> {
   return repo.countUnread(userId).then((count) => ({ ok: true as const, status: 200, data: { count } }));
 }
 
+/** Mark messages as read for an order or a sender. */
 export function markRead(repo: MessageRepo, input: MarkReadInput): Promise<ChatResult<{ marked: number }>> {
   if (!input.orderId && !input.senderId) {
     return Promise.resolve({ ok: false, status: 400, error: "orderId or senderId required" });
@@ -148,10 +156,12 @@ export function markRead(repo: MessageRepo, input: MarkReadInput): Promise<ChatR
   }).then((marked) => ({ ok: true as const, status: 200, data: { marked } }));
 }
 
+/** Build an in-memory message store, mainly for tests. */
 export function createInMemoryRepo(): MessageRepo & { records: MessageRecord[] } {
   const records: MessageRecord[] = [];
   let seq = 0;
 
+  /** True if this message is between the user and an optional other person. */
   function matchesParty(msg: MessageRecord, userId: string, withUser?: string) {
     if (!withUser) {
       return msg.senderId === userId || msg.receiverId === userId;
@@ -164,6 +174,7 @@ export function createInMemoryRepo(): MessageRepo & { records: MessageRecord[] }
 
   return {
     records,
+    /** Save a new message and return it. */
     async create(data) {
       const message: MessageRecord = {
         id: `msg-${++seq}`,
@@ -178,6 +189,7 @@ export function createInMemoryRepo(): MessageRepo & { records: MessageRecord[] }
       records.push(message);
       return message;
     },
+    /** Find messages for an order, a direct chat, or all of this user's chats. */
     async findMany({ orderId, userId, withUser, isAdmin }) {
       let result = records.filter((msg) => {
         if (orderId) {
@@ -200,13 +212,16 @@ export function createInMemoryRepo(): MessageRepo & { records: MessageRecord[] }
 
       return result;
     },
+    /** Group this user's messages into conversation previews. */
     async listConversations(userId) {
       const mine = records.filter((msg) => msg.senderId === userId || msg.receiverId === userId);
       return groupConversations(userId, mine);
     },
+    /** Count unread messages for this user. */
     async countUnread(userId) {
       return records.filter((msg) => msg.receiverId === userId && msg.readAt === null).length;
     },
+    /** Mark matching unread messages as read and return how many changed. */
     async markRead({ userId, orderId, senderId }) {
       let marked = 0;
       for (const msg of records) {

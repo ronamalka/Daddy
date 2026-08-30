@@ -33,6 +33,7 @@ const CONTRAST_LABELS: Record<A11yState["contrast"], string> = {
 
 export const A11Y_BOOTSTRAP_SCRIPT = `(function(){try{var c=document.documentElement.classList;c.remove('a11y-highlight-headings');var raw=localStorage.getItem('${STORAGE_KEY}');if(!raw)return;var s=JSON.parse(raw);var st=document.documentElement.style;if(s.fontSize&&s.fontSize!==100)st.fontSize=s.fontSize+'%';c.toggle('a11y-high-contrast',s.contrast==='high');c.toggle('a11y-contrast-invert',s.contrast==='invert');c.toggle('a11y-contrast-mono',s.contrast==='mono');c.toggle('a11y-large-cursor',!!s.largerCursor);c.toggle('a11y-highlight-links',!!s.highlightLinks);c.toggle('a11y-pause-animations',!!s.pauseAnimations);c.toggle('a11y-line-height',!!s.lineHeight)}catch(e){}})()`;
 
+/** Shows a panel to change font size, contrast, and other accessibility settings. */
 export function AccessibilityToolbar() {
   const [open, setOpen] = useState(false);
   const [state, setState] = useState<A11yState>(DEFAULT_STATE);
@@ -64,6 +65,7 @@ export function AccessibilityToolbar() {
   }, []);
 
   useEffect(() => {
+    /** Toggles the accessibility toolbar with Alt+A. */
     function handleKeyDown(e: KeyboardEvent) {
       if (e.altKey && !e.ctrlKey && !e.metaKey && !e.shiftKey && e.code === "KeyA") {
         e.preventDefault();
@@ -82,6 +84,7 @@ export function AccessibilityToolbar() {
 
   useEffect(() => {
     if (!open) return;
+    /** Closes the toolbar when the user presses Escape. */
     function handleEscape(e: KeyboardEvent) {
       if (e.key === "Escape") {
         setOpen(false);
@@ -265,6 +268,7 @@ export function AccessibilityToolbar() {
   );
 }
 
+/** Small square button used for font-size and contrast actions in the toolbar. */
 function ToolbarButton({ onClick, label, children }: { onClick: () => void; label: string; children: React.ReactNode }) {
   return (
     <button
@@ -277,6 +281,7 @@ function ToolbarButton({ onClick, label, children }: { onClick: () => void; labe
   );
 }
 
+/** On/off row for one accessibility setting, with a switch control. */
 function ToggleOption({ icon, label, active, onToggle }: { icon: React.ReactNode; label: string; active: boolean; onToggle: () => void }) {
   return (
     <button
@@ -303,6 +308,7 @@ function ToggleOption({ icon, label, active, onToggle }: { icon: React.ReactNode
   );
 }
 
+/** Applies font size and accessibility classes on the document root. */
 function applySettings(s: A11yState) {
   const root = document.documentElement;
   root.style.fontSize = s.fontSize === 100 ? "" : `${s.fontSize}%`;

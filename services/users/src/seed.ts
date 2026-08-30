@@ -20,6 +20,7 @@ export const SEED_IDS = {
   buyer3: "seed-user-buyer3",
 };
 
+/** Loads demo buyers, sellers, and an admin into daddy_users. */
 async function main() {
   const passwordHash = await hash("password123", 12);
 

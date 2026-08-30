@@ -21,6 +21,7 @@ app.use(express.json({ limit: "1mb" }));
 app.use(extractUser);
 app.use(generalRateLimit);
 
+/** Return a simple OK so other systems know the gigs service is running. */
 app.get("/health", (_req, res) => {
   res.json({ status: "ok", service: "gigs" });
 });
@@ -31,6 +32,7 @@ app.use("/favorites", favoritesRoutes);
 app.use("/reviews", reviewsRoutes);
 app.use("/recent-reviews", recentReviewsRoutes);
 
+/** Start the gigs HTTP server. */
 app.listen(PORT, "0.0.0.0", () => {
   console.log(`Gigs service running on port ${PORT}`);
 });

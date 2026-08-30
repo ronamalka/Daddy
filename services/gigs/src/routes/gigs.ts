@@ -2,8 +2,10 @@ import { Router, Request, Response } from "express";
 import { requireSeller } from "../../../shared/middleware";
 import { prisma } from "../index";
 
+/** Routes for listing gigs and creating a new gig. */
 export const gigsRoutes = Router();
 
+/** Search and page gigs with filters, sort, and ratings. */
 gigsRoutes.get("/", async (req: Request, res: Response) => {
   const search = (req.query.search as string) || "";
   const category = (req.query.category as string) || "";
@@ -79,6 +81,7 @@ gigsRoutes.get("/", async (req: Request, res: Response) => {
   res.json({ gigs: gigsWithRating, total, hasMore: skip + take < total });
 });
 
+/** Create a new gig with tiers, and optional FAQs and requirements. */
 gigsRoutes.post("/", requireSeller, async (req: Request, res: Response) => {
   const { title, description, image, categoryId, tiers, faqs, requirements } = req.body;
 

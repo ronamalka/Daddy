@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { proxyRequest, USERS_SERVICE, ORDERS_SERVICE } from "@/lib/gateway";
 import { generateAvailableSlots, type WeeklyHours, type TimeOffDate } from "@/lib/availability";
 
+/** Returns a seller's open visit slots, weekly hours, time off, and booked times. */
 export async function GET(_request: Request, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
 

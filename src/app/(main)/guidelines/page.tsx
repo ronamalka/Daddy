@@ -25,6 +25,7 @@ const FORBIDDEN = [
   "פעילות פלילית, הונאה, הטרדה, פגיעה בקטינים, או תוכן בלתי חוקי.",
 ];
 
+/** Shows what work is allowed and forbidden on the site. */
 export default function GuidelinesPage() {
   return (
     <div className="min-h-screen bg-[rgb(var(--color-surface-elevated))]">

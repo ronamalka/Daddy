@@ -18,6 +18,7 @@ interface ServiceAreaEntry {
   cityName?: string;
 }
 
+/** Shows the sign-up form to create a new account. */
 export default function RegisterPage() {
   const router = useRouter();
   const [error, setError] = useState("");
@@ -42,6 +43,7 @@ export default function RegisterPage() {
 
   const totalSteps = role === "SELLER" ? 3 : 2;
 
+  /** Creates the account and signs the user in. */
   async function handleSubmit() {
     if (!ensureLegalConsent()) {
       setStep(1);
@@ -95,6 +97,7 @@ export default function RegisterPage() {
     }
   }
 
+  /** Checks that the user accepted the required legal terms. */
   function ensureLegalConsent(): boolean {
     if (!acceptedTerms || !confirmedAge18) {
       setError("יש לאשר את תנאי השימוש ומדיניות הפרטיות, ולאשר שאתה מעל גיל 18.");
@@ -107,6 +110,7 @@ export default function RegisterPage() {
     return true;
   }
 
+  /** Moves to the next sign-up step, or submits the form. */
   function handleNext() {
     if (step === 1) {
       if (!ensureLegalConsent()) return;
@@ -120,6 +124,7 @@ export default function RegisterPage() {
 
   const [googleLoading, setGoogleLoading] = useState(false);
 
+  /** Starts Google sign-up after the legal terms are accepted. */
   async function handleGoogleSignUp() {
     if (!ensureLegalConsent()) return;
     setGoogleLoading(true);

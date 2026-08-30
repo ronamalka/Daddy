@@ -3,8 +3,10 @@ import { compare, hash } from "bcryptjs";
 import { requireAuth } from "../../../shared/middleware";
 import { prisma } from "../index";
 
+/** Routes for the current user's profile and password. */
 export const profileRoutes = Router();
 
+/** Return the current user's profile. */
 profileRoutes.get("/", requireAuth, async (req: Request, res: Response) => {
   const user = await prisma.user.findUnique({
     where: { id: req.user!.id },
@@ -24,6 +26,7 @@ profileRoutes.get("/", requireAuth, async (req: Request, res: Response) => {
   res.json(user);
 });
 
+/** Update the current user's name, bio, phone, city, or avatar. */
 profileRoutes.put("/", requireAuth, async (req: Request, res: Response) => {
   const { name, bio, phone, city, avatar } = req.body;
 
@@ -51,6 +54,7 @@ profileRoutes.put("/", requireAuth, async (req: Request, res: Response) => {
   res.json(updated);
 });
 
+/** Change the current user's password after checking the old one. */
 profileRoutes.put("/password", requireAuth, async (req: Request, res: Response) => {
   const { currentPassword, newPassword } = req.body;
 

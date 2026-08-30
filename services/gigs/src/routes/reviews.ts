@@ -2,8 +2,10 @@ import { Router, Request, Response } from "express";
 import { requireAuth } from "../../../shared/middleware";
 import { prisma } from "../index";
 
+/** Routes for creating reviews, looking them up, flagging, and seller replies. */
 export const reviewsRoutes = Router();
 
+/** Get the review for one order, if it exists. */
 reviewsRoutes.get("/by-order/:orderId", async (req: Request, res: Response) => {
   const orderId = req.params.orderId as string;
 
@@ -32,6 +34,7 @@ reviewsRoutes.get("/by-order/:orderId", async (req: Request, res: Response) => {
   res.json(review);
 });
 
+/** Flag a review as a problem, unless it is the user's own review. */
 reviewsRoutes.post("/:id/flag", requireAuth, async (req: Request, res: Response) => {
   const id = req.params.id as string;
   const { reason } = req.body;
@@ -71,6 +74,7 @@ reviewsRoutes.post("/:id/flag", requireAuth, async (req: Request, res: Response)
   res.status(201).json(flag);
 });
 
+/** Let the gig's seller reply to a review once. */
 reviewsRoutes.post("/:id/respond", requireAuth, async (req: Request, res: Response) => {
   const id = req.params.id as string;
 
@@ -108,6 +112,7 @@ reviewsRoutes.post("/:id/respond", requireAuth, async (req: Request, res: Respon
   res.json(updated);
 });
 
+/** Create a review for a completed order. */
 reviewsRoutes.post("/", requireAuth, async (req: Request, res: Response) => {
   const { orderId, gigId, rating, comment, ratingAttitude, ratingTimeliness, ratingPrice, ratingQuality } = req.body;
 

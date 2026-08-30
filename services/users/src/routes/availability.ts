@@ -2,10 +2,12 @@ import { Router, Request, Response } from "express";
 import { requireAuth, requireSeller } from "../../../shared/middleware";
 import { prisma } from "../index";
 
+/** Routes for a seller's weekly hours, time off, and whether they take jobs. */
 export const availabilityRoutes = Router();
 
 const MAX_TIME_OFF = 90;
 
+/** Shape weekly hours and time-off rows for the API response. */
 function serializeAvailability(
   acceptingJobs: boolean,
   weeklyHours: { dayOfWeek: number; startMin: number; endMin: number }[],
@@ -26,6 +28,7 @@ function serializeAvailability(
   };
 }
 
+/** Return the current user's availability. */
 availabilityRoutes.get("/", requireAuth, async (req: Request, res: Response) => {
   const userId = req.user!.id;
   const user = await prisma.user.findUnique({
@@ -45,6 +48,7 @@ availabilityRoutes.get("/", requireAuth, async (req: Request, res: Response) => 
   res.json(serializeAvailability(user.acceptingJobs, user.weeklyHours, user.timeOff));
 });
 
+/** Replace the current seller's hours, time off, and accepting-jobs flag. */
 availabilityRoutes.put("/", requireAuth, requireSeller, async (req: Request, res: Response) => {
   const userId = req.user!.id;
   const { acceptingJobs, weeklyHours, timeOff } = req.body as {
@@ -115,6 +119,7 @@ availabilityRoutes.put("/", requireAuth, requireSeller, async (req: Request, res
     });
   }
 
+  /** Replace hours and time off in one write. */
   await prisma.$transaction(async (tx) => {
     await tx.user.update({
       where: { id: userId },
@@ -138,6 +143,7 @@ availabilityRoutes.put("/", requireAuth, requireSeller, async (req: Request, res
   res.json(serializeAvailability(saved!.acceptingJobs, saved!.weeklyHours, saved!.timeOff));
 });
 
+/** Return a seller's public availability by their id. */
 availabilityRoutes.get("/:sellerId", async (req: Request, res: Response) => {
   const sellerId = req.params.sellerId as string;
 

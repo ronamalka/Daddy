@@ -26,6 +26,7 @@ const TYPE_ICON: Record<string, React.ReactNode> = {
   NEW_MESSAGE: <ChatCircle className="h-4 w-4 text-[rgb(var(--color-primary))]" weight="fill" />,
 };
 
+/** Shows a bell with a dropdown of the user's latest order and chat alerts. */
 export function NotificationBell() {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [open, setOpen] = useState(false);
@@ -48,6 +49,7 @@ export function NotificationBell() {
 
   const unreadCount = notifications.filter((n) => !readIds.has(n.id)).length;
 
+  /** Opens or closes the menu and marks items as read when it opens. */
   function handleOpen(isOpen: boolean) {
     setOpen(isOpen);
     if (isOpen) {
@@ -55,6 +57,7 @@ export function NotificationBell() {
     }
   }
 
+  /** Turns a date into a short Hebrew relative time, like "5 min ago". */
   function timeAgo(dateStr: string) {
     const diff = Date.now() - new Date(dateStr).getTime();
     const minutes = Math.floor(diff / 60000);

@@ -15,6 +15,7 @@ interface Gig {
   reviewCount: number;
 }
 
+/** Shows the gigs the user has saved as favorites. */
 export default function FavoritesPage() {
   const { data: session } = useSession();
   const [gigs, setGigs] = useState<Gig[]>([]);

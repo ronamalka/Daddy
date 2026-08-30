@@ -4,6 +4,7 @@ import { ZodError } from "zod";
 
 const MAX_BODY_SIZE = 1_048_576; // 1MB
 
+/** Parses and checks JSON with a Zod schema. Returns data or an error response. */
 export async function validateBody<T>(
   request: Request,
   schema: ZodSchema<T>

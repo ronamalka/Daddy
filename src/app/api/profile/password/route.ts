@@ -11,6 +11,7 @@ const changePasswordSchema = z.object({
   newPassword: passwordSchema,
 }).strict();
 
+/** Changes the signed-in user's password after checking the current one and leak lists. */
 export async function PUT(request: NextRequest) {
   const session = await auth();
   if (!session?.user) {

@@ -5,6 +5,7 @@ export const metadata: Metadata = {
   description: "אבאל׳ה נגיש לכולם. הצהרת נגישות לפי תקן IS 5568 ותקנות שוויון זכויות לאנשים עם מוגבלות.",
 };
 
+/** Shows the accessibility statement. */
 export default function AccessibilityPage() {
   return (
     <div className="mx-auto max-w-3xl px-5 py-12 lg:px-8">

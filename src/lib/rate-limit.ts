@@ -4,6 +4,7 @@ export const RATE_LIMIT_AUTH = parsePositiveInt(process.env.RATE_LIMIT_AUTH, 10)
 export const RATE_LIMIT_POST = parsePositiveInt(process.env.RATE_LIMIT_POST, 30);
 export const RATE_LIMIT_DEFAULT = parsePositiveInt(process.env.RATE_LIMIT_DEFAULT, 120);
 
+/** Parses a positive integer from an env string, or uses the fallback. */
 function parsePositiveInt(value: string | undefined, fallback: number): number {
   const parsed = parseInt(value || "", 10);
   return Number.isFinite(parsed) && parsed > 0 ? parsed : fallback;
@@ -46,6 +47,7 @@ export function isCredentialAuthPath(pathname: string, method: string): boolean 
   return true;
 }
 
+/** Picks the auth, write, or default request limit for this path and method. */
 export function resolveRateLimitTier(pathname: string, method: string): RateLimitTier {
   if (isCredentialAuthPath(pathname, method)) {
     return { name: "auth", limit: RATE_LIMIT_AUTH };
@@ -58,6 +60,7 @@ export function resolveRateLimitTier(pathname: string, method: string): RateLimi
   return { name: "default", limit: RATE_LIMIT_DEFAULT };
 }
 
+/** Reads the client IP from x-forwarded-for or x-real-ip. */
 export function clientIpFromHeaders(headers: {
   get(name: string): string | null;
 }): string {
@@ -71,6 +74,7 @@ export function clientIpFromHeaders(headers: {
   return "unknown";
 }
 
+/** Builds a rate-limit key from IP, a short session id, and the limit. */
 export function rateLimitKey(ip: string, sessionToken: string | undefined, limit: number): string {
   const sessionSuffix = sessionToken ? `:s${sessionToken.slice(0, 8)}` : "";
   return `${ip}${sessionSuffix}:${limit}`;

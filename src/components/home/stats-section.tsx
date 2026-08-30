@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { STATS } from "./data";
 import { AnimatedCounter } from "./animated-counter";
 
+/** Row of marketplace stats with animated numbers. */
 export function StatsSection() {
   return (
     <section className="relative z-10 -mt-8">

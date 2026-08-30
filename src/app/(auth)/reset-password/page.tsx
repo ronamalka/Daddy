@@ -6,6 +6,7 @@ import { useSession } from "next-auth/react";
 import { useState, useEffect, Suspense } from "react";
 import { PasswordStrength } from "@/components/password-strength";
 
+/** Shows the form to set a new password from a reset link. */
 function ResetPasswordForm() {
   const searchParams = useSearchParams();
   const token = searchParams.get("token");
@@ -46,6 +47,7 @@ function ResetPasswordForm() {
       });
   }, [token, status, router]);
 
+  /** Sets a new password from the reset link. */
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError("");
@@ -223,6 +225,7 @@ function ResetPasswordForm() {
   );
 }
 
+/** Shows the reset-password screen with a loading fallback. */
 export default function ResetPasswordPage() {
   return (
     <div className="w-full max-w-md">

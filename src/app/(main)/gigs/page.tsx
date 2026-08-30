@@ -48,6 +48,7 @@ const SORT_OPTIONS = [
 
 const PAGE_SIZE = 12;
 
+/** Shows a searchable, filterable list of gigs. */
 function GigsContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -137,15 +138,18 @@ function GigsContent() {
     return () => observer.disconnect();
   }, [hasMore, loadingMore, loading, gigs.length, fetchGigs]);
 
+  /** Runs the gig search with the text the user typed. */
   function handleSearchSubmit(e: React.FormEvent) {
     e.preventDefault();
     router.push(buildUrl({ search: searchInput }));
   }
 
+  /** Applies the minimum and maximum price filters. */
   function handlePriceApply() {
     router.push(buildUrl({ minPrice: minPriceInput, maxPrice: maxPriceInput }));
   }
 
+  /** Clears all search and price filters. */
   function handleClearFilters() {
     setSearchInput("");
     setMinPriceInput("");
@@ -382,6 +386,7 @@ function GigsContent() {
   );
 }
 
+/** Shows the gig marketplace with a loading fallback. */
 export default function GigsPage() {
   return (
     <Suspense

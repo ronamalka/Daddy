@@ -16,6 +16,7 @@ interface CategoriesSectionProps {
   setServiceSearch: (v: string) => void;
 }
 
+/** Category grid on the home page; tapping one opens its services. */
 export function CategoriesSection({
   selectedCategory, setSelectedCategory, setSelectedService, setServiceSearch,
 }: CategoriesSectionProps) {
@@ -117,6 +118,7 @@ export function CategoriesSection({
   );
 }
 
+/** List of services inside the selected category. */
 function SubServicesPanel({
   category, setSelectedService, setServiceSearch,
 }: {

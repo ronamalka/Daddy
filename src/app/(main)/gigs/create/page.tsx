@@ -27,6 +27,7 @@ interface TierData { title: string; description: string; price: string; delivery
 interface FaqData { question: string; answer: string; }
 interface RequirementData { question: string; required: boolean; }
 
+/** Shows the form to create a new gig. */
 export default function CreateGigPage() {
   const { data: session } = useSession();
   const router = useRouter();
@@ -58,10 +59,12 @@ export default function CreateGigPage() {
     );
   }
 
+  /** Updates one field on a price package. */
   function updateTier(tier: string, field: keyof TierData, value: string) {
     setTiers((prev) => ({ ...prev, [tier]: { ...prev[tier], [field]: value } }));
   }
 
+  /** Returns only the price packages that have a price set. */
   function getValidTiers() {
     return TIERS.filter((t) => tiers[t].price).map((t) => ({
       tier: t, title: tiers[t].title, description: tiers[t].description,
@@ -70,6 +73,7 @@ export default function CreateGigPage() {
     }));
   }
 
+  /** Checks the form and shows a preview before publishing. */
   function handlePreview(e: React.FormEvent) {
     e.preventDefault();
     setError("");
@@ -79,6 +83,7 @@ export default function CreateGigPage() {
     setShowPreview(true);
   }
 
+  /** Creates the gig and opens its page. */
   async function handlePublish() {
     setLoading(true);
     setError("");

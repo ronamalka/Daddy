@@ -31,6 +31,7 @@ interface LocationPickerProps {
   label?: string;
 }
 
+/** Lets a user pick a city or several service areas from districts and cities. */
 export function LocationPicker({ mode, value, areas = [], onChange, onAreasChange, label }: LocationPickerProps) {
   const [districts, setDistricts] = useState<District[]>([]);
   const [allCities, setAllCities] = useState<City[]>([]);

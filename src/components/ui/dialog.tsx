@@ -12,6 +12,7 @@ interface DialogProps {
   className?: string;
 }
 
+/** Centered modal overlay that locks scrolling and closes on Escape or backdrop click. */
 export function Dialog({ open, onOpenChange, children, className }: DialogProps) {
   React.useEffect(() => {
     if (open) {

@@ -14,6 +14,7 @@ interface FeaturedDaddiesSectionProps {
   loading?: boolean;
 }
 
+/** Cards for featured sellers with ratings, city, and services. */
 export function FeaturedDaddiesSection({ featuredDaddies, loading }: FeaturedDaddiesSectionProps) {
   return (
     <section className="py-20">

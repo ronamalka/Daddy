@@ -4,6 +4,7 @@ import { proxyRequest, REQUESTS_SERVICE, USERS_SERVICE } from "@/lib/gateway";
 
 type Person = { id: string; name: string; avatar?: string | null };
 
+/** Loads a user's public name and avatar, or a fallback if the lookup fails. */
 async function loadPerson(id: string): Promise<Person> {
   const { data } = await proxyRequest(USERS_SERVICE, `/sellers/${id}`);
   if (data?.id && typeof data.name === "string") {
@@ -12,6 +13,7 @@ async function loadPerson(id: string): Promise<Person> {
   return { id, name: "משתמש", avatar: null };
 }
 
+/** Adds buyer and seller names to a service request and its quote replies. */
 async function enrichRequest(request: {
   buyerId: string;
   responses?: { sellerId: string }[];
@@ -32,6 +34,7 @@ async function enrichRequest(request: {
   };
 }
 
+/** Lets a seller send a quote on a service request. */
 export async function POST(request: Request, { params }: { params: Promise<{ id: string }> }) {
   const session = await auth();
   if (!session?.user) {
@@ -49,6 +52,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
   return NextResponse.json(data, { status });
 }
 
+/** Returns one service request with buyer and seller names filled in. */
 export async function GET(_request: Request, { params }: { params: Promise<{ id: string }> }) {
   const session = await auth();
   if (!session?.user) {

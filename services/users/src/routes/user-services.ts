@@ -2,8 +2,10 @@ import { Router, Request, Response } from "express";
 import { requireAuth } from "../../../shared/middleware";
 import { prisma } from "../index";
 
+/** Routes for the services a seller offers. */
 export const userServicesRoutes = Router();
 
+/** List the current user's service slugs. */
 userServicesRoutes.get("/", requireAuth, async (req: Request, res: Response) => {
   const services = await prisma.userService.findMany({
     where: { userId: req.user!.id },
@@ -13,6 +15,7 @@ userServicesRoutes.get("/", requireAuth, async (req: Request, res: Response) => 
   res.json(services.map((s) => s.serviceSlug));
 });
 
+/** Replace the current user's service list. */
 userServicesRoutes.post("/", requireAuth, async (req: Request, res: Response) => {
   const userId = req.user!.id;
   const { services } = req.body;

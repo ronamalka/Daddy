@@ -17,6 +17,7 @@ interface RequestsViewProps {
   resetSearch: () => void;
 }
 
+/** List of open service requests that sellers can reply to, with district filters. */
 export function RequestsView({
   requests, loadingRequests, selectedDistrict, setSelectedDistrict, loadRequests, resetSearch,
 }: RequestsViewProps) {

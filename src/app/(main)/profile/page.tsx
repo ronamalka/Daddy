@@ -14,6 +14,7 @@ interface Stats {
   reviewsGiven: number;
 }
 
+/** Shows the user's profile overview and account details. */
 export default function ProfilePage() {
   const { data: session } = useSession();
   const [stats, setStats] = useState<Stats | null>(null);
@@ -186,6 +187,7 @@ export default function ProfilePage() {
   );
 }
 
+/** Shows one labeled row of account information. */
 function AccountRow({ icon, label, value }: { icon: string; label: string; value: string }) {
   const IconComponent = icon === "user" ? User : icon === "email" ? Envelope : Shield;
   return (

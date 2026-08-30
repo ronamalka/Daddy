@@ -11,6 +11,7 @@ interface CtaSectionProps {
   loadRequests: (district?: string) => void;
 }
 
+/** Bottom call-to-action that changes copy based on whether the user is signed in. */
 export function CtaSection({ session, setView, loadRequests }: CtaSectionProps) {
   return (
     <section className="mx-auto max-w-6xl px-4 py-16">

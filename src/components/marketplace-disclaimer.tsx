@@ -4,6 +4,7 @@ interface MarketplaceDisclaimerProps {
   compact?: boolean;
 }
 
+/** Shows a short or full note that the site only connects buyers and sellers. */
 export function MarketplaceDisclaimer({ compact = false }: MarketplaceDisclaimerProps) {
   if (compact) {
     return (

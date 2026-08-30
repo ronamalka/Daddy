@@ -39,6 +39,7 @@ export interface ButtonProps
   asChild?: boolean;
 }
 
+/** Button with size and color variants; can wrap a Link when `asChild` is set. */
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   ({ className, variant, size, asChild, children, ...props }, ref) => {
     if (asChild) {

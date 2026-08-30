@@ -1,3 +1,6 @@
+/**
+ * NextAuth config: Google and email/password login, account lockout, and JWT sessions tracked in Redis.
+ */
 import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import Google from "next-auth/providers/google";

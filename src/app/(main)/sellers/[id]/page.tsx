@@ -75,6 +75,7 @@ const TABS = [
 
 type TabKey = (typeof TABS)[number]["key"];
 
+/** Shows one rating score as a colored bar. */
 function RatingBar({ label, value, icon }: { label: string; value: number; icon: React.ReactNode }) {
   const pct = (value / 10) * 100;
   const color = value >= 8 ? "rgb(var(--color-success))" : value >= 6 ? "rgb(var(--color-accent-yellow))" : value >= 4 ? "rgb(var(--color-warning))" : "rgb(var(--color-error))";
@@ -97,6 +98,7 @@ function RatingBar({ label, value, icon }: { label: string; value: number; icon:
   );
 }
 
+/** Shows a loading placeholder for the seller profile. */
 function SellerSkeleton() {
   return (
     <div className="mx-auto max-w-5xl px-4 py-8">
@@ -132,6 +134,7 @@ function SellerSkeleton() {
   );
 }
 
+/** Shows a seller's profile, reviews, prices, and gigs. */
 export default function SellerProfilePage() {
   const params = useParams();
   const router = useRouter();
@@ -172,6 +175,7 @@ export default function SellerProfilePage() {
       });
   }, [sellerId]);
 
+  /** Sends a message to this seller and opens the inbox. */
   async function sendMessage(e: React.FormEvent) {
     e.preventDefault();
     if (!msgText.trim() || msgSending || !sellerId) return;
@@ -553,6 +557,7 @@ export default function SellerProfilePage() {
   );
 }
 
+/** Shows the seller's customer reviews. */
 function ReviewsTab({ reviews }: { reviews: ReviewData[] }) {
   if (!reviews || reviews.length === 0) {
     return (
@@ -624,6 +629,7 @@ function ReviewsTab({ reviews }: { reviews: ReviewData[] }) {
   );
 }
 
+/** Shows the seller's service price list. */
 function PricesTab({
   prices,
   sellerId,
@@ -642,6 +648,7 @@ function PricesTab({
   const [bookError, setBookError] = useState("");
   const [selectedSlot, setSelectedSlot] = useState<SlotOption | null>(null);
 
+  /** Books a visit from the seller's price list. */
   async function bookFromPriceList(sp: SellerProfile["servicePrices"][number]) {
     if (!selectedSlot) {
       setBookError("יש לבחור חלון ביקור של שעתיים");
@@ -753,6 +760,7 @@ function PricesTab({
   );
 }
 
+/** Shows the seller's listed gigs. */
 function GigsTab({ gigs, sellerName, sellerAvatar }: { gigs: SellerProfile["gigs"]; sellerName: string; sellerAvatar: string | null }) {
   if (gigs.length === 0) {
     return (

@@ -4,6 +4,7 @@ import { proxyRequest, CHAT_SERVICE } from "@/lib/gateway";
 import { validateBody } from "@/lib/validate";
 import { markReadSchema } from "@/lib/message-validation";
 
+/** Marks messages from another user as read. */
 export async function POST(request: Request) {
   const session = await auth();
   if (!session?.user) {

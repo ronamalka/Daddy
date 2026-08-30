@@ -10,6 +10,7 @@ import { splitOrdersForUser } from "@/lib/order-views";
 
 type Tab = "calendar" | "selling" | "buying";
 
+/** Shows the user's orders as a calendar and buying or selling lists. */
 export default function OrdersPage() {
   const { data: session } = useSession();
   const [orders, setOrders] = useState<OrderListItem[]>([]);
@@ -123,6 +124,7 @@ export default function OrdersPage() {
   );
 }
 
+/** Renders a tab chip used to switch order views. */
 function TabButton({
   active,
   onClick,

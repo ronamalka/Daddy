@@ -17,6 +17,7 @@ const rules: Rule[] = [
   { label: "תו מיוחד (!@#$...)", test: (pw) => /[^a-zA-Z0-9]/.test(pw) },
 ];
 
+/** Shows a bar and checklist of how strong a password is as the user types. */
 export function PasswordStrength({ password }: PasswordStrengthProps) {
   if (!password) return null;
 

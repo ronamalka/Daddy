@@ -1,8 +1,10 @@
 import { Router, Request, Response } from "express";
 import { prisma } from "../index";
 
+/** Routes for recent high ratings shown on the home page. */
 export const recentReviewsRoutes = Router();
 
+/** Return the latest reviews with a rating of 4 or higher. */
 recentReviewsRoutes.get("/", async (_req: Request, res: Response) => {
   const reviews = await prisma.review.findMany({
     where: { rating: { gte: 4 } },

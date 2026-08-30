@@ -105,10 +105,12 @@ export const ALL_SERVICES = SERVICE_CATEGORIES.flatMap((cat) =>
   cat.services.map((s) => ({ ...s, category: cat.slug, categoryName: cat.nameHe }))
 );
 
+/** Finds a service by slug, including its category. */
 export function getServiceBySlug(slug: string) {
   return ALL_SERVICES.find((s) => s.slug === slug);
 }
 
+/** Finds a category and its services by category slug. */
 export function getServicesByCategory(categorySlug: string) {
   return SERVICE_CATEGORIES.find((c) => c.slug === categorySlug);
 }

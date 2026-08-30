@@ -10,6 +10,7 @@ const INTER_SERVICE_SECRET = process.env.INTER_SERVICE_SECRET || "dev-secret-cha
 
 export { USERS_SERVICE, GIGS_SERVICE, ORDERS_SERVICE, REQUESTS_SERVICE, CHAT_SERVICE };
 
+/** Signs a string with HMAC-SHA256 using the shared service secret. */
 export function signPayload(payload: string): string {
   return crypto.createHmac("sha256", INTER_SERVICE_SECRET).update(payload).digest("hex");
 }
@@ -21,6 +22,7 @@ interface ProxyOptions {
   user?: { id: string; email: string; name: string; role: string };
 }
 
+/** Forwards an HTTP request to a backend service, optionally with a signed user header. Returns JSON and status, or 502 on failure. */
 export async function proxyRequest(serviceUrl: string, path: string, options: ProxyOptions = {}) {
   const { method = "GET", body, user } = options;
 

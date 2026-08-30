@@ -13,6 +13,7 @@ export type AvailabilityPayload = {
   error?: unknown;
 };
 
+/** Checks that visit start and end are a future two-hour window. Returns the slot or an error. */
 export function parseRequiredVisitSlot(slotStart: unknown, slotEnd: unknown) {
   if (typeof slotStart !== "string" || typeof slotEnd !== "string") {
     return { error: "יש לבחור חלון ביקור של שעתיים", status: 400 as const };
@@ -27,6 +28,7 @@ export function parseRequiredVisitSlot(slotStart: unknown, slotEnd: unknown) {
   return { slot };
 }
 
+/** Returns an error if the seller is closed or the slot is outside their hours; otherwise null. */
 export function sellerAvailabilityError(
   availability: AvailabilityPayload | null | undefined,
   slot: { start: Date; end: Date },

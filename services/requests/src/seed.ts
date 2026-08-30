@@ -12,6 +12,7 @@ const S = {
   buyer3: "seed-user-buyer3",
 };
 
+/** Loads demo local job posts into daddy_requests. */
 async function main() {
   const requests = [
     {

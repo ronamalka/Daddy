@@ -5,12 +5,14 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
+/** Shows the login form so users can sign in. */
 export default function LoginPage() {
   const router = useRouter();
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
 
+  /** Signs the user in with email and password. */
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setLoading(true);
@@ -32,6 +34,7 @@ export default function LoginPage() {
     }
   }
 
+  /** Signs the user in with Google. */
   async function handleGoogleSignIn() {
     setGoogleLoading(true);
     setError("");

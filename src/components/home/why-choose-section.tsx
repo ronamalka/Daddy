@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { SectionHeader } from "./section-header";
 import { WHY_CHOOSE } from "./data";
 
+/** Grid of reasons to use the marketplace. */
 export function WhyChooseSection() {
   return (
     <section className="mx-auto max-w-6xl px-4 py-20">

@@ -5,6 +5,7 @@ import { verifyTurnstileToken } from "@/lib/turnstile";
 import { detectBot } from "@/lib/bot-detection";
 import { isTwoHourLocalWindow, parseSlotIso } from "@/lib/availability";
 
+/** Returns open service requests. Query params are passed through. */
 export async function GET(request: NextRequest) {
   const params = request.nextUrl.searchParams.toString();
   const path = params ? `/service-requests?${params}` : "/service-requests";
@@ -15,6 +16,7 @@ export async function GET(request: NextRequest) {
   return NextResponse.json(data, { status });
 }
 
+/** Creates a service request after bot, CAPTCHA, and visit-window checks. */
 export async function POST(request: NextRequest) {
   const session = await auth();
   if (!session?.user) {

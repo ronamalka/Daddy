@@ -6,6 +6,7 @@ const directUrl = process.env.SEED_DATABASE_URL || process.env.DATABASE_URL || "
 const adapter = new PrismaPg({ connectionString: directUrl });
 const prisma = new PrismaClient({ adapter });
 
+/** Loads demo categories, users, gigs, and related rows into the BFF database. */
 async function main() {
   const categories = [
     { name: "תיקונים ותחזוקת הבית", slug: "home-maintenance" },

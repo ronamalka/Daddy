@@ -13,6 +13,7 @@ interface RateLimitEntry {
 
 const store = new Map<string, RateLimitEntry>();
 
+/** Drops expired in-memory rate-limit entries every minute. */
 setInterval(() => {
   const now = Date.now();
   for (const [key, entry] of store) {
@@ -22,10 +23,12 @@ setInterval(() => {
   }
 }, 60_000);
 
+/** Returns the client IP from request headers. */
 function getClientIp(request: NextRequest): string {
   return clientIpFromHeaders(request.headers);
 }
 
+/** Reads the Auth.js session cookie if present. */
 function getSessionToken(request: NextRequest): string | undefined {
   return (
     request.cookies.get("authjs.session-token")?.value ||
@@ -33,6 +36,7 @@ function getSessionToken(request: NextRequest): string | undefined {
   );
 }
 
+/** Builds the in-memory rate-limit key and the request limit for this path. */
 function limitStoreKey(request: NextRequest, pathname: string): { key: string; limit: number } {
   const method = request.method;
   const tier = resolveRateLimitTier(pathname, method);
@@ -41,6 +45,7 @@ function limitStoreKey(request: NextRequest, pathname: string): { key: string; l
   return { key, limit: tier.limit };
 }
 
+/** Counts this request. Returns a 429 response if over the limit, otherwise null. */
 function checkRateLimit(request: NextRequest, pathname: string): NextResponse | null {
   const { key, limit } = limitStoreKey(request, pathname);
   const now = Date.now();
@@ -77,6 +82,7 @@ function checkRateLimit(request: NextRequest, pathname: string): NextResponse | 
   return null;
 }
 
+/** Adds remaining-request headers onto the response. */
 function setRateLimitHeaders(response: NextResponse, request: NextRequest, pathname: string) {
   const { key, limit } = limitStoreKey(request, pathname);
   const entry = store.get(key);
@@ -97,18 +103,21 @@ const CSRF_EXEMPT = [
   "/api/auth",
 ];
 
+/** Creates a random hex CSRF token. */
 function generateToken(): string {
   const array = new Uint8Array(32);
   crypto.getRandomValues(array);
   return Array.from(array, (b) => b.toString(16).padStart(2, "0")).join("");
 }
 
+/** Returns true if this path skips CSRF checks. */
 function isCsrfExempt(pathname: string): boolean {
   return CSRF_EXEMPT.some((prefix) => pathname.startsWith(prefix));
 }
 
 // --- Main Middleware ---
 
+/** Rate-limits API routes, checks CSRF on writes, and sets the CSRF cookie. */
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const isApi = pathname.startsWith("/api/");

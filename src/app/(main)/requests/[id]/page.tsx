@@ -32,6 +32,7 @@ interface ServiceRequestDetail {
   orderId?: string | null;
 }
 
+/** Shows one service request and seller replies. */
 export default function RequestDetailPage() {
   const params = useParams();
   const router = useRouter();
@@ -57,6 +58,7 @@ export default function RequestDetailPage() {
       .catch(() => setLoading(false));
   }, [params.id]);
 
+  /** Sends a quote or message on this service request. */
   async function handleSubmitResponse() {
     if (!responseMsg.trim()) return;
     setSubmitting(true);
@@ -87,6 +89,7 @@ export default function RequestDetailPage() {
     setSubmitting(false);
   }
 
+  /** Accepts a seller quote and opens the new order. */
   async function handleAcceptQuote(responseId: string) {
     setAcceptingId(responseId);
     setError("");

@@ -22,6 +22,7 @@ const createGigSchema = z.object({
   tags: z.array(z.string().max(50)).max(10).optional(),
 }).strict();
 
+/** Returns gigs with seller details. Can filter by district query param. */
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const params = searchParams.toString();
@@ -68,6 +69,7 @@ export async function GET(request: Request) {
   return NextResponse.json({ gigs: enriched, total: filteredTotal, hasMore: filteredHasMore });
 }
 
+/** Creates a new gig. Only sellers may call this. */
 export async function POST(request: Request) {
   const session = await auth();
   if (!session?.user || (session.user as { role: string }).role !== "SELLER") {

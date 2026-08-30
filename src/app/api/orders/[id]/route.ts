@@ -8,6 +8,7 @@ const updateOrderSchema = z.object({
   status: z.enum(["accepted", "rejected", "in_progress", "delivered", "completed", "cancelled"]),
 }).strict();
 
+/** Returns one order with gig, buyer, seller, messages, and review data. */
 export async function GET(_request: Request, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const session = await auth();
@@ -57,6 +58,7 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
   return NextResponse.json(enriched);
 }
 
+/** Updates an order status (accept, reject, deliver, complete, and so on). */
 export async function PATCH(request: Request, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const session = await auth();

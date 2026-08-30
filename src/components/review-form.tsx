@@ -18,6 +18,7 @@ interface ReviewFormProps {
   onSubmitted: () => void;
 }
 
+/** Form for a buyer to rate a completed job on four scores and leave a comment. */
 export function ReviewForm({ orderId, sellerName, onSubmitted }: ReviewFormProps) {
   const [ratings, setRatings] = useState<Record<string, number>>({
     ratingQuality: 0,
@@ -38,6 +39,7 @@ export function ReviewForm({ orderId, sellerName, onSubmitted }: ReviewFormProps
     ? (Object.values(ratings).reduce((s, v) => s + v, 0) / 4).toFixed(1)
     : null;
 
+  /** Sends the ratings and comment to the order review API. */
   async function handleSubmit() {
     if (!allRated || !comment.trim()) return;
     setSubmitting(true);

@@ -4,6 +4,7 @@ import { jerusalemLocalToUtc, minutesToTimeLabel } from "@/lib/availability";
 
 const START_OPTIONS = Array.from({ length: 15 }, (_, i) => (6 + i) * 60);
 
+/** Returns today's date in Asia/Jerusalem as YYYY-MM-DD. */
 function todayKey(): string {
   const now = new Date();
   const parts = new Intl.DateTimeFormat("en-CA", {
@@ -25,6 +26,7 @@ interface VisitWindowFieldsProps {
   onChange: (value: VisitWindowValue) => void;
 }
 
+/** Turns a date and start minute into UTC start and end times for a two-hour visit. */
 export function visitWindowToIso(value: VisitWindowValue): { slotStart: string; slotEnd: string } {
   const [year, month, day] = value.date.split("-").map(Number);
   const start = jerusalemLocalToUtc(year, month, day, value.startMin);
@@ -32,6 +34,7 @@ export function visitWindowToIso(value: VisitWindowValue): { slotStart: string; 
   return { slotStart: start.toISOString(), slotEnd: end.toISOString() };
 }
 
+/** Date and start-time fields for choosing a two-hour visit window. */
 export function VisitWindowFields({ value, onChange }: VisitWindowFieldsProps) {
   const minDate = todayKey();
   const date = value?.date || "";

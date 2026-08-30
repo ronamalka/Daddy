@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { proxyRequest, CHAT_SERVICE } from "@/lib/gateway";
 
+/** Returns how many unread messages the signed-in user has. */
 export async function GET() {
   const session = await auth();
   if (!session?.user) {

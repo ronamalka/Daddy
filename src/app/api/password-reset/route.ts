@@ -22,6 +22,7 @@ const resetPasswordSchema = z.object({
   password: passwordSchema,
 }).strict();
 
+/** Handles password reset: request a link, check a token, or set a new password (`action` query). */
 export async function POST(request: NextRequest) {
   const url = new URL(request.url);
   const action = url.searchParams.get("action");

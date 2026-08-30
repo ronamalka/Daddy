@@ -18,6 +18,7 @@ const S = {
   buyer3: "seed-user-buyer3",
 };
 
+/** Loads demo categories, gigs, and reviews into daddy_gigs. */
 async function main() {
   // Categories
   const categories = [

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Wrench, House, MagnifyingGlass, Envelope } from "@phosphor-icons/react/dist/ssr";
 
+/** Shows a friendly 404 screen when a page does not exist. */
 export default function NotFound() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-[rgb(var(--color-bg))] px-4 text-center">

@@ -21,6 +21,7 @@ export const markReadSchema = z
     message: "orderId or senderId required",
   });
 
+/** Adds a sender object (id, name, avatar) onto a message. */
 export function attachSender<T extends Record<string, unknown>>(
   message: T,
   user: { id: string; name?: string | null; image?: string | null }

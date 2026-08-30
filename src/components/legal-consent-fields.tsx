@@ -12,6 +12,7 @@ interface LegalConsentFieldsProps {
   onIndependentContractorChange: (value: boolean) => void;
 }
 
+/** Checkboxes for terms, age 18+, and independent-contractor status on sign-up. */
 export function LegalConsentFields({
   acceptedTerms,
   onAcceptedTermsChange,

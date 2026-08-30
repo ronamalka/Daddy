@@ -22,6 +22,7 @@ interface SlotPickerProps {
   onChange: (slot: SlotOption | null) => void;
 }
 
+/** Lets the user pick an open two-hour visit slot from a seller's calendar. */
 export function SlotPicker({ sellerId, value, onChange }: SlotPickerProps) {
   const [data, setData] = useState<SellerAvailability | null>(null);
   const [loading, setLoading] = useState(true);

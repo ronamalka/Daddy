@@ -3,8 +3,10 @@ import { requireAuth } from "../../../shared/middleware";
 import { prisma } from "../index";
 import { OrderStatus } from "../generated/prisma/client";
 
+/** Routes for one order: details, status changes, and buyer requirements. */
 export const orderDetailRoutes = Router();
 
+/** Get one order if the user is the buyer, the seller, or an admin. */
 orderDetailRoutes.get("/:id", requireAuth, async (req: Request, res: Response) => {
   const id = req.params.id as string;
 
@@ -28,6 +30,7 @@ orderDetailRoutes.get("/:id", requireAuth, async (req: Request, res: Response) =
   res.json(order);
 });
 
+/** Update an order's status using the allowed buyer and seller steps. */
 orderDetailRoutes.patch("/:id", requireAuth, async (req: Request, res: Response) => {
   const id = req.params.id as string;
   const { status } = req.body;
@@ -88,6 +91,7 @@ orderDetailRoutes.patch("/:id", requireAuth, async (req: Request, res: Response)
   res.json(updated);
 });
 
+/** Save the buyer's answers to the gig's requirement questions. */
 orderDetailRoutes.post("/:id/requirements", requireAuth, async (req: Request, res: Response) => {
   const orderId = req.params.id as string;
 
@@ -123,4 +127,3 @@ orderDetailRoutes.post("/:id/requirements", requireAuth, async (req: Request, re
 
   res.status(201).json({ count: created.count });
 });
-

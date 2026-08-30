@@ -4,6 +4,7 @@ import { proxyRequest, GIGS_SERVICE, ORDERS_SERVICE } from "@/lib/gateway";
 import { verifyTurnstileToken } from "@/lib/turnstile";
 import { detectBot } from "@/lib/bot-detection";
 
+/** Submits a buyer review for a completed order after bot and CAPTCHA checks. */
 export async function POST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id: orderId } = await params;
   const session = await auth();

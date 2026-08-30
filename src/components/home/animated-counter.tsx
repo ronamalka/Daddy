@@ -3,6 +3,7 @@
 import { useEffect, useState, useRef } from "react";
 import { useInView } from "framer-motion";
 
+/** Counts up to a number when the element scrolls into view. */
 export function AnimatedCounter({ value, suffix = "" }: { value: number; suffix?: string }) {
   const ref = useRef<HTMLSpanElement>(null);
   const inView = useInView(ref, { once: true });

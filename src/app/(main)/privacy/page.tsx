@@ -94,6 +94,7 @@ const SECTIONS = [
   },
 ];
 
+/** Shows the privacy policy. */
 export default function PrivacyPage() {
   return (
     <div className="min-h-screen bg-[rgb(var(--color-surface-elevated))]">

@@ -9,6 +9,7 @@ export const metadata: Metadata = {
   },
 };
 
+/** Sets the title and description for the how-it-works page. */
 export default function HowItWorksLayout({
   children,
 }: {

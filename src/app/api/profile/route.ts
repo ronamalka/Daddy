@@ -12,6 +12,7 @@ const profileUpdateSchema = z.object({
   location: z.string().max(100).optional(),
 }).strict();
 
+/** Returns the signed-in user's profile. */
 export async function GET() {
   const session = await auth();
   if (!session?.user) {
@@ -24,6 +25,7 @@ export async function GET() {
   return NextResponse.json(data, { status });
 }
 
+/** Updates the signed-in user's name, phone, bio, avatar, or location. */
 export async function PUT(request: Request) {
   const session = await auth();
   if (!session?.user) {

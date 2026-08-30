@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { proxyRequest, GIGS_SERVICE, USERS_SERVICE } from "@/lib/gateway";
 
+/** Returns related gigs for a listing, each with seller name and avatar. */
 export async function GET(_request: Request, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const { data, status } = await proxyRequest(GIGS_SERVICE, `/gigs/${id}/related`);

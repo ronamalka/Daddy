@@ -22,6 +22,7 @@ interface SecurityEvent {
   metadata?: Record<string, unknown>;
 }
 
+/** Writes a security event as one JSON line to the console. */
 export function logSecurityEvent(
   event: SecurityEventType,
   details: Omit<SecurityEvent, "timestamp" | "event">
@@ -35,6 +36,7 @@ export function logSecurityEvent(
   console.log(`[SECURITY] ${JSON.stringify(entry)}`);
 }
 
+/** Reads IP and user-agent from a Request. */
 export function extractClientInfo(request: Request): {
   ip: string;
   userAgent: string;

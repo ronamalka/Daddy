@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { proxyRequest, ORDERS_SERVICE } from "@/lib/gateway";
 
+/** Saves the buyer's answers to a gig's requirement questions for this order. */
 export async function POST(request: Request, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const session = await auth();

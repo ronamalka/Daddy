@@ -20,6 +20,7 @@ export type LockoutStatus =
   | { allowed: false; reason: "soft_locked"; retryAfter: number }
   | { allowed: false; reason: "hard_locked" };
 
+/** Checks if this email may try to log in. Returns allowed, delayed, or locked. */
 export async function checkLockout(email: string): Promise<LockoutStatus> {
   const redis = getRedis();
   const key = normalizeKey(email);
@@ -46,6 +47,7 @@ export async function checkLockout(email: string): Promise<LockoutStatus> {
   return { allowed: true };
 }
 
+/** Adds one failed login for this email and may delay or lock the account. Returns the new attempt count. */
 export async function recordFailedAttempt(email: string): Promise<number> {
   const redis = getRedis();
   const key = normalizeKey(email);
@@ -69,6 +71,7 @@ export async function recordFailedAttempt(email: string): Promise<number> {
   return attempts;
 }
 
+/** Clears failed-login counts and a soft lock after a successful login. */
 export async function resetAttempts(email: string): Promise<void> {
   const redis = getRedis();
   const key = normalizeKey(email);
@@ -79,6 +82,7 @@ export async function resetAttempts(email: string): Promise<void> {
   );
 }
 
+/** Removes all lockout keys for this email. Returns true if anything was deleted. */
 export async function adminUnlockAccount(email: string): Promise<boolean> {
   const redis = getRedis();
   const key = normalizeKey(email);
@@ -99,6 +103,7 @@ export interface LockedAccountInfo {
   lockedAt: string;
 }
 
+/** Lists accounts that are currently soft-locked or hard-locked. */
 export async function getLockedAccounts(): Promise<LockedAccountInfo[]> {
   const redis = getRedis();
   const members = await redis.smembers(LOCKED_ACCOUNTS_SET);
@@ -137,12 +142,14 @@ export interface LockoutEvent {
   lockedAt: string;
 }
 
+/** Returns recent lockout events, newest first, up to the given limit. */
 export async function getRecentLockoutEvents(limit = 50): Promise<LockoutEvent[]> {
   const redis = getRedis();
   const events = await redis.lrange("lockout_events_log", 0, limit - 1);
   return events.map((e) => JSON.parse(e));
 }
 
+/** Saves a lockout event in Redis and adds the email to the locked-accounts set. */
 async function trackLockoutEvent(
   redis: ReturnType<typeof getRedis>,
   key: string,
@@ -157,6 +164,7 @@ async function trackLockoutEvent(
   await redis.ltrim("lockout_events_log", 0, 499);
 }
 
+/** Lowercases and trims an email so lockout keys match. */
 function normalizeKey(email: string): string {
   return email.toLowerCase().trim();
 }

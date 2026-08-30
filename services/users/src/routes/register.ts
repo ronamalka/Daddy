@@ -2,8 +2,10 @@ import { Router, Request, Response } from "express";
 import { hash } from "bcryptjs";
 import { prisma } from "../index";
 
+/** Routes for creating a new account. */
 export const registerRoutes = Router();
 
+/** Create a buyer or seller account with email and password. */
 registerRoutes.post("/", async (req: Request, res: Response) => {
   const { name, email, password, role, cityCode, cityName, districtCode, serviceAreas, services } = req.body;
 

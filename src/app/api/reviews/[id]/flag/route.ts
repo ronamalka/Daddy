@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { proxyRequest, GIGS_SERVICE } from "@/lib/gateway";
 
+/** Flags a review as inappropriate. Requires a signed-in user. */
 export async function POST(request: Request, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const session = await auth();

@@ -18,6 +18,7 @@ const S = {
   buyer3: "seed-user-buyer3",
 };
 
+/** Loads demo bookings in several statuses into daddy_orders. */
 async function main() {
   const orders = [
     { id: "ord-1", gigId: "seed-gig-ikea", buyerId: S.buyer, sellerId: S.seller, tier: "BASIC" as const, price: 150, status: "COMPLETED" as const },

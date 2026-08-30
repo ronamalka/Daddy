@@ -4,6 +4,7 @@ const REDIS_URL = process.env.REDIS_URL || "redis://localhost:6379";
 
 let redis: Redis | null = null;
 
+/** Returns a shared Redis client, creating it on first use. */
 export function getRedis(): Redis {
   if (!redis) {
     redis = new Redis(REDIS_URL, {

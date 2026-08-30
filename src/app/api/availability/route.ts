@@ -22,6 +22,7 @@ const saveAvailabilitySchema = z.object({
   timeOff: z.array(timeOffSchema).max(90),
 }).strict();
 
+/** Returns the signed-in seller's weekly hours, time off, and accepting-jobs flag. */
 export async function GET() {
   const session = await auth();
   if (!session?.user) {
@@ -33,6 +34,7 @@ export async function GET() {
   return NextResponse.json(data, { status });
 }
 
+/** Saves the signed-in seller's availability. Sellers and admins only. */
 export async function PUT(request: Request) {
   const session = await auth();
   if (!session?.user) {

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState, useRef, useCallback } from "react";
 import { TurnstileWidget } from "@/components/turnstile-widget";
 
+/** Shows a form to request a password reset email. */
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
@@ -14,6 +15,7 @@ export default function ForgotPasswordPage() {
   const handleTurnstileVerify = useCallback((token: string) => setTurnstileToken(token), []);
   const handleTurnstileExpire = useCallback(() => setTurnstileToken(""), []);
 
+  /** Sends a password-reset email to the address the user typed. */
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);

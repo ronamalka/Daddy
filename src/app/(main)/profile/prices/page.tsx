@@ -13,6 +13,7 @@ interface PriceEntry {
   description: string;
 }
 
+/** Shows the form to set prices for each offered service. */
 export default function ProfilePricesPage() {
   const { data: session } = useSession();
   const router = useRouter();
@@ -52,6 +53,7 @@ export default function ProfilePricesPage() {
       .catch(() => setLoading(false));
   }, []);
 
+  /** Updates the price or description for one listed service. */
   function updatePrice(slug: string, field: "price" | "description", value: string) {
     setPrices((prev) =>
       prev.map((p) =>
@@ -62,6 +64,7 @@ export default function ProfilePricesPage() {
     );
   }
 
+  /** Saves the seller's service prices. */
   async function handleSave() {
     setSaving(true);
     setSaved(false);

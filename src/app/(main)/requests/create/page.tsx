@@ -10,6 +10,7 @@ import { UserCircle } from "@phosphor-icons/react";
 import { TurnstileWidget } from "@/components/turnstile-widget";
 import { VisitWindowFields, visitWindowToIso, type VisitWindowValue } from "@/components/visit-window-fields";
 
+/** Shows the form to post a new service request. */
 function CreateRequestPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
@@ -57,6 +58,7 @@ function CreateRequestPage() {
 
   const districtName = districtCode ? DISTRICTS[Number(districtCode)] : undefined;
 
+  /** Creates a new service request from the form. */
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
@@ -203,6 +205,7 @@ function CreateRequestPage() {
   );
 }
 
+/** Shows the create-request page with a loading fallback. */
 export default function CreateRequestPageWrapper() {
   return (
     <Suspense

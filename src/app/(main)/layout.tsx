@@ -3,6 +3,7 @@ import { Footer } from "@/components/footer";
 import { WeakPasswordBanner } from "@/components/weak-password-banner";
 import { NewMessageToast } from "@/components/inbox/new-message-toast";
 
+/** Adds the navbar, footer, and main content area around each page. */
 export default function MainLayout({ children }: { children: React.ReactNode }) {
   return (
     <>

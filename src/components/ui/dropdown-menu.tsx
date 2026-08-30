@@ -13,6 +13,7 @@ interface DropdownMenuProps {
   className?: string;
 }
 
+/** Menu that opens below a trigger and closes on outside click or Escape. */
 export function DropdownMenu({
   open,
   onOpenChange,
@@ -25,11 +26,13 @@ export function DropdownMenu({
 
   React.useEffect(() => {
     if (!open) return;
+    /** Closes the menu when the user clicks outside it. */
     function handleClickOutside(event: MouseEvent) {
       if (ref.current && !ref.current.contains(event.target as Node)) {
         onOpenChange(false);
       }
     }
+    /** Closes the menu when the user presses Escape. */
     function handleKeyDown(event: KeyboardEvent) {
       if (event.key === "Escape") onOpenChange(false);
     }
@@ -67,6 +70,7 @@ export function DropdownMenu({
   );
 }
 
+/** Clickable row inside a dropdown menu. */
 export function DropdownMenuItem({
   children,
   onClick,
@@ -94,10 +98,12 @@ export function DropdownMenuItem({
   );
 }
 
+/** Thin line that splits groups of dropdown items. */
 export function DropdownMenuSeparator() {
   return <div className="my-1 border-t border-[rgb(var(--color-border-light))]" />;
 }
 
+/** Header text at the top of a dropdown, usually the user's name. */
 export function DropdownMenuLabel({
   children,
   className,

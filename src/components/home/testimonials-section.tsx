@@ -11,6 +11,7 @@ interface TestimonialsSectionProps {
   liveReviews: LiveReview[];
 }
 
+/** Three review cards from live data, or fallback quotes if none exist. */
 export function TestimonialsSection({ liveReviews }: TestimonialsSectionProps) {
   return (
     <section className="py-20">

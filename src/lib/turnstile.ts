@@ -7,6 +7,7 @@ interface TurnstileResult {
   "error-codes"?: string[];
 }
 
+/** Asks Cloudflare if the Turnstile token is valid. Returns true in local dev if no secret is set. */
 export async function verifyTurnstileToken(token: string, ip?: string): Promise<boolean> {
   const TURNSTILE_SECRET = process.env.TURNSTILE_SECRET_KEY || "";
   if (!TURNSTILE_SECRET) {

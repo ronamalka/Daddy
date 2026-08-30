@@ -31,6 +31,7 @@ interface ChatMessage {
   createdAt: string;
 }
 
+/** Turns a date into a short relative label like "5 min" or "yesterday". */
 function timeAgo(dateStr: string) {
   const diff = Date.now() - new Date(dateStr).getTime();
   const minutes = Math.floor(diff / 60000);
@@ -44,6 +45,7 @@ function timeAgo(dateStr: string) {
   return new Date(dateStr).toLocaleDateString("he-IL", { day: "numeric", month: "short" });
 }
 
+/** Human-readable day heading for a chat timestamp (today, yesterday, or full date). */
 function dayLabel(dateStr: string) {
   const date = new Date(dateStr);
   const today = new Date();
@@ -56,11 +58,13 @@ function dayLabel(dateStr: string) {
   return date.toLocaleDateString("he-IL", { weekday: "long", day: "numeric", month: "long" });
 }
 
+/** Stable year-month-day key used to group messages by calendar day. */
 function dayKey(dateStr: string) {
   const d = new Date(dateStr);
   return `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
 }
 
+/** Round avatar showing the first letter of a person's name. */
 function Avatar({ name, size = "md" }: { name: string; size?: "sm" | "md" }) {
   const initial = (name || "מ")[0];
   const cls = size === "sm" ? "h-10 w-10 text-[14px]" : "h-12 w-12 text-[16px]";
@@ -76,12 +80,14 @@ function Avatar({ name, size = "md" }: { name: string; size?: "sm" | "md" }) {
   );
 }
 
+/** Fires a browser event so other UI can refresh after messages change. */
 export function emitMessagesChanged() {
   if (typeof window !== "undefined") {
     window.dispatchEvent(new Event("daddy:messages-changed"));
   }
 }
 
+/** Full inbox UI: conversation list on one side and the open thread on the other. */
 export function MessengerInbox({ peerId }: { peerId?: string }) {
   const { data: session } = useSession();
   const router = useRouter();
@@ -114,6 +120,7 @@ export function MessengerInbox({ peerId }: { peerId?: string }) {
   useEffect(() => {
     loadConversations().finally(() => setLoading(false));
     const interval = setInterval(loadConversations, 8000);
+    /** Reloads conversations when a message event fires. */
     function onChange() {
       loadConversations();
     }
@@ -144,6 +151,7 @@ export function MessengerInbox({ peerId }: { peerId?: string }) {
     seededNew.current = null;
     let cancelled = false;
 
+    /** Loads messages with this person and optionally marks them as read. */
     async function loadThread(mark = false) {
       const res = await fetch(`/api/messages?withUser=${encodeURIComponent(otherId)}`);
       const data = await res.json();
@@ -183,6 +191,7 @@ export function MessengerInbox({ peerId }: { peerId?: string }) {
     return conversations.filter((c) => c.otherUser.name.includes(q) || c.lastMessage.content.includes(q));
   }, [conversations, query]);
 
+  /** Posts the draft message to the open conversation. */
   async function send(e: React.FormEvent) {
     e.preventDefault();
     if (!draft.trim() || !peerId || sending) return;

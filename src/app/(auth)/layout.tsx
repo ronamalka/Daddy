@@ -1,5 +1,6 @@
 import Image from "next/image";
 
+/** Shows login and signup pages next to a branding panel. */
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex min-h-screen bg-[rgb(var(--color-surface-elevated))]">

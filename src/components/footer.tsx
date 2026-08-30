@@ -5,6 +5,7 @@ import Image from "next/image";
 import { Wrench, FileText, Shield } from "@phosphor-icons/react";
 import { BUSINESS_DISCLOSURE, LEGAL_CONTACTS } from "@/lib/legal";
 
+/** Site footer with company details and links to legal and account pages. */
 export function Footer() {
   return (
     <footer className="border-t border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))]">
@@ -68,6 +69,7 @@ export function Footer() {
   );
 }
 
+/** Simple footer text link. */
 function FooterLink({ href, children }: { href: string; children: React.ReactNode }) {
   return (
     <Link

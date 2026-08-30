@@ -4,6 +4,7 @@ import { useRef } from "react";
 import { motion, useInView } from "framer-motion";
 import { cn } from "@/lib/utils";
 
+/** Centered title and subtitle used above home-page sections. */
 export function SectionHeader({ title, subtitle, className }: { title: string; subtitle: string; className?: string }) {
   const ref = useRef(null);
   const inView = useInView(ref, { once: true, margin: "-50px" });

@@ -16,6 +16,7 @@ interface GigWithReviews {
   [key: string]: unknown;
 }
 
+/** Returns a seller profile with gigs, reviews, ratings, and completed-order count. */
 export async function GET(_request: Request, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
 

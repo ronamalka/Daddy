@@ -16,6 +16,7 @@ const ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
   "events-and-family": Confetti,
 };
 
+/** Icon for a service category slug, or a wrench if the slug is unknown. */
 export function CategoryIcon({
   slug,
   className,
@@ -27,6 +28,7 @@ export function CategoryIcon({
   return <Icon className={cn("h-5 w-5", className)} />;
 }
 
+/** Returns a short English name for a category icon, used in tests or logs. */
 export function getCategoryIconName(slug: string): string {
   const names: Record<string, string> = {
     "assembly-and-installation": "wrench",

@@ -114,6 +114,7 @@ export const ALL_SERVICES = SERVICE_CATEGORIES.flatMap((cat) =>
   cat.services.map((s) => ({ ...s, category: cat.slug, categoryName: cat.nameHe, categoryIcon: cat.icon }))
 );
 
+/** Find a service in the catalog by its slug. */
 export function getServiceBySlug(slug: string) {
   return ALL_SERVICES.find((s) => s.slug === slug);
 }

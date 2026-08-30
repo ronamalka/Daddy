@@ -25,6 +25,7 @@ const AVATAR_GRADIENTS = [
   "from-[rgb(var(--color-primary-light))] to-[rgb(var(--color-accent))]",
 ];
 
+/** Card that shows a gig's photo, seller, price, and rating, as a grid or list item. */
 export function GigCard({ id, title, image, seller, startingPrice, avgRating, reviewCount, variant = "grid" }: GigCardProps) {
   const [isFavorite, setIsFavorite] = useState(false);
   const sellerName = seller?.name || "משתמש";
@@ -139,6 +140,7 @@ export function GigCard({ id, title, image, seller, startingPrice, avgRating, re
   );
 }
 
+/** Heart button that adds or removes a gig from favorites without leaving the card. */
 function FavoriteButton({ isFavorite, onToggle }: { isFavorite: boolean; onToggle: () => void }) {
   return (
     <motion.button
@@ -164,6 +166,7 @@ function FavoriteButton({ isFavorite, onToggle }: { isFavorite: boolean; onToggl
   );
 }
 
+/** Placeholder card shown while gig results are loading. */
 export function GigCardSkeleton({ variant = "grid" }: { variant?: "grid" | "list" }) {
   if (variant === "list") {
     return (

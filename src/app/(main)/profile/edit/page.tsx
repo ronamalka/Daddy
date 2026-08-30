@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 
+/** Shows the form to edit the user's profile. */
 export default function EditProfilePage() {
   const { data: session } = useSession();
   const router = useRouter();
@@ -38,6 +39,7 @@ export default function EditProfilePage() {
     return <div className="flex items-center justify-center py-20"><div className="h-10 w-10 animate-spin rounded-full border-4 border-[rgba(var(--color-primary),0.1)] border-t-[rgb(var(--color-primary))]" /></div>;
   }
 
+  /** Saves the user's profile details. */
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setSaving(true);

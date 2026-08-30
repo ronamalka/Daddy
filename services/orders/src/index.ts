@@ -18,6 +18,7 @@ app.use(express.json({ limit: "1mb" }));
 app.use(extractUser);
 app.use(generalRateLimit);
 
+/** Return a simple OK so other systems know the orders service is running. */
 app.get("/health", (_req, res) => {
   res.json({ status: "ok", service: "orders" });
 });
@@ -25,6 +26,7 @@ app.get("/health", (_req, res) => {
 app.use("/orders", ordersRoutes);
 app.use("/orders", orderDetailRoutes);
 
+/** Start the orders HTTP server. */
 app.listen(PORT, "0.0.0.0", () => {
   console.log(`Orders service running on port ${PORT}`);
 });

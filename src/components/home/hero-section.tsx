@@ -16,6 +16,7 @@ interface HeroSectionProps {
   filteredServices: typeof ALL_SERVICES;
 }
 
+/** Home hero with logo, slogan, and a service search box. */
 export function HeroSection({
   serviceSearch, setServiceSearch, setSelectedService, setView, filteredServices,
 }: HeroSectionProps) {

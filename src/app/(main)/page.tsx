@@ -20,6 +20,7 @@ import {
 import type { Provider, ServiceRequest, FeaturedDaddy, LiveReview } from "@/components/home/types";
 import { VisitWindowFields, visitWindowToIso, type VisitWindowValue } from "@/components/visit-window-fields";
 
+/** Shows the home page with search, featured daddies, and how the site works. */
 export default function HomePage() {
   const { data: session } = useSession();
   const [view, setView] = useState<"browse" | "results" | "requests">("browse");
@@ -50,6 +51,7 @@ export default function HomePage() {
 
   useEffect(() => {
     let cancelled = false;
+    /** Loads featured daddies and recent reviews for the homepage. */
     async function fetchHomepageData() {
       try {
         const [daddiesRes, reviewsRes] = await Promise.all([
@@ -78,6 +80,7 @@ export default function HomePage() {
   useEffect(() => {
     if (!selectedService) return;
     let cancelled = false;
+    /** Fetches providers that match the selected service and district. */
     async function fetchProviders() {
       setLoadingProviders(true);
       const p = new URLSearchParams();
@@ -93,6 +96,7 @@ export default function HomePage() {
     return () => { cancelled = true; };
   }, [selectedService, selectedDistrict]);
 
+  /** Loads open service requests, optionally filtered by district. */
   function loadRequests(district?: string) {
     setLoadingRequests(true);
     const p = new URLSearchParams();
@@ -104,6 +108,7 @@ export default function HomePage() {
       .catch(() => setLoadingRequests(false));
   }
 
+  /** Sends a new service request from the homepage form. */
   async function submitRequest() {
     if (!reqTitle.trim() || !reqDesc.trim() || !reqWindow?.date) return;
     setSubmitting(true);
@@ -131,6 +136,7 @@ export default function HomePage() {
     setTimeout(() => setSubmitted(false), 4000);
   }
 
+  /** Clears the current search and returns to the browse view. */
   function resetSearch() {
     setView("browse");
     setSelectedCategory("");

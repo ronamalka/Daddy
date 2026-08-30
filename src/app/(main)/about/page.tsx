@@ -28,6 +28,7 @@ const STATS: { value: string; label: string; Icon: PhosphorIcon }[] = [
   { value: "4", label: "קריטריוני דירוג", Icon: Star },
 ];
 
+/** Shows the about page with the site's story and values. */
 export default function AboutPage() {
   return (
     <div className="min-h-screen bg-[rgb(var(--color-bg))]">

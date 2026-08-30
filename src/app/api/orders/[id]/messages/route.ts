@@ -4,6 +4,7 @@ import { proxyRequest, ORDERS_SERVICE, CHAT_SERVICE } from "@/lib/gateway";
 import { validateBody } from "@/lib/validate";
 import { orderMessageSchema, attachSender } from "@/lib/message-validation";
 
+/** Sends a chat message on an order. Only the buyer or seller on that order may post. */
 export async function POST(request: Request, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const session = await auth();

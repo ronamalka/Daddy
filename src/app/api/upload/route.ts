@@ -11,6 +11,7 @@ import {
 const UPLOAD_DIR = process.env.UPLOAD_DIR || join(process.cwd(), "public", "uploads");
 const UPLOAD_BASE_URL = process.env.UPLOAD_BASE_URL || "/uploads";
 
+/** Saves uploaded files after size and type checks. Requires a signed-in user. */
 export async function POST(request: NextRequest) {
   const session = await auth();
   if (!session?.user) {

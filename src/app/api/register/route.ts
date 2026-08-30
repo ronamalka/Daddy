@@ -33,6 +33,7 @@ const registerSchema = z.object({
   }
 });
 
+/** Creates a new buyer or seller account after bot, CAPTCHA, and password checks. */
 export async function POST(request: NextRequest) {
   const result = await validateBody(request, registerSchema);
   if ("error" in result) return result.error;

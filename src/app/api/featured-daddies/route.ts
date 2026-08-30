@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { proxyRequest, USERS_SERVICE, GIGS_SERVICE, ORDERS_SERVICE } from "@/lib/gateway";
 
+/** Returns up to six featured sellers with ratings and completed-order counts. */
 export async function GET() {
   const { data: sellers } = await proxyRequest(USERS_SERVICE, "/featured-daddies");
 

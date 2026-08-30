@@ -2,8 +2,10 @@ import { Router, Request, Response } from "express";
 import { requireAuth } from "../../../shared/middleware";
 import { prisma } from "../index";
 
+/** Routes for one gig, related gigs, seller stats, and favorite counts. */
 export const gigDetailRoutes = Router();
 
+/** Return one gig with tiers, reviews, and whether the user favorited it. */
 gigDetailRoutes.get("/:id", async (req: Request, res: Response) => {
   const id = req.params.id as string;
 
@@ -62,6 +64,7 @@ gigDetailRoutes.get("/:id", async (req: Request, res: Response) => {
   });
 });
 
+/** Update a gig that the current user owns. */
 gigDetailRoutes.put("/:id", requireAuth, async (req: Request, res: Response) => {
   const id = req.params.id as string;
 
@@ -77,6 +80,7 @@ gigDetailRoutes.put("/:id", requireAuth, async (req: Request, res: Response) => 
 
   const { title, description, image, categoryId, tiers, faqs, requirements } = req.body;
 
+  /** Update the gig and replace tiers, FAQs, and requirements together. */
   await prisma.$transaction(async (tx) => {
     await tx.gig.update({
       where: { id },
@@ -140,6 +144,7 @@ gigDetailRoutes.put("/:id", requireAuth, async (req: Request, res: Response) => 
   res.json(full);
 });
 
+/** List a few other gigs in the same category or from the same seller. */
 gigDetailRoutes.get("/:id/related", async (req: Request, res: Response) => {
   const id = req.params.id as string;
 
@@ -178,6 +183,7 @@ gigDetailRoutes.get("/:id/related", async (req: Request, res: Response) => {
   res.json(result);
 });
 
+/** List all gigs for one seller. */
 gigDetailRoutes.get("/by-seller/:sellerId", async (req: Request, res: Response) => {
   const sellerId = req.params.sellerId as string;
 
@@ -216,11 +222,13 @@ gigDetailRoutes.get("/by-seller/:sellerId", async (req: Request, res: Response) 
   res.json(result);
 });
 
+/** Return how many gigs exist. */
 gigDetailRoutes.get("/stats/counts", async (_req: Request, res: Response) => {
   const count = await prisma.gig.count();
   res.json({ gigs: count });
 });
 
+/** Return review count and average rating for one seller. */
 gigDetailRoutes.get("/reviews/by-seller/:sellerId", async (req: Request, res: Response) => {
   const sellerId = req.params.sellerId as string;
 
@@ -240,6 +248,7 @@ gigDetailRoutes.get("/reviews/by-seller/:sellerId", async (req: Request, res: Re
   });
 });
 
+/** Count how many gigs one user has favorited. */
 gigDetailRoutes.get("/favorites/count/:userId", async (req: Request, res: Response) => {
   const userId = req.params.userId as string;
   const count = await prisma.favorite.count({ where: { userId } });

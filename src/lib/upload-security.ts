@@ -25,11 +25,13 @@ export interface UploadValidationResult {
   detectedType?: string;
 }
 
+/** Returns true if the file starts with the expected bytes. */
 function checkMagicBytes(buffer: Uint8Array, expected: number[]): boolean {
   if (buffer.length < expected.length) return false;
   return expected.every((byte, i) => buffer[i] === byte);
 }
 
+/** Detects JPEG, PNG, or WebP from file bytes. Returns null if unknown. */
 function detectMimeType(buffer: Uint8Array): string | null {
   for (const [mime, config] of Object.entries(ALLOWED_TYPES)) {
     for (const magic of config.magicBytes) {
@@ -50,6 +52,7 @@ function detectMimeType(buffer: Uint8Array): string | null {
   return null;
 }
 
+/** Removes EXIF and similar JPEG metadata. Returns the original buffer if this is not a JPEG. */
 export function stripExifFromJpeg(buffer: Uint8Array): Uint8Array {
   if (buffer[0] !== 0xff || buffer[1] !== 0xd8) return buffer;
 
@@ -91,6 +94,7 @@ export function stripExifFromJpeg(buffer: Uint8Array): Uint8Array {
   return new Uint8Array(result);
 }
 
+/** Checks size and type, then returns a random file name and detected type. */
 export function validateUpload(
   file: { name: string; size: number; type: string },
   buffer: Uint8Array
@@ -114,6 +118,7 @@ export function validateUpload(
   return { valid: true, sanitizedName, detectedType };
 }
 
+/** Returns an error string if all files together are too large, otherwise null. */
 export function validateTotalSize(files: { size: number }[]): string | null {
   const total = files.reduce((sum, f) => sum + f.size, 0);
   if (total > MAX_TOTAL_SIZE) {

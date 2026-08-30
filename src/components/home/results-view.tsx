@@ -31,6 +31,7 @@ interface ResultsViewProps {
   submitted: boolean;
 }
 
+/** List of matching providers and a form to post a service request. */
 export function ResultsView({
   providers, loadingProviders, selectedServiceDef, selectedDistrict, setSelectedDistrict,
   resetSearch, session, showRequestForm, setShowRequestForm,

@@ -16,10 +16,12 @@ const SSR_SENTINEL = Symbol("ssr");
 let cached: CookieConsentState | null | typeof SSR_SENTINEL = SSR_SENTINEL;
 const listeners = new Set<() => void>();
 
+/** Tells all listeners that cookie consent data changed. */
 function emit() {
   listeners.forEach((l) => l());
 }
 
+/** Reads the saved cookie choice from localStorage. */
 function readFromStorage(): CookieConsentState | null {
   try {
     return parseCookieConsent(localStorage.getItem(COOKIE_CONSENT_STORAGE_KEY));
@@ -30,6 +32,7 @@ function readFromStorage(): CookieConsentState | null {
 
 type Snapshot = CookieConsentState | null | "pending";
 
+/** Returns the current cookie choice for the client store. */
 function getSnapshot(): Snapshot {
   if (cached === SSR_SENTINEL) {
     cached = readFromStorage();
@@ -37,15 +40,18 @@ function getSnapshot(): Snapshot {
   return cached;
 }
 
+/** Returns a pending placeholder while the server renders. */
 function getServerSnapshot(): Snapshot {
   return "pending";
 }
 
+/** Subscribes to cookie-consent changes and returns an unsubscribe function. */
 function subscribe(listener: () => void) {
   listeners.add(listener);
   return () => listeners.delete(listener);
 }
 
+/** Saves the cookie choice to localStorage and a cookie, then notifies listeners. */
 function persist(state: CookieConsentState) {
   const raw = JSON.stringify(state);
   localStorage.setItem(COOKIE_CONSENT_STORAGE_KEY, raw);
@@ -55,6 +61,7 @@ function persist(state: CookieConsentState) {
   emit();
 }
 
+/** Stores an accept or reject choice with the current timestamp. */
 function saveChoice(choice: CookieConsentChoice) {
   persist({
     choice,
@@ -65,10 +72,12 @@ function saveChoice(choice: CookieConsentChoice) {
   });
 }
 
+/** Shows a bottom banner asking the user to accept or reject extra cookies. */
 export function CookieConsentBanner() {
   const consent = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
 
   useEffect(() => {
+    /** Reloads cookie consent when another tab changes it. */
     function onStorage(e: StorageEvent) {
       if (e.key === COOKIE_CONSENT_STORAGE_KEY) {
         cached = readFromStorage();
@@ -84,6 +93,7 @@ export function CookieConsentBanner() {
 
   useEffect(() => {
     if (consent) return;
+    /** Rejects extra cookies when the user presses Escape. */
     function onKey(e: KeyboardEvent) {
       if (e.key === "Escape") reject();
     }

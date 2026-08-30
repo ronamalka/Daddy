@@ -12,6 +12,7 @@ interface SheetProps {
   children: React.ReactNode;
 }
 
+/** Side panel that slides in from the edge, used for the mobile nav. */
 export function Sheet({ open, onOpenChange, children }: SheetProps) {
   const [mounted, setMounted] = React.useState(false);
   const [isRtl, setIsRtl] = React.useState(true);

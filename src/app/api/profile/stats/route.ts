@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { proxyRequest, ORDERS_SERVICE, GIGS_SERVICE } from "@/lib/gateway";
 
+/** Returns order, review, gig, and favorite counts for the signed-in user's profile. */
 export async function GET() {
   const session = await auth();
   if (!session?.user) {

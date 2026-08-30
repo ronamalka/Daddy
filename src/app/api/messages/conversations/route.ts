@@ -15,6 +15,7 @@ type ConversationRow = {
   };
 };
 
+/** Returns the signed-in user's chat threads with the other person's name and avatar. */
 export async function GET() {
   const session = await auth();
   if (!session?.user) {

@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils";
 import { SectionHeader } from "./section-header";
 import { BUYER_STEPS, DADDY_STEPS } from "./data";
 
+/** Step-by-step guide for buyers and sellers, with a tab to switch roles. */
 export function HowItWorksSection() {
   const [howItWorksTab, setHowItWorksTab] = useState<"buyer" | "daddy">("buyer");
 

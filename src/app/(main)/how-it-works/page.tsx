@@ -29,6 +29,7 @@ const FAQ = [
   { q: "מי אחראי אם משהו משתבש בעבודה?", a: "נותן השירות בשטח — האבאל׳ה שבחרתם. אבאל׳ה היא פלטפורמת תיווך: לא מעסיקה, לא מבטחת, ולא מבצעת את העבודה. פירוט בתנאי השימוש ובכללי הקהילה." },
 ];
 
+/** Shows step-by-step how buyers and daddies use the site. */
 export default function HowItWorksPage() {
   const [openFaq, setOpenFaq] = useState<number | null>(null);
 

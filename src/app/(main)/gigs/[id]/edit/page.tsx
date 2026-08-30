@@ -21,6 +21,7 @@ interface TierData { title: string; description: string; price: string; delivery
 interface FaqData { question: string; answer: string; }
 interface RequirementData { question: string; required: boolean; }
 
+/** Shows the form to edit an existing gig. */
 export default function EditGigPage() {
   const params = useParams();
   const { data: session } = useSession();
@@ -78,10 +79,12 @@ export default function EditGigPage() {
     return <div className="flex items-center justify-center py-20"><div className="h-10 w-10 animate-spin rounded-full border-4 border-[rgba(var(--color-primary),0.1)] border-t-[rgb(var(--color-primary))]" /></div>;
   }
 
+  /** Updates one field on a price package. */
   function updateTier(tier: string, field: keyof TierData, value: string) {
     setTiers((prev) => ({ ...prev, [tier]: { ...prev[tier], [field]: value } }));
   }
 
+  /** Saves the edited gig details. */
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setSaving(true);

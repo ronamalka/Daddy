@@ -3,6 +3,7 @@ import { PrismaClient } from "@/generated/prisma/client";
 
 const globalForPrisma = globalThis as unknown as { prisma: InstanceType<typeof PrismaClient> };
 
+/** Builds a Prisma client from DATABASE_URL, including Prisma Postgres api_key URLs. */
 function createPrismaClient() {
   const databaseUrl = process.env.DATABASE_URL;
   if (!databaseUrl) {
@@ -20,6 +21,7 @@ function createPrismaClient() {
   return new PrismaClient({ adapter });
 }
 
+/** Returns a shared Prisma client, creating it once. */
 function getPrismaClient() {
   if (!globalForPrisma.prisma) {
     globalForPrisma.prisma = createPrismaClient();
@@ -28,6 +30,7 @@ function getPrismaClient() {
 }
 
 export const prisma = new Proxy({} as InstanceType<typeof PrismaClient>, {
+  /** Forwards each property lookup to the shared Prisma client. */
   get(_target, prop) {
     return Reflect.get(getPrismaClient(), prop);
   },

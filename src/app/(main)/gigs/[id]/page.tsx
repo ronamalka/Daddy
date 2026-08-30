@@ -44,6 +44,7 @@ interface RelatedGig {
 
 const TIER_ORDER = ["BASIC", "STANDARD", "PREMIUM"];
 
+/** Shows one gig's details, packages, and reviews. */
 export default function GigDetailPage() {
   const params = useParams();
   const router = useRouter();
@@ -63,6 +64,7 @@ export default function GigDetailPage() {
   const [loadError, setLoadError] = useState(false);
   const [reloadKey, setReloadKey] = useState(0);
 
+  /** Reports a review with the reason the user typed. */
   async function flagReview(reviewId: string) {
     if (!flagReason.trim()) return;
     const res = await fetch(`/api/reviews/${reviewId}/flag`, {
@@ -111,6 +113,7 @@ export default function GigDetailPage() {
     };
   }, [params.id, reloadKey]);
 
+  /** Adds or removes this gig from the user's favorites. */
   async function toggleFavorite() {
     if (!session) { router.push("/login"); return; }
     const res = await fetch("/api/favorites", {
@@ -124,6 +127,7 @@ export default function GigDetailPage() {
     }
   }
 
+  /** Places an order for the selected package and visit slot. */
   async function handleOrder() {
     if (!session) { router.push("/login"); return; }
     if (!selectedSlot) {

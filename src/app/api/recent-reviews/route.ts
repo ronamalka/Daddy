@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { proxyRequest, GIGS_SERVICE, USERS_SERVICE } from "@/lib/gateway";
 
+/** Returns recent reviews with buyer and seller names filled in. */
 export async function GET() {
   const { data: reviews } = await proxyRequest(GIGS_SERVICE, "/recent-reviews");
 

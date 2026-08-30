@@ -15,6 +15,7 @@ export type AcceptQuoteResult =
   | { ok: true }
   | { ok: false; status: number; error: string };
 
+/** Checks that this buyer (or admin) can accept this open quote with a price. */
 export function validateAcceptQuote(input: {
   actorId: string;
   actorRole: string;

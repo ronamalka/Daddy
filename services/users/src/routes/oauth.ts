@@ -1,8 +1,10 @@
 import { Router, Request, Response } from "express";
 import { prisma } from "../index";
 
+/** Routes for Google (and similar) sign-in. */
 export const oauthRoutes = Router();
 
+/** Find or create a buyer from OAuth email and name. */
 oauthRoutes.post("/", async (req: Request, res: Response) => {
   const { email, name, avatar } = req.body;
 

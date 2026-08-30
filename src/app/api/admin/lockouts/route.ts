@@ -4,6 +4,7 @@ import { getLockedAccounts, getRecentLockoutEvents, adminUnlockAccount } from "@
 import { z } from "zod";
 import { logSecurityEvent, extractClientInfo } from "@/lib/security-logger";
 
+/** Returns locked accounts, or recent lockout events when `view=events`. Admins only. */
 export async function GET(request: Request) {
   const session = await auth();
   if (!session?.user || (session.user as { role: string }).role !== "ADMIN") {
@@ -26,6 +27,7 @@ const unlockSchema = z.object({
   email: z.string().email().max(254),
 }).strict();
 
+/** Unlocks a user account by email. Admins only. */
 export async function POST(request: Request) {
   const session = await auth();
   if (!session?.user || (session.user as { role: string }).role !== "ADMIN") {

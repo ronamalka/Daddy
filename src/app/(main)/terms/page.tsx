@@ -145,6 +145,7 @@ const SECTIONS = [
   },
 ];
 
+/** Shows the terms of use. */
 export default function TermsPage() {
   return (
     <div className="min-h-screen bg-[rgb(var(--color-surface-elevated))]">

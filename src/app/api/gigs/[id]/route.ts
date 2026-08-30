@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { proxyRequest, GIGS_SERVICE, USERS_SERVICE } from "@/lib/gateway";
 
+/** Returns one gig with seller profile details attached. */
 export async function GET(_request: Request, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
 
@@ -37,6 +38,7 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
   return NextResponse.json(data, { status });
 }
 
+/** Updates an existing gig. Requires a signed-in user who owns it. */
 export async function PUT(request: Request, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const session = await auth();

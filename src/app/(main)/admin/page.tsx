@@ -63,6 +63,7 @@ const ROLE_BADGE: Record<string, { bg: string; text: string }> = {
   BUYER: { bg: "bg-[rgba(var(--color-accent),0.15)]", text: "text-[rgb(var(--color-success))]" },
 };
 
+/** Shows admin stats and a list of users. */
 export default function AdminPage() {
   const { data: session } = useSession();
   const [stats, setStats] = useState<Stats | null>(null);

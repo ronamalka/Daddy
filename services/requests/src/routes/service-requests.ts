@@ -2,8 +2,10 @@ import { Router, Request, Response } from "express";
 import { requireAuth, requireSeller } from "../../../shared/middleware";
 import { prisma } from "../index";
 
+/** Routes for local service requests, seller quotes, and accepting a quote. */
 export const serviceRequestsRoutes = Router();
 
+/** List service requests the current user is allowed to see. */
 serviceRequestsRoutes.get("/", requireAuth, async (req: Request, res: Response) => {
   const district = req.query.district as string | undefined;
   const status = (req.query.status as string) || "OPEN";
@@ -33,6 +35,7 @@ serviceRequestsRoutes.get("/", requireAuth, async (req: Request, res: Response) 
   res.json(requests);
 });
 
+/** Create a new local service request with a visit window. */
 serviceRequestsRoutes.post("/", requireAuth, async (req: Request, res: Response) => {
   const { title, description, serviceSlug, districtCode, districtName, cityCode, cityName, slotStart, slotEnd } = req.body;
 
@@ -74,6 +77,7 @@ serviceRequestsRoutes.post("/", requireAuth, async (req: Request, res: Response)
   res.json(created);
 });
 
+/** Get one request and its quotes. Buyers can only see their own. */
 serviceRequestsRoutes.get("/:id", requireAuth, async (req: Request, res: Response) => {
   const id = req.params.id as string;
   const user = req.user!;
@@ -100,6 +104,7 @@ serviceRequestsRoutes.get("/:id", requireAuth, async (req: Request, res: Respons
   res.json({ request: serviceRequest });
 });
 
+/** Let a seller send a quote on an open request. */
 serviceRequestsRoutes.post("/:id/respond", requireAuth, requireSeller, async (req: Request, res: Response) => {
   const id = req.params.id as string;
   const { message, proposedPrice } = req.body;
@@ -146,6 +151,7 @@ serviceRequestsRoutes.post("/:id/respond", requireAuth, requireSeller, async (re
   res.json(response);
 });
 
+/** Let the buyer accept a quote and link it to an order. */
 serviceRequestsRoutes.post("/:id/accept", requireAuth, async (req: Request, res: Response) => {
   const id = req.params.id as string;
   const { responseId, orderId } = req.body as { responseId?: string; orderId?: string };
@@ -156,6 +162,7 @@ serviceRequestsRoutes.post("/:id/accept", requireAuth, async (req: Request, res:
   }
 
   try {
+    /** Mark the quote as selected and move the request to in progress. */
     const updated = await prisma.$transaction(async (tx) => {
       const serviceRequest = await tx.serviceRequest.findUnique({
         where: { id },

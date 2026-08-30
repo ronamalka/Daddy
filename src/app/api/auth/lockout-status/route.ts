@@ -6,6 +6,7 @@ const schema = z.object({
   email: z.string().email().max(254),
 });
 
+/** Checks whether an email is locked out from signing in, and how long until retry. */
 export async function POST(request: Request) {
   let body: unknown;
   try {

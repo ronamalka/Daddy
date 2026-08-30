@@ -34,6 +34,7 @@ const TESTIMONIALS = [
   { name: "אבי ישראלי, 55", city: "תל אביב", service: "הרכבת רהיטים", text: "30 שנה בנגרות. אמרו לי ׳תנוח, מגיע לך׳. אבל מה אני אעשה — אשב מול הטלוויזיה? עכשיו אני מרכיב ארונות לזוגות צעירים, ותמיד יוצא עם בדיחה טובה.", rating: 5 },
 ];
 
+/** Shows why and how to join as a daddy (service provider). */
 export default function BecomeADaddyPage() {
   return (
     <div className="min-h-screen bg-[rgb(var(--color-bg))]">

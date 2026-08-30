@@ -4,6 +4,7 @@ import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { useState } from "react";
 
+/** Warns signed-in users whose password is weak and links them to change it. */
 export function WeakPasswordBanner() {
   const { data: session } = useSession();
   const [dismissed, setDismissed] = useState(false);

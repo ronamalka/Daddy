@@ -3,10 +3,12 @@ import { randomBytes } from "crypto";
 import { hash } from "bcryptjs";
 import { prisma } from "../index";
 
+/** Routes for requesting, checking, and using a password-reset token. */
 export const passwordResetRoutes = Router();
 
 const TOKEN_EXPIRY_HOURS = 1;
 
+/** Create a reset token for this email, without saying if the account exists. */
 passwordResetRoutes.post("/request", async (req: Request, res: Response) => {
   const { email } = req.body;
 
@@ -46,6 +48,7 @@ passwordResetRoutes.post("/request", async (req: Request, res: Response) => {
   res.json({ message: "If the email exists, a reset link has been sent" });
 });
 
+/** Check that a reset token is still valid. */
 passwordResetRoutes.post("/validate", async (req: Request, res: Response) => {
   const { token } = req.body;
 
@@ -64,6 +67,7 @@ passwordResetRoutes.post("/validate", async (req: Request, res: Response) => {
   res.json({ valid: true });
 });
 
+/** Set a new password using a valid reset token. */
 passwordResetRoutes.post("/reset", async (req: Request, res: Response) => {
   const { token, password } = req.body;
 

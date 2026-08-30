@@ -10,6 +10,7 @@ const acceptQuoteSchema = z.object({
   responseId: z.string().min(1).max(50),
 }).strict();
 
+/** Accepts a seller quote, creates an order, and sends a chat message to the seller. */
 export async function POST(request: Request, { params }: { params: Promise<{ id: string }> }) {
   const session = await auth();
   if (!session?.user) {
