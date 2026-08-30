@@ -29,14 +29,18 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         const password = credentials?.password as string;
         if (!email || !password) return null;
 
-        const lockout = await checkLockout(email);
-        if (!lockout.allowed) {
-          logSecurityEvent("login_lockout", {
-            email,
-            outcome: "blocked",
-            metadata: { reason: lockout.reason },
-          });
-          return null;
+        try {
+          const lockout = await checkLockout(email);
+          if (!lockout.allowed) {
+            logSecurityEvent("login_lockout", {
+              email,
+              outcome: "blocked",
+              metadata: { reason: lockout.reason },
+            });
+            return null;
+          }
+        } catch (err) {
+          console.error("[auth] lockout check failed, continuing login:", err);
         }
 
         const res = await fetch(`${USERS_SERVICE}/login`, {
@@ -46,16 +50,25 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         });
 
         if (!res.ok) {
-          const attempts = await recordFailedAttempt(email);
-          logSecurityEvent("login_failure", {
-            email,
-            outcome: "failure",
-            metadata: { attempts },
-          });
+          try {
+            const attempts = await recordFailedAttempt(email);
+            logSecurityEvent("login_failure", {
+              email,
+              outcome: "failure",
+              metadata: { attempts },
+            });
+          } catch (err) {
+            console.error("[auth] failed to record lockout attempt:", err);
+            logSecurityEvent("login_failure", { email, outcome: "failure" });
+          }
           return null;
         }
 
-        await resetAttempts(email);
+        try {
+          await resetAttempts(email);
+        } catch (err) {
+          console.error("[auth] failed to reset lockout attempts:", err);
+        }
         const user = await res.json();
         logSecurityEvent("login_success", {
           email,
