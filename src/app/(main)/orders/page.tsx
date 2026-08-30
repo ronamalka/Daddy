@@ -44,7 +44,12 @@ export default function OrdersPage() {
     fetch("/api/orders")
       .then((r) => r.json())
       .then((data) => {
-        setOrders(data);
+        setOrders(Array.isArray(data) ? data : []);
+      })
+      .catch(() => {
+        setOrders([]);
+      })
+      .finally(() => {
         setLoading(false);
       });
   }, []);

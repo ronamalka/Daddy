@@ -29,7 +29,8 @@ export async function proxyRequest(serviceUrl: string, path: string, options: Pr
   };
 
   if (user) {
-    const userPayload = JSON.stringify(user);
+    // HTTP headers are Latin-1; Hebrew names must be percent-encoded or fetch throws.
+    const userPayload = encodeURIComponent(JSON.stringify(user));
     headers["x-user"] = userPayload;
     headers["x-user-signature"] = signPayload(userPayload);
   }

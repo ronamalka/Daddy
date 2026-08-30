@@ -19,7 +19,7 @@ export async function GET() {
   const { data, status } = await proxyRequest(ORDERS_SERVICE, "/orders", { user });
 
   if (status !== 200 || !Array.isArray(data)) {
-    return NextResponse.json(data, { status });
+    return NextResponse.json(data ?? { error: "Failed to load orders" }, { status });
   }
 
   const gigIds = [...new Set(data.map((o: { gigId: string }) => o.gigId))] as string[];
@@ -31,14 +31,14 @@ export async function GET() {
   await Promise.all([
     ...gigIds.map(async (id) => {
       const { data: gig } = await proxyRequest(GIGS_SERVICE, `/gigs/${id}`);
-      if (gig) {
+      if (gig?.id && typeof gig.title === "string") {
         gigMap[id] = { id: gig.id, title: gig.title, image: gig.image };
       }
     }),
     ...userIds.map(async (id) => {
       const { data: u } = await proxyRequest(USERS_SERVICE, `/sellers/${id}`);
-      if (u) {
-        userMap[id] = { id: u.id, name: u.name, avatar: u.avatar };
+      if (u?.id && typeof u.name === "string") {
+        userMap[id] = { id: u.id, name: u.name, avatar: u.avatar ?? null };
       }
     }),
   ]);

@@ -53,10 +53,25 @@ describe("proxyRequest", () => {
       expect.any(String),
       expect.objectContaining({
         headers: expect.objectContaining({
-          "x-user": JSON.stringify(user),
+          "x-user": encodeURIComponent(JSON.stringify(user)),
         }),
       })
     );
+  });
+
+  it("percent-encodes non-ascii names so x-user stays a latin-1 header", async () => {
+    const mockResponse = { ok: true, json: () => Promise.resolve([]) };
+    globalThis.fetch = vi.fn().mockResolvedValue(mockResponse);
+
+    const user = { id: "u1", email: "seller@daddy.com", name: "יוסי הגולדן", role: "SELLER" };
+    const { proxyRequest } = await import("../../src/lib/gateway");
+    await proxyRequest("http://localhost:4003", "/orders", { user });
+
+    const headers = (globalThis.fetch as ReturnType<typeof vi.fn>).mock.calls[0][1].headers as Record<string, string>;
+    expect(headers["x-user"]).toBe(encodeURIComponent(JSON.stringify(user)));
+    for (const value of Object.values(headers)) {
+      expect([...value].every((ch) => ch.charCodeAt(0) < 256)).toBe(true);
+    }
   });
 
   it("sends body as JSON for POST requests", async () => {
