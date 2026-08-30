@@ -251,7 +251,7 @@ export default function SellerProfilePage() {
           <div className="flex flex-col items-center -mt-14 sm:flex-row sm:items-end sm:gap-6">
             {/* Avatar */}
             <div className="relative">
-              <div className="flex h-28 w-28 items-center justify-center rounded-full border-4 border-[rgb(var(--color-surface))] bg-gradient-to-br from-[rgb(var(--color-primary))] to-[rgb(var(--color-primary-light))] text-4xl font-bold text-white shadow-[0_4px_16px_rgba(var(--color-primary),0.25)]">
+              <div className="relative flex h-28 w-28 items-center justify-center overflow-hidden rounded-full border-4 border-[rgb(var(--color-surface))] bg-gradient-to-br from-[rgb(var(--color-primary))] to-[rgb(var(--color-primary-light))] text-4xl font-bold text-white shadow-[0_4px_16px_rgba(var(--color-primary),0.25)]">
                 {seller.avatar ? (
                   <Image src={seller.avatar} alt={seller.name} fill className="rounded-full object-cover" unoptimized />
                 ) : (
@@ -781,7 +781,7 @@ function GigsTab({ gigs, sellerName, sellerAvatar }: { gigs: SellerProfile["gigs
           image={g.image}
           seller={{ name: sellerName, avatar: sellerAvatar }}
           startingPrice={g.tiers?.[0]?.price || 0}
-          avgRating={g.avgRating}
+          avgRating={g.avgRating ?? 0}
           reviewCount={g.reviewCount}
         />
       ))}
