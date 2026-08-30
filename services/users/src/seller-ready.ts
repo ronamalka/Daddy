@@ -1,5 +1,3 @@
-import type { Prisma } from "./generated/prisma/client";
-
 export const SELLER_READY_KEYS = [
   "pricedService",
   "serviceArea",
@@ -60,8 +58,8 @@ interface SearchableSellerFilters {
 }
 
 /** Prisma where-clause for sellers who may appear in search and featured lists. */
-export function searchableSellerWhere(filters: SearchableSellerFilters = {}): Prisma.UserWhereInput {
-  const and: Prisma.UserWhereInput[] = [
+export function searchableSellerWhere(filters: SearchableSellerFilters = {}) {
+  const and: object[] = [
     { phone: { not: null } },
     { phone: { not: "" } },
     { avatar: { not: null } },
