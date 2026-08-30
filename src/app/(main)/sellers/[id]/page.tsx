@@ -91,7 +91,7 @@ function RatingBar({ label, value, icon }: { label: string; value: number; icon:
           transition={{ duration: 0.8, ease: "easeOut" }}
         />
       </div>
-      <span className="w-10 text-left text-[15px] font-bold" style={{ color }}>{value.toFixed(1)}</span>
+      <span className="w-10 text-left text-[15px] font-bold" style={{ color }}>{Number(value).toFixed(1)}</span>
     </div>
   );
 }
@@ -240,10 +240,10 @@ export default function SellerProfilePage() {
                   <CalendarBlank className="h-3.5 w-3.5" />
                   חבר מאז {memberSince}
                 </span>
-                {seller.avgRating > 0 && (
+                {Number(seller.avgRating) > 0 && (
                   <span className="flex items-center gap-1">
                     <Star className="h-3.5 w-3.5 text-[rgb(var(--color-accent-yellow))]" weight="fill" />
-                    {seller.avgRating.toFixed(1)} ({seller.totalReviews})
+                    {Number(seller.avgRating).toFixed(1)} ({seller.totalReviews})
                   </span>
                 )}
               </div>
@@ -570,7 +570,7 @@ function ReviewsTab({ reviews }: { reviews: ReviewData[] }) {
 }
 
 function PricesTab({ prices }: { prices: SellerProfile["servicePrices"] }) {
-  if (prices.length === 0) {
+  if (!prices || prices.length === 0) {
     return (
       <div className="rounded-2xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] p-12 text-center">
         <Coins className="mx-auto mb-3 h-10 w-10 text-[rgb(var(--color-text-muted))]" />
@@ -616,7 +616,7 @@ function PricesTab({ prices }: { prices: SellerProfile["servicePrices"] }) {
 }
 
 function GigsTab({ gigs, sellerName, sellerAvatar }: { gigs: SellerProfile["gigs"]; sellerName: string; sellerAvatar: string | null }) {
-  if (gigs.length === 0) {
+  if (!gigs || gigs.length === 0) {
     return (
       <div className="rounded-2xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] p-12 text-center">
         <p className="text-[16px] font-medium text-[rgb(var(--color-text))]">אין שירותים עדיין</p>
@@ -634,7 +634,7 @@ function GigsTab({ gigs, sellerName, sellerAvatar }: { gigs: SellerProfile["gigs
           title={g.title}
           image={g.image}
           seller={{ name: sellerName, avatar: sellerAvatar }}
-          startingPrice={g.tiers[0]?.price || 0}
+          startingPrice={g.tiers?.[0]?.price || 0}
           avgRating={g.avgRating}
           reviewCount={g.reviewCount}
         />

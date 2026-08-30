@@ -71,7 +71,7 @@ export function GigCard({ id, title, image, seller, startingPrice, avgRating, re
             <div className="mt-3 flex items-center justify-between border-t border-[rgb(var(--color-border-light))] pt-3">
               <div className="flex items-center gap-1.5">
                 <Star className="h-4 w-4 text-[rgb(var(--color-accent-yellow))]" weight="fill" />
-                <span className="text-[13px] font-bold text-[rgb(var(--color-text))]">{avgRating.toFixed(1)}</span>
+                <span className="text-[13px] font-bold text-[rgb(var(--color-text))]">{(avgRating ?? 0).toFixed(1)}</span>
                 <span className="text-[13px] text-[rgb(var(--color-text-muted))]">({reviewCount})</span>
               </div>
               <div>
@@ -125,7 +125,7 @@ export function GigCard({ id, title, image, seller, startingPrice, avgRating, re
           </h3>
           <div className="mb-3 flex items-center gap-1.5">
             <Star className="h-4 w-4 text-[rgb(var(--color-accent-yellow))]" weight="fill" />
-            <span className="text-[13px] font-bold text-[rgb(var(--color-text))]">{avgRating.toFixed(1)}</span>
+            <span className="text-[13px] font-bold text-[rgb(var(--color-text))]">{(avgRating ?? 0).toFixed(1)}</span>
             <span className="text-[13px] text-[rgb(var(--color-text-muted))]">({reviewCount})</span>
           </div>
           <div className="border-t border-[rgb(var(--color-border-light))] pt-3">

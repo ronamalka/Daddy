@@ -34,6 +34,27 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
     }
   }
 
+  if (Array.isArray(data.reviews) && data.reviews.length > 0) {
+    const reviewerIds = [...new Set(
+      data.reviews
+        .map((review: { userId?: string }) => review.userId)
+        .filter((id: string | undefined): id is string => typeof id === "string" && id.length > 0)
+    )];
+    const reviewerMap: Record<string, { name: string; avatar: string | null }> = {};
+    await Promise.all(
+      reviewerIds.map(async (userId) => {
+        const { data: reviewer } = await proxyRequest(USERS_SERVICE, `/sellers/${userId}`);
+        if (reviewer?.id && typeof reviewer.name === "string") {
+          reviewerMap[userId] = { name: reviewer.name, avatar: reviewer.avatar ?? null };
+        }
+      })
+    );
+    data.reviews = data.reviews.map((review: { userId?: string }) => ({
+      ...review,
+      user: (review.userId && reviewerMap[review.userId]) || { name: "משתמש", avatar: null },
+    }));
+  }
+
   return NextResponse.json(data, { status });
 }
 

@@ -21,7 +21,7 @@ interface GigDetail {
     id: string; rating: number; comment: string; createdAt: string;
     communicationRating: number | null; qualityRating: number | null; timelinessRating: number | null;
     sellerResponse: string | null; sellerResponseAt: string | null;
-    user: { name: string; avatar: string | null };
+    user?: { name: string; avatar: string | null };
   }[];
   images: { id: string; url: string; order: number }[];
   faqs: { id: string; question: string; answer: string; order: number }[];
@@ -224,7 +224,7 @@ export default function GigDetailPage() {
               <div className="flex items-center gap-2 text-[13px]">
                 <div className="flex items-center gap-1">
                   <Star className="h-4 w-4 text-[rgb(var(--color-accent-yellow))] " weight="fill" />
-                  <span className="font-bold text-[rgb(var(--color-text))]">{gig.avgRating.toFixed(1)}</span>
+                  <span className="font-bold text-[rgb(var(--color-text))]">{(gig.avgRating ?? 0).toFixed(1)}</span>
                 </div>
                 <span className="text-[rgb(var(--color-text-muted))]">({gig.reviewCount} ביקורות)</span>
                 {gig.seller?.city && <span className="text-[rgb(var(--color-text-muted))]">· {gig.seller.city}</span>}
@@ -300,7 +300,7 @@ export default function GigDetailPage() {
           )}
 
           {/* Reviews */}
-          {gig.reviews.length > 0 && (
+          {Array.isArray(gig.reviews) && gig.reviews.length > 0 && (
             <div className="mb-8 rounded-2xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] overflow-hidden">
               <div className="flex items-center gap-2 border-b border-[rgb(var(--color-border))] px-6 py-4">
                 <Star className="h-5 w-5 text-[rgb(var(--color-accent-yellow))] " weight="fill" />
@@ -314,10 +314,10 @@ export default function GigDetailPage() {
                   <div key={review.id} className="py-4 first:pt-0 last:pb-0">
                     <div className="mb-2 flex items-center gap-3">
                       <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-[rgb(var(--color-accent))] to-[rgb(var(--color-success))] text-[12px] font-bold text-white">
-                        {review.user.name[0]}
+                        {(review.user?.name || "משתמש")[0]}
                       </div>
                       <div className="flex-1">
-                        <p className="text-[14px] font-semibold text-[rgb(var(--color-text))]">{review.user.name}</p>
+                        <p className="text-[14px] font-semibold text-[rgb(var(--color-text))]">{review.user?.name || "משתמש"}</p>
                         <div className="flex items-center gap-0.5">
                           {Array.from({ length: 5 }, (_, i) => (
                             <Star
