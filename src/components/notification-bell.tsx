@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
-import { Bell, Package, ArrowsClockwise, CheckCircle, Handshake } from "@phosphor-icons/react";
+import { Bell, ChatCircle, Package, ArrowsClockwise, CheckCircle, Handshake } from "@phosphor-icons/react";
 import { AnimatePresence, motion } from "framer-motion";
 import { DropdownMenu } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
@@ -12,7 +12,8 @@ interface Notification {
   type: string;
   title: string;
   message: string;
-  orderId: string;
+  href?: string;
+  orderId?: string;
   createdAt: string;
   read: boolean;
 }
@@ -22,6 +23,7 @@ const TYPE_ICON: Record<string, React.ReactNode> = {
   REVISION_REQUESTED: <ArrowsClockwise className="h-4 w-4 text-[rgb(var(--color-warning))]" />,
   ORDER_DELIVERED: <CheckCircle className="h-4 w-4 text-[rgb(var(--color-success))]" weight="fill" />,
   ORDER_ACCEPTED: <Handshake className="h-4 w-4 text-[rgb(var(--color-primary))]" />,
+  NEW_MESSAGE: <ChatCircle className="h-4 w-4 text-[rgb(var(--color-primary))]" weight="fill" />,
 };
 
 export function NotificationBell() {
@@ -101,7 +103,7 @@ export function NotificationBell() {
           {notifications.map((n) => (
             <Link
               key={n.id}
-              href={`/orders/${n.orderId}`}
+              href={n.href || (n.orderId ? `/orders/${n.orderId}` : "/inbox")}
               onClick={() => setOpen(false)}
               className={cn(
                 "flex items-start gap-3 px-4 py-3 transition-colors hover:bg-[rgb(var(--color-surface-elevated))]",

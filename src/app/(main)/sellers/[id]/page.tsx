@@ -134,6 +134,7 @@ function SellerSkeleton() {
 
 export default function SellerProfilePage() {
   const params = useParams();
+  const router = useRouter();
   const { data: session } = useSession();
   const [seller, setSeller] = useState<SellerProfile | null>(null);
   const [notFound, setNotFound] = useState(false);
@@ -184,6 +185,7 @@ export default function SellerProfilePage() {
     if (res.ok) {
       setMsgSent(true);
       setMsgText("");
+      router.push(`/inbox/${sellerId}`);
     } else {
       setMsgError("לא הצלחנו לשלוח את ההודעה. נסה שוב.");
     }

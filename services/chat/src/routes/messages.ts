@@ -1,6 +1,6 @@
 import { Router, Request, Response } from "express";
 import { requireAuth } from "../../../shared/middleware";
-import { listMessages, markRead, sendMessage, unreadCount, type MessageRepo } from "../chat";
+import { listConversations, listMessages, markRead, sendMessage, unreadCount, type MessageRepo } from "../chat";
 
 export function createMessagesRouter(repo: MessageRepo) {
   const router = Router();
@@ -19,6 +19,15 @@ export function createMessagesRouter(repo: MessageRepo) {
       return;
     }
     res.status(result.status).json(result.data);
+  });
+
+  router.get("/conversations", requireAuth, async (req: Request, res: Response) => {
+    const result = await listConversations(repo, req.user!.id);
+    if (!result.ok) {
+      res.status(result.status).json({ error: result.error });
+      return;
+    }
+    res.json(result.data);
   });
 
   router.get("/", requireAuth, async (req: Request, res: Response) => {

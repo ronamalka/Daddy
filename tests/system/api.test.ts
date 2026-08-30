@@ -371,6 +371,13 @@ describe("System Tests — Auth-Protected API", () => {
     });
   });
 
+  describe("GET /api/messages/conversations", () => {
+    it("returns 401 without auth", async () => {
+      const { status } = await fetchApi("/api/messages/conversations");
+      expect(status).toBe(401);
+    });
+  });
+
   describe("GET /api/messages/unread-count", () => {
     it("returns count 0 without auth (graceful fallback)", async () => {
       const { status, body } = await fetchApi("/api/messages/unread-count");

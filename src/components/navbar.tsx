@@ -58,8 +58,12 @@ export function Navbar() {
         .catch(() => {});
     }
     fetchUnread();
-    const interval = setInterval(fetchUnread, 30000);
-    return () => clearInterval(interval);
+    const interval = setInterval(fetchUnread, 10000);
+    window.addEventListener("daddy:messages-changed", fetchUnread);
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener("daddy:messages-changed", fetchUnread);
+    };
   }, [session]);
 
   return (

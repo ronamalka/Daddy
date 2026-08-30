@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { useParams } from "next/navigation";
+import Link from "next/link";
 import { ReviewForm } from "@/components/review-form";
 import { Star, Handshake, Clock, Coins, Tag, ClipboardText, ChatCircle, PaperPlaneTilt, ArrowsClockwise, Warning } from "@phosphor-icons/react";
 import { Dialog } from "@/components/ui/dialog";
@@ -494,10 +495,20 @@ export default function OrderDetailPage() {
 
       {/* Messages Section */}
       <div className="rounded-2xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] shadow-[0_2px_8px_rgba(var(--color-primary),0.06)] overflow-hidden">
-        <div className="flex items-center gap-2 border-b border-[rgb(var(--color-border))] px-6 py-4">
+        <div className="flex items-center justify-between gap-3 border-b border-[rgb(var(--color-border))] px-6 py-4">
+        <div className="flex flex-1 items-center gap-2">
           <ChatCircle className="h-5 w-5 text-[rgb(var(--color-primary))]" />
           <h2 className="text-[16px] font-bold text-[rgb(var(--color-text))]">הודעות</h2>
           <span className="rounded-full bg-[rgba(var(--color-primary),0.1)] px-2.5 py-0.5 text-[12px] font-semibold text-[rgb(var(--color-primary))]">{order.messages.length}</span>
+        </div>
+        {session?.user && (
+          <Link
+            href={`/inbox/${session.user.id === order.buyer.id ? order.seller.id : order.buyer.id}`}
+            className="text-[13px] font-semibold text-[rgb(var(--color-primary))] hover:underline"
+          >
+            כל השיחה עם {session.user.id === order.buyer.id ? order.seller.name : order.buyer.name}
+          </Link>
+        )}
         </div>
 
         <div className="max-h-[400px] overflow-y-auto p-6 bg-[rgb(var(--color-surface-elevated))]">
