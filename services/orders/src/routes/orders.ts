@@ -2,17 +2,15 @@ import { Router, Request, Response } from "express";
 import { requireAuth } from "../../../shared/middleware";
 import { prisma } from "../index";
 import { parseRequiredSlot } from "../lib/slots";
+import { orderListWhere } from "../lib/order-list";
 
+/** Routes for listing orders, creating them, and reading booking stats. */
 export const ordersRoutes = Router();
 
+/** List the current user's orders. */
 ordersRoutes.get("/", requireAuth, async (req: Request, res: Response) => {
-  const where =
-    req.user!.role === "SELLER"
-      ? { sellerId: req.user!.id }
-      : { buyerId: req.user!.id };
-
   const orders = await prisma.order.findMany({
-    where,
+    where: orderListWhere(req.user!.id),
     include: {
       requirements: true,
     },
@@ -22,6 +20,7 @@ ordersRoutes.get("/", requireAuth, async (req: Request, res: Response) => {
   res.json(orders);
 });
 
+/** Create a gig order or a local-request order with a visit window. */
 ordersRoutes.post("/", requireAuth, async (req: Request, res: Response) => {
   const jobType = req.body.jobType === "LOCAL_REQUEST" ? "LOCAL_REQUEST" : "GIG";
   const { gigId, sellerId, tier, price, slotStart, slotEnd, title, requestId } = req.body;
@@ -58,6 +57,7 @@ ordersRoutes.post("/", requireAuth, async (req: Request, res: Response) => {
   }
 
   try {
+    /** Create the order only if the visit window is free. */
     const order = await prisma.$transaction(async (tx) => {
       const conflict = await tx.order.findFirst({
         where: {
@@ -100,6 +100,7 @@ ordersRoutes.post("/", requireAuth, async (req: Request, res: Response) => {
   }
 });
 
+/** Return how many orders this user has as buyer and as seller. */
 ordersRoutes.get("/stats", requireAuth, async (req: Request, res: Response) => {
   const userId = req.user!.id;
 
@@ -111,6 +112,7 @@ ordersRoutes.get("/stats", requireAuth, async (req: Request, res: Response) => {
   res.json({ ordersBuyer, ordersSeller, totalOrders: ordersBuyer + ordersSeller });
 });
 
+/** Return platform-wide order count and completed-order revenue. */
 ordersRoutes.get("/stats/admin", requireAuth, async (_req: Request, res: Response) => {
   const orderCount = await prisma.order.count();
 
@@ -124,6 +126,7 @@ ordersRoutes.get("/stats/admin", requireAuth, async (_req: Request, res: Respons
   res.json({ orders: orderCount, revenue });
 });
 
+/** Count completed orders for one seller. */
 ordersRoutes.get("/count-by-seller/:sellerId", async (req: Request, res: Response) => {
   const sellerId = req.params.sellerId as string;
   const count = await prisma.order.count({
@@ -132,6 +135,7 @@ ordersRoutes.get("/count-by-seller/:sellerId", async (req: Request, res: Respons
   res.json({ completedOrders: count });
 });
 
+/** List a seller's booked visit windows in a date range. */
 ordersRoutes.get("/booked-slots/:sellerId", async (req: Request, res: Response) => {
   const sellerId = req.params.sellerId as string;
   const from = typeof req.query.from === "string" ? new Date(req.query.from) : new Date();

@@ -91,15 +91,13 @@ describe("Price Tier Sorting", () => {
 });
 
 describe("Role-Based Filtering", () => {
-  function buildOrderFilter(userId: string, role: string) {
-    return role === "SELLER" ? { sellerId: userId } : { buyerId: userId };
+  function buildOrderFilter(userId: string) {
+    return { OR: [{ sellerId: userId }, { buyerId: userId }] };
   }
 
-  it("seller sees orders where they are seller", () => {
-    expect(buildOrderFilter("seller-1", "SELLER")).toEqual({ sellerId: "seller-1" });
-  });
-
-  it("buyer sees orders where they are buyer", () => {
-    expect(buildOrderFilter("buyer-1", "BUYER")).toEqual({ buyerId: "buyer-1" });
+  it("returns orders the user sells or buys", () => {
+    expect(buildOrderFilter("seller-1")).toEqual({
+      OR: [{ sellerId: "seller-1" }, { buyerId: "seller-1" }],
+    });
   });
 });

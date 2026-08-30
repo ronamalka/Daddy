@@ -12,6 +12,7 @@ type NotificationItem = {
   read: boolean;
 };
 
+/** Returns the latest notifications for the signed-in user from orders and unread chats. */
 export async function GET() {
   const session = await auth();
   if (!session?.user) {
@@ -25,11 +26,13 @@ export async function GET() {
   ]);
 
   const notifications: NotificationItem[] = [];
-  const isSeller = user.role === "SELLER";
   const orderList = ordersStatus === 200 && Array.isArray(orders) ? orders : [];
 
   for (const order of orderList) {
-    if (isSeller && order.status === "PENDING") {
+    const asSeller = order.sellerId === user.id;
+    const asBuyer = order.buyerId === user.id;
+
+    if (asSeller && order.status === "PENDING") {
       notifications.push({
         id: `new-order-${order.id}`,
         type: "NEW_ORDER",
@@ -41,7 +44,7 @@ export async function GET() {
       });
     }
 
-    if (isSeller && order.status === "REVISION") {
+    if (asSeller && order.status === "REVISION") {
       notifications.push({
         id: `revision-${order.id}`,
         type: "REVISION_REQUESTED",
@@ -53,7 +56,7 @@ export async function GET() {
       });
     }
 
-    if (!isSeller && order.status === "DELIVERED") {
+    if (asBuyer && order.status === "DELIVERED") {
       notifications.push({
         id: `delivered-${order.id}`,
         type: "ORDER_DELIVERED",
@@ -65,7 +68,7 @@ export async function GET() {
       });
     }
 
-    if (!isSeller && order.status === "IN_PROGRESS") {
+    if (asBuyer && order.status === "IN_PROGRESS") {
       notifications.push({
         id: `accepted-${order.id}`,
         type: "ORDER_ACCEPTED",

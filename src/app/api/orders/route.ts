@@ -32,6 +32,7 @@ type OrderRow = {
   sellerId: string;
 };
 
+/** Builds a small gig object when the real listing is missing. */
 function gigFallback(order: OrderRow) {
   return {
     id: order.gigId || "",
@@ -40,6 +41,7 @@ function gigFallback(order: OrderRow) {
   };
 }
 
+/** Returns the signed-in user's orders with gig, buyer, and seller names filled in. */
 export async function GET() {
   const session = await auth();
   if (!session?.user) {
@@ -78,6 +80,7 @@ export async function GET() {
 
   const enriched = data.map((order: OrderRow) => ({
     ...order,
+    mySide: order.sellerId === user.id ? "SELLER" : "BUYER",
     gig: (order.gigId && gigMap[order.gigId]) || gigFallback(order),
     buyer: userMap[order.buyerId] || { id: order.buyerId, name: "משתמש", avatar: null },
     seller: userMap[order.sellerId] || { id: order.sellerId, name: "משתמש", avatar: null },
@@ -86,11 +89,13 @@ export async function GET() {
   return NextResponse.json(enriched);
 }
 
+/** Loads a seller's weekly hours and time-off from the users service. */
 async function loadAvailability(sellerId: string) {
   const { data } = await proxyRequest(USERS_SERVICE, `/availability/${sellerId}`);
   return data;
 }
 
+/** Creates an order from a gig or a local request, after checking the visit slot is free. */
 export async function POST(request: Request) {
   const session = await auth();
   if (!session?.user) {

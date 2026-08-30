@@ -1,44 +1,38 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useSession } from "next-auth/react";
-import Link from "next/link";
-import Image from "next/image";
-import { Lock, Archive } from "@phosphor-icons/react";
+import { Bag, CalendarBlank, Lock } from "@phosphor-icons/react";
+import { OrderCards } from "@/components/orders/order-cards";
+import { SellerCalendar } from "@/components/orders/seller-calendar";
+import type { OrderListItem } from "@/components/orders/types";
+import { splitOrdersForUser } from "@/lib/order-views";
 
-interface Order {
-  id: string;
-  tier: string | null;
-  price: number;
-  status: string;
-  createdAt: string;
-  gig: { id: string; title: string; image: string | null };
-  buyer: { id: string; name: string };
-  seller: { id: string; name: string };
-}
-
-const STATUS_COLORS: Record<string, { bg: string; text: string; dot: string }> = {
-  PENDING: { bg: "bg-[rgba(var(--color-accent-yellow),0.15)]", text: "text-[rgb(var(--color-warning))]", dot: "bg-[rgb(var(--color-accent-yellow))]" },
-  IN_PROGRESS: { bg: "bg-[rgba(var(--color-primary),0.1)]", text: "text-[rgb(var(--color-primary))]", dot: "bg-[rgb(var(--color-primary))]" },
-  DELIVERED: { bg: "bg-[rgba(var(--color-primary-light),0.15)]", text: "text-[rgb(var(--color-primary-hover))]", dot: "bg-[rgb(var(--color-primary-light))]" },
-  COMPLETED: { bg: "bg-[rgba(var(--color-success),0.15)]", text: "text-[rgb(var(--color-success))]", dot: "bg-[rgb(var(--color-success))]" },
-  REVISION: { bg: "bg-[rgba(var(--color-accent-yellow),0.15)]", text: "text-[rgb(var(--color-warning))]", dot: "bg-[rgb(var(--color-accent-yellow))]" },
-  CANCELLED: { bg: "bg-[rgba(var(--color-error),0.1)]", text: "text-[rgb(var(--color-error))]", dot: "bg-[rgb(var(--color-error))]" },
-};
-
-const STATUS_LABELS: Record<string, string> = {
-  PENDING: "ממתין",
-  IN_PROGRESS: "בעבודה",
-  DELIVERED: "נמסר",
-  COMPLETED: "הושלם",
-  REVISION: "תיקון",
-  CANCELLED: "בוטל",
-};
+type Tab = "calendar" | "selling" | "buying";
 
 export default function OrdersPage() {
   const { data: session } = useSession();
-  const [orders, setOrders] = useState<Order[]>([]);
+  const [orders, setOrders] = useState<OrderListItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [tab, setTab] = useState<Tab | null>(null);
+
+  const userId = session?.user?.id ?? "";
+  const role = session?.user?.role;
+  const isProvider = role === "SELLER" || role === "ADMIN";
+
+  const { selling, buying } = useMemo(
+    () => (userId ? splitOrdersForUser(orders, userId) : { selling: [], buying: [] }),
+    [orders, userId]
+  );
+
+  const sellingByVisit = useMemo(() => {
+    return [...selling].sort((a, b) => {
+      if (a.slotStart && b.slotStart) return new Date(a.slotStart).getTime() - new Date(b.slotStart).getTime();
+      if (a.slotStart) return -1;
+      if (b.slotStart) return 1;
+      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+    });
+  }, [selling]);
 
   useEffect(() => {
     fetch("/api/orders")
@@ -54,10 +48,16 @@ export default function OrdersPage() {
       });
   }, []);
 
+  useEffect(() => {
+    if (tab) return;
+    if (!session) return;
+    setTab(isProvider ? "calendar" : "buying");
+  }, [session, isProvider, tab]);
+
   if (!session) {
     return (
       <div className="flex flex-col items-center justify-center py-20">
-        <div className="rounded-full bg-[rgba(var(--color-primary),0.1)] p-4 mb-4">
+        <div className="mb-4 rounded-full bg-[rgba(var(--color-primary),0.1)] p-4">
           <Lock className="h-8 w-8 text-[rgb(var(--color-primary))]" />
         </div>
         <p className="text-[16px] text-[rgb(var(--color-text-secondary))]">התחבר כדי לצפות בהזמנות.</p>
@@ -65,7 +65,7 @@ export default function OrdersPage() {
     );
   }
 
-  if (loading) {
+  if (loading || !tab) {
     return (
       <div className="flex items-center justify-center py-20">
         <div className="h-10 w-10 animate-spin rounded-full border-4 border-[rgba(var(--color-primary),0.1)] border-t-[rgb(var(--color-primary))]" />
@@ -73,67 +73,79 @@ export default function OrdersPage() {
     );
   }
 
+  const title = isProvider ? "העבודות שלי" : "ההזמנות שלי";
+  const subtitle = isProvider
+    ? `${selling.length} עבודות לספק${buying.length ? ` · ${buying.length} הזמנות שביצעתי` : ""}`
+    : `${buying.length} ${buying.length !== 1 ? "הזמנות" : "הזמנה"} סה״כ`;
+
   return (
     <div className="mx-auto max-w-5xl px-4 py-8">
-      <div className="mb-8 flex items-center justify-between">
+      <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <h1 className="text-[32px] font-bold tracking-[-0.01em] text-[rgb(var(--color-text))]">ההזמנות שלי</h1>
-          <p className="mt-1 text-[14px] text-[rgb(var(--color-text-secondary))]">{orders.length} {orders.length !== 1 ? "הזמנות" : "הזמנה"} סה״כ</p>
+          <h1 className="text-[32px] font-bold tracking-[-0.01em] text-[rgb(var(--color-text))]">{title}</h1>
+          <p className="mt-1 text-[14px] text-[rgb(var(--color-text-secondary))]">{subtitle}</p>
         </div>
+        {isProvider && (
+          <div className="flex flex-wrap gap-2">
+            <TabButton active={tab === "calendar"} onClick={() => setTab("calendar")} icon={<CalendarBlank className="h-4 w-4" />}>
+              יומן
+            </TabButton>
+            <TabButton active={tab === "selling"} onClick={() => setTab("selling")} icon={<Bag className="h-4 w-4" />}>
+              עבודות לספק
+            </TabButton>
+            <TabButton active={tab === "buying"} onClick={() => setTab("buying")}>
+              הזמנות שביצעתי
+            </TabButton>
+          </div>
+        )}
       </div>
 
-      {orders.length === 0 ? (
-        <div className="flex flex-col items-center justify-center rounded-2xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] py-16">
-          <div className="rounded-full bg-[rgba(var(--color-primary),0.1)] p-5 mb-4">
-            <Archive className="h-10 w-10 text-[rgb(var(--color-primary-light))]" />
-          </div>
-          <p className="text-[16px] font-medium text-[rgb(var(--color-text))]">שקט פה. בטח כולם כבר סידרו הכל.</p>
-          <p className="mt-1 text-[14px] text-[rgb(var(--color-text-muted))]">כשתזמין אבאל׳ה — ההזמנה תופיע כאן</p>
-        </div>
-      ) : (
-        <div className="space-y-3">
-          {orders.map((order) => {
-            const colors = STATUS_COLORS[order.status] || STATUS_COLORS.PENDING;
-            return (
-              <Link
-                key={order.id}
-                href={`/orders/${order.id}`}
-                className="group flex items-center gap-4 rounded-2xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] p-5 transition-all hover:shadow-[0_4px_16px_rgba(var(--color-primary),0.08)] hover:border-[rgba(var(--color-primary-light),0.3)]"
-              >
-                <div className="relative h-16 w-16 flex-shrink-0 overflow-hidden rounded-xl bg-[rgba(var(--color-primary),0.1)]">
-                  {order.gig.image ? (
-                    <Image src={order.gig.image} alt="" fill className="object-cover" sizes="64px" unoptimized />
-                  ) : (
-                    <div className="flex h-full w-full items-center justify-center text-[20px] font-bold text-[rgb(var(--color-primary))]">
-                      א
-                    </div>
-                  )}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <h3 className="font-semibold text-[rgb(var(--color-text))] truncate group-hover:text-[rgb(var(--color-primary))] transition-colors">
-                    {order.gig.title}
-                  </h3>
-                  <p className="mt-1 text-[14px] text-[rgb(var(--color-text-secondary))]">
-                    {session.user.role === "SELLER" ? `קונה: ${order.buyer.name}` : `מוכר: ${order.seller.name}`}
-                    {order.tier ? (
-                      <>
-                        <span className="mx-2 text-[rgb(var(--color-border))]">|</span>
-                        {order.tier}
-                      </>
-                    ) : null}
-                    <span className="mx-2 text-[rgb(var(--color-border))]">|</span>
-                    <span className="font-semibold text-[rgb(var(--color-text))]">₪{order.price}</span>
-                  </p>
-                </div>
-                <span className={`flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-[12px] font-semibold ${colors.bg} ${colors.text}`}>
-                  <span className={`h-1.5 w-1.5 rounded-full ${colors.dot}`} />
-                  {STATUS_LABELS[order.status] || order.status}
-                </span>
-              </Link>
-            );
-          })}
-        </div>
+      {tab === "calendar" && isProvider && <SellerCalendar orders={selling} />}
+
+      {tab === "selling" && (
+        <OrderCards
+          orders={sellingByVisit}
+          counterpart="buyer"
+          emptyTitle="עדיין אין עבודות סגורות"
+          emptyHint="כשייסגרו איתך ג׳ובים — הם יופיעו כאן עם חלון הביקור"
+        />
+      )}
+
+      {tab === "buying" && (
+        <OrderCards
+          orders={buying}
+          counterpart="seller"
+          emptyTitle="שקט פה. בטח כולם כבר סידרו הכל."
+          emptyHint="כשתזמין אבאל׳ה — ההזמנה תופיע כאן"
+        />
       )}
     </div>
+  );
+}
+
+function TabButton({
+  active,
+  onClick,
+  children,
+  icon,
+}: {
+  active: boolean;
+  onClick: () => void;
+  children: React.ReactNode;
+  icon?: React.ReactNode;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-[13px] font-semibold transition-colors ${
+        active
+          ? "bg-[rgb(var(--color-primary))] text-white"
+          : "border border-[rgb(var(--color-border))] text-[rgb(var(--color-text-secondary))] hover:border-[rgb(var(--color-primary))] hover:text-[rgb(var(--color-primary))]"
+      }`}
+    >
+      {icon}
+      {children}
+    </button>
   );
 }

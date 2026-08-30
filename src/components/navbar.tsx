@@ -27,6 +27,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
 
+/** Shows a round avatar with the user's first initial. */
 function UserAvatar({ name, size = "sm" }: { name: string; size?: "sm" | "md" }) {
   const initial = name.charAt(0).toUpperCase();
   const sizeClasses = size === "md" ? "h-10 w-10 text-sm" : "h-8 w-8 text-xs";
@@ -43,6 +44,7 @@ function UserAvatar({ name, size = "sm" }: { name: string; size?: "sm" | "md" })
   );
 }
 
+/** Site header with search, inbox, notifications, and account links. */
 export function Navbar() {
   const { data: session } = useSession();
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -51,6 +53,7 @@ export function Navbar() {
 
   useEffect(() => {
     if (!session?.user) return;
+    /** Loads how many unread chats the signed-in user has. */
     function fetchUnread() {
       fetch("/api/messages/unread-count")
         .then((r) => r.json())
@@ -87,7 +90,9 @@ export function Navbar() {
               {session.user.role === "SELLER" && (
                 <NavLink href="/gigs/create" icon={<Plus className="h-4 w-4" />}>צור שירות</NavLink>
               )}
-              <NavLink href="/orders" icon={<Bag className="h-4 w-4" />}>הזמנות</NavLink>
+              <NavLink href="/orders" icon={<Bag className="h-4 w-4" />}>
+                {session.user.role === "SELLER" ? "עבודות" : "הזמנות"}
+              </NavLink>
               <NavLink href="/favorites" icon={<Heart className="h-4 w-4" />}>מועדפים</NavLink>
               <NavLink href="/inbox" icon={<Chat className="h-4 w-4" />}>
                 <span className="relative">
@@ -133,7 +138,7 @@ export function Navbar() {
                 <DropdownMenuItem onClick={() => setProfileOpen(false)}>
                   <Link href="/orders" className="flex items-center gap-2 w-full">
                     <Bag className="h-4 w-4" />
-                    ההזמנות שלי
+                    {session.user.role === "SELLER" ? "העבודות שלי" : "ההזמנות שלי"}
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
@@ -209,7 +214,7 @@ export function Navbar() {
                 </MobileNavLink>
               )}
               <MobileNavLink href="/orders" onClick={() => setMobileOpen(false)} icon={<Bag className="h-4 w-4" />}>
-                הזמנות
+                {session.user.role === "SELLER" ? "עבודות" : "הזמנות"}
               </MobileNavLink>
               <MobileNavLink href="/favorites" onClick={() => setMobileOpen(false)} icon={<Heart className="h-4 w-4" />}>
                 מועדפים
@@ -261,6 +266,7 @@ export function Navbar() {
   );
 }
 
+/** Desktop header link with an optional icon. */
 function NavLink({
   href,
   children,
@@ -281,6 +287,7 @@ function NavLink({
   );
 }
 
+/** Mobile menu link that closes the sheet after a tap. */
 function MobileNavLink({
   href,
   onClick,
