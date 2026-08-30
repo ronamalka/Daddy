@@ -1,5 +1,5 @@
 import { Router, Request, Response } from "express";
-import { requireAuth } from "../../../shared/middleware";
+import { requireAuth, requireSeller } from "../../../shared/middleware";
 import { prisma } from "../index";
 
 export const serviceRequestsRoutes = Router();
@@ -100,7 +100,7 @@ serviceRequestsRoutes.get("/:id", requireAuth, async (req: Request, res: Respons
   res.json({ request: serviceRequest });
 });
 
-serviceRequestsRoutes.post("/:id/respond", requireAuth, async (req: Request, res: Response) => {
+serviceRequestsRoutes.post("/:id/respond", requireAuth, requireSeller, async (req: Request, res: Response) => {
   const id = req.params.id as string;
   const { message, proposedPrice } = req.body;
 
@@ -112,6 +112,11 @@ serviceRequestsRoutes.post("/:id/respond", requireAuth, async (req: Request, res
   const serviceRequest = await prisma.serviceRequest.findUnique({ where: { id } });
   if (!serviceRequest) {
     res.status(404).json({ error: "Request not found" });
+    return;
+  }
+
+  if (serviceRequest.status !== "OPEN") {
+    res.status(409).json({ error: "Request is no longer open" });
     return;
   }
 
@@ -139,4 +144,82 @@ serviceRequestsRoutes.post("/:id/respond", requireAuth, async (req: Request, res
   });
 
   res.json(response);
+});
+
+serviceRequestsRoutes.post("/:id/accept", requireAuth, async (req: Request, res: Response) => {
+  const id = req.params.id as string;
+  const { responseId, orderId } = req.body as { responseId?: string; orderId?: string };
+
+  if (!responseId || !orderId) {
+    res.status(400).json({ error: "responseId and orderId are required" });
+    return;
+  }
+
+  try {
+    const updated = await prisma.$transaction(async (tx) => {
+      const serviceRequest = await tx.serviceRequest.findUnique({
+        where: { id },
+        include: { responses: true },
+      });
+
+      if (!serviceRequest) {
+        throw new Error("NOT_FOUND");
+      }
+
+      const isOwner = serviceRequest.buyerId === req.user!.id;
+      if (!isOwner && req.user!.role !== "ADMIN") {
+        throw new Error("FORBIDDEN");
+      }
+
+      if (serviceRequest.status !== "OPEN") {
+        throw new Error("NOT_OPEN");
+      }
+
+      const quote = serviceRequest.responses.find((row) => row.id === responseId);
+      if (!quote) {
+        throw new Error("QUOTE_NOT_FOUND");
+      }
+
+      await tx.requestResponse.updateMany({
+        where: { requestId: id },
+        data: { selected: false },
+      });
+      await tx.requestResponse.update({
+        where: { id: responseId },
+        data: { selected: true },
+      });
+
+      return tx.serviceRequest.update({
+        where: { id },
+        data: {
+          status: "IN_PROGRESS",
+          selectedResponseId: responseId,
+          orderId,
+        },
+        include: {
+          responses: { orderBy: { createdAt: "asc" } },
+        },
+      });
+    });
+
+    res.json({ request: updated });
+  } catch (err) {
+    if (err instanceof Error && err.message === "NOT_FOUND") {
+      res.status(404).json({ error: "Request not found" });
+      return;
+    }
+    if (err instanceof Error && err.message === "FORBIDDEN") {
+      res.status(403).json({ error: "Forbidden" });
+      return;
+    }
+    if (err instanceof Error && err.message === "NOT_OPEN") {
+      res.status(409).json({ error: "Request is no longer open" });
+      return;
+    }
+    if (err instanceof Error && err.message === "QUOTE_NOT_FOUND") {
+      res.status(404).json({ error: "Quote not found" });
+      return;
+    }
+    throw err;
+  }
 });

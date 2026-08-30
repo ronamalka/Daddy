@@ -6,6 +6,7 @@ import { useParams, useRouter } from "next/navigation";
 import { getServiceBySlug } from "@/lib/services";
 import { CategoryIcon } from "@/components/ui/category-icon";
 import { formatVisitWindow } from "@/lib/availability";
+import Link from "next/link";
 
 interface ServiceRequestDetail {
   id: string;
@@ -23,9 +24,12 @@ interface ServiceRequestDetail {
     id: string;
     message: string;
     proposedPrice: number | null;
+    selected?: boolean;
     createdAt: string;
     seller: { id: string; name: string };
   }[];
+  selectedResponseId?: string | null;
+  orderId?: string | null;
 }
 
 export default function RequestDetailPage() {
@@ -39,6 +43,7 @@ export default function RequestDetailPage() {
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState("");
+  const [acceptingId, setAcceptingId] = useState<string | null>(null);
 
   useEffect(() => {
     fetch(`/api/service-requests/${params.id}/respond`)
@@ -82,6 +87,27 @@ export default function RequestDetailPage() {
     setSubmitting(false);
   }
 
+  async function handleAcceptQuote(responseId: string) {
+    setAcceptingId(responseId);
+    setError("");
+    try {
+      const res = await fetch(`/api/service-requests/${params.id}/accept`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ responseId }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (res.ok && data.order?.id) {
+        router.push(`/orders/${data.order.id}`);
+        return;
+      }
+      setError((data as { error?: string }).error || "שגיאה בקבלת ההצעה");
+    } catch {
+      setError("שגיאה בקבלת ההצעה");
+    }
+    setAcceptingId(null);
+  }
+
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
@@ -103,7 +129,8 @@ export default function RequestDetailPage() {
 
   const svc = request.serviceSlug ? getServiceBySlug(request.serviceSlug) : null;
   const isSeller = session?.user?.role === "SELLER";
-  const alreadyResponded = request.responses.some((r) => r.seller.id === session?.user?.id);
+  const isBuyer = session?.user?.id === request.buyer?.id;
+  const alreadyResponded = request.responses.some((r) => r.seller?.id === session?.user?.id);
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-8">
@@ -141,6 +168,15 @@ export default function RequestDetailPage() {
           </p>
         )}
 
+        {request.orderId && isBuyer && (
+          <Link
+            href={`/orders/${request.orderId}`}
+            className="mt-4 inline-flex rounded-xl bg-[rgb(var(--color-primary))] px-4 py-2 text-[13px] font-semibold text-white hover:bg-[rgb(var(--color-primary-hover))]"
+          >
+            לצ׳אט ולעבודה
+          </Link>
+        )}
+
         {svc && (
           <div className="mt-4 flex items-center gap-2">
             <span className="rounded-full bg-[rgba(var(--color-primary),0.1)] px-3 py-1 text-[12px] font-medium text-[rgb(var(--color-primary))]">
@@ -155,6 +191,7 @@ export default function RequestDetailPage() {
         <h2 className="mb-4 text-[18px] font-bold text-[rgb(var(--color-text))]">
           הצעות ({request.responses.length})
         </h2>
+        {error && <p className="mb-3 text-[13px] text-[rgb(var(--color-error))]">{error}</p>}
 
         {request.responses.length === 0 ? (
           <div className="rounded-xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] p-6 text-center">
@@ -167,9 +204,9 @@ export default function RequestDetailPage() {
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center gap-2">
                     <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-[rgb(var(--color-primary))] to-[rgb(var(--color-primary-light))] text-[12px] font-bold text-white">
-                      {resp.seller.name[0]}
+                      {resp.seller?.name?.[0] || "?"}
                     </div>
-                    <span className="text-[14px] font-semibold text-[rgb(var(--color-text))]">{resp.seller.name}</span>
+                    <span className="text-[14px] font-semibold text-[rgb(var(--color-text))]">{resp.seller?.name || "משתמש"}</span>
                   </div>
                   <div className="flex items-center gap-3">
                     {resp.proposedPrice != null && (
@@ -183,6 +220,23 @@ export default function RequestDetailPage() {
                   </div>
                 </div>
                 <p className="text-[14px] text-[rgb(var(--color-text-secondary))]">{resp.message}</p>
+                {isBuyer && request.status === "OPEN" && resp.proposedPrice != null && resp.proposedPrice > 0 && (
+                  <button
+                    onClick={() => handleAcceptQuote(resp.id)}
+                    disabled={acceptingId !== null}
+                    className="mt-4 rounded-xl bg-[rgb(var(--color-primary))] px-4 py-2 text-[13px] font-semibold text-white hover:bg-[rgb(var(--color-primary-hover))] disabled:opacity-40"
+                  >
+                    {acceptingId === resp.id
+                      ? "סוגרים עבודה..."
+                      : `קבלו את ההצעה של ${resp.seller?.name || "אבא"} ב-₪${resp.proposedPrice}`}
+                  </button>
+                )}
+                {resp.selected && (
+                  <p className="mt-3 text-[13px] font-semibold text-[rgb(var(--color-success))]">ההצעה שנבחרה</p>
+                )}
+                {!resp.selected && request.status !== "OPEN" && (
+                  <p className="mt-3 text-[13px] text-[rgb(var(--color-text-muted))]">לא נבחרה</p>
+                )}
               </div>
             ))}
           </div>

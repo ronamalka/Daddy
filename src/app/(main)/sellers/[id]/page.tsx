@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
@@ -16,6 +16,7 @@ import {
 } from "@phosphor-icons/react";
 import { CategoryIcon } from "@/components/ui/category-icon";
 import { DAY_LABELS_HE, minutesToTimeLabel } from "@/lib/availability";
+import { SlotPicker, type SlotOption } from "@/components/slot-picker";
 
 interface ReviewData {
   id: string;
@@ -534,7 +535,15 @@ export default function SellerProfilePage() {
           transition={{ duration: 0.2 }}
         >
           {activeTab === "reviews" && <ReviewsTab reviews={seller.allReviews} />}
-          {activeTab === "prices" && <PricesTab prices={seller.servicePrices} />}
+          {activeTab === "prices" && (
+            <PricesTab
+              prices={seller.servicePrices}
+              sellerId={seller.id}
+              acceptingJobs={seller.acceptingJobs !== false}
+              isOwnProfile={session?.user?.id === seller.id}
+              isLoggedIn={Boolean(session?.user)}
+            />
+          )}
           {activeTab === "gigs" && <GigsTab gigs={seller.gigs} sellerName={seller.name} sellerAvatar={seller.avatar} />}
         </motion.div>
       </AnimatePresence>
@@ -613,7 +622,53 @@ function ReviewsTab({ reviews }: { reviews: ReviewData[] }) {
   );
 }
 
-function PricesTab({ prices }: { prices: SellerProfile["servicePrices"] }) {
+function PricesTab({
+  prices,
+  sellerId,
+  acceptingJobs,
+  isOwnProfile,
+  isLoggedIn,
+}: {
+  prices: SellerProfile["servicePrices"];
+  sellerId: string;
+  acceptingJobs: boolean;
+  isOwnProfile: boolean;
+  isLoggedIn: boolean;
+}) {
+  const router = useRouter();
+  const [bookingSlug, setBookingSlug] = useState<string | null>(null);
+  const [bookError, setBookError] = useState("");
+  const [selectedSlot, setSelectedSlot] = useState<SlotOption | null>(null);
+
+  async function bookFromPriceList(sp: SellerProfile["servicePrices"][number]) {
+    if (!selectedSlot) {
+      setBookError("יש לבחור חלון ביקור של שעתיים");
+      return;
+    }
+    setBookingSlug(sp.serviceSlug);
+    setBookError("");
+    const svc = getServiceBySlug(sp.serviceSlug);
+    const res = await fetch("/api/orders", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        jobType: "LOCAL_REQUEST",
+        sellerId,
+        price: sp.price,
+        title: svc?.nameHe || sp.serviceSlug,
+        serviceSlug: sp.serviceSlug,
+        slotStart: selectedSlot.slotStart,
+        slotEnd: selectedSlot.slotEnd,
+      }),
+    });
+    const data = await res.json().catch(() => ({}));
+    if (res.ok && data.id) {
+      router.push(`/orders/${data.id}`);
+      return;
+    }
+    setBookError((data as { error?: string }).error || "לא הצלחנו לפתוח הזמנה");
+    setBookingSlug(null);
+  }
   if (prices.length === 0) {
     return (
       <div className="rounded-2xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] p-12 text-center">
@@ -628,8 +683,14 @@ function PricesTab({ prices }: { prices: SellerProfile["servicePrices"] }) {
     <div className="rounded-2xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] overflow-hidden">
       <div className="px-6 py-4 bg-[rgb(var(--color-bg))] border-b border-[rgb(var(--color-border-light))]">
         <h3 className="text-[16px] font-bold text-[rgb(var(--color-text))]">המחירון שלי</h3>
-        <p className="text-[12px] text-[rgb(var(--color-text-muted))] mt-0.5">המחירים למקרים סטנדרטיים בלבד</p>
+        <p className="text-[12px] text-[rgb(var(--color-text-muted))] mt-0.5">הזמן לפי מחיר קבוע, או בקש הצעה אם העבודה לא סטנדרטית</p>
+        {bookError && <p className="mt-2 text-[13px] text-[rgb(var(--color-error))]">{bookError}</p>}
       </div>
+      {!isOwnProfile && isLoggedIn && acceptingJobs && (
+        <div className="border-b border-[rgb(var(--color-border-light))] px-6 py-4">
+          <SlotPicker sellerId={sellerId} value={selectedSlot} onChange={setSelectedSlot} />
+        </div>
+      )}
       <div className="divide-y divide-[rgb(var(--color-border-light))]">
         {prices.map((sp, i) => {
           const svc = getServiceBySlug(sp.serviceSlug);
@@ -650,7 +711,38 @@ function PricesTab({ prices }: { prices: SellerProfile["servicePrices"] }) {
                   )}
                 </div>
               </div>
-              <span className="text-[17px] font-bold text-[rgb(var(--color-primary))]">₪{sp.price}</span>
+              <div className="flex items-center gap-3">
+                <span className="text-[17px] font-bold text-[rgb(var(--color-primary))]">₪{sp.price}</span>
+                {!isOwnProfile && (
+                  isLoggedIn ? (
+                    <div className="flex items-center gap-2">
+                      {acceptingJobs && (
+                        <button
+                          type="button"
+                          onClick={() => bookFromPriceList(sp)}
+                          disabled={bookingSlug !== null || !selectedSlot}
+                          className="rounded-lg bg-[rgb(var(--color-primary))] px-3 py-1.5 text-[12px] font-semibold text-white hover:bg-[rgb(var(--color-primary-hover))] disabled:opacity-40"
+                        >
+                          {bookingSlug === sp.serviceSlug ? "מזמין..." : `הזמן ב-₪${sp.price}`}
+                        </button>
+                      )}
+                      <Link
+                        href={`/requests/create?service=${encodeURIComponent(sp.serviceSlug)}`}
+                        className="rounded-lg border border-[rgb(var(--color-border))] px-3 py-1.5 text-[12px] font-semibold text-[rgb(var(--color-text-secondary))] hover:border-[rgb(var(--color-primary))] hover:text-[rgb(var(--color-primary))]"
+                      >
+                        בקש הצעה
+                      </Link>
+                    </div>
+                  ) : (
+                    <Link
+                      href="/login"
+                      className="rounded-lg border border-[rgb(var(--color-border))] px-3 py-1.5 text-[12px] font-semibold text-[rgb(var(--color-primary))]"
+                    >
+                      התחבר להזמנה
+                    </Link>
+                  )
+                )}
+              </div>
             </motion.div>
           );
         })}

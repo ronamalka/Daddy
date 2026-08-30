@@ -1,8 +1,8 @@
 "use client";
 
 import { useSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
-import { useState, useRef, useCallback } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useState, useRef, useCallback, useEffect } from "react";
 import Link from "next/link";
 import { SERVICE_CATEGORIES } from "@/lib/services";
 import { DISTRICTS } from "@/lib/districts";
@@ -13,6 +13,7 @@ import { VisitWindowFields, visitWindowToIso, type VisitWindowValue } from "@/co
 export default function CreateRequestPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [turnstileToken, setTurnstileToken] = useState("");
@@ -25,6 +26,11 @@ export default function CreateRequestPage() {
   const [serviceSlug, setServiceSlug] = useState("");
   const [districtCode, setDistrictCode] = useState("");
   const [visitWindow, setVisitWindow] = useState<VisitWindowValue | null>(null);
+
+  useEffect(() => {
+    const preset = searchParams.get("service");
+    if (preset) setServiceSlug(preset);
+  }, [searchParams]);
 
   if (status === "loading") {
     return (
