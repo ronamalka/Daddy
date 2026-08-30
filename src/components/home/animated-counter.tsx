@@ -20,12 +20,14 @@ export function AnimatedCounter({ value, suffix = "" }: { value: number; suffix?
         setCount(value);
         clearInterval(timer);
       } else {
-        setCount(Math.floor(current));
+        setCount(current);
       }
     }, duration / steps);
     return () => clearInterval(timer);
   }, [inView, value]);
 
-  const display = Number.isInteger(value) ? count.toLocaleString() : count.toFixed(1);
+  const display = Number.isInteger(value)
+    ? Math.round(count).toLocaleString()
+    : count.toFixed(1);
   return <span ref={ref}>{display}{suffix}</span>;
 }

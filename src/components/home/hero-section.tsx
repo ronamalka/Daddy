@@ -2,10 +2,10 @@
 
 import Image from "next/image";
 import { motion } from "framer-motion";
-import { MagnifyingGlass, X, Wrench, CaretLeft, Sparkle } from "@phosphor-icons/react";
+import { MagnifyingGlass, X, CaretLeft } from "@phosphor-icons/react";
 import { ALL_SERVICES } from "@/lib/services";
-import { Badge } from "@/components/ui/badge";
-import { CATEGORY_ICONS } from "./data";
+import { POPULAR_SEARCHES } from "./data";
+import { CategoryIcon } from "@/components/ui/category-icon";
 
 interface HeroSectionProps {
   serviceSearch: string;
@@ -17,7 +17,7 @@ interface HeroSectionProps {
 }
 
 export function HeroSection({
-  serviceSearch, setServiceSearch, selectedService, setSelectedService, setView, filteredServices,
+  serviceSearch, setServiceSearch, setSelectedService, setView, filteredServices,
 }: HeroSectionProps) {
   return (
     <section className="relative overflow-hidden">
@@ -76,7 +76,7 @@ export function HeroSection({
                   <input
                     type="text"
                     aria-label="חיפוש שירותים"
-                    placeholder='מה נשבר הפעם? נסה "הרכבת רהיטים" או "תליית טלוויזיה"'
+                    placeholder="מה נשבר הפעם?"
                     value={serviceSearch}
                     onChange={(e) => {
                       setServiceSearch(e.target.value);
@@ -101,7 +101,7 @@ export function HeroSection({
                       className="flex w-full items-center gap-3 px-5 py-3.5 text-right transition-colors hover:bg-[rgb(var(--color-surface-elevated))]"
                     >
                       <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-[rgba(var(--color-primary),0.1)] text-[rgb(var(--color-primary))]">
-                        {CATEGORY_ICONS[svc.category] || <Wrench className="h-5 w-5" />}
+                        <CategoryIcon slug={svc.category} className="h-5 w-5" />
                       </div>
                       <div className="flex-1">
                         <p className="text-sm font-semibold text-[rgb(var(--color-text))]">{svc.nameHe}</p>
@@ -116,17 +116,18 @@ export function HeroSection({
 
             <div className="mt-5 flex flex-wrap items-center justify-center gap-2 text-sm">
               <span className="text-[rgb(var(--color-text-muted))]">פופולרי:</span>
-              {["ברז שלא מפסיק לבכות", "ארון שמסרב להתרכב", "הוזלת חשבונות", "טלוויזיה שצריכה לעלות על הקיר"].map((tag) => (
+              {POPULAR_SEARCHES.map((tag) => (
                 <button
-                  key={tag}
+                  key={tag.label}
+                  type="button"
                   onClick={() => {
-                    setServiceSearch(tag);
-                    const match = ALL_SERVICES.find((s) => s.nameHe === tag);
-                    if (match) { setSelectedService(match.slug); setServiceSearch(match.nameHe); }
+                    setServiceSearch(tag.query);
+                    const match = ALL_SERVICES.find((s) => s.nameHe === tag.query);
+                    if (match) setSelectedService(match.slug);
                   }}
                   className="rounded-full border border-[rgb(var(--color-border))] px-3.5 py-1.5 text-xs text-[rgb(var(--color-text-secondary))] transition-all hover:border-[rgb(var(--color-primary-light))] hover:text-[rgb(var(--color-primary))] hover:bg-[rgba(var(--color-primary),0.05)]"
                 >
-                  {tag}
+                  {tag.label}
                 </button>
               ))}
             </div>

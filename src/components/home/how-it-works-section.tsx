@@ -15,13 +15,15 @@ export function HowItWorksSection() {
       <div className="mx-auto max-w-6xl px-4">
         <SectionHeader title="איך זה עובד?" subtitle="תהליך פשוט, לשני הצדדים" />
 
-        <div className="mx-auto mb-10 flex max-w-sm overflow-hidden rounded-lg border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] p-1">
+        <div className="mx-auto mb-10 flex w-full max-w-md overflow-hidden rounded-lg border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] p-1">
           {(["buyer", "daddy"] as const).map((tab) => (
             <button
               key={tab}
+              type="button"
+              aria-pressed={howItWorksTab === tab}
               onClick={() => setHowItWorksTab(tab)}
               className={cn(
-                "flex-1 flex items-center justify-center gap-2 rounded-md py-2.5 text-sm font-bold transition-all",
+                "flex-1 flex items-center justify-center gap-1.5 rounded-md py-2.5 text-xs font-bold transition-all sm:gap-2 sm:text-sm",
                 howItWorksTab === tab
                   ? "bg-[rgb(var(--color-primary))] text-white shadow-sm"
                   : "text-[rgb(var(--color-text-secondary))] hover:text-[rgb(var(--color-text))]"
@@ -32,7 +34,7 @@ export function HowItWorksSection() {
           ))}
         </div>
 
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid grid-cols-1 gap-4 pt-3 sm:grid-cols-2 lg:grid-cols-4">
           {(howItWorksTab === "buyer" ? BUYER_STEPS : DADDY_STEPS).map((item, i) => (
             <motion.div
               key={`${howItWorksTab}-${i}`}

@@ -11,9 +11,10 @@ import type { FeaturedDaddy } from "./types";
 
 interface FeaturedDaddiesSectionProps {
   featuredDaddies: FeaturedDaddy[];
+  loading?: boolean;
 }
 
-export function FeaturedDaddiesSection({ featuredDaddies }: FeaturedDaddiesSectionProps) {
+export function FeaturedDaddiesSection({ featuredDaddies, loading }: FeaturedDaddiesSectionProps) {
   return (
     <section className="py-20">
       <div className="mx-auto max-w-6xl px-4">
@@ -23,7 +24,7 @@ export function FeaturedDaddiesSection({ featuredDaddies }: FeaturedDaddiesSecti
             <p className="mt-2 text-[rgb(var(--color-text-secondary))]">בעלי מקצוע מנוסים שכבר הוכיחו את עצמם</p>
           </div>
           <Button variant="outline" className="mt-4 md:mt-0 gap-2" asChild>
-            <Link href="/register">
+            <Link href="/become-a-daddy">
               הצטרף כאבאל׳ה
               <ArrowLeft className="h-4 w-4" />
             </Link>
@@ -45,7 +46,7 @@ export function FeaturedDaddiesSection({ featuredDaddies }: FeaturedDaddiesSecti
                   <div className="flex items-center gap-3 mb-4">
                     <div className="relative">
                       <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-gradient-to-br from-[rgb(var(--color-primary))] to-[rgb(var(--color-primary-light))] text-lg font-bold text-white shadow-md">
-                        {d.name[0]}
+                        {d.name?.[0] ?? "א"}
                       </div>
                       {d.avgRating >= 4.5 && (
                         <div className="absolute -top-1 -left-1 flex h-5 w-5 items-center justify-center rounded-full bg-[rgb(var(--color-accent-yellow))] shadow-sm">
@@ -93,7 +94,7 @@ export function FeaturedDaddiesSection({ featuredDaddies }: FeaturedDaddiesSecti
               </motion.div>
             );
           })}
-          {featuredDaddies.length === 0 && [1, 2, 3].map((i) => (
+          {loading && featuredDaddies.length === 0 && [1, 2, 3].map((i) => (
             <div key={i} className="animate-pulse rounded-xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] p-5">
               <div className="flex items-center gap-3 mb-4">
                 <div className="h-14 w-14 rounded-xl bg-[rgb(var(--color-surface-elevated))]" />
@@ -103,6 +104,18 @@ export function FeaturedDaddiesSection({ featuredDaddies }: FeaturedDaddiesSecti
               <div className="h-3 w-2/3 rounded bg-[rgb(var(--color-surface-elevated))]" />
             </div>
           ))}
+          {!loading && featuredDaddies.length === 0 && (
+            <div className="col-span-full rounded-xl border border-dashed border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] px-6 py-12 text-center">
+              <p className="text-sm font-semibold text-[rgb(var(--color-text))]">האבאל׳ות עוד מתארגנים</p>
+              <p className="mt-1 text-sm text-[rgb(var(--color-text-muted))]">בינתיים אפשר לעיין בכל השירותים או להצטרף בעצמך.</p>
+              <Button variant="outline" className="mt-4 gap-2" asChild>
+                <Link href="/gigs">
+                  עיין בשירותים
+                  <ArrowLeft className="h-4 w-4" />
+                </Link>
+              </Button>
+            </div>
+          )}
         </div>
       </div>
     </section>
