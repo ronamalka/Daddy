@@ -28,7 +28,7 @@ interface ReviewData {
   sellerResponse: string | null;
   sellerResponseAt: string | null;
   createdAt: string;
-  user: { id: string; name: string; city: string | null };
+  user?: { id: string; name: string; city: string | null };
 }
 
 interface SellerProfile {
@@ -135,31 +135,70 @@ export default function SellerProfilePage() {
   const params = useParams();
   const { data: session } = useSession();
   const [seller, setSeller] = useState<SellerProfile | null>(null);
+  const [notFound, setNotFound] = useState(false);
   const [msgText, setMsgText] = useState("");
   const [msgSent, setMsgSent] = useState(false);
   const [msgSending, setMsgSending] = useState(false);
+  const [msgError, setMsgError] = useState("");
   const [activeTab, setActiveTab] = useState<TabKey>("reviews");
 
+  const sellerId = typeof params.id === "string" ? params.id : params.id?.[0];
+
   useEffect(() => {
-    fetch(`/api/sellers/${params.id}`)
+    if (!sellerId) return;
+    setNotFound(false);
+    fetch(`/api/sellers/${sellerId}`)
       .then((r) => r.json())
-      .then(setSeller);
-  }, [params.id]);
+      .then((data) => {
+        if (!data?.id || data.error) {
+          setSeller(null);
+          setNotFound(true);
+          return;
+        }
+        setSeller({
+          ...data,
+          serviceAreas: data.serviceAreas ?? [],
+          userServices: data.userServices ?? [],
+          servicePrices: data.servicePrices ?? [],
+          gigs: Array.isArray(data.gigs) ? data.gigs : [],
+          allReviews: Array.isArray(data.allReviews) ? data.allReviews : [],
+        });
+      })
+      .catch(() => {
+        setSeller(null);
+        setNotFound(true);
+      });
+  }, [sellerId]);
 
   async function sendMessage(e: React.FormEvent) {
     e.preventDefault();
-    if (!msgText.trim() || msgSending) return;
+    if (!msgText.trim() || msgSending || !sellerId) return;
     setMsgSending(true);
+    setMsgError("");
     const res = await fetch("/api/messages", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ receiverId: params.id, content: msgText }),
+      body: JSON.stringify({ receiverId: sellerId, content: msgText }),
     });
     if (res.ok) {
       setMsgSent(true);
       setMsgText("");
+    } else {
+      setMsgError("לא הצלחנו לשלוח את ההודעה. נסה שוב.");
     }
     setMsgSending(false);
+  }
+
+  if (notFound) {
+    return (
+      <div className="mx-auto max-w-lg px-4 py-20 text-center">
+        <p className="text-[18px] font-semibold text-[rgb(var(--color-text))]">הפרופיל לא נמצא</p>
+        <p className="mt-2 text-[14px] text-[rgb(var(--color-text-muted))]">יכול להיות שהאבאל׳ה עבר דירה. נסו מישהו אחר.</p>
+        <Link href="/" className="mt-6 inline-block text-[14px] font-semibold text-[rgb(var(--color-primary))]">
+          חזרה לעיון
+        </Link>
+      </div>
+    );
   }
 
   if (!seller) return <SellerSkeleton />;
@@ -209,7 +248,7 @@ export default function SellerProfilePage() {
                 {seller.avatar ? (
                   <Image src={seller.avatar} alt={seller.name} fill className="rounded-full object-cover" unoptimized />
                 ) : (
-                  seller.name[0]
+                  (seller.name || "א")[0]
                 )}
               </div>
               {/* Verified badge */}
@@ -433,21 +472,26 @@ export default function SellerProfilePage() {
               ההודעה נשלחה בהצלחה!
             </motion.div>
           ) : (
-            <form onSubmit={sendMessage} className="flex gap-3">
-              <input
-                value={msgText}
-                onChange={(e) => setMsgText(e.target.value)}
-                placeholder="היי, אני מתעניין בשירות שלך..."
-                className="flex-1 rounded-xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] px-4 py-3 text-[14px] text-[rgb(var(--color-text))] placeholder-[rgb(var(--color-text-muted))] focus:border-[rgb(var(--color-primary))] focus:outline-none focus:ring-2 focus:ring-[rgba(var(--color-primary),0.2)]"
-              />
-              <button
-                type="submit"
-                disabled={!msgText.trim() || msgSending}
-                className="flex items-center gap-2 rounded-xl bg-[rgb(var(--color-primary))] px-6 py-3 text-[14px] font-semibold text-white transition-all hover:bg-[rgb(var(--color-primary-hover))] hover:shadow-[0_4px_16px_rgba(var(--color-primary),0.25)] disabled:opacity-40"
-              >
-                <PaperPlaneTilt className="h-4 w-4" />
-                שלח
-              </button>
+            <form onSubmit={sendMessage} className="space-y-3">
+              <div className="flex gap-3">
+                <input
+                  value={msgText}
+                  onChange={(e) => setMsgText(e.target.value)}
+                  placeholder="היי, אני מתעניין בשירות שלך..."
+                  className="flex-1 rounded-xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] px-4 py-3 text-[14px] text-[rgb(var(--color-text))] placeholder-[rgb(var(--color-text-muted))] focus:border-[rgb(var(--color-primary))] focus:outline-none focus:ring-2 focus:ring-[rgba(var(--color-primary),0.2)]"
+                />
+                <button
+                  type="submit"
+                  disabled={!msgText.trim() || msgSending}
+                  className="flex items-center gap-2 rounded-xl bg-[rgb(var(--color-primary))] px-6 py-3 text-[14px] font-semibold text-white transition-all hover:bg-[rgb(var(--color-primary-hover))] hover:shadow-[0_4px_16px_rgba(var(--color-primary),0.25)] disabled:opacity-40"
+                >
+                  <PaperPlaneTilt className="h-4 w-4" />
+                  שלח
+                </button>
+              </div>
+              {msgError && (
+                <p className="text-[13px] text-[rgb(var(--color-error))]">{msgError}</p>
+              )}
             </form>
           )}
         </motion.div>
@@ -499,7 +543,7 @@ export default function SellerProfilePage() {
 }
 
 function ReviewsTab({ reviews }: { reviews: ReviewData[] }) {
-  if (reviews.length === 0) {
+  if (!reviews || reviews.length === 0) {
     return (
       <div className="rounded-2xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] p-12 text-center">
         <ChatCircleDots className="mx-auto mb-3 h-10 w-10 text-[rgb(var(--color-text-muted))]" />
@@ -522,12 +566,12 @@ function ReviewsTab({ reviews }: { reviews: ReviewData[] }) {
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-3">
               <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[rgba(var(--color-primary),0.1)] text-[14px] font-bold text-[rgb(var(--color-primary))]">
-                {review.user.name[0]}
+                {(review.user?.name || "משתמש")[0]}
               </div>
               <div>
-                <p className="text-[14px] font-semibold text-[rgb(var(--color-text))]">{review.user.name}</p>
+                <p className="text-[14px] font-semibold text-[rgb(var(--color-text))]">{review.user?.name || "משתמש"}</p>
                 <p className="text-[12px] text-[rgb(var(--color-text-muted))]">
-                  {review.user.city && `${review.user.city} · `}
+                  {review.user?.city && `${review.user.city} · `}
                   {new Date(review.createdAt).toLocaleDateString("he-IL")}
                 </p>
               </div>
@@ -634,7 +678,7 @@ function GigsTab({ gigs, sellerName, sellerAvatar }: { gigs: SellerProfile["gigs
           title={g.title}
           image={g.image}
           seller={{ name: sellerName, avatar: sellerAvatar }}
-          startingPrice={g.tiers[0]?.price || 0}
+          startingPrice={g.tiers?.[0]?.price || 0}
           avgRating={g.avgRating}
           reviewCount={g.reviewCount}
         />

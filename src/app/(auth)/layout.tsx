@@ -9,7 +9,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
         style={{ background: "linear-gradient(135deg, rgb(var(--color-primary)) 0%, rgb(var(--color-primary-light)) 50%, rgb(var(--color-accent)) 100%)" }}
       >
         <div className="max-w-md text-center">
-          <Image src="/logo.jpeg" alt="אבאל׳ה" width={120} height={120} className="mx-auto mb-6 rounded-full shadow-lg" />
+          <Image src="/logo.jpeg" alt="אבאל׳ה" width={120} height={120} className="mx-auto mb-6 rounded-full shadow-lg" unoptimized />
           <h1 className="text-5xl font-extrabold tracking-[-0.02em] text-white mb-4">
             אבאל׳ה
           </h1>

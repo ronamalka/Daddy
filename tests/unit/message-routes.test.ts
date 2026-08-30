@@ -72,6 +72,16 @@ describe("POST /api/messages", () => {
     expect(res.status).toBe(400);
     expect(mockedProxy).not.toHaveBeenCalled();
   });
+
+  it("returns a JSON error body when the chat service is unreachable", async () => {
+    mockedProxy.mockResolvedValue({ data: null, status: 502 });
+    const res = await postDm(jsonRequest("http://localhost/api/messages", {
+      receiverId: "clseller1",
+      content: "hi",
+    }));
+    expect(res.status).toBe(502);
+    await expect(res.json()).resolves.toEqual({ error: "Failed to send message" });
+  });
 });
 
 describe("POST /api/orders/:id/messages", () => {
