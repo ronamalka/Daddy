@@ -19,7 +19,7 @@ export async function POST(request: Request) {
     body: result.data,
     user,
   });
-  return NextResponse.json(data, { status });
+  return NextResponse.json(data ?? { error: "Failed to send message" }, { status });
 }
 
 export async function GET(request: Request) {

@@ -11,7 +11,7 @@ interface GigCardProps {
   id: string;
   title: string;
   image: string | null;
-  seller: { name: string; avatar: string | null; serviceAreas?: { districtName: string; cityName: string | null }[] };
+  seller?: { name: string; avatar: string | null; serviceAreas?: { districtName: string; cityName: string | null }[] };
   startingPrice: number;
   avgRating: number;
   reviewCount: number;
@@ -27,7 +27,8 @@ const AVATAR_GRADIENTS = [
 
 export function GigCard({ id, title, image, seller, startingPrice, avgRating, reviewCount, variant = "grid" }: GigCardProps) {
   const [isFavorite, setIsFavorite] = useState(false);
-  const gradientIndex = seller.name.charCodeAt(0) % AVATAR_GRADIENTS.length;
+  const sellerName = seller?.name || "משתמש";
+  const gradientIndex = sellerName.charCodeAt(0) % AVATAR_GRADIENTS.length;
 
   if (variant === "list") {
     return (
@@ -56,10 +57,10 @@ export function GigCard({ id, title, image, seller, startingPrice, avgRating, re
                   "flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-br text-[11px] font-bold text-white",
                   AVATAR_GRADIENTS[gradientIndex]
                 )}>
-                  {seller.name[0]}
+                  {sellerName[0]}
                 </div>
-                <span className="text-[13px] text-[rgb(var(--color-text-secondary))]">{seller.name}</span>
-                {seller.serviceAreas && seller.serviceAreas.length > 0 && (
+                <span className="text-[13px] text-[rgb(var(--color-text-secondary))]">{sellerName}</span>
+                {seller?.serviceAreas && seller.serviceAreas.length > 0 && (
                   <span className="flex items-center gap-1 text-[11px] text-[rgb(var(--color-text-muted))]">
                     <MapPin className="h-3 w-3" />
                     {seller.serviceAreas.slice(0, 3).map((a) => a.cityName || a.districtName).join(", ")}
@@ -107,11 +108,11 @@ export function GigCard({ id, title, image, seller, startingPrice, avgRating, re
               "flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br text-[12px] font-bold text-white",
               AVATAR_GRADIENTS[gradientIndex]
             )}>
-              {seller.name[0]}
+              {sellerName[0]}
             </div>
             <div className="min-w-0 flex-1">
-              <span className="text-[13px] font-medium text-[rgb(var(--color-text-secondary))]">{seller.name}</span>
-              {seller.serviceAreas && seller.serviceAreas.length > 0 && (
+              <span className="text-[13px] font-medium text-[rgb(var(--color-text-secondary))]">{sellerName}</span>
+              {seller?.serviceAreas && seller.serviceAreas.length > 0 && (
                 <div className="flex items-center gap-1 text-[11px] text-[rgb(var(--color-text-muted))] truncate">
                   <MapPin className="h-3 w-3 flex-shrink-0" />
                   {seller.serviceAreas.map((a) => a.cityName || a.districtName).join(", ")}

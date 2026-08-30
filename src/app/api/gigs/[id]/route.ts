@@ -11,7 +11,13 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
   const { data, status } = await proxyRequest(GIGS_SERVICE, `/gigs/${id}`, { user });
 
   if (status !== 200 || !data) {
-    return NextResponse.json(data ?? { error: "Not found" }, { status: status === 502 ? 404 : status });
+    const fallback =
+      status === 502
+        ? { error: "Service unavailable" }
+        : status === 429
+          ? { error: "Too many requests" }
+          : { error: "Not found" };
+    return NextResponse.json(data ?? fallback, { status: status === 502 ? 503 : status });
   }
 
   if (data.sellerId) {

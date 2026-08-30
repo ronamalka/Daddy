@@ -60,6 +60,8 @@ export default function GigDetailPage() {
   const [flaggedReviews, setFlaggedReviews] = useState<Set<string>>(new Set());
   const [orderError, setOrderError] = useState<string | null>(null);
   const [selectedSlot, setSelectedSlot] = useState<SlotOption | null>(null);
+  const [loadError, setLoadError] = useState(false);
+  const [reloadKey, setReloadKey] = useState(0);
 
   async function flagReview(reviewId: string) {
     if (!flagReason.trim()) return;
@@ -76,17 +78,38 @@ export default function GigDetailPage() {
   }
 
   useEffect(() => {
-    fetch(`/api/gigs/${params.id}`)
+    const gigId = typeof params.id === "string" ? params.id : undefined;
+    if (!gigId) return;
+
+    let cancelled = false;
+
+    fetch(`/api/gigs/${gigId}`, { signal: AbortSignal.timeout(15_000) })
+      .then(async (res) => {
+        const data = await res.json().catch(() => null);
+        if (cancelled) return;
+        if (!res.ok || !data?.id || !Array.isArray(data.tiers)) {
+          setLoadError(true);
+          return;
+        }
+        setLoadError(false);
+        setGig(data);
+        setFavorited(Boolean(data.isFavorited));
+      })
+      .catch(() => {
+        if (!cancelled) setLoadError(true);
+      });
+
+    fetch(`/api/gigs/${gigId}/related`)
       .then((r) => r.json())
       .then((data) => {
-        setGig(data);
-        setFavorited(data.isFavorited);
-      });
-    fetch(`/api/gigs/${params.id}/related`)
-      .then((r) => r.json())
-      .then(setRelated)
+        if (!cancelled && Array.isArray(data)) setRelated(data);
+      })
       .catch(() => {});
-  }, [params.id]);
+
+    return () => {
+      cancelled = true;
+    };
+  }, [params.id, reloadKey]);
 
   async function toggleFavorite() {
     if (!session) { router.push("/login"); return; }
@@ -127,6 +150,25 @@ export default function GigDetailPage() {
       setOrderError(data.error || "ביצוע ההזמנה נכשל");
       setOrdering(false);
     }
+  }
+
+  if (loadError) {
+    return (
+      <div className="flex flex-col items-center justify-center py-20">
+        <p className="text-[16px] text-[rgb(var(--color-text-secondary))]">לא ניתן לטעון את השירות.</p>
+        <button
+          type="button"
+          onClick={() => {
+            setLoadError(false);
+            setGig(null);
+            setReloadKey((k) => k + 1);
+          }}
+          className="mt-4 rounded-xl bg-[rgb(var(--color-primary))] px-5 py-2.5 text-[14px] font-semibold text-white"
+        >
+          נסה שוב
+        </button>
+      </div>
+    );
   }
 
   if (!gig) {
