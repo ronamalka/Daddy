@@ -39,7 +39,12 @@ export default function InboxPage() {
     fetch("/api/orders")
       .then((r) => r.json())
       .then((data) => {
-        setOrders(data);
+        setOrders(Array.isArray(data) ? data : []);
+      })
+      .catch(() => {
+        setOrders([]);
+      })
+      .finally(() => {
         setLoading(false);
       });
   }, []);
@@ -87,6 +92,7 @@ export default function InboxPage() {
         <div className="space-y-2">
           {orders.map((order, index) => {
             const otherPerson = session.user.id === order.buyer.id ? order.seller : order.buyer;
+            const displayName = otherPerson?.name || "משתמש";
             const avatarGradient = AVATAR_COLORS[index % AVATAR_COLORS.length];
             const statusDot = STATUS_DOT[order.status] || STATUS_DOT.PENDING;
 
@@ -99,7 +105,7 @@ export default function InboxPage() {
                 {/* Avatar */}
                 <div className="relative flex-shrink-0">
                   <div className={`flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br ${avatarGradient} text-[16px] font-bold text-white`}>
-                    {otherPerson.name[0]}
+                    {displayName[0]}
                   </div>
                   <span className={`absolute -bottom-0.5 -right-0.5 h-3.5 w-3.5 rounded-full border-2 border-[rgb(var(--color-surface))] ${statusDot}`} />
                 </div>
@@ -108,7 +114,7 @@ export default function InboxPage() {
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center justify-between">
                     <p className="font-semibold text-[rgb(var(--color-text))] group-hover:text-[rgb(var(--color-primary))] transition-colors">
-                      {otherPerson.name}
+                      {displayName}
                     </p>
                     <span className="text-[12px] text-[rgb(var(--color-text-muted))]">
                       {order.status.replace("_", " ")}

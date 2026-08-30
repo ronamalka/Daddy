@@ -32,7 +32,7 @@ export function extractUser(req: Request, res: Response, next: NextFunction) {
         res.status(403).json({ error: "Invalid request signature" });
         return;
       }
-      req.user = JSON.parse(header) as AuthUser;
+      req.user = JSON.parse(decodeURIComponent(header)) as AuthUser;
     } catch {
       res.status(403).json({ error: "Invalid request signature" });
       return;
