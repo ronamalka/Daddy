@@ -1,11 +1,19 @@
 import { test, expect } from "@playwright/test";
+import { stubCookieConsent } from "./cookies";
 
 test.describe("Auth Flow", () => {
-  test("register page loads and shows form", async ({ page }) => {
+  test.beforeEach(async ({ page }) => {
+    await stubCookieConsent(page);
+  });
+
+  test("register requires legal consent checkboxes", async ({ page }) => {
     await page.goto("/register");
-    await expect(page.getByText("צור חשבון חדש")).toBeVisible({ timeout: 10000 });
-    await expect(page.getByPlaceholder("ישראל ישראלי")).toBeVisible();
-    await expect(page.getByPlaceholder("you@example.com")).toBeVisible();
+    await expect(page.getByText("אישורים משפטיים")).toBeVisible({ timeout: 10000 });
+    await page.getByPlaceholder("ישראל ישראלי").fill("ישראל ישראלי");
+    await page.getByPlaceholder("you@example.com").fill("consent@example.com");
+    await page.getByPlaceholder(/לפחות 8 תווים/).fill("Password1!");
+    await page.getByRole("button", { name: "המשך" }).click();
+    await expect(page.getByRole("heading", { name: "בוא נכיר" })).toBeVisible();
   });
 
   test("login page loads and shows form", async ({ page }) => {

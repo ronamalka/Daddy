@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback, useRef } from "react";
-import { WheelchairMotion, X, MagnifyingGlassPlus, MagnifyingGlassMinus, HighlighterCircle, Cursor, TextT, Pause, ArrowCounterClockwise, LinkSimple, TextHOne } from "@phosphor-icons/react";
+import { WheelchairMotion, X, MagnifyingGlassPlus, MagnifyingGlassMinus, HighlighterCircle, Cursor, TextT, Pause, ArrowCounterClockwise, LinkSimple } from "@phosphor-icons/react";
 
 interface A11yState {
   fontSize: number;
@@ -10,7 +10,6 @@ interface A11yState {
   highlightLinks: boolean;
   pauseAnimations: boolean;
   lineHeight: boolean;
-  highlightHeadings: boolean;
 }
 
 const DEFAULT_STATE: A11yState = {
@@ -20,7 +19,6 @@ const DEFAULT_STATE: A11yState = {
   highlightLinks: false,
   pauseAnimations: false,
   lineHeight: false,
-  highlightHeadings: false,
 };
 
 const STORAGE_KEY = "a11y-settings";
@@ -33,7 +31,7 @@ const CONTRAST_LABELS: Record<A11yState["contrast"], string> = {
   mono: "שחור-לבן",
 };
 
-export const A11Y_BOOTSTRAP_SCRIPT = `(function(){try{var raw=localStorage.getItem('${STORAGE_KEY}');if(!raw)return;var s=JSON.parse(raw);var c=document.documentElement.classList;var st=document.documentElement.style;if(s.fontSize&&s.fontSize!==100)st.fontSize=s.fontSize+'%';c.toggle('a11y-high-contrast',s.contrast==='high');c.toggle('a11y-contrast-invert',s.contrast==='invert');c.toggle('a11y-contrast-mono',s.contrast==='mono');c.toggle('a11y-large-cursor',!!s.largerCursor);c.toggle('a11y-highlight-links',!!s.highlightLinks);c.toggle('a11y-pause-animations',!!s.pauseAnimations);c.toggle('a11y-line-height',!!s.lineHeight);c.toggle('a11y-highlight-headings',!!s.highlightHeadings)}catch(e){}})()`;
+export const A11Y_BOOTSTRAP_SCRIPT = `(function(){try{var c=document.documentElement.classList;c.remove('a11y-highlight-headings');var raw=localStorage.getItem('${STORAGE_KEY}');if(!raw)return;var s=JSON.parse(raw);var st=document.documentElement.style;if(s.fontSize&&s.fontSize!==100)st.fontSize=s.fontSize+'%';c.toggle('a11y-high-contrast',s.contrast==='high');c.toggle('a11y-contrast-invert',s.contrast==='invert');c.toggle('a11y-contrast-mono',s.contrast==='mono');c.toggle('a11y-large-cursor',!!s.largerCursor);c.toggle('a11y-highlight-links',!!s.highlightLinks);c.toggle('a11y-pause-animations',!!s.pauseAnimations);c.toggle('a11y-line-height',!!s.lineHeight)}catch(e){}})()`;
 
 export function AccessibilityToolbar() {
   const [open, setOpen] = useState(false);
@@ -45,9 +43,22 @@ export function AccessibilityToolbar() {
     try {
       const saved = localStorage.getItem(STORAGE_KEY);
       if (saved) {
-        const parsed = JSON.parse(saved);
-        setState(parsed);
-        applySettings(parsed);
+        const parsed = JSON.parse(saved) as Partial<A11yState> & { highlightHeadings?: boolean };
+        const next: A11yState = {
+          fontSize: typeof parsed.fontSize === "number" ? parsed.fontSize : DEFAULT_STATE.fontSize,
+          contrast: CONTRAST_CYCLE.includes(parsed.contrast as A11yState["contrast"])
+            ? (parsed.contrast as A11yState["contrast"])
+            : DEFAULT_STATE.contrast,
+          largerCursor: !!parsed.largerCursor,
+          highlightLinks: !!parsed.highlightLinks,
+          pauseAnimations: !!parsed.pauseAnimations,
+          lineHeight: !!parsed.lineHeight,
+        };
+        setState(next);
+        applySettings(next);
+        if ("highlightHeadings" in parsed) {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+        }
       }
     } catch {}
   }, []);
@@ -231,16 +242,6 @@ export function AccessibilityToolbar() {
                 announce(state.lineHeight ? "מרווח שורות רגיל" : "מרווח שורות מוגדל");
               }}
             />
-
-            <ToggleOption
-              icon={<TextHOne className="h-4 w-4" />}
-              label="הדגשת כותרות"
-              active={state.highlightHeadings}
-              onToggle={() => {
-                update("highlightHeadings", !state.highlightHeadings);
-                announce(state.highlightHeadings ? "הדגשת כותרות כבויה" : "הדגשת כותרות פעילה");
-              }}
-            />
           </div>
 
           <div className="mt-4 flex gap-2">
@@ -312,5 +313,5 @@ function applySettings(s: A11yState) {
   root.classList.toggle("a11y-highlight-links", s.highlightLinks);
   root.classList.toggle("a11y-pause-animations", s.pauseAnimations);
   root.classList.toggle("a11y-line-height", s.lineHeight);
-  root.classList.toggle("a11y-highlight-headings", s.highlightHeadings);
+  root.classList.remove("a11y-highlight-headings");
 }

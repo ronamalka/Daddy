@@ -2,23 +2,19 @@
 
 import {
   MagnifyingGlass, Users, Wrench, MapPin, Lightning, ChartBar, Coins,
-  PencilLine, Chat, Trophy, PaperPlaneTilt, Sparkle, Star, CheckCircle,
+  PencilLine, Chat, Trophy, Star, CheckCircle,
 } from "@phosphor-icons/react";
 
 import { DISTRICTS } from "@/lib/districts";
 
 export const DISTRICT_LIST = Object.entries(DISTRICTS).map(([code, name]) => ({ code: Number(code), name }));
 
-export const CATEGORY_ICONS: Record<string, React.ReactNode> = {
-  "assembly-and-installation": <Wrench className="h-6 w-6" />,
-  "home-maintenance": <Wrench className="h-6 w-6" />,
-  "moving-and-delivery": <PaperPlaneTilt className="h-6 w-6" />,
-  "tech-and-digital": <Lightning className="h-6 w-6" />,
-  "errands-and-help": <Users className="h-6 w-6" />,
-  "financial-help": <Coins className="h-6 w-6" />,
-  "automotive": <Wrench className="h-6 w-6" />,
-  "events": <Sparkle className="h-6 w-6" />,
-};
+export const POPULAR_SEARCHES = [
+  { label: "ברז שלא מפסיק לבכות", query: "תיקונים קטנים" },
+  { label: "ארון שמסרב להתרכב", query: "הרכבת רהיטים" },
+  { label: "הוזלת חשבונות", query: "הוזלת חשבונות" },
+  { label: "טלוויזיה שצריכה לעלות על הקיר", query: "תליית טלוויזיה" },
+] as const;
 
 export const STATS = [
   { number: 1200, suffix: "+", label: "אבאל׳ות שיודעים לסדר", icon: <Users className="h-5 w-5" /> },

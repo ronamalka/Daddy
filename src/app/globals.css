@@ -188,15 +188,6 @@ body {
 .a11y-line-height span {
   line-height: 2 !important;
 }
-.a11y-highlight-headings h1,
-.a11y-highlight-headings h2,
-.a11y-highlight-headings h3,
-.a11y-highlight-headings h4,
-.a11y-highlight-headings h5,
-.a11y-highlight-headings h6 {
-  outline: 2px solid rgb(var(--color-primary)) !important;
-  outline-offset: 4px !important;
-}
 
 /* Counter-invert the accessibility widget when invert/mono is active (IS 5568) */
 html.a11y-contrast-invert {

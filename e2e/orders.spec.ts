@@ -1,6 +1,8 @@
 import { test, expect } from "@playwright/test";
+import { stubCookieConsent } from "./cookies";
 
 async function login(page: import("@playwright/test").Page) {
+  await stubCookieConsent(page);
   await page.goto("/login");
   await page.getByPlaceholder("you@example.com").fill("admin@daddy.com");
   await page.getByPlaceholder("הזן את הסיסמה שלך").fill("password123");

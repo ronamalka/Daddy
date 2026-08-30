@@ -22,12 +22,16 @@ export function applySecurity(app: Express) {
   });
 }
 
+// Users service is ClusterIP-only; the BFF is the public choke point.
+// Default must not be a cluster-wide cap of 20 — express-rate-limit keys
+// by the BFF pod IP, so every login on the platform shares one bucket.
 export const authRateLimit = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: parseInt(process.env.AUTH_RATE_LIMIT_MAX || "20", 10),
+  max: parseInt(process.env.AUTH_RATE_LIMIT_MAX || "200", 10),
   message: { error: "Too many attempts, please try again later" },
   standardHeaders: true,
   legacyHeaders: false,
+  validate: { xForwardedForHeader: false },
 });
 
 export const passwordResetRateLimit = rateLimit({

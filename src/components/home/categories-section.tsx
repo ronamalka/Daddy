@@ -3,11 +3,11 @@
 import React, { useRef, useEffect } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { ArrowLeft, Wrench, CaretLeft } from "@phosphor-icons/react";
+import { ArrowLeft, CaretLeft } from "@phosphor-icons/react";
 import { SERVICE_CATEGORIES, ALL_SERVICES } from "@/lib/services";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { CATEGORY_ICONS } from "./data";
+import { CategoryIcon } from "@/components/ui/category-icon";
 
 interface CategoriesSectionProps {
   selectedCategory: string;
@@ -31,7 +31,6 @@ export function CategoriesSection({
 
   const mobileInsertAfter = selectedIndex >= 0 ? Math.floor(selectedIndex / 2) * 2 + 1 : -1;
   const desktopInsertAfter = selectedIndex >= 0 ? Math.floor(selectedIndex / 4) * 4 + 3 : -1;
-  const insertAfter = Math.max(mobileInsertAfter, desktopInsertAfter);
 
   const items: React.ReactNode[] = [];
 
@@ -57,7 +56,7 @@ export function CategoriesSection({
             ? "bg-[rgb(var(--color-primary))] text-white"
             : "bg-[rgba(var(--color-primary),0.1)] text-[rgb(var(--color-primary))] group-hover:bg-[rgb(var(--color-primary))] group-hover:text-white"
         )}>
-          {CATEGORY_ICONS[cat.slug] || <Wrench className="h-6 w-6" />}
+          <CategoryIcon slug={cat.slug} className="h-6 w-6" />
         </div>
         <p className={cn(
           "text-sm font-bold",
@@ -147,7 +146,7 @@ function SubServicesPanel({
               className="group flex items-center gap-3 rounded-lg border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] p-4 text-right transition-all hover:border-[rgb(var(--color-primary))] hover:shadow-sm"
             >
               <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-[rgba(var(--color-primary),0.1)] text-[rgb(var(--color-primary))] transition-colors group-hover:bg-[rgb(var(--color-primary))] group-hover:text-white">
-                {CATEGORY_ICONS[svc.category] || <Wrench className="h-5 w-5" />}
+                <CategoryIcon slug={svc.category} className="h-5 w-5" />
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-semibold text-[rgb(var(--color-text))] group-hover:text-[rgb(var(--color-primary))]">{svc.nameHe}</p>

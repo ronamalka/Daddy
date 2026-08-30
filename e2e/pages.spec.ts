@@ -12,16 +12,25 @@ test.describe("Public Pages", () => {
     await expect(content).toBeVisible();
   });
 
-  test("terms page loads", async ({ page }) => {
+  test("terms page states the platform is an intermediary", async ({ page }) => {
     await page.goto("/terms");
-    const content = page.locator("main, [role='main'], body").first();
-    await expect(content).toBeVisible();
+    await expect(page.getByRole("heading", { name: "תנאי שימוש" })).toBeVisible();
+    await expect(page.getByText(/תיווך בלבד/)).toBeVisible();
   });
 
-  test("privacy page loads", async ({ page }) => {
-    await page.goto("/privacy");
+  test("cookie banner can be rejected", async ({ page }) => {
+    await page.goto("/");
+    const dialog = page.getByRole("dialog", { name: "עוגיות והסכמה" });
+    await expect(dialog).toBeVisible({ timeout: 10000 });
+    await dialog.getByRole("button", { name: "דחייה" }).click();
+    await expect(dialog).toBeHidden();
+  });
+
+  test("guidelines page loads", async ({ page }) => {
+    await page.goto("/guidelines");
     const content = page.locator("main, [role='main'], body").first();
     await expect(content).toBeVisible();
+    await expect(page.getByRole("heading", { name: "כללי קהילה" })).toBeVisible();
   });
 
   test("become a daddy page loads", async ({ page }) => {

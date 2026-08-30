@@ -38,6 +38,7 @@ export default function HomePage() {
   const [featuredDaddies, setFeaturedDaddies] = useState<FeaturedDaddy[]>([]);
   const [liveReviews, setLiveReviews] = useState<LiveReview[]>([]);
   const [fetchError, setFetchError] = useState<string | null>(null);
+  const [loadingFeatured, setLoadingFeatured] = useState(true);
 
   const filteredServices = serviceSearch
     ? ALL_SERVICES.filter((s) => s.nameHe.includes(serviceSearch) || s.description.includes(serviceSearch))
@@ -57,12 +58,14 @@ export default function HomePage() {
         if (!cancelled) {
           setFeaturedDaddies(Array.isArray(daddies) ? daddies : []);
           setLiveReviews(Array.isArray(reviews) ? reviews : []);
+          setLoadingFeatured(false);
         }
       } catch {
         if (!cancelled) {
           setFetchError("לא הצלחנו לטעון נתונים. נסה לרענן את הדף.");
           setFeaturedDaddies([]);
           setLiveReviews([]);
+          setLoadingFeatured(false);
         }
       }
     }
@@ -192,7 +195,7 @@ export default function HomePage() {
         setServiceSearch={setServiceSearch}
       />
 
-      <FeaturedDaddiesSection featuredDaddies={featuredDaddies} />
+      <FeaturedDaddiesSection featuredDaddies={featuredDaddies} loading={loadingFeatured} />
 
       <WhyChooseSection />
 

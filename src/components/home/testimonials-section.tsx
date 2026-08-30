@@ -18,7 +18,7 @@ export function TestimonialsSection({ liveReviews }: TestimonialsSectionProps) {
         <SectionHeader title="מה הקהילה אומרת" subtitle="ביקורות אמיתיות מאנשים אמיתיים" />
 
         <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-          {(liveReviews.length > 0 ? liveReviews.slice(0, 3) : FALLBACK_TESTIMONIALS).map((review, i) => {
+          {(liveReviews.length > 0 ? liveReviews : FALLBACK_TESTIMONIALS).slice(0, 3).map((review, i) => {
             const isLive = "id" in review;
             const r = review as LiveReview & typeof FALLBACK_TESTIMONIALS[0];
             return (
@@ -49,7 +49,7 @@ export function TestimonialsSection({ liveReviews }: TestimonialsSectionProps) {
                 <div className="flex items-center justify-between border-t border-[rgb(var(--color-border-light))] pt-3">
                   <div className="flex items-center gap-2">
                     <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-[rgb(var(--color-primary))] to-[rgb(var(--color-primary-light))] text-xs font-bold text-white">
-                      {isLive ? r.user.name[0] : r.name[0]}
+                      {(isLive ? r.user?.name : r.name)?.[0] ?? "א"}
                     </div>
                     <div>
                       <span className="text-xs font-semibold text-[rgb(var(--color-text))]">{isLive ? r.user.name : r.name}</span>

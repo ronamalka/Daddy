@@ -1,6 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
-
-// --- Rate Limiting ---
+import {
+  RATE_LIMIT_WINDOW_MS,
+  clientIpFromHeaders,
+  rateLimitKey,
+  resolveRateLimitTier,
+} from "@/lib/rate-limit";
 
 interface RateLimitEntry {
   count: number;
@@ -8,30 +12,6 @@ interface RateLimitEntry {
 }
 
 const store = new Map<string, RateLimitEntry>();
-
-const WINDOW_MS = 60_000;
-
-const RATE_LIMIT_AUTH = parseInt(process.env.RATE_LIMIT_AUTH || "10", 10);
-const RATE_LIMIT_POST = parseInt(process.env.RATE_LIMIT_POST || "30", 10);
-const RATE_LIMIT_DEFAULT = parseInt(process.env.RATE_LIMIT_DEFAULT || "120", 10);
-
-const TIERS: { match: (path: string, method: string) => boolean; limit: number }[] = [
-  {
-    match: (path) =>
-      path.startsWith("/api/auth") ||
-      path.startsWith("/api/register") ||
-      path.startsWith("/api/password-reset"),
-    limit: RATE_LIMIT_AUTH,
-  },
-  {
-    match: (_path, method) => method === "POST",
-    limit: RATE_LIMIT_POST,
-  },
-  {
-    match: () => true,
-    limit: RATE_LIMIT_DEFAULT,
-  },
-];
 
 setInterval(() => {
   const now = Date.now();
@@ -43,40 +23,41 @@ setInterval(() => {
 }, 60_000);
 
 function getClientIp(request: NextRequest): string {
-  const forwarded = request.headers.get("x-forwarded-for");
-  if (forwarded) {
-    return forwarded.split(",")[0].trim();
-  }
-  const real = request.headers.get("x-real-ip");
-  if (real) return real;
-  return "unknown";
+  return clientIpFromHeaders(request.headers);
+}
+
+function getSessionToken(request: NextRequest): string | undefined {
+  return (
+    request.cookies.get("authjs.session-token")?.value ||
+    request.cookies.get("__Secure-authjs.session-token")?.value
+  );
+}
+
+function limitStoreKey(request: NextRequest, pathname: string): { key: string; limit: number } {
+  const method = request.method;
+  const tier = resolveRateLimitTier(pathname, method);
+  const ip = getClientIp(request);
+  const key = rateLimitKey(ip, getSessionToken(request), tier.limit);
+  return { key, limit: tier.limit };
 }
 
 function checkRateLimit(request: NextRequest, pathname: string): NextResponse | null {
-  const method = request.method;
-  const tier = TIERS.find((t) => t.match(pathname, method));
-  if (!tier) return null;
-
-  const ip = getClientIp(request);
-  const sessionToken = request.cookies.get("authjs.session-token")?.value
-    || request.cookies.get("__Secure-authjs.session-token")?.value
-    || "";
-  const sessionSuffix = sessionToken ? `:s${sessionToken.slice(0, 8)}` : "";
-  const key = `${ip}${sessionSuffix}:${tier.limit}`;
+  const { key, limit } = limitStoreKey(request, pathname);
   const now = Date.now();
 
   let entry = store.get(key);
   if (!entry || now > entry.resetAt) {
-    entry = { count: 0, resetAt: now + WINDOW_MS };
+    entry = { count: 0, resetAt: now + RATE_LIMIT_WINDOW_MS };
     store.set(key, entry);
   }
 
   entry.count++;
 
-  if (entry.count > tier.limit) {
+  if (entry.count > limit) {
     const retryAfter = Math.ceil((entry.resetAt - now) / 1000);
+    const ip = getClientIp(request);
     console.warn(
-      `[rate-limit] ${ip} exceeded ${tier.limit} req/min on ${method} ${pathname}`
+      `[rate-limit] ${ip} exceeded ${limit} req/min on ${request.method} ${pathname}`
     );
     return new NextResponse(
       JSON.stringify({ error: "Too many requests. Try again later." }),
@@ -85,7 +66,7 @@ function checkRateLimit(request: NextRequest, pathname: string): NextResponse | 
         headers: {
           "Content-Type": "application/json",
           "Retry-After": String(retryAfter),
-          "X-RateLimit-Limit": String(tier.limit),
+          "X-RateLimit-Limit": String(limit),
           "X-RateLimit-Remaining": "0",
           "X-RateLimit-Reset": String(Math.ceil(entry.resetAt / 1000)),
         },
@@ -97,16 +78,11 @@ function checkRateLimit(request: NextRequest, pathname: string): NextResponse | 
 }
 
 function setRateLimitHeaders(response: NextResponse, request: NextRequest, pathname: string) {
-  const method = request.method;
-  const tier = TIERS.find((t) => t.match(pathname, method));
-  if (!tier) return;
-
-  const ip = getClientIp(request);
-  const key = `${ip}:${tier.limit}`;
+  const { key, limit } = limitStoreKey(request, pathname);
   const entry = store.get(key);
   if (entry) {
-    response.headers.set("X-RateLimit-Limit", String(tier.limit));
-    response.headers.set("X-RateLimit-Remaining", String(Math.max(0, tier.limit - entry.count)));
+    response.headers.set("X-RateLimit-Limit", String(limit));
+    response.headers.set("X-RateLimit-Remaining", String(Math.max(0, limit - entry.count)));
     response.headers.set("X-RateLimit-Reset", String(Math.ceil(entry.resetAt / 1000)));
   }
 }

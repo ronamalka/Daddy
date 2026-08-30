@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Gift, Coins, Star, Clock, MapPin, Sparkle, FileText, GearSix, Rocket, Wrench } from "@phosphor-icons/react/dist/ssr";
 import type { Icon as PhosphorIcon } from "@phosphor-icons/react";
+import { MarketplaceDisclaimer } from "@/components/marketplace-disclaimer";
 
 export const metadata: Metadata = {
   title: "הפוך לאבאל׳ה — הידיים שלך עדיין זוכרות",
@@ -23,13 +24,13 @@ const BENEFITS: { title: string; desc: string; Icon: PhosphorIcon }[] = [
 
 const STEPS: { step: string; title: string; desc: string; Icon: PhosphorIcon; color: string }[] = [
   { step: "01", title: "ספר מה אתה יודע", desc: "הרשם עם אימייל וספר על עצמך. 30 שנות ניסיון? תכתוב את זה. לקוחות אוהבים לדעת שמגיע אליהם מישהו שעשה את זה אלף פעם.", Icon: FileText, color: "from-[rgb(var(--color-primary))] to-[rgb(var(--color-primary-light))]" },
-  { step: "02", title: "הגדר שירותים", desc: "בחר מה אתה עושה — אינסטלציה, חשמל, הובלות, או כל דבר אחר שאתה טוב בו. הגדר מחירים שמתאימים לך.", Icon: GearSix, color: "from-[rgb(var(--color-success))] to-[rgb(var(--color-accent))]" },
+  { step: "02", title: "הגדר שירותים", desc: "בחר מה אתה עושה מתוך העזרה הביתית שבאתר. עבודות טעונות רישיון (חשמל, גז, ביטוח) רק אם יש לך רישיון בתוקף — ואתה מציג אותו ללקוח.", Icon: GearSix, color: "from-[rgb(var(--color-success))] to-[rgb(var(--color-accent))]" },
   { step: "03", title: "תתחיל לקבל טלפונים", desc: "לקוחות מהאזור שלך ימצאו אותך וישלחו הודעות. תגיע, תסדר, ותרוויח. כמו פעם, רק עם יותר ׳תודה רבה׳.", Icon: Rocket, color: "from-[rgb(var(--color-accent-yellow))] to-[rgb(var(--color-error))]" },
 ];
 
 const TESTIMONIALS = [
-  { name: "משה כהן, 62", city: "באר שבע", service: "אינסטלציה", text: "פרשתי מחברת החשמל לפני שנתיים. ישבתי בבית, השתגעתי. עכשיו אני עושה 3-4 עבודות בשבוע ומרגיש שוב שימושי. והנכדים חושבים שאני גיבור.", rating: 5 },
-  { name: "יוסי לוי, 58", city: "חיפה", service: "חשמל", text: "הילדים עפו מהבית, הבית שקט מדי. התחלתי לתקן דברים לשכנים, ואז נרשמתי לאבאל׳ה. הטלפון לא מפסיק. אני שוב מרגיש שצריכים אותי.", rating: 5 },
+  { name: "משה כהן, 62", city: "באר שבע", service: "הרכבת רהיטים", text: "פרשתי לפני שנתיים. ישבתי בבית, השתגעתי. עכשיו אני עושה 3-4 עבודות בשבוע ומרגיש שוב שימושי. והנכדים חושבים שאני גיבור.", rating: 5 },
+  { name: "יוסי לוי, 58", city: "חיפה", service: "תיקונים קטנים", text: "הילדים עפו מהבית, הבית שקט מדי. התחלתי לתקן דברים לשכנים, ואז נרשמתי לאבאל׳ה. הטלפון לא מפסיק. אני שוב מרגיש שצריכים אותי.", rating: 5 },
   { name: "אבי ישראלי, 55", city: "תל אביב", service: "הרכבת רהיטים", text: "30 שנה בנגרות. אמרו לי ׳תנוח, מגיע לך׳. אבל מה אני אעשה — אשב מול הטלוויזיה? עכשיו אני מרכיב ארונות לזוגות צעירים, ותמיד יוצא עם בדיחה טובה.", rating: 5 },
 ];
 
@@ -50,6 +51,9 @@ export default function BecomeADaddyPage() {
           <Link href="/register" className="mt-8 inline-block rounded-xl bg-gradient-to-r from-[rgb(var(--color-success))] to-[rgb(var(--color-accent))] px-8 py-4 text-[16px] font-bold text-white shadow-[0_4px_16px_rgba(var(--color-success),0.3)] transition-all hover:shadow-[0_8px_24px_rgba(var(--color-success),0.4)] hover:-translate-y-0.5">
             הירשם עכשיו — בחינם
           </Link>
+          <p className="mt-4 text-[13px] text-white/60 max-w-xl mx-auto">
+            נותני השירות הם עצמאיים, לא עובדים של אבאל׳ה. עבודות חשמל, גז וביטוח דורשות רישיון בתוקף.
+          </p>
         </div>
       </section>
 
@@ -123,6 +127,10 @@ export default function BecomeADaddyPage() {
             </div>
           ))}
         </div>
+      </section>
+
+      <section className="mx-auto max-w-3xl px-4 py-8">
+        <MarketplaceDisclaimer />
       </section>
 
       {/* CTA */}

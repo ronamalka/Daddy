@@ -76,6 +76,7 @@ export function GigCard({ id, title, image, seller, startingPrice, avgRating, re
               <div>
                 <span className="text-[12px] text-[rgb(var(--color-text-muted))]">החל מ-</span>
                 <span className="text-[18px] font-bold text-[rgb(var(--color-text))]">₪{startingPrice}</span>
+                <span className="ms-1 text-[10px] text-[rgb(var(--color-text-muted))]">כולל מע״מ</span>
               </div>
             </div>
           </div>
@@ -129,6 +130,7 @@ export function GigCard({ id, title, image, seller, startingPrice, avgRating, re
           <div className="border-t border-[rgb(var(--color-border-light))] pt-3">
             <span className="text-[12px] text-[rgb(var(--color-text-muted))]">החל מ-</span>
             <span className="me-1.5 text-[18px] font-bold text-[rgb(var(--color-text))]">₪{startingPrice}</span>
+            <span className="text-[10px] text-[rgb(var(--color-text-muted))]">כולל מע״מ</span>
           </div>
         </div>
       </Link>
