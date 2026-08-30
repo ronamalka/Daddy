@@ -214,6 +214,30 @@ describe("System Tests — Auth-Protected API", () => {
     });
   });
 
+  describe("GET /api/sellers/:id/availability", () => {
+    it("returns 404 for an unknown seller", async () => {
+      const { status } = await fetchApi("/api/sellers/does-not-exist/availability");
+      expect([404, 502]).toContain(status);
+    });
+  });
+
+  describe("GET /api/availability", () => {
+    it("returns 401 without auth", async () => {
+      const { status } = await fetchApi("/api/availability");
+      expect(status).toBe(401);
+    });
+  });
+
+  describe("PUT /api/availability", () => {
+    it("returns 401 without auth", async () => {
+      const { status } = await fetchApi("/api/availability", {
+        method: "PUT",
+        body: JSON.stringify({ acceptingJobs: true, weeklyHours: [], timeOff: [] }),
+      });
+      expect(status).toBe(401);
+    });
+  });
+
   describe("GET /api/orders", () => {
     it("returns 401 without auth", async () => {
       const { status } = await fetchApi("/api/orders");

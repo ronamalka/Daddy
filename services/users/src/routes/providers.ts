@@ -8,7 +8,7 @@ providersRoutes.get("/", async (req: Request, res: Response) => {
   const district = req.query.district as string | undefined;
   const cityCode = req.query.cityCode as string | undefined;
 
-  const where: Record<string, unknown> = { role: "SELLER" };
+  const where: Record<string, unknown> = { role: "SELLER", acceptingJobs: true };
 
   if (service) {
     where.userServices = { some: { serviceSlug: service } };

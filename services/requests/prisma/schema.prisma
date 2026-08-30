@@ -24,6 +24,8 @@ model ServiceRequest {
   cityCode     Int?
   cityName     String?
   status       RequestStatus @default(OPEN)
+  slotStart    DateTime?
+  slotEnd      DateTime?
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
 

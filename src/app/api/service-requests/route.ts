@@ -3,6 +3,7 @@ import { auth } from "@/lib/auth";
 import { proxyRequest, REQUESTS_SERVICE } from "@/lib/gateway";
 import { verifyTurnstileToken } from "@/lib/turnstile";
 import { detectBot } from "@/lib/bot-detection";
+import { isTwoHourLocalWindow, parseSlotIso } from "@/lib/availability";
 
 export async function GET(request: NextRequest) {
   const params = request.nextUrl.searchParams.toString();
@@ -53,6 +54,23 @@ export async function POST(request: NextRequest) {
   }
 
   const { turnstileToken: _t, _hp_field: _h, _formLoadedAt: _f, ...cleanBody } = body;
+
+  const slot = parseSlotIso(String(cleanBody.slotStart ?? ""), String(cleanBody.slotEnd ?? ""));
+  if (!slot || !isTwoHourLocalWindow(slot.start, slot.end)) {
+    return NextResponse.json(
+      { error: "יש לבחור חלון ביקור של שעתיים" },
+      { status: 400 }
+    );
+  }
+  if (slot.start.getTime() <= Date.now()) {
+    return NextResponse.json(
+      { error: "חלון הביקור חייב להיות בעתיד" },
+      { status: 400 }
+    );
+  }
+
+  cleanBody.slotStart = slot.start.toISOString();
+  cleanBody.slotEnd = slot.end.toISOString();
 
   const user = session.user as { id: string; email: string; name: string; role: string };
   const { data, status } = await proxyRequest(REQUESTS_SERVICE, "/service-requests", {

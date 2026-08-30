@@ -18,6 +18,7 @@ import {
   RequestsView,
 } from "@/components/home";
 import type { Provider, ServiceRequest, FeaturedDaddy, LiveReview } from "@/components/home/types";
+import { VisitWindowFields, visitWindowToIso, type VisitWindowValue } from "@/components/visit-window-fields";
 
 export default function HomePage() {
   const { data: session } = useSession();
@@ -33,6 +34,7 @@ export default function HomePage() {
   const [showRequestForm, setShowRequestForm] = useState(false);
   const [reqTitle, setReqTitle] = useState("");
   const [reqDesc, setReqDesc] = useState("");
+  const [reqWindow, setReqWindow] = useState<VisitWindowValue | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [featuredDaddies, setFeaturedDaddies] = useState<FeaturedDaddy[]>([]);
@@ -103,18 +105,28 @@ export default function HomePage() {
   }
 
   async function submitRequest() {
-    if (!reqTitle.trim() || !reqDesc.trim()) return;
+    if (!reqTitle.trim() || !reqDesc.trim() || !reqWindow?.date) return;
     setSubmitting(true);
     const districtName = selectedDistrict ? DISTRICTS[Number(selectedDistrict)] : null;
+    const { slotStart, slotEnd } = visitWindowToIso(reqWindow);
     await fetch("/api/service-requests", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ title: reqTitle, description: reqDesc, serviceSlug: selectedService || null, districtCode: selectedDistrict ? Number(selectedDistrict) : null, districtName }),
+      body: JSON.stringify({
+        title: reqTitle,
+        description: reqDesc,
+        serviceSlug: selectedService || null,
+        districtCode: selectedDistrict ? Number(selectedDistrict) : null,
+        districtName,
+        slotStart,
+        slotEnd,
+      }),
     });
     setSubmitting(false);
     setSubmitted(true);
     setReqTitle("");
     setReqDesc("");
+    setReqWindow(null);
     setShowRequestForm(false);
     setTimeout(() => setSubmitted(false), 4000);
   }
@@ -147,6 +159,8 @@ export default function HomePage() {
         setReqTitle={setReqTitle}
         reqDesc={reqDesc}
         setReqDesc={setReqDesc}
+        reqWindow={reqWindow}
+        setReqWindow={setReqWindow}
         submitting={submitting}
         submitRequest={submitRequest}
         submitted={submitted}

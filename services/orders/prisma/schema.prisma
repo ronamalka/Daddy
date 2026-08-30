@@ -30,6 +30,8 @@ model Order {
   price     Float
   status    OrderStatus @default(PENDING)
   dueDate   DateTime?
+  slotStart DateTime?
+  slotEnd   DateTime?
   createdAt DateTime    @default(now())
   updatedAt DateTime    @updatedAt
 
@@ -38,6 +40,7 @@ model Order {
   @@index([buyerId])
   @@index([sellerId])
   @@index([gigId])
+  @@index([sellerId, slotStart])
 }
 
 model OrderRequirement {

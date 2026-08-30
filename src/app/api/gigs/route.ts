@@ -34,7 +34,7 @@ export async function GET(request: Request) {
 
   const sellerIds = [...new Set(data.gigs.map((g: { sellerId: string }) => g.sellerId))] as string[];
 
-  const sellerMap: Record<string, { id: string; name: string; avatar: string | null; serviceAreas?: { districtName: string; cityName: string | null }[] }> = {};
+  const sellerMap: Record<string, { id: string; name: string; avatar: string | null; serviceAreas?: { districtName: string; cityName: string | null }[]; acceptingJobs?: boolean }> = {};
   await Promise.all(
     sellerIds.map(async (id) => {
       const { data: seller } = await proxyRequest(USERS_SERVICE, `/sellers/${id}`);
@@ -44,6 +44,7 @@ export async function GET(request: Request) {
           name: seller.name,
           avatar: seller.avatar,
           serviceAreas: seller.serviceAreas,
+          acceptingJobs: seller.acceptingJobs !== false,
         };
       }
     })
@@ -52,7 +53,7 @@ export async function GET(request: Request) {
   let enriched = data.gigs.map((gig: { sellerId: string }) => ({
     ...gig,
     seller: sellerMap[gig.sellerId] || { id: gig.sellerId, name: "משתמש", avatar: null },
-  }));
+  })).filter((gig: { seller: { acceptingJobs?: boolean } }) => gig.seller.acceptingJobs !== false);
 
   const district = searchParams.get("district");
   if (district) {
@@ -61,8 +62,8 @@ export async function GET(request: Request) {
     );
   }
 
-  const filteredTotal = district ? enriched.length : data.total;
-  const filteredHasMore = district ? false : data.hasMore;
+  const filteredTotal = district || enriched.length !== data.gigs.length ? enriched.length : data.total;
+  const filteredHasMore = district || enriched.length !== data.gigs.length ? false : data.hasMore;
 
   return NextResponse.json({ gigs: enriched, total: filteredTotal, hasMore: filteredHasMore });
 }

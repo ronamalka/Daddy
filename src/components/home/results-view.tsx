@@ -8,6 +8,7 @@ import { type getServiceBySlug } from "@/lib/services";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
+import { VisitWindowFields, type VisitWindowValue } from "@/components/visit-window-fields";
 
 interface ResultsViewProps {
   providers: Provider[];
@@ -23,6 +24,8 @@ interface ResultsViewProps {
   setReqTitle: (v: string) => void;
   reqDesc: string;
   setReqDesc: (v: string) => void;
+  reqWindow: VisitWindowValue | null;
+  setReqWindow: (v: VisitWindowValue) => void;
   submitting: boolean;
   submitRequest: () => void;
   submitted: boolean;
@@ -31,7 +34,7 @@ interface ResultsViewProps {
 export function ResultsView({
   providers, loadingProviders, selectedServiceDef, selectedDistrict, setSelectedDistrict,
   resetSearch, session, showRequestForm, setShowRequestForm,
-  reqTitle, setReqTitle, reqDesc, setReqDesc, submitting, submitRequest, submitted,
+  reqTitle, setReqTitle, reqDesc, setReqDesc, reqWindow, setReqWindow, submitting, submitRequest, submitted,
 }: ResultsViewProps) {
   return (
     <div className="min-h-screen">
@@ -98,10 +101,13 @@ export function ResultsView({
               ) : (
                 <div className="mx-auto max-w-md text-right">
                   <input value={reqTitle} onChange={(e) => setReqTitle(e.target.value)} placeholder="מה אתה צריך? (כותרת קצרה)" className="mb-3 w-full rounded-lg border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] px-4 py-3 text-sm text-[rgb(var(--color-text))] placeholder-[rgb(var(--color-text-muted))] focus:border-[rgb(var(--color-primary))] focus:outline-none focus:ring-2 focus:ring-[rgba(var(--color-primary),0.1)]" />
-                  <textarea value={reqDesc} onChange={(e) => setReqDesc(e.target.value)} placeholder="תאר בפירוט מה צריך לעשות, מתי, ותקציב משוער..." rows={4} className="mb-3 w-full rounded-lg border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] px-4 py-3 text-sm text-[rgb(var(--color-text))] placeholder-[rgb(var(--color-text-muted))] focus:border-[rgb(var(--color-primary))] focus:outline-none focus:ring-2 focus:ring-[rgba(var(--color-primary),0.1)] resize-none" />
+                  <textarea value={reqDesc} onChange={(e) => setReqDesc(e.target.value)} placeholder="תאר בפירוט מה צריך לעשות ותקציב משוער..." rows={4} className="mb-3 w-full rounded-lg border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] px-4 py-3 text-sm text-[rgb(var(--color-text))] placeholder-[rgb(var(--color-text-muted))] focus:border-[rgb(var(--color-primary))] focus:outline-none focus:ring-2 focus:ring-[rgba(var(--color-primary),0.1)] resize-none" />
+                  <div className="mb-3 text-right">
+                    <VisitWindowFields value={reqWindow} onChange={setReqWindow} />
+                  </div>
                   <div className="flex gap-3">
                     <Button variant="outline" className="flex-1" onClick={() => setShowRequestForm(false)}>ביטול</Button>
-                    <Button className="flex-1" onClick={submitRequest} disabled={submitting || !reqTitle.trim() || !reqDesc.trim()}>
+                    <Button className="flex-1" onClick={submitRequest} disabled={submitting || !reqTitle.trim() || !reqDesc.trim() || !reqWindow?.date}>
                       {submitting ? "שולח..." : "פרסם בקשה"}
                     </Button>
                   </div>

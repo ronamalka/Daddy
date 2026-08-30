@@ -5,6 +5,7 @@ import { useSession } from "next-auth/react";
 import { useParams, useRouter } from "next/navigation";
 import { getServiceBySlug } from "@/lib/services";
 import { CategoryIcon } from "@/components/ui/category-icon";
+import { formatVisitWindow } from "@/lib/availability";
 
 interface ServiceRequestDetail {
   id: string;
@@ -15,6 +16,8 @@ interface ServiceRequestDetail {
   cityName: string | null;
   status: string;
   createdAt: string;
+  slotStart?: string | null;
+  slotEnd?: string | null;
   buyer: { id: string; name: string };
   responses: {
     id: string;
@@ -131,6 +134,12 @@ export default function RequestDetailPage() {
         </div>
 
         <p className="text-[15px] leading-relaxed text-[rgb(var(--color-text-secondary))] whitespace-pre-wrap">{request.description}</p>
+
+        {request.slotStart && request.slotEnd && (
+          <p className="mt-4 rounded-xl bg-[rgba(var(--color-primary),0.08)] px-4 py-3 text-[14px] font-medium text-[rgb(var(--color-text))]">
+            חלון מבוקש: {formatVisitWindow(new Date(request.slotStart), new Date(request.slotEnd))}
+          </p>
+        )}
 
         {svc && (
           <div className="mt-4 flex items-center gap-2">

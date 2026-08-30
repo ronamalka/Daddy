@@ -5,7 +5,7 @@ export const featuredRoutes = Router();
 
 featuredRoutes.get("/", async (_req: Request, res: Response) => {
   const sellers = await prisma.user.findMany({
-    where: { role: "SELLER" },
+    where: { role: "SELLER", acceptingJobs: true },
     select: {
       id: true,
       name: true,

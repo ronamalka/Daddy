@@ -3,10 +3,13 @@ import { z } from "zod";
 import { auth } from "@/lib/auth";
 import { proxyRequest, ORDERS_SERVICE, GIGS_SERVICE, USERS_SERVICE } from "@/lib/gateway";
 import { validateBody } from "@/lib/validate";
+import { isTwoHourLocalWindow, parseSlotIso, slotFitsSchedule } from "@/lib/availability";
 
 const createOrderSchema = z.object({
-  gigId: z.string().uuid(),
+  gigId: z.string().min(1).max(50),
   tier: z.string().min(1).max(50),
+  slotStart: z.string().min(10).max(40),
+  slotEnd: z.string().min(10).max(40),
 }).strict();
 
 export async function GET() {
@@ -62,7 +65,22 @@ export async function POST(request: Request) {
   const result = await validateBody(request, createOrderSchema);
   if ("error" in result) return result.error;
 
-  const { gigId, tier } = result.data;
+  const { gigId, tier, slotStart, slotEnd } = result.data;
+
+  const slot = parseSlotIso(slotStart, slotEnd);
+  if (!slot || !isTwoHourLocalWindow(slot.start, slot.end)) {
+    return NextResponse.json(
+      { error: "יש לבחור חלון ביקור של שעתיים" },
+      { status: 400 }
+    );
+  }
+
+  if (slot.start.getTime() <= Date.now()) {
+    return NextResponse.json(
+      { error: "חלון הביקור חייב להיות בעתיד" },
+      { status: 400 }
+    );
+  }
 
   const { data: gig, status: gigStatus } = await proxyRequest(GIGS_SERVICE, `/gigs/${gigId}`);
   if (gigStatus !== 200 || !gig) {
@@ -75,6 +93,39 @@ export async function POST(request: Request) {
   }
 
   const user = session.user as { id: string; email: string; name: string; role: string };
+  const { data: availability } = await proxyRequest(
+    USERS_SERVICE,
+    `/availability/${gig.sellerId}`
+  );
+
+  if (!availability || availability.error) {
+    return NextResponse.json(
+      { error: "לא ניתן לבדוק את הזמינות של האבא" },
+      { status: 400 }
+    );
+  }
+
+  if (availability.acceptingJobs === false) {
+    return NextResponse.json(
+      { error: "האבא לא מקבל עבודות השבוע" },
+      { status: 400 }
+    );
+  }
+
+  if (
+    !slotFitsSchedule(
+      slot.start,
+      slot.end,
+      availability.weeklyHours || [],
+      availability.timeOff || []
+    )
+  ) {
+    return NextResponse.json(
+      { error: "החלון שבחרת מחוץ לשעות הזמינות" },
+      { status: 400 }
+    );
+  }
+
   const { data, status } = await proxyRequest(ORDERS_SERVICE, "/orders", {
     method: "POST",
     body: {
@@ -82,9 +133,18 @@ export async function POST(request: Request) {
       sellerId: gig.sellerId,
       tier,
       price: pricingTier.price,
-      deliveryDays: pricingTier.deliveryDays,
+      slotStart: slot.start.toISOString(),
+      slotEnd: slot.end.toISOString(),
     },
     user,
   });
+
+  if (status === 409) {
+    return NextResponse.json(
+      { error: "החלון תפוס, בחר זמן אחר" },
+      { status: 409 }
+    );
+  }
+
   return NextResponse.json(data, { status });
 }

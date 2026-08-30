@@ -119,6 +119,26 @@ async function main() {
     });
   }
 
+  const DEFAULT_WEEKLY_HOURS = [
+    { dayOfWeek: 0, startMin: 16 * 60, endMin: 20 * 60 },
+    { dayOfWeek: 1, startMin: 16 * 60, endMin: 20 * 60 },
+    { dayOfWeek: 2, startMin: 16 * 60, endMin: 20 * 60 },
+    { dayOfWeek: 3, startMin: 16 * 60, endMin: 20 * 60 },
+    { dayOfWeek: 4, startMin: 16 * 60, endMin: 20 * 60 },
+    { dayOfWeek: 5, startMin: 8 * 60, endMin: 13 * 60 },
+  ];
+
+  const sellerIds = [S.seller, S.seller2, S.seller3, S.seller4, S.seller5, S.seller6];
+  for (const userId of sellerIds) {
+    for (const hours of DEFAULT_WEEKLY_HOURS) {
+      await prisma.weeklyHours.upsert({
+        where: { userId_dayOfWeek: { userId, dayOfWeek: hours.dayOfWeek } },
+        update: { startMin: hours.startMin, endMin: hours.endMin },
+        create: { userId, ...hours },
+      });
+    }
+  }
+
   console.log("Users seed complete.");
 }
 

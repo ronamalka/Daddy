@@ -16,6 +16,11 @@ sellerRoutes.get("/:id", async (req: Request, res: Response) => {
       city: true,
       createdAt: true,
       role: true,
+      acceptingJobs: true,
+      weeklyHours: {
+        select: { dayOfWeek: true, startMin: true, endMin: true },
+        orderBy: { dayOfWeek: "asc" },
+      },
       serviceAreas: {
         select: { districtCode: true, districtName: true, cityCode: true, cityName: true },
         orderBy: [{ districtName: "asc" }, { cityName: "asc" }],
