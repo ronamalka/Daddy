@@ -165,9 +165,12 @@ export function Navbar() {
         <div className="flex items-center gap-2 md:hidden">
           {session?.user && <NotificationBell />}
           <button
+            type="button"
             className="flex h-10 w-10 items-center justify-center rounded-lg text-[rgb(var(--color-text-secondary))] hover:bg-[rgb(var(--color-surface-elevated))] transition-colors"
             onClick={() => setMobileOpen(true)}
             aria-label="פתח תפריט"
+            aria-expanded={mobileOpen}
+            aria-controls="mobile-nav-sheet"
           >
             <MenuIcon className="h-5 w-5" />
           </button>

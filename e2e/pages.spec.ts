@@ -84,4 +84,33 @@ test.describe("Navigation", () => {
     const content = page.locator("main, [role='main'], body").first();
     await expect(content).toBeVisible();
   });
+
+  test("mobile hamburger menu covers the viewport", async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto("/");
+    const cookieDialog = page.getByRole("dialog", { name: "עוגיות והסכמה" });
+    await cookieDialog.waitFor({ state: "visible", timeout: 10000 }).catch(() => {});
+    if (await cookieDialog.isVisible().catch(() => false)) {
+      await cookieDialog.getByRole("button", { name: "דחייה" }).click();
+      await expect(cookieDialog).toBeHidden();
+    }
+
+    await page.getByRole("button", { name: "פתח תפריט", exact: true }).click();
+    const menu = page.getByRole("dialog", { name: "תפריט ניווט" });
+    await expect(menu).toBeVisible();
+
+    const box = await menu.boundingBox();
+    expect(box).toBeTruthy();
+    expect(box!.y).toBeLessThanOrEqual(2);
+    expect(box!.height).toBeGreaterThan(700);
+
+    await expect(menu.getByRole("link", { name: "עיון" })).toBeVisible();
+    await expect(menu.getByRole("link", { name: "שירותים" })).toBeVisible();
+
+    const trappedInNav = await menu.evaluate((el) => !!el.closest("nav"));
+    expect(trappedInNav).toBe(false);
+
+    await page.getByRole("button", { name: "סגור תפריט" }).click();
+    await expect(menu).toBeHidden();
+  });
 });
