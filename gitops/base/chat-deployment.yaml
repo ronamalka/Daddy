@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: chat-service
-          image: quay.io/rh_ee_rmalka/daddy-chat-service:1fbe3c39
+          image: quay.io/rh_ee_rmalka/daddy-chat-service:633dc53d
           ports:
             - containerPort: 4005
           env:
