@@ -1,8 +1,5 @@
 /** Current published terms version. Bump this when legal copy changes. */
-export const TERMS_VERSION = "2026-08-30.2";
-
-/** Platform take on each completed job, as a percent of the daddy's listed price. */
-export const PLATFORM_SERVICE_FEE_PERCENT = 17;
+export const TERMS_VERSION = "2026-08-30";
 
 export const LEGAL_CONTACTS = {
   legal: "legal@abale.co.il",
