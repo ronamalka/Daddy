@@ -1,5 +1,5 @@
 import { PrismaClient } from "./generated/prisma/client";
-import { MessageRepo, MessageRecord } from "./chat";
+import { MessageRepo, MessageRecord, groupConversations } from "./chat";
 
 export function prismaMessageRepo(prisma: PrismaClient): MessageRepo {
   return {
@@ -32,7 +32,6 @@ export function prismaMessageRepo(prisma: PrismaClient): MessageRepo {
       if (withUser) {
         return prisma.message.findMany({
           where: {
-            orderId: null,
             OR: [
               { senderId: userId, receiverId: withUser },
               { senderId: withUser, receiverId: userId },
@@ -50,6 +49,15 @@ export function prismaMessageRepo(prisma: PrismaClient): MessageRepo {
         orderBy: { createdAt: "desc" },
       }) as Promise<MessageRecord[]>;
     },
+    async listConversations(userId) {
+      const messages = await prisma.message.findMany({
+        where: {
+          OR: [{ senderId: userId }, { receiverId: userId }],
+        },
+        orderBy: { createdAt: "asc" },
+      });
+      return groupConversations(userId, messages as MessageRecord[]);
+    },
     async countUnread(userId) {
       return prisma.message.count({
         where: { receiverId: userId, readAt: null },
@@ -64,7 +72,6 @@ export function prismaMessageRepo(prisma: PrismaClient): MessageRepo {
         where.orderId = orderId;
       } else {
         where.senderId = senderId;
-        where.orderId = null;
       }
       const { count } = await prisma.message.updateMany({
         where,

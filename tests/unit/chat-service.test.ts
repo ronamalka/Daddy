@@ -3,6 +3,7 @@ import {
   createInMemoryRepo,
   sendMessage,
   listMessages,
+  listConversations,
   unreadCount,
   markRead,
 } from "../../services/chat/src/chat";
@@ -140,5 +141,55 @@ describe("chat service send/receive", () => {
 
     const unscoped = await markRead(repo, { userId: buyer });
     expect(unscoped).toMatchObject({ ok: false, status: 400 });
+  });
+
+  it("keeps every message between two people in a single conversation", async () => {
+    const repo = createInMemoryRepo();
+    await sendMessage(repo, {
+      senderId: buyer,
+      receiverId: seller,
+      content: "היי, ראיתי את הפרופיל",
+    });
+    await sendMessage(repo, {
+      senderId: buyer,
+      receiverId: seller,
+      content: "אפשר מחר בבוקר?",
+      orderId,
+    });
+    await sendMessage(repo, {
+      senderId: buyer,
+      receiverId: seller,
+      content: "וגם לגבי ההתמקחות",
+      orderId: "ord-4",
+    });
+    await sendMessage(repo, {
+      senderId: stranger,
+      receiverId: seller,
+      content: "שאלה אחרת",
+    });
+
+    const buyerInbox = await listConversations(repo, buyer);
+    expect(buyerInbox.ok).toBe(true);
+    if (!buyerInbox.ok) return;
+    expect(buyerInbox.data).toHaveLength(1);
+    expect(buyerInbox.data[0].otherUserId).toBe(seller);
+    expect(buyerInbox.data[0].lastMessage.content).toBe("וגם לגבי ההתמקחות");
+
+    const sellerInbox = await listConversations(repo, seller);
+    expect(sellerInbox.ok).toBe(true);
+    if (!sellerInbox.ok) return;
+    expect(sellerInbox.data.map((c) => c.otherUserId).sort()).toEqual([buyer, stranger].sort());
+    const danaThread = sellerInbox.data.find((c) => c.otherUserId === buyer);
+    expect(danaThread?.unreadCount).toBe(3);
+
+    const thread = await listMessages(repo, { userId: seller, withUser: buyer });
+    expect(thread.ok).toBe(true);
+    if (!thread.ok) return;
+    expect(thread.data).toHaveLength(3);
+
+    const marked = await markRead(repo, { userId: seller, senderId: buyer });
+    expect(marked.ok && marked.data.marked).toBe(3);
+    const after = await unreadCount(repo, seller);
+    expect(after.ok && after.data.count).toBe(1);
   });
 });

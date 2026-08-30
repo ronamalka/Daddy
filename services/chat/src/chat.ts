@@ -32,6 +32,12 @@ export type MarkReadInput = {
   senderId?: string;
 };
 
+export type ConversationPreview = {
+  otherUserId: string;
+  lastMessage: MessageRecord;
+  unreadCount: number;
+};
+
 export interface MessageRepo {
   create(data: {
     content: string;
@@ -45,8 +51,36 @@ export interface MessageRepo {
     withUser?: string;
     isAdmin?: boolean;
   }): Promise<MessageRecord[]>;
+  listConversations(userId: string): Promise<ConversationPreview[]>;
   countUnread(userId: string): Promise<number>;
   markRead(args: { userId: string; orderId?: string; senderId?: string }): Promise<number>;
+}
+
+export function peerId(userId: string, message: Pick<MessageRecord, "senderId" | "receiverId">): string {
+  return message.senderId === userId ? message.receiverId : message.senderId;
+}
+
+export function groupConversations(userId: string, messages: MessageRecord[]): ConversationPreview[] {
+  const byPeer = new Map<string, MessageRecord[]>();
+  for (const message of messages) {
+    const otherUserId = peerId(userId, message);
+    const bucket = byPeer.get(otherUserId) || [];
+    bucket.push(message);
+    byPeer.set(otherUserId, bucket);
+  }
+
+  const conversations: ConversationPreview[] = [];
+  for (const [otherUserId, thread] of byPeer) {
+    const sorted = [...thread].sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
+    conversations.push({
+      otherUserId,
+      lastMessage: sorted[sorted.length - 1],
+      unreadCount: thread.filter((msg) => msg.receiverId === userId && msg.readAt === null).length,
+    });
+  }
+
+  conversations.sort((a, b) => b.lastMessage.createdAt.getTime() - a.lastMessage.createdAt.getTime());
+  return conversations;
 }
 
 export type ChatResult<T> =
@@ -89,6 +123,13 @@ export function listMessages(repo: MessageRepo, input: ListMessagesInput): Promi
     orderId: input.orderId,
     isAdmin: input.role === "ADMIN",
   }).then((data) => ({ ok: true as const, status: 200, data }));
+}
+
+export function listConversations(
+  repo: MessageRepo,
+  userId: string
+): Promise<ChatResult<ConversationPreview[]>> {
+  return repo.listConversations(userId).then((data) => ({ ok: true as const, status: 200, data }));
 }
 
 export function unreadCount(repo: MessageRepo, userId: string): Promise<ChatResult<{ count: number }>> {
@@ -143,8 +184,11 @@ export function createInMemoryRepo(): MessageRepo & { records: MessageRecord[] }
           if (msg.orderId !== orderId) return false;
           return isAdmin || matchesParty(msg, userId);
         }
+        if (withUser) {
+          return matchesParty(msg, userId, withUser);
+        }
         if (msg.orderId !== null) return false;
-        return matchesParty(msg, userId, withUser);
+        return matchesParty(msg, userId);
       });
 
       result = [...result].sort((a, b) => {
@@ -156,6 +200,10 @@ export function createInMemoryRepo(): MessageRepo & { records: MessageRecord[] }
 
       return result;
     },
+    async listConversations(userId) {
+      const mine = records.filter((msg) => msg.senderId === userId || msg.receiverId === userId);
+      return groupConversations(userId, mine);
+    },
     async countUnread(userId) {
       return records.filter((msg) => msg.receiverId === userId && msg.readAt === null).length;
     },
@@ -166,7 +214,7 @@ export function createInMemoryRepo(): MessageRepo & { records: MessageRecord[] }
         if (orderId) {
           if (msg.orderId !== orderId) continue;
         } else if (senderId) {
-          if (msg.senderId !== senderId || msg.orderId !== null) continue;
+          if (msg.senderId !== senderId) continue;
         } else {
           continue;
         }

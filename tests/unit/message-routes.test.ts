@@ -15,6 +15,7 @@ vi.mock("@/lib/gateway", () => ({
 import { auth } from "@/lib/auth";
 import { proxyRequest } from "@/lib/gateway";
 import { POST as postDm } from "@/app/api/messages/route";
+import { GET as getConversations } from "@/app/api/messages/conversations/route";
 import { POST as postOrderMessage } from "@/app/api/orders/[id]/messages/route";
 import { POST as postMarkRead } from "@/app/api/messages/mark-read/route";
 
@@ -166,5 +167,53 @@ describe("POST /api/messages/mark-read", () => {
         body: { orderId: "clorder1" },
       })
     );
+  });
+});
+
+describe("GET /api/messages/conversations", () => {
+  it("returns 401 when logged out", async () => {
+    mockedAuth.mockResolvedValue(null as never);
+    const res = await getConversations();
+    expect(res.status).toBe(401);
+    expect(mockedProxy).not.toHaveBeenCalled();
+  });
+
+  it("groups chat rows and attaches the other person's name", async () => {
+    mockedProxy.mockImplementation(async (url: string, path: string) => {
+      if (url === "http://chat.test") {
+        return {
+          status: 200,
+          data: [
+            {
+              otherUserId: "clseller1",
+              unreadCount: 2,
+              lastMessage: {
+                id: "m1",
+                content: "בטח, תשע בבוקר.",
+                senderId: "clseller1",
+                receiverId: "cluser1",
+                orderId: "ord-1",
+                createdAt: "2026-08-30T10:00:00.000Z",
+              },
+            },
+          ],
+        };
+      }
+      if (url === "http://users.test" && path === "/sellers/clseller1") {
+        return { status: 200, data: { id: "clseller1", name: "יוסי הגולדן", avatar: null } };
+      }
+      return { data: null, status: 404 };
+    });
+
+    const res = await getConversations();
+    expect(res.status).toBe(200);
+    const body = await res.json();
+    expect(body).toHaveLength(1);
+    expect(body[0].otherUser).toEqual({
+      id: "clseller1",
+      name: "יוסי הגולדן",
+      avatar: null,
+    });
+    expect(body[0].unreadCount).toBe(2);
   });
 });
