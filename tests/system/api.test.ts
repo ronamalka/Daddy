@@ -247,6 +247,8 @@ describe("System Tests — Auth-Protected API", () => {
       expect(status).toBe(401);
     });
   });
+
+  describe("GET /api/orders", () => {
     it("returns 401 without auth", async () => {
       const { status } = await fetchApi("/api/orders");
       expect(status).toBe(401);
