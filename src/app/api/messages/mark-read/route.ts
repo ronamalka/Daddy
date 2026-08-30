@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { proxyRequest, ORDERS_SERVICE } from "@/lib/gateway";
+import { validateBody } from "@/lib/validate";
+import { markReadSchema } from "@/lib/message-validation";
 
 export async function POST(request: Request) {
   const session = await auth();
@@ -8,11 +10,13 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const body = await request.json();
+  const result = await validateBody(request, markReadSchema);
+  if ("error" in result) return result.error;
+
   const user = session.user as { id: string; email: string; name: string; role: string };
   const { data, status } = await proxyRequest(ORDERS_SERVICE, "/messages/mark-read", {
     method: "POST",
-    body,
+    body: result.data,
     user,
   });
   return NextResponse.json(data, { status });

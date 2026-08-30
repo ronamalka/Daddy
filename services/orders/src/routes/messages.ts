@@ -4,11 +4,24 @@ import { prisma } from "../index";
 
 export const messagesRoutes = Router();
 
-messagesRoutes.post("/", requireAuth, async (req: Request, res: Response) => {
-  const { receiverId, content, attachment } = req.body;
+const MAX_MESSAGE_LENGTH = 5000;
 
-  if (!receiverId || !content?.trim()) {
+messagesRoutes.post("/", requireAuth, async (req: Request, res: Response) => {
+  const { receiverId, content } = req.body;
+  const trimmed = typeof content === "string" ? content.trim() : "";
+
+  if (!receiverId || !trimmed) {
     res.status(400).json({ error: "receiverId and content required" });
+    return;
+  }
+
+  if (typeof receiverId !== "string" || receiverId.length > 64) {
+    res.status(400).json({ error: "Invalid receiverId" });
+    return;
+  }
+
+  if (trimmed.length > MAX_MESSAGE_LENGTH) {
+    res.status(400).json({ error: "Message too long" });
     return;
   }
 
@@ -19,8 +32,7 @@ messagesRoutes.post("/", requireAuth, async (req: Request, res: Response) => {
 
   const message = await prisma.message.create({
     data: {
-      content,
-      attachment: attachment || null,
+      content: trimmed,
       senderId: req.user!.id,
       receiverId,
     },
@@ -72,6 +84,11 @@ messagesRoutes.get("/unread-count", requireAuth, async (req: Request, res: Respo
 messagesRoutes.post("/mark-read", requireAuth, async (req: Request, res: Response) => {
   const { orderId, senderId } = req.body;
 
+  if (!orderId && !senderId) {
+    res.status(400).json({ error: "orderId or senderId required" });
+    return;
+  }
+
   const where: Record<string, unknown> = {
     receiverId: req.user!.id,
     readAt: null,
@@ -79,7 +96,7 @@ messagesRoutes.post("/mark-read", requireAuth, async (req: Request, res: Respons
 
   if (orderId) {
     where.orderId = orderId;
-  } else if (senderId) {
+  } else {
     where.senderId = senderId;
     where.orderId = null;
   }

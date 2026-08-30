@@ -490,12 +490,12 @@ export default function OrderDetailPage() {
           ) : (
             <div className="space-y-4">
               {order.messages.map((msg) => {
-                const isMe = msg.sender.id === session?.user?.id;
+                const isMe = msg.sender?.id === session?.user?.id;
                 return (
                   <div key={msg.id} className={`flex ${isMe ? "justify-end" : "justify-start"}`}>
                     <div className={`max-w-[320px] ${isMe ? "order-2" : "order-1"}`}>
                       <div className={`rounded-2xl px-4 py-3 ${isMe ? "rounded-br-[4px] bg-[rgb(var(--color-primary))] text-white" : "rounded-bl-[4px] bg-[rgb(var(--color-surface))] border border-[rgb(var(--color-border))] text-[rgb(var(--color-text))]"}`}>
-                        <p className={`text-[12px] font-semibold mb-1 ${isMe ? "text-white/70" : "text-[rgb(var(--color-primary))]"}`}>{msg.sender.name}</p>
+                        <p className={`text-[12px] font-semibold mb-1 ${isMe ? "text-white/70" : "text-[rgb(var(--color-primary))]"}`}>{msg.sender?.name ?? "משתמש"}</p>
                         {msg.attachment && (
                           <a href={msg.attachment} target="_blank" rel="noopener noreferrer" className="mb-2 block">
                             {/\.(jpg|jpeg|png|gif|webp)$/i.test(msg.attachment) ? (

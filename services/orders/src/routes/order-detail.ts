@@ -141,9 +141,14 @@ orderDetailRoutes.post("/:id/messages", requireAuth, async (req: Request, res: R
     return;
   }
 
-  const { content, attachment } = req.body;
-  if (!content?.trim()) {
+  const { content } = req.body;
+  const trimmed = typeof content === "string" ? content.trim() : "";
+  if (!trimmed) {
     res.status(400).json({ error: "Message cannot be empty" });
+    return;
+  }
+  if (trimmed.length > 5000) {
+    res.status(400).json({ error: "Message too long" });
     return;
   }
 
@@ -151,8 +156,7 @@ orderDetailRoutes.post("/:id/messages", requireAuth, async (req: Request, res: R
 
   const message = await prisma.message.create({
     data: {
-      content,
-      attachment: attachment || null,
+      content: trimmed,
       orderId,
       senderId: req.user!.id,
       receiverId,
