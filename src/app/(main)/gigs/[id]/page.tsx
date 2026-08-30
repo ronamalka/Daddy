@@ -60,6 +60,8 @@ export default function GigDetailPage() {
   const [flaggedReviews, setFlaggedReviews] = useState<Set<string>>(new Set());
   const [orderError, setOrderError] = useState<string | null>(null);
   const [selectedSlot, setSelectedSlot] = useState<SlotOption | null>(null);
+  const [loadError, setLoadError] = useState(false);
+  const [reloadKey, setReloadKey] = useState(0);
 
   async function flagReview(reviewId: string) {
     if (!flagReason.trim()) return;
@@ -76,17 +78,38 @@ export default function GigDetailPage() {
   }
 
   useEffect(() => {
-    fetch(`/api/gigs/${params.id}`)
+    const gigId = typeof params.id === "string" ? params.id : undefined;
+    if (!gigId) return;
+
+    let cancelled = false;
+
+    fetch(`/api/gigs/${gigId}`, { signal: AbortSignal.timeout(15_000) })
+      .then(async (res) => {
+        const data = await res.json().catch(() => null);
+        if (cancelled) return;
+        if (!res.ok || !data?.id || !Array.isArray(data.tiers)) {
+          setLoadError(true);
+          return;
+        }
+        setLoadError(false);
+        setGig(data);
+        setFavorited(Boolean(data.isFavorited));
+      })
+      .catch(() => {
+        if (!cancelled) setLoadError(true);
+      });
+
+    fetch(`/api/gigs/${gigId}/related`)
       .then((r) => r.json())
       .then((data) => {
-        setGig(data);
-        setFavorited(data.isFavorited);
-      });
-    fetch(`/api/gigs/${params.id}/related`)
-      .then((r) => r.json())
-      .then(setRelated)
+        if (!cancelled && Array.isArray(data)) setRelated(data);
+      })
       .catch(() => {});
-  }, [params.id]);
+
+    return () => {
+      cancelled = true;
+    };
+  }, [params.id, reloadKey]);
 
   async function toggleFavorite() {
     if (!session) { router.push("/login"); return; }
@@ -129,6 +152,25 @@ export default function GigDetailPage() {
     }
   }
 
+  if (loadError) {
+    return (
+      <div className="flex flex-col items-center justify-center py-20">
+        <p className="text-[16px] text-[rgb(var(--color-text-secondary))]">לא ניתן לטעון את השירות.</p>
+        <button
+          type="button"
+          onClick={() => {
+            setLoadError(false);
+            setGig(null);
+            setReloadKey((k) => k + 1);
+          }}
+          className="mt-4 rounded-xl bg-[rgb(var(--color-primary))] px-5 py-2.5 text-[14px] font-semibold text-white"
+        >
+          נסה שוב
+        </button>
+      </div>
+    );
+  }
+
   if (!gig) {
     return (
       <div className="flex items-center justify-center py-20">
@@ -139,7 +181,8 @@ export default function GigDetailPage() {
 
   const currentTier = gig.tiers.find((t) => t.tier === selectedTier) || gig.tiers[0];
   const sortedTiers = [...gig.tiers].sort((a, b) => TIER_ORDER.indexOf(a.tier) - TIER_ORDER.indexOf(b.tier));
-  const allImages = gig.images.length > 0 ? gig.images.map((i) => i.url) : gig.image ? [gig.image] : [];
+  const allImages = gig.images?.length > 0 ? gig.images.map((i) => i.url) : gig.image ? [gig.image] : [];
+  const sellerName = gig.seller?.name || "משתמש";
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8">
@@ -150,7 +193,7 @@ export default function GigDetailPage() {
             <span className="rounded-full bg-[rgba(var(--color-primary),0.1)] px-3 py-1 text-[12px] font-semibold text-[rgb(var(--color-primary))]">
               {gig.category.name}
             </span>
-            {gig.seller.id === session?.user?.id && (
+            {gig.seller?.id === session?.user?.id && (
               <Link
                 href={`/gigs/${gig.id}/edit`}
                 className="rounded-full bg-[rgba(var(--color-accent-yellow),0.15)] px-3 py-1 text-[12px] font-semibold text-[rgb(var(--color-warning))] hover:bg-[rgba(var(--color-accent-yellow),0.25)] transition-colors"
@@ -172,19 +215,19 @@ export default function GigDetailPage() {
           </div>
 
           {/* Seller Info */}
-          <Link href={`/sellers/${gig.seller.id}`} className="mb-6 flex items-center gap-3 group">
+          <Link href={`/sellers/${gig.seller?.id ?? ""}`} className="mb-6 flex items-center gap-3 group">
             <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-[rgb(var(--color-primary))] to-[rgb(var(--color-primary-light))] text-[14px] font-bold text-white">
-              {gig.seller.name[0]}
+              {sellerName[0]}
             </div>
             <div>
-              <p className="font-semibold text-[rgb(var(--color-text))] group-hover:text-[rgb(var(--color-primary))] transition-colors">{gig.seller.name}</p>
+              <p className="font-semibold text-[rgb(var(--color-text))] group-hover:text-[rgb(var(--color-primary))] transition-colors">{sellerName}</p>
               <div className="flex items-center gap-2 text-[13px]">
                 <div className="flex items-center gap-1">
                   <Star className="h-4 w-4 text-[rgb(var(--color-accent-yellow))] " weight="fill" />
                   <span className="font-bold text-[rgb(var(--color-text))]">{gig.avgRating.toFixed(1)}</span>
                 </div>
                 <span className="text-[rgb(var(--color-text-muted))]">({gig.reviewCount} ביקורות)</span>
-                {gig.seller.city && <span className="text-[rgb(var(--color-text-muted))]">· {gig.seller.city}</span>}
+                {gig.seller?.city && <span className="text-[rgb(var(--color-text-muted))]">· {gig.seller.city}</span>}
               </div>
             </div>
           </Link>
@@ -316,7 +359,7 @@ export default function GigDetailPage() {
                     )}
 
                     {/* Flag review */}
-                    {session && gig.seller.id !== (session.user as { id: string }).id && !flaggedReviews.has(review.id) && (
+                    {session && gig.seller?.id !== (session.user as { id: string }).id && !flaggedReviews.has(review.id) && (
                       <div className="mt-2">
                         {flaggingReviewId !== review.id ? (
                           <button
@@ -427,12 +470,18 @@ export default function GigDetailPage() {
                 </div>
 
                 <div className="mb-5">
-                  <SlotPicker sellerId={gig.seller.id} value={selectedSlot} onChange={setSelectedSlot} />
+                  {gig.seller?.id ? (
+                    <SlotPicker sellerId={gig.seller.id} value={selectedSlot} onChange={setSelectedSlot} />
+                  ) : (
+                    <p className="rounded-xl bg-[rgb(var(--color-bg))] px-4 py-3 text-[13px] text-[rgb(var(--color-text-secondary))]">
+                      לא ניתן לבחור חלון ביקור כרגע.
+                    </p>
+                  )}
                 </div>
 
                 <button
                   onClick={handleOrder}
-                  disabled={ordering || gig.seller.id === session?.user?.id || !selectedSlot}
+                  disabled={ordering || gig.seller?.id === session?.user?.id || !selectedSlot}
                   className="w-full rounded-xl bg-[rgb(var(--color-primary))] py-3.5 text-[14px] font-semibold text-white shadow-[0_4px_16px_rgba(var(--color-primary),0.3)] transition-all hover:bg-[rgb(var(--color-primary-hover))] hover:shadow-[0_6px_20px_rgba(var(--color-primary),0.4)] disabled:opacity-40 disabled:cursor-not-allowed disabled:shadow-none"
                 >
                   {ordering ? "מבצע הזמנה..." : `המשך (₪${currentTier.price})`}
@@ -444,7 +493,7 @@ export default function GigDetailPage() {
                   </div>
                 )}
 
-                {gig.seller.id === session?.user?.id && (
+                {gig.seller?.id === session?.user?.id && (
                   <p className="mt-3 text-center text-[12px] text-[rgb(var(--color-text-muted))]">אי אפשר להזמין את השירות של עצמך</p>
                 )}
 
@@ -453,9 +502,9 @@ export default function GigDetailPage() {
                 </div>
 
                 {/* Contact seller */}
-                {session?.user && gig.seller.id !== session.user.id && (
+                {session?.user && gig.seller?.id !== session.user.id && (
                   <Link
-                    href={`/sellers/${gig.seller.id}`}
+                    href={`/sellers/${gig.seller?.id}`}
                     className="mt-3 flex w-full items-center justify-center gap-2 rounded-xl border border-[rgb(var(--color-border))] py-3 text-[14px] font-medium text-[rgb(var(--color-text-secondary))] transition-all hover:border-[rgba(var(--color-primary-light),0.3)] hover:text-[rgb(var(--color-primary))]"
                   >
                     <ChatCircle className="h-4 w-4" />
