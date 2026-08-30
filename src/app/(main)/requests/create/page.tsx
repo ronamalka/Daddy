@@ -2,7 +2,7 @@
 
 import { useSession } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useState, useRef, useCallback, useEffect } from "react";
+import { useState, useRef, useCallback, useEffect, Suspense } from "react";
 import Link from "next/link";
 import { SERVICE_CATEGORIES } from "@/lib/services";
 import { DISTRICTS } from "@/lib/districts";
@@ -10,7 +10,7 @@ import { UserCircle } from "@phosphor-icons/react";
 import { TurnstileWidget } from "@/components/turnstile-widget";
 import { VisitWindowFields, visitWindowToIso, type VisitWindowValue } from "@/components/visit-window-fields";
 
-export default function CreateRequestPage() {
+function CreateRequestPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -200,5 +200,19 @@ export default function CreateRequestPage() {
         </button>
       </form>
     </div>
+  );
+}
+
+export default function CreateRequestPageWrapper() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex items-center justify-center py-20">
+          <div className="h-8 w-8 animate-spin rounded-full border-4 border-[rgba(var(--color-primary),0.2)] border-t-[rgb(var(--color-primary))]" />
+        </div>
+      }
+    >
+      <CreateRequestPage />
+    </Suspense>
   );
 }
