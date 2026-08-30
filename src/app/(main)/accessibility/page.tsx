@@ -32,7 +32,7 @@ export default function AccessibilityPage() {
             <li>טקסט חלופי (alt) לתמונות</li>
             <li>תמיכה מלאה בכיוון RTL (ימין לשמאל) לעברית</li>
             <li>סרגל נגישות עם אפשרויות התאמה אישית (ניתן לפתיחה גם באמצעות Alt+A)</li>
-            <li>הדגשת כותרות וקישורים לניווט קל יותר</li>
+            <li>הדגשת קישורים לניווט קל יותר</li>
             <li>כיבוד הגדרת prefers-reduced-motion של המערכת</li>
           </ul>
         </section>
@@ -47,7 +47,6 @@ export default function AccessibilityPage() {
             <li>מצבי ניגודיות: גבוהה, הפוך צבעים, שחור-לבן</li>
             <li>הגדלת הסמן</li>
             <li>הדגשת קישורים</li>
-            <li>הדגשת כותרות</li>
             <li>עצירת אנימציות</li>
             <li>הגדלת מרווח שורות</li>
           </ul>
