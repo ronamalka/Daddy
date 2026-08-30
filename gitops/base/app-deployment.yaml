@@ -44,6 +44,8 @@ spec:
               value: "http://orders-service:4003"
             - name: REQUESTS_SERVICE_URL
               value: "http://requests-service:4004"
+            - name: REDIS_URL
+              value: "redis://redis:6379"
           resources:
             requests:
               memory: "128Mi"

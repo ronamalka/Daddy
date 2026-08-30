@@ -9,7 +9,7 @@ spec:
   project: daddy
   source:
     repoURL: https://github.com/ronamalka/Daddy.git
-    targetRevision: main
+    targetRevision: dev
     path: gitops/overlays/dev
   destination:
     server: https://kubernetes.default.svc

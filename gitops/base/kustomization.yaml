@@ -13,3 +13,4 @@ resources:
   - gigs-deployment.yaml
   - orders-deployment.yaml
   - requests-deployment.yaml
+  - redis-deployment.yaml
