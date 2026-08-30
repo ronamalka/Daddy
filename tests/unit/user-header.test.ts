@@ -1,7 +1,6 @@
 import { describe, it, expect, vi } from "vitest";
 import crypto from "crypto";
 import { extractUser } from "../../services/shared/middleware";
-import type { Request, Response, NextFunction } from "express";
 
 const SECRET = process.env.INTER_SERVICE_SECRET || "dev-secret-change-in-production";
 
@@ -16,7 +15,7 @@ function mockRes() {
   };
   res.status.mockReturnValue(res);
   res.json.mockReturnValue(res);
-  return res as unknown as Response & { status: ReturnType<typeof vi.fn>; json: ReturnType<typeof vi.fn> };
+  return res;
 }
 
 describe("extractUser x-user header", () => {
@@ -28,14 +27,14 @@ describe("extractUser x-user header", () => {
         "x-user": header,
         "x-user-signature": sign(header),
       },
-    } as unknown as Request;
+    };
     const res = mockRes();
-    const next = vi.fn() as NextFunction;
+    const next = vi.fn();
 
-    extractUser(req, res, next);
+    extractUser(req as never, res as never, next);
 
     expect(next).toHaveBeenCalledOnce();
-    expect(req.user).toEqual(user);
+    expect(req).toMatchObject({ user });
   });
 
   it("still accepts legacy ascii JSON headers", () => {
@@ -46,13 +45,13 @@ describe("extractUser x-user header", () => {
         "x-user": header,
         "x-user-signature": sign(header),
       },
-    } as unknown as Request;
+    };
     const res = mockRes();
-    const next = vi.fn() as NextFunction;
+    const next = vi.fn();
 
-    extractUser(req, res, next);
+    extractUser(req as never, res as never, next);
 
     expect(next).toHaveBeenCalledOnce();
-    expect(req.user).toEqual(user);
+    expect(req).toMatchObject({ user });
   });
 });
