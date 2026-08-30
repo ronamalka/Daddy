@@ -12,7 +12,7 @@ export function Footer() {
         <div className="flex flex-col gap-8 md:flex-row md:justify-between">
           <div>
             <div className="flex items-center gap-2 mb-2">
-              <Image src="/logo.jpeg" alt="אבאל׳ה" width={36} height={36} className="rounded-full" />
+              <Image src="/logo.jpeg" alt="אבאל׳ה" width={36} height={36} className="rounded-full" unoptimized />
               <span className="text-gradient-hero text-xl font-extrabold">אבאל׳ה</span>
             </div>
             <p className="text-sm text-[rgb(var(--color-text-muted))] mt-2 max-w-xs">

@@ -19,7 +19,7 @@ export async function POST(request: Request) {
     body: result.data,
     user,
   });
-  return NextResponse.json(data, { status });
+  return NextResponse.json(data ?? { error: "Failed to send message" }, { status });
 }
 
 export async function GET(request: Request) {
@@ -34,5 +34,5 @@ export async function GET(request: Request) {
 
   const user = session.user as { id: string; email: string; name: string; role: string };
   const { data, status } = await proxyRequest(CHAT_SERVICE, path, { user });
-  return NextResponse.json(data, { status });
+  return NextResponse.json(data ?? { error: "Failed to load messages" }, { status });
 }

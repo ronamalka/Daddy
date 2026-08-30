@@ -42,6 +42,7 @@ export function HeroSection({
               height={160}
               className="mx-auto rounded-full shadow-xl"
               priority
+              unoptimized
             />
           </motion.div>
 

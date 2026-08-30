@@ -3,6 +3,7 @@ import { proxyRequest, USERS_SERVICE, GIGS_SERVICE, ORDERS_SERVICE } from "@/lib
 
 interface GigReview {
   rating: number;
+  userId?: string;
   ratingAttitude?: number | null;
   ratingTimeliness?: number | null;
   ratingPrice?: number | null;
@@ -31,7 +32,29 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
 
   const seller = sellerRes.data;
   const gigs: GigWithReviews[] = Array.isArray(gigsRes.data) ? gigsRes.data : [];
-  const allReviews: GigReview[] = gigs.flatMap((g) => g.reviews || []);
+  const rawReviews: GigReview[] = gigs.flatMap((g) => g.reviews || []);
+
+  const reviewerIds = [...new Set(
+    rawReviews.map((r) => r.userId).filter((id): id is string => typeof id === "string" && id.length > 0)
+  )];
+  const reviewerMap: Record<string, { id: string; name: string; city: string | null }> = {};
+  await Promise.all(
+    reviewerIds.map(async (userId) => {
+      const { data: u } = await proxyRequest(USERS_SERVICE, `/sellers/${userId}`);
+      if (u?.id && typeof u.name === "string") {
+        reviewerMap[userId] = { id: u.id, name: u.name, city: u.city ?? null };
+      }
+    })
+  );
+
+  const allReviews = rawReviews.map((r) => ({
+    ...r,
+    user: reviewerMap[r.userId as string] || {
+      id: r.userId || "unknown",
+      name: "משתמש",
+      city: null,
+    },
+  }));
 
   const avgRating = allReviews.length > 0
     ? allReviews.reduce((sum, r) => sum + r.rating, 0) / allReviews.length

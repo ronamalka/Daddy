@@ -42,9 +42,14 @@ export const passwordResetRateLimit = rateLimit({
   legacyHeaders: false,
 });
 
+// ClusterIP services only see the BFF pod IP, and OpenShift probes hit
+// /health every few seconds. A 300 cap is exhausted by probes alone, which
+// then 429s seller gigs and chat DMs for every user on the platform.
 export const generalRateLimit = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 300,
+  max: parseInt(process.env.GENERAL_RATE_LIMIT_MAX || "2000", 10),
   standardHeaders: true,
   legacyHeaders: false,
+  validate: { xForwardedForHeader: false },
+  skip: (req) => req.path === "/health",
 });
