@@ -63,6 +63,9 @@ export function RequestsView({
                         <span className="flex items-center gap-1"><User className="h-3 w-3" />{req.buyer.name}</span>
                         {req.districtName && <span>· {req.cityName || req.districtName}</span>}
                         {svc && <span>· {svc.nameHe}</span>}
+                        {req.slotStart && req.slotEnd && (
+                          <span>· {new Date(req.slotStart).toLocaleString("he-IL", { weekday: "short", day: "numeric", month: "numeric", hour: "2-digit", minute: "2-digit" })}</span>
+                        )}
                         <span>· {new Date(req.createdAt).toLocaleDateString("he-IL")}</span>
                       </div>
                     </div>

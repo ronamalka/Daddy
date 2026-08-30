@@ -6,6 +6,7 @@ import { useParams } from "next/navigation";
 import { ReviewForm } from "@/components/review-form";
 import { Star, Handshake, Clock, Coins, Tag, ClipboardText, ChatCircle, PaperPlaneTilt, ArrowsClockwise, Warning } from "@phosphor-icons/react";
 import { Dialog } from "@/components/ui/dialog";
+import { formatVisitWindow } from "@/lib/availability";
 
 interface GigRequirement {
   id: string;
@@ -25,6 +26,8 @@ interface OrderDetail {
   price: number;
   status: string;
   dueDate: string | null;
+  slotStart: string | null;
+  slotEnd: string | null;
   createdAt: string;
   gig: { id: string; title: string; image: string | null; tiers: { tier: string; deliveryDays: number }[]; requirements: GigRequirement[] };
   buyer: { id: string; name: string; avatar: string | null };
@@ -269,8 +272,18 @@ export default function OrderDetailPage() {
           </span>
         </div>
 
+        {/* Visit window */}
+        {order.slotStart && order.slotEnd && (
+          <div className="mb-5 flex items-center gap-2 rounded-xl bg-[rgba(var(--color-primary),0.08)] px-4 py-3">
+            <Clock className="h-5 w-5 text-[rgb(var(--color-primary))]" />
+            <span className="text-[14px] font-medium text-[rgb(var(--color-text))]">
+              ביקור: {formatVisitWindow(new Date(order.slotStart), new Date(order.slotEnd))}
+            </span>
+          </div>
+        )}
+
         {/* Due Date Countdown */}
-        {daysLeft !== null && order.status !== "COMPLETED" && order.status !== "CANCELLED" && (
+        {daysLeft !== null && !order.slotStart && order.status !== "COMPLETED" && order.status !== "CANCELLED" && (
           <div className={`mb-5 flex items-center gap-2 rounded-xl px-4 py-3 ${
             daysLeft < 0 ? "bg-[rgba(var(--color-error),0.1)]" : daysLeft <= 1 ? "bg-[rgba(var(--color-accent-yellow),0.15)]" : "bg-[rgba(var(--color-success),0.1)]"
           }`}>

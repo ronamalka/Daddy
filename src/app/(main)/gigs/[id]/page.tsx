@@ -7,6 +7,7 @@ import Link from "next/link";
 import { GigCard } from "@/components/gig-card";
 import { Heart, Star, Clock, ArrowsClockwise, ChatCircle, CaretDown } from "@phosphor-icons/react";
 import { MarketplaceDisclaimer } from "@/components/marketplace-disclaimer";
+import { SlotPicker, type SlotOption } from "@/components/slot-picker";
 
 interface GigDetail {
   id: string;
@@ -58,6 +59,7 @@ export default function GigDetailPage() {
   const [flagReason, setFlagReason] = useState("");
   const [flaggedReviews, setFlaggedReviews] = useState<Set<string>>(new Set());
   const [orderError, setOrderError] = useState<string | null>(null);
+  const [selectedSlot, setSelectedSlot] = useState<SlotOption | null>(null);
 
   async function flagReview(reviewId: string) {
     if (!flagReason.trim()) return;
@@ -101,11 +103,21 @@ export default function GigDetailPage() {
 
   async function handleOrder() {
     if (!session) { router.push("/login"); return; }
+    if (!selectedSlot) {
+      setOrderError("יש לבחור חלון ביקור של שעתיים");
+      return;
+    }
     setOrdering(true);
+    setOrderError(null);
     const res = await fetch("/api/orders", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ gigId: gig!.id, tier: selectedTier }),
+      body: JSON.stringify({
+        gigId: gig!.id,
+        tier: selectedTier,
+        slotStart: selectedSlot.slotStart,
+        slotEnd: selectedSlot.slotEnd,
+      }),
     });
     if (res.ok) {
       const order = await res.json();
@@ -414,9 +426,13 @@ export default function GigDetailPage() {
                   </span>
                 </div>
 
+                <div className="mb-5">
+                  <SlotPicker sellerId={gig.seller.id} value={selectedSlot} onChange={setSelectedSlot} />
+                </div>
+
                 <button
                   onClick={handleOrder}
-                  disabled={ordering || gig.seller.id === session?.user?.id}
+                  disabled={ordering || gig.seller.id === session?.user?.id || !selectedSlot}
                   className="w-full rounded-xl bg-[rgb(var(--color-primary))] py-3.5 text-[14px] font-semibold text-white shadow-[0_4px_16px_rgba(var(--color-primary),0.3)] transition-all hover:bg-[rgb(var(--color-primary-hover))] hover:shadow-[0_6px_20px_rgba(var(--color-primary),0.4)] disabled:opacity-40 disabled:cursor-not-allowed disabled:shadow-none"
                 >
                   {ordering ? "מבצע הזמנה..." : `המשך (₪${currentTier.price})`}

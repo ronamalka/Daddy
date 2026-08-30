@@ -25,13 +25,16 @@ model User {
   city         String?
   cityCode     Int?
   districtCode Int?
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  acceptingJobs Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 
   serviceAreas    ServiceArea[]
   userServices    UserService[]
   servicePrices   ServicePrice[]
   passwordResets  PasswordReset[]
+  weeklyHours     WeeklyHours[]
+  timeOff         TimeOff[]
 }
 
 model PasswordReset {
@@ -88,5 +91,30 @@ model ServicePrice {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, serviceSlug])
+  @@index([userId])
+}
+
+model WeeklyHours {
+  id        String @id @default(cuid())
+  userId    String
+  dayOfWeek Int
+  startMin  Int
+  endMin    Int
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, dayOfWeek])
+  @@index([userId])
+}
+
+model TimeOff {
+  id     String  @id @default(cuid())
+  userId String
+  date   String
+  note   String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, date])
   @@index([userId])
 }

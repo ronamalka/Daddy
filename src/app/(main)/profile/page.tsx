@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
-import { Lock, MapPin, Package, CurrencyDollar, Star, User, Envelope, Shield } from "@phosphor-icons/react";
+import { Lock, MapPin, Package, CurrencyDollar, Star, User, Envelope, Shield, CalendarBlank } from "@phosphor-icons/react";
 
 interface Stats {
   totalOrders: number;
@@ -94,6 +94,15 @@ export default function ProfilePage() {
                 <CurrencyDollar className="h-3.5 w-3.5" />
                 מחירון
               </Link>
+              {session.user.role === "SELLER" && (
+                <Link
+                  href="/profile/availability"
+                  className="rounded-full border border-[rgb(var(--color-border))] px-4 py-1.5 text-[13px] font-semibold text-[rgb(var(--color-text-secondary))] hover:border-[rgb(var(--color-primary))] hover:text-[rgb(var(--color-primary))] transition-all flex items-center gap-1.5"
+                >
+                  <CalendarBlank className="h-3.5 w-3.5" />
+                  זמינות
+                </Link>
+              )}
               {session.user.role === "SELLER" && (
                 <Link
                   href="/profile/gigs"

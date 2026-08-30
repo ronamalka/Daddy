@@ -15,6 +15,7 @@ import {
   CalendarBlank, ShieldCheck, CheckCircle,
 } from "@phosphor-icons/react";
 import { CategoryIcon } from "@/components/ui/category-icon";
+import { DAY_LABELS_HE, minutesToTimeLabel } from "@/lib/availability";
 
 interface ReviewData {
   id: string;
@@ -51,6 +52,8 @@ interface SellerProfile {
   serviceAreas: { districtCode: number; districtName: string; cityCode: number | null; cityName: string | null }[];
   userServices: { serviceSlug: string }[];
   servicePrices: { serviceSlug: string; price: number; description: string | null }[];
+  acceptingJobs?: boolean;
+  weeklyHours?: { dayOfWeek: number; startMin: number; endMin: number }[];
   allReviews: ReviewData[];
   gigs: {
     id: string;
@@ -249,6 +252,30 @@ export default function SellerProfilePage() {
 
           {seller.bio && (
             <p className="mt-5 text-[14px] leading-relaxed text-[rgb(var(--color-text-secondary))]">{seller.bio}</p>
+          )}
+
+          {seller.acceptingJobs === false && (
+            <p className="mt-4 rounded-xl bg-[rgba(var(--color-accent-yellow),0.15)] px-4 py-3 text-[13px] font-medium text-[rgb(var(--color-warning))]">
+              לא מקבל עבודות השבוע
+            </p>
+          )}
+
+          {seller.weeklyHours && seller.weeklyHours.length > 0 && (
+            <div className="mt-5 rounded-xl border border-[rgb(var(--color-border-light))] bg-[rgb(var(--color-surface-elevated))] p-4">
+              <h2 className="mb-3 flex items-center gap-1.5 text-[13px] font-semibold text-[rgb(var(--color-text-secondary))]">
+                <Clock className="h-4 w-4" />
+                שעות זמינות
+              </h2>
+              <ul className="grid grid-cols-2 gap-x-4 gap-y-1.5 text-[13px] text-[rgb(var(--color-text))] sm:grid-cols-3">
+                {seller.weeklyHours.map((row) => (
+                  <li key={row.dayOfWeek}>
+                    <span className="font-semibold">{DAY_LABELS_HE[row.dayOfWeek]}</span>
+                    {" · "}
+                    {minutesToTimeLabel(row.startMin)}–{minutesToTimeLabel(row.endMin)}
+                  </li>
+                ))}
+              </ul>
+            </div>
           )}
 
           {/* Trust Indicators */}

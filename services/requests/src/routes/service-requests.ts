@@ -34,10 +34,22 @@ serviceRequestsRoutes.get("/", requireAuth, async (req: Request, res: Response) 
 });
 
 serviceRequestsRoutes.post("/", requireAuth, async (req: Request, res: Response) => {
-  const { title, description, serviceSlug, districtCode, districtName, cityCode, cityName } = req.body;
+  const { title, description, serviceSlug, districtCode, districtName, cityCode, cityName, slotStart, slotEnd } = req.body;
 
   if (!title?.trim() || !description?.trim()) {
     res.status(400).json({ error: "Title and description are required" });
+    return;
+  }
+
+  if (!slotStart || !slotEnd) {
+    res.status(400).json({ error: "A 2-hour visit window is required" });
+    return;
+  }
+
+  const start = new Date(slotStart);
+  const end = new Date(slotEnd);
+  if (Number.isNaN(start.getTime()) || Number.isNaN(end.getTime()) || end <= start) {
+    res.status(400).json({ error: "Invalid visit window" });
     return;
   }
 
@@ -51,6 +63,8 @@ serviceRequestsRoutes.post("/", requireAuth, async (req: Request, res: Response)
       districtName: districtName || null,
       cityCode: cityCode ? Number(cityCode) : null,
       cityName: cityName || null,
+      slotStart: start,
+      slotEnd: end,
     },
     include: {
       _count: { select: { responses: true } },

@@ -8,6 +8,7 @@ import { SERVICE_CATEGORIES } from "@/lib/services";
 import { DISTRICTS } from "@/lib/districts";
 import { UserCircle } from "@phosphor-icons/react";
 import { TurnstileWidget } from "@/components/turnstile-widget";
+import { VisitWindowFields, visitWindowToIso, type VisitWindowValue } from "@/components/visit-window-fields";
 
 export default function CreateRequestPage() {
   const { data: session, status } = useSession();
@@ -23,6 +24,7 @@ export default function CreateRequestPage() {
   const [description, setDescription] = useState("");
   const [serviceSlug, setServiceSlug] = useState("");
   const [districtCode, setDistrictCode] = useState("");
+  const [visitWindow, setVisitWindow] = useState<VisitWindowValue | null>(null);
 
   if (status === "loading") {
     return (
@@ -54,6 +56,14 @@ export default function CreateRequestPage() {
     setLoading(true);
     setError("");
 
+    if (!visitWindow?.date) {
+      setError("יש לבחור חלון ביקור של שעתיים");
+      setLoading(false);
+      return;
+    }
+
+    const { slotStart, slotEnd } = visitWindowToIso(visitWindow);
+
     const res = await fetch("/api/service-requests", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -63,6 +73,8 @@ export default function CreateRequestPage() {
         serviceSlug: serviceSlug || undefined,
         districtCode: districtCode ? Number(districtCode) : undefined,
         districtName,
+        slotStart,
+        slotEnd,
         turnstileToken,
         _hp_field: "",
         _formLoadedAt: formLoadedAtRef.current,
@@ -118,9 +130,16 @@ export default function CreateRequestPage() {
                 onChange={(e) => setDescription(e.target.value)}
                 required
                 rows={4}
-                placeholder="ספר בפירוט מה צריך לעשות, מתי, ואיפה. ככל שתפרט יותר, כך תקבל הצעות מדויקות יותר."
+                placeholder="ספר בפירוט מה צריך לעשות ואיפה. ככל שתפרט יותר, כך תקבל הצעות מדויקות יותר."
                 className={inputClass}
               />
+            </div>
+
+            <div>
+              <label className="mb-2 block text-[13px] font-semibold text-[rgb(var(--color-text-secondary))]">
+                מתי לבוא? <span className="font-normal text-[rgb(var(--color-error))]">*</span>
+              </label>
+              <VisitWindowFields value={visitWindow} onChange={setVisitWindow} />
             </div>
           </div>
         </div>
@@ -163,7 +182,7 @@ export default function CreateRequestPage() {
 
         <button
           type="submit"
-          disabled={loading}
+          disabled={loading || !visitWindow?.date}
           className="w-full rounded-xl bg-[rgb(var(--color-primary))] py-4 text-[15px] font-semibold text-white shadow-[0_4px_16px_rgba(var(--color-primary),0.3)] transition-all hover:bg-[rgb(var(--color-primary-hover))] hover:shadow-[0_6px_20px_rgba(var(--color-primary),0.4)] disabled:opacity-40 disabled:cursor-not-allowed"
         >
           {loading ? (

@@ -14,6 +14,7 @@ import { servicePricesRoutes } from "./routes/service-prices";
 import { userServicesRoutes } from "./routes/user-services";
 import { locationsRoutes } from "./routes/locations";
 import { featuredRoutes } from "./routes/featured";
+import { availabilityRoutes } from "./routes/availability";
 import { loginRoutes } from "./routes/login";
 import { oauthRoutes } from "./routes/oauth";
 import { passwordResetRoutes } from "./routes/password-reset";
@@ -46,6 +47,7 @@ app.use("/service-prices", servicePricesRoutes);
 app.use("/user-services", userServicesRoutes);
 app.use("/locations", locationsRoutes);
 app.use("/featured-daddies", featuredRoutes);
+app.use("/availability", availabilityRoutes);
 
 app.listen(PORT, "0.0.0.0", () => {
   console.log(`Users service running on port ${PORT}`);

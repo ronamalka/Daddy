@@ -19,6 +19,8 @@ export interface ServiceRequest {
   cityName: string | null;
   status: string;
   createdAt: string;
+  slotStart?: string | null;
+  slotEnd?: string | null;
   buyer: { id: string; name: string };
   _count: { responses: number };
 }
