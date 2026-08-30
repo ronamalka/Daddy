@@ -4,6 +4,7 @@ type SecurityEventType =
   | "login_lockout"
   | "password_reset_requested"
   | "password_reset_completed"
+  | "password_changed"
   | "csrf_violation"
   | "rate_limit_exceeded"
   | "auth_failure"

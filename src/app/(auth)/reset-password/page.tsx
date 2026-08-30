@@ -1,13 +1,16 @@
 "use client";
 
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useSession } from "next-auth/react";
 import { useState, useEffect, Suspense } from "react";
 import { PasswordStrength } from "@/components/password-strength";
 
 function ResetPasswordForm() {
   const searchParams = useSearchParams();
   const token = searchParams.get("token");
+  const router = useRouter();
+  const { status } = useSession();
 
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -19,6 +22,11 @@ function ResetPasswordForm() {
 
   useEffect(() => {
     if (!token) {
+      if (status === "loading") return;
+      if (status === "authenticated") {
+        router.replace("/profile/password");
+        return;
+      }
       setValidating(false);
       return;
     }
@@ -36,7 +44,7 @@ function ResetPasswordForm() {
         setTokenValid(false);
         setValidating(false);
       });
-  }, [token]);
+  }, [token, status, router]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();

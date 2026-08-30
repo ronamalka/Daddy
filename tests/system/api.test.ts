@@ -296,6 +296,16 @@ describe("System Tests — Auth-Protected API", () => {
     });
   });
 
+  describe("PUT /api/profile/password", () => {
+    it("returns 401 without auth", async () => {
+      const { status } = await fetchApi("/api/profile/password", {
+        method: "PUT",
+        body: JSON.stringify({ currentPassword: "old", newPassword: "NewPass1!" }),
+      });
+      expect(status).toBe(401);
+    });
+  });
+
   describe("GET /api/favorites", () => {
     it("returns 401 without auth", async () => {
       const { status } = await fetchApi("/api/favorites");
