@@ -23,11 +23,13 @@ model ServiceRequest {
   districtName String?
   cityCode     Int?
   cityName     String?
-  status       RequestStatus @default(OPEN)
-  slotStart    DateTime?
-  slotEnd      DateTime?
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
+  status             RequestStatus @default(OPEN)
+  slotStart          DateTime?
+  slotEnd            DateTime?
+  selectedResponseId String?
+  orderId            String?
+  createdAt          DateTime      @default(now())
+  updatedAt          DateTime      @updatedAt
 
   responses RequestResponse[]
 
@@ -42,6 +44,7 @@ model RequestResponse {
   sellerId      String   // cross-service ref to users-service
   message       String
   proposedPrice Float?
+  selected      Boolean  @default(false)
   createdAt     DateTime @default(now())
 
   request ServiceRequest @relation(fields: [requestId], references: [id], onDelete: Cascade)

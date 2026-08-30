@@ -3,14 +3,42 @@ import { z } from "zod";
 import { auth } from "@/lib/auth";
 import { proxyRequest, ORDERS_SERVICE, GIGS_SERVICE, USERS_SERVICE } from "@/lib/gateway";
 import { validateBody } from "@/lib/validate";
-import { isTwoHourLocalWindow, parseSlotIso, slotFitsSchedule } from "@/lib/availability";
+import { parseRequiredVisitSlot, sellerAvailabilityError } from "@/lib/seller-slot";
 
-const createOrderSchema = z.object({
+const createGigOrderSchema = z.object({
   gigId: z.string().min(1).max(50),
   tier: z.string().min(1).max(50),
   slotStart: z.string().min(10).max(40),
   slotEnd: z.string().min(10).max(40),
 }).strict();
+
+const createLocalOrderSchema = z.object({
+  jobType: z.literal("LOCAL_REQUEST"),
+  sellerId: z.string().min(1).max(50),
+  price: z.number().positive().max(100000),
+  title: z.string().min(1).max(200),
+  serviceSlug: z.string().max(100).optional(),
+  requestId: z.string().min(1).max(50).optional(),
+  slotStart: z.string().min(10).max(40),
+  slotEnd: z.string().min(10).max(40),
+}).strict();
+
+const createOrderSchema = z.union([createGigOrderSchema, createLocalOrderSchema]);
+
+type OrderRow = {
+  gigId?: string | null;
+  title?: string | null;
+  buyerId: string;
+  sellerId: string;
+};
+
+function gigFallback(order: OrderRow) {
+  return {
+    id: order.gigId || "",
+    title: order.title || "עבודת שטח",
+    image: null as string | null,
+  };
+}
 
 export async function GET() {
   const session = await auth();
@@ -25,8 +53,10 @@ export async function GET() {
     return NextResponse.json(data ?? { error: "Failed to load orders" }, { status });
   }
 
-  const gigIds = [...new Set(data.map((o: { gigId: string }) => o.gigId))] as string[];
-  const userIds = [...new Set(data.flatMap((o: { buyerId: string; sellerId: string }) => [o.buyerId, o.sellerId]))] as string[];
+  const gigIds = [...new Set(
+    data.map((o: OrderRow) => o.gigId).filter((id): id is string => Boolean(id))
+  )];
+  const userIds = [...new Set(data.flatMap((o: OrderRow) => [o.buyerId, o.sellerId]))];
 
   const gigMap: Record<string, { id: string; title: string; image: string | null }> = {};
   const userMap: Record<string, { id: string; name: string; avatar: string | null }> = {};
@@ -46,14 +76,19 @@ export async function GET() {
     }),
   ]);
 
-  const enriched = data.map((order: { gigId: string; buyerId: string; sellerId: string }) => ({
+  const enriched = data.map((order: OrderRow) => ({
     ...order,
-    gig: gigMap[order.gigId] || { id: order.gigId, title: "שירות", image: null },
+    gig: (order.gigId && gigMap[order.gigId]) || gigFallback(order),
     buyer: userMap[order.buyerId] || { id: order.buyerId, name: "משתמש", avatar: null },
     seller: userMap[order.sellerId] || { id: order.sellerId, name: "משתמש", avatar: null },
   }));
 
   return NextResponse.json(enriched);
+}
+
+async function loadAvailability(sellerId: string) {
+  const { data } = await proxyRequest(USERS_SERVICE, `/availability/${sellerId}`);
+  return data;
 }
 
 export async function POST(request: Request) {
@@ -65,22 +100,47 @@ export async function POST(request: Request) {
   const result = await validateBody(request, createOrderSchema);
   if ("error" in result) return result.error;
 
-  const { gigId, tier, slotStart, slotEnd } = result.data;
-
-  const slot = parseSlotIso(slotStart, slotEnd);
-  if (!slot || !isTwoHourLocalWindow(slot.start, slot.end)) {
-    return NextResponse.json(
-      { error: "יש לבחור חלון ביקור של שעתיים" },
-      { status: 400 }
-    );
+  const user = session.user as { id: string; email: string; name: string; role: string };
+  const parsedSlot = parseRequiredVisitSlot(result.data.slotStart, result.data.slotEnd);
+  if ("error" in parsedSlot) {
+    return NextResponse.json({ error: parsedSlot.error }, { status: parsedSlot.status });
   }
 
-  if (slot.start.getTime() <= Date.now()) {
-    return NextResponse.json(
-      { error: "חלון הביקור חייב להיות בעתיד" },
-      { status: 400 }
-    );
+  if ("jobType" in result.data) {
+    const { sellerId, price, title, serviceSlug, requestId } = result.data;
+    if (sellerId === user.id) {
+      return NextResponse.json({ error: "לא ניתן להזמין את עצמך" }, { status: 400 });
+    }
+
+    const availability = await loadAvailability(sellerId);
+    const blocked = sellerAvailabilityError(availability, parsedSlot.slot, { requireAccepting: true });
+    if (blocked) {
+      return NextResponse.json({ error: blocked.error }, { status: blocked.status });
+    }
+
+    const { data, status } = await proxyRequest(ORDERS_SERVICE, "/orders", {
+      method: "POST",
+      body: {
+        jobType: "LOCAL_REQUEST",
+        sellerId,
+        price,
+        title,
+        serviceSlug,
+        requestId,
+        slotStart: parsedSlot.slot.start.toISOString(),
+        slotEnd: parsedSlot.slot.end.toISOString(),
+      },
+      user,
+    });
+
+    if (status === 409) {
+      return NextResponse.json({ error: "החלון תפוס, בחר זמן אחר" }, { status: 409 });
+    }
+
+    return NextResponse.json(data, { status });
   }
+
+  const { gigId, tier } = result.data;
 
   const { data: gig, status: gigStatus } = await proxyRequest(GIGS_SERVICE, `/gigs/${gigId}`);
   if (gigStatus !== 200 || !gig) {
@@ -92,38 +152,10 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Invalid tier" }, { status: 400 });
   }
 
-  const user = session.user as { id: string; email: string; name: string; role: string };
-  const { data: availability } = await proxyRequest(
-    USERS_SERVICE,
-    `/availability/${gig.sellerId}`
-  );
-
-  if (!availability || availability.error) {
-    return NextResponse.json(
-      { error: "לא ניתן לבדוק את הזמינות של האבא" },
-      { status: 400 }
-    );
-  }
-
-  if (availability.acceptingJobs === false) {
-    return NextResponse.json(
-      { error: "האבא לא מקבל עבודות השבוע" },
-      { status: 400 }
-    );
-  }
-
-  if (
-    !slotFitsSchedule(
-      slot.start,
-      slot.end,
-      availability.weeklyHours || [],
-      availability.timeOff || []
-    )
-  ) {
-    return NextResponse.json(
-      { error: "החלון שבחרת מחוץ לשעות הזמינות" },
-      { status: 400 }
-    );
+  const availability = await loadAvailability(gig.sellerId);
+  const blocked = sellerAvailabilityError(availability, parsedSlot.slot, { requireAccepting: true });
+  if (blocked) {
+    return NextResponse.json({ error: blocked.error }, { status: blocked.status });
   }
 
   const { data, status } = await proxyRequest(ORDERS_SERVICE, "/orders", {
@@ -133,8 +165,8 @@ export async function POST(request: Request) {
       sellerId: gig.sellerId,
       tier,
       price: pricingTier.price,
-      slotStart: slot.start.toISOString(),
-      slotEnd: slot.end.toISOString(),
+      slotStart: parsedSlot.slot.start.toISOString(),
+      slotEnd: parsedSlot.slot.end.toISOString(),
     },
     user,
   });

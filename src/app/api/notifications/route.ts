@@ -77,7 +77,7 @@ export async function GET() {
     }
   }
 
-  const gigIds = [...new Set(orders.map((o: { gigId: string }) => o.gigId))];
+  const gigIds = [...new Set(orders.map((o: { gigId?: string | null }) => o.gigId).filter((id): id is string => Boolean(id)))];
   const gigMap: Record<string, string> = {};
   await Promise.all(
     gigIds.map(async (id: string) => {
@@ -87,10 +87,10 @@ export async function GET() {
   );
 
   for (const n of notifications) {
-    const order = orders.find((o: { id: string }) => o.id === n.orderId);
-    if (order && gigMap[order.gigId]) {
-      n.message += ` — ${gigMap[order.gigId]}`;
-    }
+    const order = orders.find((o: { id: string; gigId?: string | null; title?: string | null }) => o.id === n.orderId);
+    if (!order) continue;
+    const label = (order.gigId && gigMap[order.gigId]) || order.title;
+    if (label) n.message += ` — ${label}`;
   }
 
   notifications.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());

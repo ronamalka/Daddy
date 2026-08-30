@@ -238,7 +238,15 @@ describe("System Tests — Auth-Protected API", () => {
     });
   });
 
-  describe("GET /api/orders", () => {
+  describe("POST /api/service-requests/:id/accept", () => {
+    it("returns 401 without auth", async () => {
+      const { status } = await fetchApi("/api/service-requests/req-1/accept", {
+        method: "POST",
+        body: JSON.stringify({ responseId: "quote-1" }),
+      });
+      expect(status).toBe(401);
+    });
+  });
     it("returns 401 without auth", async () => {
       const { status } = await fetchApi("/api/orders");
       expect(status).toBe(401);

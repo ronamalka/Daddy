@@ -8,7 +8,7 @@ import { Lock, Archive } from "@phosphor-icons/react";
 
 interface Order {
   id: string;
-  tier: string;
+  tier: string | null;
   price: number;
   status: string;
   createdAt: string;
@@ -115,8 +115,12 @@ export default function OrdersPage() {
                   </h3>
                   <p className="mt-1 text-[14px] text-[rgb(var(--color-text-secondary))]">
                     {session.user.role === "SELLER" ? `קונה: ${order.buyer.name}` : `מוכר: ${order.seller.name}`}
-                    <span className="mx-2 text-[rgb(var(--color-border))]">|</span>
-                    {order.tier}
+                    {order.tier ? (
+                      <>
+                        <span className="mx-2 text-[rgb(var(--color-border))]">|</span>
+                        {order.tier}
+                      </>
+                    ) : null}
                     <span className="mx-2 text-[rgb(var(--color-border))]">|</span>
                     <span className="font-semibold text-[rgb(var(--color-text))]">₪{order.price}</span>
                   </p>

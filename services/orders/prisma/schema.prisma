@@ -21,12 +21,20 @@ enum GigTier {
   PREMIUM
 }
 
+enum JobType {
+  GIG
+  LOCAL_REQUEST
+}
+
 model Order {
   id        String      @id @default(cuid())
-  gigId     String      // cross-service ref to gigs-service
+  jobType   JobType     @default(GIG)
+  gigId     String?     // null for local jobs
+  requestId String?
+  title     String?
   buyerId   String      // cross-service ref to users-service
   sellerId  String      // cross-service ref to users-service
-  tier      GigTier
+  tier      GigTier?
   price     Float
   status    OrderStatus @default(PENDING)
   dueDate   DateTime?
@@ -40,6 +48,7 @@ model Order {
   @@index([buyerId])
   @@index([sellerId])
   @@index([gigId])
+  @@index([requestId])
   @@index([sellerId, slotStart])
 }
 

@@ -23,7 +23,7 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
   }
 
   const [gigRes, buyerRes, sellerRes, reviewRes, messagesRes] = await Promise.all([
-    proxyRequest(GIGS_SERVICE, `/gigs/${data.gigId}`),
+    data.gigId ? proxyRequest(GIGS_SERVICE, `/gigs/${data.gigId}`) : Promise.resolve({ data: null, status: 404 }),
     proxyRequest(USERS_SERVICE, `/sellers/${data.buyerId}`),
     proxyRequest(USERS_SERVICE, `/sellers/${data.sellerId}`),
     proxyRequest(GIGS_SERVICE, `/reviews/by-order/${id}`),
@@ -47,7 +47,7 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
       image: gig.image,
       tiers: gig.tiers || [],
       requirements: gig.requirements || [],
-    } : { id: data.gigId, title: "שירות", image: null, tiers: [], requirements: [] },
+    } : { id: data.gigId || "", title: data.title || "עבודת שטח", image: null, tiers: [], requirements: [] },
     buyer: { id: data.buyerId, name: buyerRes.data?.name || "משתמש", avatar: buyerRes.data?.avatar || null },
     seller: { id: data.sellerId, name: sellerRes.data?.name || "משתמש", avatar: sellerRes.data?.avatar || null },
     messages: enrichedMessages,

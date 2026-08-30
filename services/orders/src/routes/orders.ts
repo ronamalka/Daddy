@@ -23,9 +23,20 @@ ordersRoutes.get("/", requireAuth, async (req: Request, res: Response) => {
 });
 
 ordersRoutes.post("/", requireAuth, async (req: Request, res: Response) => {
-  const { gigId, sellerId, tier, price, slotStart, slotEnd } = req.body;
+  const jobType = req.body.jobType === "LOCAL_REQUEST" ? "LOCAL_REQUEST" : "GIG";
+  const { gigId, sellerId, tier, price, slotStart, slotEnd, title, requestId } = req.body;
 
-  if (!gigId || !sellerId || !tier || !price) {
+  if (!sellerId || price == null) {
+    res.status(400).json({ error: "Missing fields" });
+    return;
+  }
+
+  if (jobType === "GIG" && (!gigId || !tier)) {
+    res.status(400).json({ error: "Missing fields" });
+    return;
+  }
+
+  if (jobType === "LOCAL_REQUEST" && !String(title || "").trim()) {
     res.status(400).json({ error: "Missing fields" });
     return;
   }
@@ -64,10 +75,13 @@ ordersRoutes.post("/", requireAuth, async (req: Request, res: Response) => {
 
       return tx.order.create({
         data: {
-          gigId,
+          jobType,
+          gigId: jobType === "GIG" ? gigId : null,
+          requestId: jobType === "LOCAL_REQUEST" ? requestId || null : null,
+          title: jobType === "LOCAL_REQUEST" ? String(title).trim() : null,
           buyerId: req.user!.id,
           sellerId,
-          tier,
+          tier: jobType === "GIG" ? tier : null,
           price,
           dueDate: slot.end,
           slotStart: slot.start,

@@ -22,7 +22,8 @@ interface OrderRequirement {
 
 interface OrderDetail {
   id: string;
-  tier: string;
+  jobType?: string;
+  tier: string | null;
   price: number;
   status: string;
   dueDate: string | null;
@@ -257,11 +258,15 @@ export default function OrderDetailPage() {
           <div className="flex-1">
             <h1 className="text-[20px] font-bold text-[rgb(var(--color-text))]">{order.gig.title}</h1>
             <div className="mt-2 flex flex-wrap items-center gap-3 text-[14px] text-[rgb(var(--color-text-secondary))]">
-              <span className="flex items-center gap-1.5">
-                <Tag className="h-4 w-4 text-[rgb(var(--color-primary-light))]" />
-                חבילת {order.tier}
-              </span>
-              <span className="text-[rgb(var(--color-border))]">|</span>
+              {order.tier && (
+                <>
+                  <span className="flex items-center gap-1.5">
+                    <Tag className="h-4 w-4 text-[rgb(var(--color-primary-light))]" />
+                    חבילת {order.tier}
+                  </span>
+                  <span className="text-[rgb(var(--color-border))]">|</span>
+                </>
+              )}
               <span className="font-semibold text-[rgb(var(--color-text))]">₪{order.price}</span>
               <span className="text-[rgb(var(--color-border))]">|</span>
               <span>{new Date(order.createdAt).toLocaleDateString("he-IL")}</span>
