@@ -2,14 +2,15 @@
 
 import { signIn } from "next-auth/react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useState, useRef, useCallback } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useState, useRef, useCallback, Suspense } from "react";
 import { LocationPicker } from "@/components/location-picker";
 import { ServicePicker } from "@/components/service-picker";
 import { PasswordStrength } from "@/components/password-strength";
 import { TurnstileWidget } from "@/components/turnstile-widget";
 import { LegalConsentFields } from "@/components/legal-consent-fields";
 import { TERMS_VERSION } from "@/lib/legal";
+import { postRegisterPath } from "@/lib/seller-ready";
 
 interface ServiceAreaEntry {
   districtCode: number;
@@ -20,7 +21,17 @@ interface ServiceAreaEntry {
 
 /** Shows the sign-up form to create a new account. */
 export default function RegisterPage() {
+  return (
+    <Suspense fallback={<div className="w-full max-w-md" />}>
+      <RegisterForm />
+    </Suspense>
+  );
+}
+
+/** Sign-up form, including seller onboarding after registration. */
+function RegisterForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [step, setStep] = useState(1);
@@ -28,7 +39,7 @@ export default function RegisterPage() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [role, setRole] = useState("BUYER");
+  const [role, setRole] = useState(searchParams.get("role") === "SELLER" ? "SELLER" : "BUYER");
 
   const [selectedCity, setSelectedCity] = useState<{ cityCode: number; cityName: string; districtCode: number; districtName: string } | null>(null);
   const [serviceAreas, setServiceAreas] = useState<ServiceAreaEntry[]>([]);
@@ -92,7 +103,7 @@ export default function RegisterPage() {
       setError("החשבון נוצר אבל ההתחברות נכשלה. נסה להתחבר מחדש.");
       setLoading(false);
     } else {
-      router.push("/");
+      router.push(postRegisterPath(role, searchParams.get("next")));
       router.refresh();
     }
   }
@@ -128,7 +139,7 @@ export default function RegisterPage() {
   async function handleGoogleSignUp() {
     if (!ensureLegalConsent()) return;
     setGoogleLoading(true);
-    await signIn("google", { callbackUrl: "/" });
+    await signIn("google", { callbackUrl: postRegisterPath(role, searchParams.get("next")) });
   }
 
   const inputClass = "w-full rounded-xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface-elevated))] px-4 py-3 text-[16px] text-[rgb(var(--color-text))] placeholder-[rgb(var(--color-text-muted))] transition-all focus:border-[rgb(var(--color-primary))] focus:outline-none focus:ring-2 focus:ring-[rgba(var(--color-primary),0.2)]";

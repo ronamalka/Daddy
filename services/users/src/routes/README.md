@@ -6,7 +6,7 @@
 | `register.ts` | `POST /register` |
 | `oauth.ts` | `POST /oauth` (Google user upsert) |
 | `password-reset.ts` | Reset request and confirm |
-| `profile.ts` | Current user profile |
+| `profile.ts` | Current user profile, readiness, become-seller |
 | `admin.ts` | Admin user list |
 | `providers.ts` | Search helpers |
 | `sellers.ts` | Public seller profile |

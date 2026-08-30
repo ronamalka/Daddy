@@ -4,7 +4,7 @@ Account settings for the signed-in user.
 
 | Path | Page |
 | --- | --- |
-| `/profile` | Overview |
+| `/profile` | Overview (includes a progress meter for sellers) |
 | `/profile/edit` | Name, bio, photo |
 | `/profile/password` | Change password |
 | `/profile/availability` | Weekly hours and time off |

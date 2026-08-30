@@ -17,6 +17,7 @@ Small modules used by API routes and pages. Each exported function has a short c
 | `order-views.ts` | Split buyer/seller orders and build a month grid |
 | `order-status.ts` | Colours and Hebrew labels for order status |
 | `seller-slot.ts` | Validate a chosen visit window against a seller |
+| `seller-ready.ts` | Daddy onboarding checklist and post-register redirect |
 | `accept-quote.ts` | Rules for accepting a seller quote |
 | `validate.ts` | Parse JSON bodies with Zod |
 | `upload-security.ts` | File type checks and EXIF strip |

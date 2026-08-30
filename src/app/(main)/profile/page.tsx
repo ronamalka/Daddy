@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { Lock, MapPin, Package, CurrencyDollar, Star, User, Envelope, Shield, CalendarBlank } from "@phosphor-icons/react";
+import { ProfileProgress } from "@/components/profile-progress";
+import type { ProfileReadinessResponse } from "@/lib/seller-ready";
 
 interface Stats {
   totalOrders: number;
@@ -18,13 +20,22 @@ interface Stats {
 export default function ProfilePage() {
   const { data: session } = useSession();
   const [stats, setStats] = useState<Stats | null>(null);
+  const [readiness, setReadiness] = useState<ProfileReadinessResponse | null>(null);
 
   useEffect(() => {
     fetch("/api/profile/stats")
       .then((r) => r.json())
       .then(setStats)
       .catch(() => {});
-  }, []);
+    if (session?.user?.role === "SELLER") {
+      fetch("/api/profile/readiness")
+        .then((r) => r.json())
+        .then((data) => {
+          if (data && typeof data.percent === "number") setReadiness(data);
+        })
+        .catch(() => {});
+    }
+  }, [session?.user?.role]);
 
   if (!session) {
     return (
@@ -117,6 +128,12 @@ export default function ProfilePage() {
               )}
             </div>
           </div>
+
+          {readiness && (
+            <div className="mt-6">
+              <ProfileProgress readiness={readiness} variant="compact" />
+            </div>
+          )}
 
           {/* Dynamic Stats Grid */}
           <div className="mt-8 grid grid-cols-3 gap-4">

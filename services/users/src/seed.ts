@@ -26,12 +26,12 @@ async function main() {
 
   const users = [
     { id: SEED_IDS.admin, name: "אבא מנהל", email: "admin@daddy.com", passwordHash, role: "ADMIN" as const },
-    { id: SEED_IDS.seller, name: "יוסי הגולדן", email: "seller@daddy.com", passwordHash, role: "SELLER" as const, bio: "אבא של 3, מתקן הכל מגיל 15. אם זה שבור – אני מסדר.", city: "תל אביב", districtCode: 5, cityCode: 5000 },
-    { id: SEED_IDS.seller2, name: "אבי המתקן", email: "seller2@daddy.com", passwordHash, role: "SELLER" as const, bio: "טכנאי רכב לשעבר, היום אבא במשרה מלאה שעוזר לכולם.", city: "חיפה", districtCode: 3, cityCode: 4000 },
-    { id: SEED_IDS.seller3, name: "דן הטכנולוג", email: "seller3@daddy.com", passwordHash, role: "SELLER" as const, bio: "מהנדס תוכנה ביום, אבאל׳ה בערב. מתמחה בטכנולוגיה, רשתות וסמארט הום.", city: "ראשון לציון", districtCode: 4, cityCode: 8300 },
-    { id: SEED_IDS.seller4, name: "משה הכל-יכול", email: "seller4@daddy.com", passwordHash, role: "SELLER" as const, bio: "אבא של 4, יד ימין לכל שכן. הרכבות, תיקונים, הובלות – הכל בחיוך.", city: "באר שבע", districtCode: 6, cityCode: 9000 },
-    { id: SEED_IDS.seller5, name: "ערן הגנן", email: "seller5@daddy.com", passwordHash, role: "SELLER" as const, bio: "גנן חובב שהפך למקצוען. מטפל בגינות, מרפסות וחצרות ברחבי השרון.", city: "נתניה", districtCode: 4, cityCode: 7400 },
-    { id: SEED_IDS.seller6, name: "רועי החוסך", email: "seller6@daddy.com", passwordHash, role: "SELLER" as const, bio: "20 שנה בתחום הביטוח והתקשורת. חוסך לאנשים אלפי שקלים בשנה.", city: "ירושלים", districtCode: 1, cityCode: 3000 },
+    { id: SEED_IDS.seller, name: "יוסי הגולדן", email: "seller@daddy.com", passwordHash, role: "SELLER" as const, bio: "אבא של 3, מתקן הכל מגיל 15. אם זה שבור – אני מסדר.", city: "תל אביב", districtCode: 5, cityCode: 5000, phone: "050-1111111", avatar: "https://ui-avatars.com/api/?name=Yossi&background=0F766E&color=fff&size=128" },
+    { id: SEED_IDS.seller2, name: "אבי המתקן", email: "seller2@daddy.com", passwordHash, role: "SELLER" as const, bio: "טכנאי רכב לשעבר, היום אבא במשרה מלאה שעוזר לכולם.", city: "חיפה", districtCode: 3, cityCode: 4000, phone: "050-2222222", avatar: "https://ui-avatars.com/api/?name=Avi&background=0F766E&color=fff&size=128" },
+    { id: SEED_IDS.seller3, name: "דן הטכנולוג", email: "seller3@daddy.com", passwordHash, role: "SELLER" as const, bio: "מהנדס תוכנה ביום, אבאל׳ה בערב. מתמחה בטכנולוגיה, רשתות וסמארט הום.", city: "ראשון לציון", districtCode: 4, cityCode: 8300, phone: "050-3333333", avatar: "https://ui-avatars.com/api/?name=Dan&background=0F766E&color=fff&size=128" },
+    { id: SEED_IDS.seller4, name: "משה הכל-יכול", email: "seller4@daddy.com", passwordHash, role: "SELLER" as const, bio: "אבא של 4, יד ימין לכל שכן. הרכבות, תיקונים, הובלות – הכל בחיוך.", city: "באר שבע", districtCode: 6, cityCode: 9000, phone: "050-4444444", avatar: "https://ui-avatars.com/api/?name=Moshe&background=0F766E&color=fff&size=128" },
+    { id: SEED_IDS.seller5, name: "ערן הגנן", email: "seller5@daddy.com", passwordHash, role: "SELLER" as const, bio: "גנן חובב שהפך למקצוען. מטפל בגינות, מרפסות וחצרות ברחבי השרון.", city: "נתניה", districtCode: 4, cityCode: 7400, phone: "050-5555555", avatar: "https://ui-avatars.com/api/?name=Eran&background=0F766E&color=fff&size=128" },
+    { id: SEED_IDS.seller6, name: "רועי החוסך", email: "seller6@daddy.com", passwordHash, role: "SELLER" as const, bio: "20 שנה בתחום הביטוח והתקשורת. חוסך לאנשים אלפי שקלים בשנה.", city: "ירושלים", districtCode: 1, cityCode: 3000, phone: "050-6666666", avatar: "https://ui-avatars.com/api/?name=Roy&background=0F766E&color=fff&size=128" },
     { id: SEED_IDS.buyer, name: "דנה לקוחה", email: "buyer@daddy.com", passwordHash, role: "BUYER" as const, city: "תל אביב", districtCode: 5, cityCode: 5000 },
     { id: SEED_IDS.buyer2, name: "מיכל הקונה", email: "buyer2@daddy.com", passwordHash, role: "BUYER" as const, city: "חיפה", districtCode: 3, cityCode: 4000 },
     { id: SEED_IDS.buyer3, name: "שי הלקוח", email: "buyer3@daddy.com", passwordHash, role: "BUYER" as const, city: "ירושלים", districtCode: 1, cityCode: 3000 },
@@ -40,7 +40,10 @@ async function main() {
   for (const u of users) {
     await prisma.user.upsert({
       where: { email: u.email },
-      update: {},
+      update: {
+        ...("phone" in u && u.phone ? { phone: u.phone } : {}),
+        ...("avatar" in u && u.avatar ? { avatar: u.avatar } : {}),
+      },
       create: u,
     });
   }

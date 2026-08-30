@@ -48,38 +48,38 @@ async function main() {
 
   const seller = await prisma.user.upsert({
     where: { email: "seller@daddy.com" },
-    update: { bio: "אבא של 3, מתקן הכל מגיל 15. אם זה שבור – אני מסדר.", city: "תל אביב", districtCode: 5, cityCode: 5000 },
-    create: { name: "יוסי הגולדן", email: "seller@daddy.com", passwordHash, role: "SELLER", bio: "אבא של 3, מתקן הכל מגיל 15. אם זה שבור – אני מסדר.", city: "תל אביב", districtCode: 5, cityCode: 5000 },
+    update: { bio: "אבא של 3, מתקן הכל מגיל 15. אם זה שבור – אני מסדר.", city: "תל אביב", districtCode: 5, cityCode: 5000, phone: "050-1111111", avatar: "https://ui-avatars.com/api/?name=Yossi&background=0F766E&color=fff&size=128" },
+    create: { name: "יוסי הגולדן", email: "seller@daddy.com", passwordHash, role: "SELLER", bio: "אבא של 3, מתקן הכל מגיל 15. אם זה שבור – אני מסדר.", city: "תל אביב", districtCode: 5, cityCode: 5000, phone: "050-1111111", avatar: "https://ui-avatars.com/api/?name=Yossi&background=0F766E&color=fff&size=128" },
   });
 
   const seller2 = await prisma.user.upsert({
     where: { email: "seller2@daddy.com" },
-    update: { bio: "טכנאי רכב לשעבר, היום אבא במשרה מלאה שעוזר לכולם.", city: "חיפה", districtCode: 3, cityCode: 4000 },
-    create: { name: "אבי המתקן", email: "seller2@daddy.com", passwordHash, role: "SELLER", bio: "טכנאי רכב לשעבר, היום אבא במשרה מלאה שעוזר לכולם.", city: "חיפה", districtCode: 3, cityCode: 4000 },
+    update: { bio: "טכנאי רכב לשעבר, היום אבא במשרה מלאה שעוזר לכולם.", city: "חיפה", districtCode: 3, cityCode: 4000, phone: "050-2222222", avatar: "https://ui-avatars.com/api/?name=Avi&background=0F766E&color=fff&size=128" },
+    create: { name: "אבי המתקן", email: "seller2@daddy.com", passwordHash, role: "SELLER", bio: "טכנאי רכב לשעבר, היום אבא במשרה מלאה שעוזר לכולם.", city: "חיפה", districtCode: 3, cityCode: 4000, phone: "050-2222222", avatar: "https://ui-avatars.com/api/?name=Avi&background=0F766E&color=fff&size=128" },
   });
 
   const seller3 = await prisma.user.upsert({
     where: { email: "seller3@daddy.com" },
-    update: { bio: "מהנדס תוכנה ביום, אבאל׳ה בערב. מתמחה בטכנולוגיה, רשתות וסמארט הום.", city: "ראשון לציון", districtCode: 4, cityCode: 8300 },
-    create: { name: "דן הטכנולוג", email: "seller3@daddy.com", passwordHash, role: "SELLER", bio: "מהנדס תוכנה ביום, אבאל׳ה בערב. מתמחה בטכנולוגיה, רשתות וסמארט הום.", city: "ראשון לציון", districtCode: 4, cityCode: 8300 },
+    update: { bio: "מהנדס תוכנה ביום, אבאל׳ה בערב. מתמחה בטכנולוגיה, רשתות וסמארט הום.", city: "ראשון לציון", districtCode: 4, cityCode: 8300, phone: "050-3333333", avatar: "https://ui-avatars.com/api/?name=Dan&background=0F766E&color=fff&size=128" },
+    create: { name: "דן הטכנולוג", email: "seller3@daddy.com", passwordHash, role: "SELLER", bio: "מהנדס תוכנה ביום, אבאל׳ה בערב. מתמחה בטכנולוגיה, רשתות וסמארט הום.", city: "ראשון לציון", districtCode: 4, cityCode: 8300, phone: "050-3333333", avatar: "https://ui-avatars.com/api/?name=Dan&background=0F766E&color=fff&size=128" },
   });
 
   const seller4 = await prisma.user.upsert({
     where: { email: "seller4@daddy.com" },
-    update: { bio: "אבא של 4, יד ימין לכל שכן. הרכבות, תיקונים, הובלות – הכל בחיוך.", city: "באר שבע", districtCode: 6, cityCode: 9000 },
-    create: { name: "משה הכל-יכול", email: "seller4@daddy.com", passwordHash, role: "SELLER", bio: "אבא של 4, יד ימין לכל שכן. הרכבות, תיקונים, הובלות – הכל בחיוך.", city: "באר שבע", districtCode: 6, cityCode: 9000 },
+    update: { bio: "אבא של 4, יד ימין לכל שכן. הרכבות, תיקונים, הובלות – הכל בחיוך.", city: "באר שבע", districtCode: 6, cityCode: 9000, phone: "050-4444444", avatar: "https://ui-avatars.com/api/?name=Moshe&background=0F766E&color=fff&size=128" },
+    create: { name: "משה הכל-יכול", email: "seller4@daddy.com", passwordHash, role: "SELLER", bio: "אבא של 4, יד ימין לכל שכן. הרכבות, תיקונים, הובלות – הכל בחיוך.", city: "באר שבע", districtCode: 6, cityCode: 9000, phone: "050-4444444", avatar: "https://ui-avatars.com/api/?name=Moshe&background=0F766E&color=fff&size=128" },
   });
 
   const seller5 = await prisma.user.upsert({
     where: { email: "seller5@daddy.com" },
-    update: { bio: "גנן חובב שהפך למקצוען. מטפל בגינות, מרפסות וחצרות ברחבי השרון.", city: "נתניה", districtCode: 4, cityCode: 7400 },
-    create: { name: "ערן הגנן", email: "seller5@daddy.com", passwordHash, role: "SELLER", bio: "גנן חובב שהפך למקצוען. מטפל בגינות, מרפסות וחצרות ברחבי השרון.", city: "נתניה", districtCode: 4, cityCode: 7400 },
+    update: { bio: "גנן חובב שהפך למקצוען. מטפל בגינות, מרפסות וחצרות ברחבי השרון.", city: "נתניה", districtCode: 4, cityCode: 7400, phone: "050-5555555", avatar: "https://ui-avatars.com/api/?name=Eran&background=0F766E&color=fff&size=128" },
+    create: { name: "ערן הגנן", email: "seller5@daddy.com", passwordHash, role: "SELLER", bio: "גנן חובב שהפך למקצוען. מטפל בגינות, מרפסות וחצרות ברחבי השרון.", city: "נתניה", districtCode: 4, cityCode: 7400, phone: "050-5555555", avatar: "https://ui-avatars.com/api/?name=Eran&background=0F766E&color=fff&size=128" },
   });
 
   const seller6 = await prisma.user.upsert({
     where: { email: "seller6@daddy.com" },
-    update: { bio: "20 שנה בתחום הביטוח והתקשורת. חוסך לאנשים אלפי שקלים בשנה.", city: "ירושלים", districtCode: 1, cityCode: 3000 },
-    create: { name: "רועי החוסך", email: "seller6@daddy.com", passwordHash, role: "SELLER", bio: "20 שנה בתחום הביטוח והתקשורת. חוסך לאנשים אלפי שקלים בשנה.", city: "ירושלים", districtCode: 1, cityCode: 3000 },
+    update: { bio: "20 שנה בתחום הביטוח והתקשורת. חוסך לאנשים אלפי שקלים בשנה.", city: "ירושלים", districtCode: 1, cityCode: 3000, phone: "050-6666666", avatar: "https://ui-avatars.com/api/?name=Roy&background=0F766E&color=fff&size=128" },
+    create: { name: "רועי החוסך", email: "seller6@daddy.com", passwordHash, role: "SELLER", bio: "20 שנה בתחום הביטוח והתקשורת. חוסך לאנשים אלפי שקלים בשנה.", city: "ירושלים", districtCode: 1, cityCode: 3000, phone: "050-6666666", avatar: "https://ui-avatars.com/api/?name=Roy&background=0F766E&color=fff&size=128" },
   });
 
   const buyer = await prisma.user.upsert({

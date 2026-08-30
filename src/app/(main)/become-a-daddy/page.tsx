@@ -49,7 +49,7 @@ export default function BecomeADaddyPage() {
           <p className="mt-4 text-[18px] text-white/70 max-w-2xl mx-auto">
             הילדים גדלו, יש לך 30 שנות ניסיון, והידיים עדיין זוכרות הכל. הגיע הזמן שמישהו ייהנה מזה — ושאתה תרוויח מזה.
           </p>
-          <Link href="/register" className="mt-8 inline-block rounded-xl bg-gradient-to-r from-[rgb(var(--color-success))] to-[rgb(var(--color-accent))] px-8 py-4 text-[16px] font-bold text-white shadow-[0_4px_16px_rgba(var(--color-success),0.3)] transition-all hover:shadow-[0_8px_24px_rgba(var(--color-success),0.4)] hover:-translate-y-0.5">
+          <Link href="/onboarding" className="mt-8 inline-block rounded-xl bg-gradient-to-r from-[rgb(var(--color-success))] to-[rgb(var(--color-accent))] px-8 py-4 text-[16px] font-bold text-white shadow-[0_4px_16px_rgba(var(--color-success),0.3)] transition-all hover:shadow-[0_8px_24px_rgba(var(--color-success),0.4)] hover:-translate-y-0.5">
             הירשם עכשיו — בחינם
           </Link>
           <p className="mt-4 text-[13px] text-white/60 max-w-xl mx-auto">
@@ -139,7 +139,7 @@ export default function BecomeADaddyPage() {
         <div className="mx-auto max-w-3xl px-4">
           <h2 className="text-[28px] font-extrabold md:text-[32px]">הידיים שלך עוד זוכרות</h2>
           <p className="mt-3 text-[16px] text-white/80">הגיע הזמן שמישהו ייהנה מזה. הרשמה בדקה, בלי עלות, בלי התחייבות.</p>
-          <Link href="/register" className="mt-8 inline-block rounded-xl bg-white px-8 py-4 text-[16px] font-bold text-[rgb(var(--color-success))] shadow-[0_4px_16px_rgba(0,0,0,0.15)] transition-all hover:shadow-[0_8px_24px_rgba(0,0,0,0.2)] hover:-translate-y-0.5">
+          <Link href="/onboarding" className="mt-8 inline-block rounded-xl bg-white px-8 py-4 text-[16px] font-bold text-[rgb(var(--color-success))] shadow-[0_4px_16px_rgba(0,0,0,0.15)] transition-all hover:shadow-[0_8px_24px_rgba(0,0,0,0.2)] hover:-translate-y-0.5">
             הירשם כאבאל׳ה עכשיו
           </Link>
         </div>

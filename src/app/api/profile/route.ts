@@ -6,11 +6,12 @@ import { validateBody } from "@/lib/validate";
 
 const profileUpdateSchema = z.object({
   name: z.string().min(1).max(100).optional(),
-  phone: z.string().max(20).optional(),
-  bio: z.string().max(1000).optional(),
-  avatar: z.string().url().max(500).optional().nullable(),
+  phone: z.string().max(20).optional().nullable(),
+  bio: z.string().max(1000).optional().nullable(),
+  avatar: z.string().max(500).optional().nullable(),
+  city: z.string().max(100).optional().nullable(),
   location: z.string().max(100).optional(),
-}).strict();
+});
 
 /** Returns the signed-in user's profile. */
 export async function GET() {
@@ -35,9 +36,10 @@ export async function PUT(request: Request) {
   const result = await validateBody(request, profileUpdateSchema);
   if ("error" in result) return result.error;
 
+  const { location, city, ...rest } = result.data;
   const { data, status } = await proxyRequest(USERS_SERVICE, "/profile", {
     method: "PUT",
-    body: result.data,
+    body: { ...rest, city: city ?? location },
     user: session.user as { id: string; email: string; name: string; role: string },
   });
   return NextResponse.json(data, { status });
