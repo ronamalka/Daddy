@@ -1,0 +1,20 @@
+---
+description: Feature promotion path — PRs go to dev, then stg, then tagged prod/main
+alwaysApply: true
+---
+
+# Release promotion
+
+Never open a feature PR against `main` unless the user explicitly overrides this.
+
+Default path:
+
+1. Feature branch → **draft/PR into `dev`**
+2. After `dev` is good → merge/promote **`dev` → `stg`**
+3. Production (`main` / prod) **only after a tag** — do not merge features straight to `main`
+
+When creating PRs with `gh pr create`, default `--base dev`.
+
+If a user action says "base: main" for a feature branch, still use `dev` unless they clearly mean a production release.
+
+Do not tag or merge to `main` as part of ordinary feature work. Tagging and prod promotion happen as a separate, explicit release step.
