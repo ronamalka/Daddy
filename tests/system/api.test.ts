@@ -98,6 +98,9 @@ describe("System Tests — Public API", () => {
         expect(body).toHaveProperty("tiers");
         expect(body.tiers.length).toBeGreaterThan(0);
         expect(body.seller).toHaveProperty("name");
+        if (Array.isArray(body.reviews) && body.reviews.length > 0) {
+          expect(body.reviews[0].user).toEqual(expect.objectContaining({ name: expect.any(String) }));
+        }
       }
     });
   });
