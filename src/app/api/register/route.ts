@@ -11,10 +11,27 @@ const registerSchema = z.object({
   email: z.string().email().max(254),
   password: passwordSchema,
   role: z.enum(["BUYER", "SELLER"]),
+  acceptedTerms: z.literal(true),
+  confirmedAge18: z.literal(true),
+  independentContractor: z.boolean().optional(),
+  termsVersion: z.string().optional(),
   turnstileToken: z.string().optional(),
   _hp_field: z.string().max(0).optional(),
   _formLoadedAt: z.number().optional(),
-}).strict();
+  cityCode: z.number().optional(),
+  cityName: z.string().max(100).optional(),
+  districtCode: z.number().optional(),
+  serviceAreas: z.array(z.unknown()).optional(),
+  services: z.array(z.string()).optional(),
+}).superRefine((data, ctx) => {
+  if (data.role === "SELLER" && data.independentContractor !== true) {
+    ctx.addIssue({
+      code: "custom",
+      message: "נותן שירות חייב לאשר שהוא עצמאי",
+      path: ["independentContractor"],
+    });
+  }
+});
 
 export async function POST(request: NextRequest) {
   const result = await validateBody(request, registerSchema);
@@ -58,7 +75,16 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const { turnstileToken: _t, _hp_field: _h, _formLoadedAt: _f, ...cleanData } = result.data;
+  const {
+    turnstileToken: _t,
+    _hp_field: _h,
+    _formLoadedAt: _f,
+    acceptedTerms: _terms,
+    confirmedAge18: _age,
+    independentContractor: _ic,
+    termsVersion: _tv,
+    ...cleanData
+  } = result.data;
 
   const { data, status } = await proxyRequest(USERS_SERVICE, "/register", {
     method: "POST",

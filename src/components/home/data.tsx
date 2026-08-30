@@ -2,23 +2,19 @@
 
 import {
   MagnifyingGlass, Users, Wrench, MapPin, Lightning, ChartBar, Coins,
-  PencilLine, Chat, Trophy, PaperPlaneTilt, Sparkle, Star, CheckCircle,
+  PencilLine, Chat, Trophy, Star, CheckCircle,
 } from "@phosphor-icons/react";
 
 import { DISTRICTS } from "@/lib/districts";
 
 export const DISTRICT_LIST = Object.entries(DISTRICTS).map(([code, name]) => ({ code: Number(code), name }));
 
-export const CATEGORY_ICONS: Record<string, React.ReactNode> = {
-  "assembly-and-installation": <Wrench className="h-6 w-6" />,
-  "home-maintenance": <Wrench className="h-6 w-6" />,
-  "moving-and-delivery": <PaperPlaneTilt className="h-6 w-6" />,
-  "tech-and-digital": <Lightning className="h-6 w-6" />,
-  "errands-and-help": <Users className="h-6 w-6" />,
-  "financial-help": <Coins className="h-6 w-6" />,
-  "automotive": <Wrench className="h-6 w-6" />,
-  "events": <Sparkle className="h-6 w-6" />,
-};
+export const POPULAR_SEARCHES = [
+  { label: "ברז שלא מפסיק לבכות", query: "תיקונים קטנים" },
+  { label: "ארון שמסרב להתרכב", query: "הרכבת רהיטים" },
+  { label: "הוזלת חשבונות", query: "הוזלת חשבונות" },
+  { label: "טלוויזיה שצריכה לעלות על הקיר", query: "תליית טלוויזיה" },
+] as const;
 
 export const STATS = [
   { number: 1200, suffix: "+", label: "אבאל׳ות שיודעים לסדר", icon: <Users className="h-5 w-5" /> },
@@ -44,7 +40,7 @@ export const DADDY_STEPS = [
 export const WHY_CHOOSE = [
   { title: "אבאל׳ות אמיתיים", desc: "לא חברות ענק עם מוקדנים שקוראים מדף. אנשים אמיתיים שיגיעו, יסדרו, ואולי גם יספרו בדיחה.", icon: <Users className="h-6 w-6" /> },
   { title: "ביקורות אמיתיות", desc: "לא חבר של חבר שאמר שהוא בסדר. 4 קריטריונים, דירוגים אמיתיים, בלי פוליטיקה.", icon: <ChartBar className="h-6 w-6" /> },
-  { title: "בלי הפתעות בחשבון", desc: "המחיר שסיכמתם — זה המחיר שתשלמו. בלי ׳אה, שכחתי להגיד...׳", icon: <Coins className="h-6 w-6" /> },
+  { title: "בלי הפתעות בחשבון", desc: "המחיר של האבאל׳ה נעול. בקופה מתווספים דמי שירות של 17% — שורה אחת, לפני שמשלמים. בלי ׳אה, שכחתי להגיד...׳", icon: <Coins className="h-6 w-6" /> },
   { title: "38 סוגי שירות", desc: "מברז שמטפטף ועד ארון שמסרב להתרכב. אם זה נשבר, יש לנו אבאל׳ה לזה.", icon: <Wrench className="h-6 w-6" /> },
   { title: "אבאל׳ה בשכונה", desc: "7 מחוזות, עשרות ערים. כן, גם באר שבע. בטח שגם באר שבע.", icon: <MapPin className="h-6 w-6" /> },
   { title: "בדקות, לא בימים", desc: "חפש, בחר, שלח הודעה. עד שתסיים את הקפה — יש לך אבאל׳ה.", icon: <Lightning className="h-6 w-6" /> },

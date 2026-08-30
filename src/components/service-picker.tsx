@@ -4,6 +4,7 @@ import { Check } from "@phosphor-icons/react";
 import { SERVICE_CATEGORIES } from "@/lib/services";
 import { CategoryIcon } from "@/components/ui/category-icon";
 import { cn } from "@/lib/utils";
+import { REGULATED_SERVICE_SLUGS, REGULATED_SERVICE_WARNING } from "@/lib/legal";
 
 interface ServicePickerProps {
   selected: string[];
@@ -87,6 +88,11 @@ export function ServicePicker({ selected, onChange }: ServicePickerProps) {
                         {svc.nameHe}
                       </p>
                       <p className="text-[11px] text-[rgb(var(--color-text-muted))] truncate">{svc.description}</p>
+                      {REGULATED_SERVICE_SLUGS.has(svc.slug) && (
+                        <p className="mt-0.5 text-[11px] leading-snug text-[rgb(var(--color-warning))]">
+                          {REGULATED_SERVICE_WARNING[svc.slug]}
+                        </p>
+                      )}
                     </div>
                     <div className={cn(
                       "ms-3 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded border-2 transition-all",

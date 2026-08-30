@@ -3,6 +3,7 @@ import { Heebo } from "next/font/google";
 import { SessionProvider } from "@/components/session-provider";
 import { AccessibilityToolbar, A11Y_BOOTSTRAP_SCRIPT } from "@/components/accessibility-toolbar";
 import { CsrfProvider } from "@/components/csrf-provider";
+import { CookieConsentBanner } from "@/components/cookie-consent-banner";
 import "./globals.css";
 
 const heebo = Heebo({
@@ -50,7 +51,7 @@ const jsonLd = {
   name: "אבאל׳ה",
   url: BASE_URL,
   logo: `${BASE_URL}/logo.jpeg`,
-  description: "אבא תמיד יודע לסדר. מצא אבאל׳ה מנוסה לכל מה שצריך — תיקונים, הרכבות, הובלות ועוד.",
+  description: "אבא תמיד יודע לסדר. מצא אבאל׳ה מנוסה לכל מה שצריך — תיקונים, הרכבות, הובלות ועוד. פלטפורמת תיווך: נותן השירות הוא הספק העצמאי, לא אבאל׳ה.",
   areaServed: {
     "@type": "Country",
     name: "Israel",
@@ -78,6 +79,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <SessionProvider>
           <CsrfProvider />
           {children}
+          <CookieConsentBanner />
           <AccessibilityToolbar />
         </SessionProvider>
       </body>

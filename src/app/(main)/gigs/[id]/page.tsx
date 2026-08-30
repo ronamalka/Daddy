@@ -6,6 +6,7 @@ import { useRouter, useParams } from "next/navigation";
 import Link from "next/link";
 import { GigCard } from "@/components/gig-card";
 import { Heart, Star, Clock, ArrowsClockwise, ChatCircle, CaretDown } from "@phosphor-icons/react";
+import { MarketplaceDisclaimer } from "@/components/marketplace-disclaimer";
 
 interface GigDetail {
   id: string;
@@ -399,6 +400,7 @@ export default function GigDetailPage() {
                   <h3 className="text-[16px] font-bold text-[rgb(var(--color-text))]">{currentTier.title}</h3>
                   <span className="text-[28px] font-bold tracking-[-0.01em] text-[rgb(var(--color-text))]">₪{currentTier.price}</span>
                 </div>
+                <p className="mb-2 text-[11px] text-[rgb(var(--color-text-muted))]">כולל מע״מ · המחיר נקבע על ידי הספק</p>
                 <p className="mb-5 text-[14px] leading-relaxed text-[rgb(var(--color-text-secondary))]">{currentTier.description}</p>
 
                 <div className="mb-5 flex items-center gap-5 text-[13px] text-[rgb(var(--color-text-secondary))]">
@@ -429,6 +431,10 @@ export default function GigDetailPage() {
                 {gig.seller.id === session?.user?.id && (
                   <p className="mt-3 text-center text-[12px] text-[rgb(var(--color-text-muted))]">אי אפשר להזמין את השירות של עצמך</p>
                 )}
+
+                <div className="mt-4">
+                  <MarketplaceDisclaimer compact />
+                </div>
 
                 {/* Contact seller */}
                 {session?.user && gig.seller.id !== session.user.id && (

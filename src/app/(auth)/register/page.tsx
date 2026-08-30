@@ -8,6 +8,8 @@ import { LocationPicker } from "@/components/location-picker";
 import { ServicePicker } from "@/components/service-picker";
 import { PasswordStrength } from "@/components/password-strength";
 import { TurnstileWidget } from "@/components/turnstile-widget";
+import { LegalConsentFields } from "@/components/legal-consent-fields";
+import { TERMS_VERSION } from "@/lib/legal";
 
 interface ServiceAreaEntry {
   districtCode: number;
@@ -31,6 +33,9 @@ export default function RegisterPage() {
   const [serviceAreas, setServiceAreas] = useState<ServiceAreaEntry[]>([]);
   const [selectedServices, setSelectedServices] = useState<string[]>([]);
   const [turnstileToken, setTurnstileToken] = useState("");
+  const [acceptedTerms, setAcceptedTerms] = useState(false);
+  const [confirmedAge18, setConfirmedAge18] = useState(false);
+  const [independentContractor, setIndependentContractor] = useState(false);
   const formLoadedAtRef = useRef(Date.now());
   const handleTurnstileVerify = useCallback((token: string) => setTurnstileToken(token), []);
   const handleTurnstileExpire = useCallback(() => setTurnstileToken(""), []);
@@ -38,6 +43,10 @@ export default function RegisterPage() {
   const totalSteps = role === "SELLER" ? 3 : 2;
 
   async function handleSubmit() {
+    if (!ensureLegalConsent()) {
+      setStep(1);
+      return;
+    }
     setLoading(true);
     setError("");
 
@@ -54,6 +63,10 @@ export default function RegisterPage() {
         districtCode: selectedCity?.districtCode,
         serviceAreas: role === "SELLER" ? serviceAreas : [],
         services: role === "SELLER" ? selectedServices : [],
+        acceptedTerms,
+        confirmedAge18,
+        independentContractor: role === "SELLER" ? independentContractor : undefined,
+        termsVersion: TERMS_VERSION,
         turnstileToken,
         _hp_field: "",
         _formLoadedAt: formLoadedAtRef.current,
@@ -82,8 +95,21 @@ export default function RegisterPage() {
     }
   }
 
+  function ensureLegalConsent(): boolean {
+    if (!acceptedTerms || !confirmedAge18) {
+      setError("יש לאשר את תנאי השימוש ומדיניות הפרטיות, ולאשר שאתה מעל גיל 18.");
+      return false;
+    }
+    if (role === "SELLER" && !independentContractor) {
+      setError("נותן שירות חייב לאשר שהוא עצמאי ושלא יבצע עבודה טעונת רישיון בלי רישיון.");
+      return false;
+    }
+    return true;
+  }
+
   function handleNext() {
     if (step === 1) {
+      if (!ensureLegalConsent()) return;
       setStep(2);
     } else if (step === 2 && role === "SELLER") {
       setStep(3);
@@ -95,6 +121,7 @@ export default function RegisterPage() {
   const [googleLoading, setGoogleLoading] = useState(false);
 
   async function handleGoogleSignUp() {
+    if (!ensureLegalConsent()) return;
     setGoogleLoading(true);
     await signIn("google", { callbackUrl: "/" });
   }
@@ -227,6 +254,15 @@ export default function RegisterPage() {
               <label htmlFor="hp-reg">Leave empty</label>
               <input id="hp-reg" type="text" name="_hp_field" tabIndex={-1} autoComplete="off" />
             </div>
+            <LegalConsentFields
+              acceptedTerms={acceptedTerms}
+              onAcceptedTermsChange={setAcceptedTerms}
+              confirmedAge18={confirmedAge18}
+              onConfirmedAge18Change={setConfirmedAge18}
+              role={role}
+              independentContractor={independentContractor}
+              onIndependentContractorChange={setIndependentContractor}
+            />
             <TurnstileWidget onVerify={handleTurnstileVerify} onExpire={handleTurnstileExpire} />
             <button type="submit" className="w-full rounded-xl bg-[rgb(var(--color-primary))] py-3.5 text-[16px] font-semibold text-white shadow-[0_4px_16px_rgba(var(--color-primary),0.08)] transition-all hover:bg-[rgb(var(--color-primary-hover))] active:scale-[0.98]">
               המשך

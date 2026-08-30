@@ -22,7 +22,7 @@ export const SERVICE_CATEGORIES: ServiceCategory[] = [
       { slug: "shelf-hanging", nameHe: "תליית מדפים", description: "מדפים, ארוניות, מתלים" },
       { slug: "curtain-rods", nameHe: "התקנת וילונות", description: "מוטות וילון, רולרים, וילונות רומאיים" },
       { slug: "picture-hanging", nameHe: "תליית תמונות ומראות", description: "תמונות, מראות, שעוני קיר, לוחות" },
-      { slug: "lighting-fixtures", nameHe: "התקנת גופי תאורה", description: "אהילים, ספוטים, פסי לד (החלפה בלבד)" },
+      { slug: "lighting-fixtures", nameHe: "התקנת גופי תאורה", description: "החלפת אהיל/גוף קיים בלבד. לא עבודת חשמלאי" },
     ],
   },
   {
@@ -57,7 +57,7 @@ export const SERVICE_CATEGORIES: ServiceCategory[] = [
     services: [
       { slug: "lawn-mowing", nameHe: "כיסוח דשא", description: "כיסוח, ניקוי עשבים, תחזוקת חצר בסיסית" },
       { slug: "garden-maintenance", nameHe: "גינון בסיסי", description: "גיזום, השקיה, שתילה, עציצים" },
-      { slug: "grill-assembly", nameHe: "הרכבת גריל/מנגל", description: "הרכבת גריל גז, מנגל, מעשנה" },
+      { slug: "grill-assembly", nameHe: "הרכבת גריל/מנגל", description: "הרכבה מכנית בלבד. בלי חיבור לגז" },
       { slug: "outdoor-furniture", nameHe: "ריהוט גינה", description: "הרכבת שולחנות, כסאות, סט ישיבה" },
       { slug: "pressure-washing", nameHe: "שטיפת לחץ", description: "ניקוי מרצפות, חניה, קירות חיצוניים" },
     ],
@@ -92,9 +92,9 @@ export const SERVICE_CATEGORIES: ServiceCategory[] = [
     icon: "📞",
     services: [
       { slug: "bill-negotiation", nameHe: "הוזלת חשבונות", description: "הפחתת חשבונות סלולר, אינטרנט, ביטוח" },
-      { slug: "form-filling", nameHe: "עזרה במילוי טפסים", description: "ביטוח לאומי, מס הכנסה, ביטוחים, רישוי" },
+      { slug: "form-filling", nameHe: "עזרה במילוי טפסים", description: "סיוע טכני בלבד — לא ייעוץ משפטי או מס" },
       { slug: "govt-office-companion", nameHe: "ליווי למשרדים ממשלתיים", description: "עירייה, משרד הפנים, ביטוח לאומי" },
-      { slug: "insurance-comparison", nameHe: "השוואת ביטוחים", description: "רכב, דירה, בריאות, חיים" },
+      { slug: "insurance-comparison", nameHe: "השוואת ביטוחים", description: "השוואה כללית בלבד — לא ייעוץ או מכירת ביטוח" },
     ],
   },
   {

@@ -83,7 +83,10 @@ export function FeaturedDaddiesSection({ featuredDaddies }: FeaturedDaddiesSecti
                       <span>{d.reviewCount} ביקורות</span>
                     </div>
                     {d.startingPrice && (
-                      <span className="text-xs font-bold text-[rgb(var(--color-success))]">החל מ-{d.startingPrice}₪</span>
+                      <span className="text-xs font-bold text-[rgb(var(--color-success))]">
+                        החל מ-{d.startingPrice}₪
+                        <span className="ms-1 font-medium text-[10px] text-[rgb(var(--color-text-muted))]">כולל מע״מ</span>
+                      </span>
                     )}
                   </div>
                 </Link>
