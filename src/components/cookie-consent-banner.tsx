@@ -99,9 +99,9 @@ export function CookieConsentBanner() {
       aria-modal="true"
       aria-labelledby="cookie-consent-title"
       aria-describedby="cookie-consent-desc"
-      className="fixed inset-x-0 bottom-0 z-[90] p-4"
+      className="pointer-events-none fixed inset-x-0 bottom-0 z-[85] p-4 pb-24 md:pb-4"
     >
-      <div className="mx-auto max-w-3xl rounded-2xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] p-5">
+      <div className="pointer-events-auto mx-auto max-w-3xl rounded-2xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] p-5 shadow-2xl">
         <div className="flex items-start justify-between gap-3">
           <h2 id="cookie-consent-title" className="text-[16px] font-bold text-[rgb(var(--color-text))]">
             עוגיות והסכמה
