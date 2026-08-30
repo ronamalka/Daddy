@@ -13,6 +13,7 @@ Reusable pieces of the interface. Subfolders group related screens.
 | `cookie-consent-banner.tsx` | Cookie choice (Israeli privacy practice) |
 | `accessibility-toolbar.tsx` | Font size, contrast, and related a11y controls |
 | `legal-consent-fields.tsx` / `marketplace-disclaimer.tsx` | Legal copy on forms |
+| `profile-progress.tsx` | Daddy onboarding meter and checklist |
 | `home/` | Homepage sections |
 | `inbox/` | Messenger UI |
 | `orders/` | Order cards and seller calendar |

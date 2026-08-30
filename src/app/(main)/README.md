@@ -14,4 +14,6 @@
 | `favorites/` | Saved gigs |
 | `admin/` | Admin tools (users, lockouts) |
 | `about/`, `how-it-works/`, `become-a-daddy/` | Marketing pages |
+| `onboarding/` | Daddy checklist until the profile is searchable |
+| `terms/`, `privacy/`, `guidelines/`, `accessibility/` | Legal and a11y pages |
 | `terms/`, `privacy/`, `guidelines/`, `accessibility/` | Legal and a11y pages |

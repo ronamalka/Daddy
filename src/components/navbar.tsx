@@ -135,6 +135,14 @@ export function Navbar() {
                     הפרופיל שלי
                   </Link>
                 </DropdownMenuItem>
+                {session.user.role === "SELLER" && (
+                  <DropdownMenuItem onClick={() => setProfileOpen(false)}>
+                    <Link href="/onboarding" className="flex items-center gap-2 w-full">
+                      <Briefcase className="h-4 w-4" />
+                      מוכנות לפרופיל
+                    </Link>
+                  </DropdownMenuItem>
+                )}
                 <DropdownMenuItem onClick={() => setProfileOpen(false)}>
                   <Link href="/orders" className="flex items-center gap-2 w-full">
                     <Bag className="h-4 w-4" />
@@ -237,6 +245,11 @@ export function Navbar() {
               <MobileNavLink href="/profile" onClick={() => setMobileOpen(false)} icon={<User className="h-4 w-4" />}>
                 פרופיל
               </MobileNavLink>
+              {session.user.role === "SELLER" && (
+                <MobileNavLink href="/onboarding" onClick={() => setMobileOpen(false)} icon={<Briefcase className="h-4 w-4" />}>
+                  מוכנות לפרופיל
+                </MobileNavLink>
+              )}
 
               <div className="my-3 border-t border-[rgb(var(--color-border-light))]" />
               <button

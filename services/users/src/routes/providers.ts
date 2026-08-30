@@ -1,5 +1,7 @@
 import { Router, Request, Response } from "express";
 import { prisma } from "../index";
+import { searchableSellerWhere } from "../seller-ready";
+import type { Prisma } from "../generated/prisma/client";
 
 /** Routes for searching sellers who take jobs. */
 export const providersRoutes = Router();
@@ -10,20 +12,8 @@ providersRoutes.get("/", async (req: Request, res: Response) => {
   const district = req.query.district as string | undefined;
   const cityCode = req.query.cityCode as string | undefined;
 
-  const where: Record<string, unknown> = { role: "SELLER", acceptingJobs: true };
-
-  if (service) {
-    where.userServices = { some: { serviceSlug: service } };
-  }
-
-  if (cityCode) {
-    where.serviceAreas = { some: { cityCode: Number(cityCode) } };
-  } else if (district) {
-    where.serviceAreas = { some: { districtCode: Number(district) } };
-  }
-
   const sellers = await prisma.user.findMany({
-    where,
+    where: searchableSellerWhere({ service, district, cityCode }) as Prisma.UserWhereInput,
     select: {
       id: true,
       name: true,

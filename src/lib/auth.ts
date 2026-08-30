@@ -125,9 +125,12 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       }
 
       if (trigger === "update" && session) {
-        const update = session as { weakPassword?: boolean };
+        const update = session as { weakPassword?: boolean; role?: string };
         if (typeof update.weakPassword === "boolean") {
           token.weakPassword = update.weakPassword;
+        }
+        if (update.role === "SELLER") {
+          token.role = "SELLER";
         }
       }
 

@@ -141,6 +141,13 @@ describe("System Tests — Public API", () => {
     });
   });
 
+  describe("GET /api/profile/readiness", () => {
+    it("returns 401 without auth", async () => {
+      const { status } = await fetchApi("/api/profile/readiness");
+      expect(status).toBe(401);
+    });
+  });
+
   describe("GET /api/service-requests", () => {
     it("returns 401 without auth", async () => {
       const { status } = await fetchApi("/api/service-requests");
@@ -541,6 +548,11 @@ describe("System Tests — Health & Pages", () => {
 
   it("become-a-daddy page returns 200", async () => {
     const res = await fetch(`${BASE_URL}/become-a-daddy`);
+    expect(res.status).toBe(200);
+  });
+
+  it("onboarding page returns 200", async () => {
+    const res = await fetch(`${BASE_URL}/onboarding`);
     expect(res.status).toBe(200);
   });
 

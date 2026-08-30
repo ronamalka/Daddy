@@ -37,6 +37,13 @@ test.describe("Public Pages", () => {
     await page.goto("/become-a-daddy");
     const content = page.locator("main, [role='main'], body").first();
     await expect(content).toBeVisible();
+    await expect(page.getByRole("link", { name: /הירשם/ }).first()).toHaveAttribute("href", "/onboarding");
+  });
+
+  test("onboarding sends guests to seller register", async ({ page }) => {
+    await page.goto("/onboarding");
+    await page.waitForURL(/\/register\?role=SELLER/, { timeout: 10000 });
+    await expect(page.getByText(/למכור שירותים/)).toBeVisible();
   });
 
   test("favorites page requires auth", async ({ page }) => {
