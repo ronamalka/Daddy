@@ -33,7 +33,6 @@ model Order {
   createdAt DateTime    @default(now())
   updatedAt DateTime    @updatedAt
 
-  messages     Message[]
   requirements OrderRequirement[]
 
   @@index([buyerId])
@@ -52,19 +51,3 @@ model OrderRequirement {
   @@unique([orderId, requirementId])
 }
 
-model Message {
-  id         String   @id @default(cuid())
-  content    String
-  attachment String?
-  orderId    String?
-  senderId   String   // cross-service ref to users-service
-  receiverId String   // cross-service ref to users-service
-  readAt     DateTime?
-  createdAt  DateTime @default(now())
-
-  order Order? @relation(fields: [orderId], references: [id])
-
-  @@index([orderId])
-  @@index([senderId])
-  @@index([receiverId])
-}

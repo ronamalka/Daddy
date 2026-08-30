@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { auth } from "@/lib/auth";
-import { proxyRequest, ORDERS_SERVICE, GIGS_SERVICE, USERS_SERVICE } from "@/lib/gateway";
+import { proxyRequest, ORDERS_SERVICE, GIGS_SERVICE, USERS_SERVICE, CHAT_SERVICE } from "@/lib/gateway";
 import { validateBody } from "@/lib/validate";
 
 const updateOrderSchema = z.object({
@@ -22,20 +22,22 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
     return NextResponse.json(data ?? { error: "Order not found" }, { status });
   }
 
-  const [gigRes, buyerRes, sellerRes, reviewRes] = await Promise.all([
+  const [gigRes, buyerRes, sellerRes, reviewRes, messagesRes] = await Promise.all([
     proxyRequest(GIGS_SERVICE, `/gigs/${data.gigId}`),
     proxyRequest(USERS_SERVICE, `/sellers/${data.buyerId}`),
     proxyRequest(USERS_SERVICE, `/sellers/${data.sellerId}`),
     proxyRequest(GIGS_SERVICE, `/reviews/by-order/${id}`),
+    proxyRequest(CHAT_SERVICE, `/messages?orderId=${id}`, { user }),
   ]);
 
   const gig = gigRes.data;
-  const enrichedMessages = data.messages?.map((msg: { senderId: string }) => ({
+  const rawMessages = Array.isArray(messagesRes.data) ? messagesRes.data : [];
+  const enrichedMessages = rawMessages.map((msg: { senderId: string }) => ({
     ...msg,
     sender: msg.senderId === data.buyerId
       ? { id: data.buyerId, name: buyerRes.data?.name || "משתמש", avatar: buyerRes.data?.avatar || null }
       : { id: data.sellerId, name: sellerRes.data?.name || "משתמש", avatar: sellerRes.data?.avatar || null },
-  })) || [];
+  }));
 
   const enriched = {
     ...data,

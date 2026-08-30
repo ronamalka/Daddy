@@ -7,6 +7,7 @@ vi.mock("@/lib/auth", () => ({
 vi.mock("@/lib/gateway", () => ({
   proxyRequest: vi.fn(),
   ORDERS_SERVICE: "http://orders.test",
+  CHAT_SERVICE: "http://chat.test",
   USERS_SERVICE: "http://users.test",
   GIGS_SERVICE: "http://gigs.test",
 }));
@@ -46,7 +47,7 @@ describe("POST /api/messages", () => {
     expect(mockedProxy).not.toHaveBeenCalled();
   });
 
-  it("proxies receiverId to the orders service", async () => {
+  it("proxies receiverId to the chat service", async () => {
     mockedProxy.mockResolvedValue({ data: { id: "clmsg1" }, status: 201 });
     const res = await postDm(jsonRequest("http://localhost/api/messages", {
       receiverId: "clseller1",
@@ -54,7 +55,7 @@ describe("POST /api/messages", () => {
     }));
     expect(res.status).toBe(201);
     expect(mockedProxy).toHaveBeenCalledWith(
-      "http://orders.test",
+      "http://chat.test",
       "/messages",
       expect.objectContaining({
         method: "POST",
@@ -74,16 +75,27 @@ describe("POST /api/messages", () => {
 });
 
 describe("POST /api/orders/:id/messages", () => {
-  it("returns the created message with a sender the UI can render", async () => {
-    mockedProxy.mockResolvedValue({
-      data: {
-        id: "clmsg1",
-        content: "hey",
-        senderId: "cluser1",
-        receiverId: "clseller1",
-        orderId: "clorder1",
-      },
-      status: 201,
+  it("checks order membership then posts to the chat service with a sender the UI can render", async () => {
+    mockedProxy.mockImplementation(async (url: string, path: string, options?: { method?: string }) => {
+      if (url === "http://orders.test" && path === "/orders/clorder1") {
+        return {
+          data: { id: "clorder1", buyerId: "cluser1", sellerId: "clseller1" },
+          status: 200,
+        };
+      }
+      if (url === "http://chat.test" && options?.method === "POST") {
+        return {
+          data: {
+            id: "clmsg1",
+            content: "hey",
+            senderId: "cluser1",
+            receiverId: "clseller1",
+            orderId: "clorder1",
+          },
+          status: 201,
+        };
+      }
+      return { data: null, status: 500 };
     });
 
     const res = await postOrderMessage(
@@ -99,18 +111,28 @@ describe("POST /api/orders/:id/messages", () => {
       avatar: null,
     });
     expect(body.content).toBe("hey");
+    expect(mockedProxy).toHaveBeenCalledWith(
+      "http://chat.test",
+      "/messages",
+      expect.objectContaining({
+        method: "POST",
+        body: { content: "hey", orderId: "clorder1", receiverId: "clseller1" },
+      })
+    );
   });
 
-  it("does not attach a sender when the orders service rejects the message", async () => {
-    mockedProxy.mockResolvedValue({ data: { error: "Forbidden" }, status: 403 });
+  it("does not post to chat when the caller is not on the order", async () => {
+    mockedProxy.mockResolvedValue({
+      data: { id: "clorder1", buyerId: "someone-else", sellerId: "clseller1" },
+      status: 200,
+    });
     const res = await postOrderMessage(
       jsonRequest("http://localhost/api/orders/clorder1/messages", { content: "hey" }),
       { params: Promise.resolve({ id: "clorder1" }) }
     );
     expect(res.status).toBe(403);
-    const body = await res.json();
-    expect(body.sender).toBeUndefined();
-    expect(body.error).toBe("Forbidden");
+    expect(mockedProxy).toHaveBeenCalledTimes(1);
+    expect(mockedProxy).toHaveBeenCalledWith("http://orders.test", "/orders/clorder1", expect.anything());
   });
 });
 
@@ -128,7 +150,7 @@ describe("POST /api/messages/mark-read", () => {
     }));
     expect(res.status).toBe(200);
     expect(mockedProxy).toHaveBeenCalledWith(
-      "http://orders.test",
+      "http://chat.test",
       "/messages/mark-read",
       expect.objectContaining({
         body: { orderId: "clorder1" },

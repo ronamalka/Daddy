@@ -89,6 +89,20 @@ services:
     networks:
       - daddy-net
 
+  chat-service:
+    build:
+      context: .
+      dockerfile: services/chat/Dockerfile
+    environment:
+      PORT: "4005"
+      DATABASE_URL: postgres://daddy:daddypass123@postgres:5432/daddy_chat
+      INTER_SERVICE_SECRET: ${INTER_SERVICE_SECRET:-dev-secret-change-in-production}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - daddy-net
+
 volumes:
   pgdata:
 

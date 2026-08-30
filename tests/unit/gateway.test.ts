@@ -132,6 +132,7 @@ describe("Service URLs", () => {
     expect(gateway.GIGS_SERVICE).toBeDefined();
     expect(gateway.ORDERS_SERVICE).toBeDefined();
     expect(gateway.REQUESTS_SERVICE).toBeDefined();
+    expect(gateway.CHAT_SERVICE).toBeDefined();
   });
 
   it("defaults to localhost URLs", async () => {
@@ -140,5 +141,7 @@ describe("Service URLs", () => {
     expect(gateway.GIGS_SERVICE).toContain("localhost");
     expect(gateway.ORDERS_SERVICE).toContain("localhost");
     expect(gateway.REQUESTS_SERVICE).toContain("localhost");
+    expect(gateway.CHAT_SERVICE).toContain("localhost");
+    expect(gateway.CHAT_SERVICE).toContain("4005");
   });
 });
