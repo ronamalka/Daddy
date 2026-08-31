@@ -14,5 +14,6 @@
 | `availability.ts` | Weekly hours and time off |
 | `service-areas.ts` | Coverage cities |
 | `service-prices.ts` | Prices per service |
-| `user-services.ts` | Offered service slugs |
+| `user-services.ts` | Offered service slugs and per-service alert mute |
+| `notifications.ts` | Persisted alerts; match nearby requests |
 | `locations.ts` | City/district lookup |

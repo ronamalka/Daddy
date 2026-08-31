@@ -1,18 +1,9 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { proxyRequest, ORDERS_SERVICE, GIGS_SERVICE, USERS_SERVICE, CHAT_SERVICE } from "@/lib/gateway";
+import { mapPersistedNotification, mergeNotificationFeed, type NotificationItem } from "@/lib/notification-feed";
 
-type NotificationItem = {
-  id: string;
-  type: string;
-  title: string;
-  message: string;
-  href: string;
-  createdAt: string;
-  read: boolean;
-};
-
-/** Returns the latest notifications for the signed-in user from orders and unread chats. */
+/** Returns the latest notifications for the signed-in user from persisted matches, orders, and unread chats. */
 export async function GET() {
   const session = await auth();
   if (!session?.user) {
@@ -20,9 +11,10 @@ export async function GET() {
   }
 
   const user = session.user as { id: string; email: string; name: string; role: string };
-  const [{ data: orders, status: ordersStatus }, { data: conversations }] = await Promise.all([
+  const [{ data: orders, status: ordersStatus }, { data: conversations }, { data: persisted }] = await Promise.all([
     proxyRequest(ORDERS_SERVICE, "/orders", { user }),
     proxyRequest(CHAT_SERVICE, "/messages/conversations", { user }),
+    proxyRequest(USERS_SERVICE, "/notifications", { user }),
   ]);
 
   const notifications: NotificationItem[] = [];
@@ -123,7 +115,11 @@ export async function GET() {
     );
   }
 
-  notifications.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+  const persistedItems = Array.isArray(persisted)
+    ? persisted
+        .filter((row: { id?: string; type?: string }) => row?.id && row?.type)
+        .map((row: Parameters<typeof mapPersistedNotification>[0]) => mapPersistedNotification(row))
+    : [];
 
-  return NextResponse.json(notifications.slice(0, 20));
+  return NextResponse.json(mergeNotificationFeed(persistedItems, notifications));
 }
