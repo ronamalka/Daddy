@@ -9,3 +9,4 @@ Bookings.
 | `/api/orders/[id]/messages` | POST | Message on this order |
 | `/api/orders/[id]/requirements` | POST | Extra notes |
 | `/api/orders/[id]/review` | POST | Leave a review |
+| `/api/orders/[id]/dispute` | GET, POST | List / open a dispute |

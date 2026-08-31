@@ -5,9 +5,11 @@ import { useSession } from "next-auth/react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import { ReviewForm } from "@/components/review-form";
-import { Star, Handshake, Clock, Coins, Tag, ClipboardText, ChatCircle, PaperPlaneTilt, ArrowsClockwise, Warning } from "@phosphor-icons/react";
+import { Star, Handshake, Clock, Coins, Tag, ClipboardText, ChatCircle, PaperPlaneTilt, ArrowsClockwise, Warning, Scales } from "@phosphor-icons/react";
 import { Dialog } from "@/components/ui/dialog";
 import { formatVisitWindow } from "@/lib/availability";
+import { DisputeDialog } from "@/components/orders/dispute-dialog";
+import { DISPUTE_REASON_LABELS, DISPUTE_STATUS_LABELS, isDisputableStatus, isOpenDisputeStatus } from "@/lib/disputes";
 
 interface GigRequirement {
   id: string;
@@ -46,6 +48,14 @@ interface OrderDetail {
     ratingQuality: number | null;
     sellerResponse: string | null;
   } | null;
+  disputes?: {
+    id: string;
+    status: string;
+    reason: string;
+    description: string;
+    photos: string[];
+    createdAt: string;
+  }[];
 }
 
 const STATUS_STYLE: Record<string, { bg: string; text: string; label: string }> = {
@@ -78,6 +88,7 @@ export default function OrderDetailPage() {
   const [revisionSubmitting, setRevisionSubmitting] = useState(false);
   const [cancelOpen, setCancelOpen] = useState(false);
   const [cancelSubmitting, setCancelSubmitting] = useState(false);
+  const [disputeOpen, setDisputeOpen] = useState(false);
 
   useEffect(() => {
     fetch(`/api/orders/${params.id}`)
@@ -343,7 +354,34 @@ export default function OrderDetailPage() {
           {isBuyer && order.status === "COMPLETED" && !order.review && (
             <button onClick={() => setReviewOpen(true)} className="flex items-center gap-2 rounded-xl bg-[rgb(var(--color-accent-yellow))] px-5 py-2.5 text-[14px] font-semibold text-[rgb(var(--color-text))] transition-all hover:opacity-80">כתוב חוות דעת</button>
           )}
+          {(isBuyer || isSeller) && isDisputableStatus(order.status) && !order.disputes?.some((d) => isOpenDisputeStatus(d.status)) && (
+            <button
+              onClick={() => setDisputeOpen(true)}
+              className="flex items-center gap-2 rounded-xl border-2 border-[rgba(var(--color-error),0.25)] bg-[rgba(var(--color-error),0.05)] px-5 py-2.5 text-[14px] font-semibold text-[rgb(var(--color-error))] transition-all hover:bg-[rgba(var(--color-error),0.1)]"
+            >
+              <Scales className="h-4 w-4" />
+              פתיחת מחלוקת
+            </button>
+          )}
         </div>
+
+        {order.disputes && order.disputes.length > 0 && (
+          <div className="mt-5 rounded-xl border border-[rgba(var(--color-error),0.2)] bg-[rgba(var(--color-error),0.06)] p-4">
+            <p className="mb-2 text-[13px] font-bold text-[rgb(var(--color-text))]">מחלוקות על הזמנה זו</p>
+            <ul className="space-y-2">
+              {order.disputes.map((d) => (
+                <li key={d.id} className="text-[13px] text-[rgb(var(--color-text-secondary))]">
+                  <span className="font-semibold text-[rgb(var(--color-text))]">
+                    {DISPUTE_REASON_LABELS[d.reason as keyof typeof DISPUTE_REASON_LABELS] || d.reason}
+                  </span>
+                  {" · "}
+                  {DISPUTE_STATUS_LABELS[d.status] || d.status}
+                  {d.description ? ` — ${d.description}` : ""}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
 
         {/* Existing Review Display */}
         {order.review && (
@@ -663,6 +701,25 @@ export default function OrderDetailPage() {
           </div>
         </div>
       </Dialog>
+
+      <DisputeDialog
+        open={disputeOpen}
+        onOpenChange={setDisputeOpen}
+        orderId={order.id}
+        onCreated={(dispute) => {
+          setOrder((prev) => prev ? {
+            ...prev,
+            disputes: [{
+              id: dispute.id,
+              status: dispute.status,
+              reason: dispute.reason,
+              description: dispute.description,
+              photos: dispute.photos ?? [],
+              createdAt: dispute.createdAt || new Date().toISOString(),
+            }, ...(prev.disputes || [])],
+          } : prev);
+        }}
+      />
     </div>
   );
 }

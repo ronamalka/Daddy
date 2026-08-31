@@ -12,7 +12,7 @@
 | `inbox/` | Direct messages |
 | `profile/` | Account, hours, prices, service areas |
 | `favorites/` | Saved gigs |
-| `admin/` | Admin tools (users, lockouts) |
+| `admin/` | Admin tools (queue, users, lockouts) |
 | `about/`, `how-it-works/`, `become-a-daddy/` | Marketing pages |
 | `onboarding/` | Daddy checklist until the profile is searchable |
 | `terms/`, `privacy/`, `guidelines/`, `accessibility/` | Legal and a11y pages |

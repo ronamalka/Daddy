@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { Users, Briefcase, Bag, CurrencyDollar, Prohibit } from "@phosphor-icons/react";
 import type { ReactNode } from "react";
+import { ModerationQueue } from "@/components/admin/moderation-queue";
+import type { QueueItem } from "@/lib/moderation-queue";
 
 interface Stats {
   users: number;
@@ -18,6 +20,7 @@ interface User {
   email: string;
   role: string;
   createdAt: string;
+  suspendedAt: string | null;
 }
 
 const STAT_CARDS: {
@@ -68,6 +71,7 @@ export default function AdminPage() {
   const { data: session } = useSession();
   const [stats, setStats] = useState<Stats | null>(null);
   const [users, setUsers] = useState<User[]>([]);
+  const [queueItems, setQueueItems] = useState<QueueItem[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -76,9 +80,11 @@ export default function AdminPage() {
     Promise.all([
       fetch("/api/admin/stats").then((r) => r.json()),
       fetch("/api/admin/users").then((r) => r.json()),
-    ]).then(([statsData, usersData]) => {
+      fetch("/api/admin/queue").then((r) => r.json()),
+    ]).then(([statsData, usersData, queueData]) => {
       setStats(statsData);
       setUsers(usersData);
+      setQueueItems(Array.isArray(queueData.items) ? queueData.items : []);
       setLoading(false);
     });
   }, [session]);
@@ -135,6 +141,18 @@ export default function AdminPage() {
         ))}
       </div>
 
+      <ModerationQueue
+        items={queueItems}
+        onRefresh={() => {
+          fetch("/api/admin/queue")
+            .then((r) => r.json())
+            .then((queueData) => setQueueItems(Array.isArray(queueData.items) ? queueData.items : []));
+          fetch("/api/admin/users")
+            .then((r) => r.json())
+            .then(setUsers);
+        }}
+      />
+
       {/* Users Table */}
       <div className="overflow-hidden rounded-xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] shadow-[var(--shadow-sm)]">
         <div className="flex items-center justify-between border-b border-[rgb(var(--color-border))] px-6 py-4">
@@ -155,6 +173,7 @@ export default function AdminPage() {
                 <th className="px-6 py-3.5 text-[12px] font-semibold uppercase tracking-[0.05em] text-[rgb(var(--color-text-muted))]">אימייל</th>
                 <th className="px-6 py-3.5 text-[12px] font-semibold uppercase tracking-[0.05em] text-[rgb(var(--color-text-muted))]">תפקיד</th>
                 <th className="px-6 py-3.5 text-[12px] font-semibold uppercase tracking-[0.05em] text-[rgb(var(--color-text-muted))]">הצטרף</th>
+                <th className="px-6 py-3.5 text-[12px] font-semibold uppercase tracking-[0.05em] text-[rgb(var(--color-text-muted))]">פעולות</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-[rgb(var(--color-border-light))]">
@@ -163,11 +182,14 @@ export default function AdminPage() {
                 return (
                   <tr key={user.id} className="transition-colors hover:bg-[rgb(var(--color-surface-elevated))]">
                     <td className="px-6 py-4">
-                      <div className="flex items-center gap-3">
+                      <div className="flex items-center gap-2">
                         <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-[rgb(var(--color-primary))] to-[rgb(var(--color-primary-light))] text-[13px] font-bold text-white">
                           {user.name[0]}
                         </div>
                         <span className="text-[14px] font-semibold text-[rgb(var(--color-text))]">{user.name}</span>
+                        {user.suspendedAt && (
+                          <span className="rounded-full bg-[rgba(var(--color-error),0.1)] px-2 py-0.5 text-[11px] font-semibold text-[rgb(var(--color-error))]">מושעה</span>
+                        )}
                       </div>
                     </td>
                     <td className="px-6 py-4 text-[14px] text-[rgb(var(--color-text-secondary))]">{user.email}</td>
@@ -178,6 +200,42 @@ export default function AdminPage() {
                     </td>
                     <td className="px-6 py-4 text-[14px] text-[rgb(var(--color-text-secondary))]">
                       {new Date(user.createdAt).toLocaleDateString("he-IL")}
+                    </td>
+                    <td className="px-6 py-4">
+                      {user.role !== "ADMIN" && (
+                        user.suspendedAt ? (
+                          <button
+                            onClick={async () => {
+                              const res = await fetch(`/api/admin/users/${user.id}/unsuspend`, { method: "POST" });
+                              if (res.ok) {
+                                const updated = await res.json();
+                                setUsers((prev) => prev.map((u) => u.id === user.id ? { ...u, ...updated } : u));
+                              }
+                            }}
+                            className="text-[12px] font-semibold text-[rgb(var(--color-primary))] hover:underline"
+                          >
+                            בטל השעיה
+                          </button>
+                        ) : (
+                          <button
+                            onClick={async () => {
+                              if (!confirm(`להשעות את ${user.name}?`)) return;
+                              const res = await fetch(`/api/admin/users/${user.id}/suspend`, {
+                                method: "POST",
+                                headers: { "Content-Type": "application/json" },
+                                body: JSON.stringify({ reason: "הושעה מלוח הניהול" }),
+                              });
+                              if (res.ok) {
+                                const updated = await res.json();
+                                setUsers((prev) => prev.map((u) => u.id === user.id ? { ...u, ...updated } : u));
+                              }
+                            }}
+                            className="text-[12px] font-semibold text-[rgb(var(--color-error))] hover:underline"
+                          >
+                            השעה
+                          </button>
+                        )
+                      )}
                     </td>
                   </tr>
                 );

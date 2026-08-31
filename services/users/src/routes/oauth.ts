@@ -16,6 +16,10 @@ oauthRoutes.post("/", async (req: Request, res: Response) => {
   let user = await prisma.user.findUnique({ where: { email } });
 
   if (user) {
+    if (user.suspendedAt) {
+      res.status(403).json({ error: "החשבון הושעה" });
+      return;
+    }
     if (!user.avatar && avatar) {
       user = await prisma.user.update({
         where: { id: user.id },

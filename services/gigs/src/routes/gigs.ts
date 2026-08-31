@@ -41,7 +41,7 @@ gigsRoutes.get("/", async (req: Request, res: Response) => {
   const includeFields = {
     category: true,
     tiers: { orderBy: { price: "asc" as const }, take: 1 },
-    reviews: { select: { rating: true } },
+    reviews: { where: { hiddenAt: null }, select: { rating: true } },
     _count: { select: { favorites: true } },
   };
 

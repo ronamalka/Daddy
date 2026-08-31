@@ -7,7 +7,7 @@ export const recentReviewsRoutes = Router();
 /** Return the latest reviews with a rating of 4 or higher. */
 recentReviewsRoutes.get("/", async (_req: Request, res: Response) => {
   const reviews = await prisma.review.findMany({
-    where: { rating: { gte: 4 } },
+    where: { rating: { gte: 4 }, hiddenAt: null },
     select: {
       id: true,
       rating: true,

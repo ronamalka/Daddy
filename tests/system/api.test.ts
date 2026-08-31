@@ -442,6 +442,33 @@ describe("System Tests — Auth-Protected API", () => {
     });
   });
 
+  describe("GET /api/admin/queue", () => {
+    it("rejects unauthenticated requests", async () => {
+      const { status } = await fetchApi("/api/admin/queue");
+      expect([401, 403]).toContain(status);
+    });
+  });
+
+  describe("POST /api/orders/:id/dispute", () => {
+    it("returns 401 without auth", async () => {
+      const { status } = await fetchApi("/api/orders/some-order-id/dispute", {
+        method: "POST",
+        body: JSON.stringify({ reason: "QUALITY", description: "לא טוב" }),
+      });
+      expect(status).toBe(401);
+    });
+  });
+
+  describe("POST /api/admin/users/:id/suspend", () => {
+    it("rejects unauthenticated requests", async () => {
+      const { status } = await fetchApi("/api/admin/users/some-user-id/suspend", {
+        method: "POST",
+        body: JSON.stringify({ reason: "test" }),
+      });
+      expect([401, 403]).toContain(status);
+    });
+  });
+
   describe("GET /api/orders/:id", () => {
     it("returns 401 without auth", async () => {
       const { status } = await fetchApi("/api/orders/some-order-id");

@@ -1,6 +1,7 @@
 import { Router, Request, Response } from "express";
-import { requireAuth } from "../../../shared/middleware";
+import { requireAuth, requireAdmin } from "../../../shared/middleware";
 import { prisma } from "../index";
+import { FlagStatus } from "../generated/prisma/client";
 
 /** Routes for creating reviews, looking them up, flagging, and seller replies. */
 export const reviewsRoutes = Router();
@@ -161,3 +162,81 @@ reviewsRoutes.post("/", requireAuth, async (req: Request, res: Response) => {
 
   res.status(201).json(review);
 });
+
+/** List review flags for the admin moderation queue. */
+reviewsRoutes.get("/admin/flags", requireAdmin, async (_req: Request, res: Response) => {
+  const flags = await prisma.reviewFlag.findMany({
+    include: {
+      review: {
+        select: {
+          id: true,
+          comment: true,
+          userId: true,
+          hiddenAt: true,
+          gig: { select: { title: true, sellerId: true } },
+        },
+      },
+    },
+    orderBy: { createdAt: "desc" },
+  });
+  res.json(flags);
+});
+
+/** Review, dismiss, or hide a flagged review. */
+reviewsRoutes.patch("/admin/flags/:id", requireAdmin, async (req: Request, res: Response) => {
+  const id = req.params.id as string;
+  const action = req.body?.action as string;
+  const hideReview = action === "hide";
+  const nextStatus =
+    action === "review" ? "UNDER_REVIEW" :
+    action === "dismiss" ? "DISMISSED" :
+    action === "hide" ? "RESOLVED" :
+    null;
+
+  if (!nextStatus) {
+    res.status(400).json({ error: "פעולה לא חוקית" });
+    return;
+  }
+
+  const flag = await prisma.reviewFlag.findUnique({ where: { id } });
+  if (!flag) {
+    res.status(404).json({ error: "הדיווח לא נמצא" });
+    return;
+  }
+
+  const note = typeof req.body?.note === "string" ? req.body.note.trim() : "";
+  const isFinal = nextStatus !== "UNDER_REVIEW";
+
+  const updated = await prisma.$transaction(async (tx) => {
+    const next = await tx.reviewFlag.update({
+      where: { id },
+      data: {
+        status: nextStatus as FlagStatus,
+        resolution: note || flag.resolution,
+        resolvedAt: isFinal ? new Date() : flag.resolvedAt,
+        resolvedBy: isFinal ? req.user!.id : flag.resolvedBy,
+      },
+      include: {
+        review: {
+          select: {
+            id: true,
+            comment: true,
+            userId: true,
+            hiddenAt: true,
+            gig: { select: { title: true, sellerId: true } },
+          },
+        },
+      },
+    });
+    if (hideReview) {
+      await tx.review.update({
+        where: { id: flag.reviewId },
+        data: { hiddenAt: new Date() },
+      });
+    }
+    return next;
+  });
+
+  res.json(updated);
+});
+

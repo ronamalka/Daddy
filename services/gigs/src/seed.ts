@@ -253,6 +253,21 @@ async function main() {
     }
   }
 
+  const existingFlag = await prisma.reviewFlag.findUnique({
+    where: { reviewId_userId: { reviewId: "rev-1", userId: S.buyer2 } },
+  });
+  if (!existingFlag) {
+    await prisma.reviewFlag.create({
+      data: {
+        id: "flag-seed-1",
+        reviewId: "rev-1",
+        userId: S.buyer2,
+        reason: "נראה כמו ביקורת מזויפת — ניסוח זהה לביקורות אחרות",
+        status: "OPEN",
+      },
+    });
+  }
+
   console.log("Gigs seed complete.");
 }
 

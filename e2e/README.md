@@ -7,6 +7,7 @@ These tests run a real browser against the running app.
 | `auth.spec.ts` | Login and related screens |
 | `gigs.spec.ts` | Gig listing and detail |
 | `orders.spec.ts` | Orders list and booking flow |
+| `admin.spec.ts` | Admin moderation queue |
 | `pages.spec.ts` | Public marketing and legal pages |
 | `onboarding.spec.ts` | Daddy onboarding until searchable: become-a-daddy CTAs, seller register + independent-contractor checkbox, profile progress meter, featured/search hide incomplete sellers |
 | `login.ts` | Shared seeded-account login helper |

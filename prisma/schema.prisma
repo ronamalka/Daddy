@@ -38,6 +38,35 @@ enum JobType {
   LOCAL_REQUEST
 }
 
+enum DisputeReason {
+  NO_SHOW
+  DAMAGE
+  DIFFERENT_PRICE
+  QUALITY
+}
+
+enum DisputeStatus {
+  OPEN
+  UNDER_REVIEW
+  RESOLVED_RELEASE
+  RESOLVED_REFUND
+  RESOLVED_SPLIT
+  CLOSED
+}
+
+enum FlagStatus {
+  OPEN
+  UNDER_REVIEW
+  DISMISSED
+  RESOLVED
+}
+
+enum PaymentAction {
+  RELEASE
+  REFUND
+  SPLIT
+}
+
 model User {
   id           String   @id @default(cuid())
   email        String   @unique
@@ -51,6 +80,8 @@ model User {
   cityCode      Int?
   districtCode  Int?
   acceptingJobs Boolean  @default(true)
+  suspendedAt   DateTime?
+  suspendReason String?
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
@@ -70,6 +101,7 @@ model User {
   reviewFlags      ReviewFlag[]
   weeklyHours      WeeklyHours[]
   timeOff          TimeOff[]
+  disputesOpened   Dispute[]
 }
 
 model WeeklyHours {
@@ -300,6 +332,7 @@ model Order {
   messages     Message[]
   review       Review?
   requirements OrderRequirement[]
+  disputes     Dispute[]
 
   @@index([buyerId])
   @@index([sellerId])
@@ -333,6 +366,7 @@ model Review {
   timelinessRating    Int?
   sellerResponse      String?
   sellerResponseAt    DateTime?
+  hiddenAt            DateTime?
   orderId             String    @unique
   gigId               String
   userId              String
@@ -345,17 +379,46 @@ model Review {
 }
 
 model ReviewFlag {
-  id        String   @id @default(cuid())
-  reviewId  String
-  userId    String
-  reason    String
-  createdAt DateTime @default(now())
+  id         String     @id @default(cuid())
+  reviewId   String
+  userId     String
+  reason     String
+  status     FlagStatus @default(OPEN)
+  resolution String?
+  resolvedAt DateTime?
+  resolvedBy String?
+  createdAt  DateTime   @default(now())
 
   review Review @relation(fields: [reviewId], references: [id], onDelete: Cascade)
   user   User   @relation(fields: [userId], references: [id])
 
   @@unique([reviewId, userId])
   @@index([reviewId])
+  @@index([status])
+}
+
+model Dispute {
+  id               String         @id @default(cuid())
+  orderId          String
+  openerId         String
+  reason           DisputeReason
+  description      String
+  photos           String[]
+  status           DisputeStatus  @default(OPEN)
+  resolution       String?
+  paymentAction    PaymentAction?
+  splitBuyerAmount Float?
+  resolvedAt       DateTime?
+  resolvedBy       String?
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+
+  order  Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  opener User  @relation(fields: [openerId], references: [id])
+
+  @@index([orderId])
+  @@index([openerId])
+  @@index([status])
 }
 
 model ServicePrice {

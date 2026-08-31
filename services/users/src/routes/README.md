@@ -7,7 +7,7 @@
 | `oauth.ts` | `POST /oauth` (Google user upsert) |
 | `password-reset.ts` | Reset request and confirm |
 | `profile.ts` | Current user profile, readiness, become-seller |
-| `admin.ts` | Admin user list |
+| `admin.ts` | Admin user list, suspend, unsuspend |
 | `providers.ts` | Search helpers |
 | `sellers.ts` | Public seller profile |
 | `featured.ts` | Homepage featured helpers |
