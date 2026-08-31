@@ -1,12 +1,8 @@
 import { NextResponse } from "next/server";
-import { z } from "zod";
 import { auth } from "@/lib/auth";
 import { proxyRequest, ORDERS_SERVICE, GIGS_SERVICE, USERS_SERVICE, CHAT_SERVICE } from "@/lib/gateway";
 import { validateBody } from "@/lib/validate";
-
-const updateOrderSchema = z.object({
-  status: z.enum(["accepted", "rejected", "in_progress", "delivered", "completed", "cancelled"]),
-}).strict();
+import { updateOrderSchema } from "@/lib/order-update";
 
 /** Returns one order with gig, buyer, seller, messages, and review data. */
 export async function GET(_request: Request, { params }: { params: Promise<{ id: string }> }) {
@@ -58,7 +54,7 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
   return NextResponse.json(enriched);
 }
 
-/** Updates an order status (accept, reject, deliver, complete, and so on). */
+/** Updates an order status (accept, deliver, complete, cancel, or request a revision). */
 export async function PATCH(request: Request, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const session = await auth();
