@@ -70,7 +70,10 @@ export function Navbar() {
   }, [session]);
 
   return (
-    <nav className="sticky top-0 z-50 glass-strong" aria-label="ניווט ראשי">
+    <nav
+      className="sticky top-0 z-50 border-b border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))]"
+      aria-label="ניווט ראשי"
+    >
       <div className="mx-auto flex max-w-7xl items-center justify-between px-5 py-3 lg:px-8">
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2 select-none">
