@@ -16,6 +16,7 @@ Small modules used by API routes and pages. Each exported function has a short c
 | `availability.ts` | Jerusalem time, two-hour visit slots |
 | `order-views.ts` | Split buyer/seller orders and build a month grid |
 | `order-status.ts` | Colours and Hebrew labels for order status |
+| `order-update.ts` | Zod body for PATCH order status |
 | `seller-slot.ts` | Validate a chosen visit window against a seller |
 | `gig-create.ts` | Zod body for creating a gig from the seller form |
 | `seller-ready.ts` | Daddy onboarding checklist and post-register redirect |

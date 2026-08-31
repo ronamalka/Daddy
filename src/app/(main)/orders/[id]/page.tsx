@@ -89,11 +89,19 @@ export default function OrderDetailPage() {
   const [cancelOpen, setCancelOpen] = useState(false);
   const [cancelSubmitting, setCancelSubmitting] = useState(false);
   const [disputeOpen, setDisputeOpen] = useState(false);
+  const [loadError, setLoadError] = useState(false);
+  const [statusBusy, setStatusBusy] = useState(false);
+  const [statusError, setStatusError] = useState("");
 
   useEffect(() => {
     fetch(`/api/orders/${params.id}`)
       .then((r) => r.json())
       .then((data) => {
+        if (!data?.id || !data?.buyer || !data?.seller) {
+          setLoadError(true);
+          return;
+        }
+        setLoadError(false);
         setOrder(data);
         if (data.requirements?.length > 0) {
           setReqsSubmitted(true);
@@ -106,7 +114,8 @@ export default function OrderDetailPage() {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ orderId: params.id }),
         }).catch(() => {});
-      });
+      })
+      .catch(() => setLoadError(true));
   }, [params.id]);
 
   useEffect(() => {
@@ -149,15 +158,25 @@ export default function OrderDetailPage() {
 
   /** Changes the status of this order. */
   async function updateStatus(status: string) {
-    const res = await fetch(`/api/orders/${params.id}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ status }),
-    });
-    if (res.ok) {
-      const updated = await res.json();
-      setOrder((prev) => prev ? { ...prev, status: updated.status } : prev);
+    setStatusBusy(true);
+    setStatusError("");
+    try {
+      const res = await fetch(`/api/orders/${params.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status }),
+      });
+      if (res.ok) {
+        const updated = await res.json();
+        setOrder((prev) => prev ? { ...prev, status: updated.status } : prev);
+      } else {
+        const data = await res.json().catch(() => ({}));
+        setStatusError((data as { error?: string }).error || "לא הצלחנו לעדכן את ההזמנה");
+      }
+    } catch {
+      setStatusError("לא הצלחנו לעדכן את ההזמנה");
     }
+    setStatusBusy(false);
   }
 
   /** Posts the seller's reply to the buyer's review. */
@@ -262,6 +281,14 @@ export default function OrderDetailPage() {
 
   const [now] = useState(() => Date.now());
 
+  if (loadError) {
+    return (
+      <div className="flex flex-col items-center justify-center py-20">
+        <p className="text-[16px] text-[rgb(var(--color-text-secondary))]">לא ניתן לטעון את ההזמנה.</p>
+      </div>
+    );
+  }
+
   if (!order) {
     return <div className="flex items-center justify-center py-20"><div className="h-10 w-10 animate-spin rounded-full border-4 border-[rgba(var(--color-primary),0.1)] border-t-[rgb(var(--color-primary))]" /></div>;
   }
@@ -332,16 +359,16 @@ export default function OrderDetailPage() {
         <div className="flex flex-wrap gap-3">
           {isSeller && order.status === "PENDING" && (
             <>
-              <button onClick={() => updateStatus("IN_PROGRESS")} className="flex items-center gap-2 rounded-xl bg-[rgb(var(--color-primary))] px-5 py-2.5 text-[14px] font-semibold text-white transition-all hover:bg-[rgb(var(--color-primary-hover))]">קבל הזמנה</button>
-              <button onClick={() => setCancelOpen(true)} className="flex items-center gap-2 rounded-xl border-2 border-[rgba(var(--color-error),0.2)] bg-[rgba(var(--color-error),0.05)] px-5 py-2.5 text-[14px] font-semibold text-[rgb(var(--color-error))] transition-all hover:bg-[rgba(var(--color-error),0.1)]">דחה הזמנה</button>
+              <button disabled={statusBusy} onClick={() => updateStatus("IN_PROGRESS")} className="flex items-center gap-2 rounded-xl bg-[rgb(var(--color-primary))] px-5 py-2.5 text-[14px] font-semibold text-white transition-all hover:bg-[rgb(var(--color-primary-hover))] disabled:opacity-50">{statusBusy ? "מעדכן..." : "קבל הזמנה"}</button>
+              <button disabled={statusBusy} onClick={() => setCancelOpen(true)} className="flex items-center gap-2 rounded-xl border-2 border-[rgba(var(--color-error),0.2)] bg-[rgba(var(--color-error),0.05)] px-5 py-2.5 text-[14px] font-semibold text-[rgb(var(--color-error))] transition-all hover:bg-[rgba(var(--color-error),0.1)] disabled:opacity-50">דחה הזמנה</button>
             </>
           )}
           {isSeller && (order.status === "IN_PROGRESS" || order.status === "REVISION") && (
-            <button onClick={() => updateStatus("DELIVERED")} className="flex items-center gap-2 rounded-xl bg-[rgb(var(--color-primary))] px-5 py-2.5 text-[14px] font-semibold text-white transition-all hover:bg-[rgb(var(--color-primary-hover))]">סמן כנמסר</button>
+            <button disabled={statusBusy} onClick={() => updateStatus("DELIVERED")} className="flex items-center gap-2 rounded-xl bg-[rgb(var(--color-primary))] px-5 py-2.5 text-[14px] font-semibold text-white transition-all hover:bg-[rgb(var(--color-primary-hover))] disabled:opacity-50">{statusBusy ? "מעדכן..." : "סמן כנמסר"}</button>
           )}
           {isBuyer && order.status === "DELIVERED" && (
             <>
-              <button onClick={() => updateStatus("COMPLETED")} className="flex items-center gap-2 rounded-xl bg-[rgb(var(--color-success))] px-5 py-2.5 text-[14px] font-semibold text-white transition-all hover:opacity-90">אשר קבלה</button>
+              <button disabled={statusBusy} onClick={() => updateStatus("COMPLETED")} className="flex items-center gap-2 rounded-xl bg-[rgb(var(--color-success))] px-5 py-2.5 text-[14px] font-semibold text-white transition-all hover:opacity-90 disabled:opacity-50">{statusBusy ? "מעדכן..." : "אשר קבלה"}</button>
               <button onClick={() => setRevisionOpen(true)} className="flex items-center gap-2 rounded-xl border-2 border-[rgba(var(--color-accent-yellow),0.3)] bg-[rgba(var(--color-accent-yellow),0.1)] px-5 py-2.5 text-[14px] font-semibold text-[rgb(var(--color-warning))] transition-all hover:bg-[rgba(var(--color-accent-yellow),0.2)]">
                 <ArrowsClockwise className="h-4 w-4" />
                 בקש תיקון
@@ -364,6 +391,9 @@ export default function OrderDetailPage() {
             </button>
           )}
         </div>
+        {statusError && (
+          <p role="alert" className="mt-3 text-[13px] font-medium text-[rgb(var(--color-error))]">{statusError}</p>
+        )}
 
         {order.disputes && order.disputes.length > 0 && (
           <div className="mt-5 rounded-xl border border-[rgba(var(--color-error),0.2)] bg-[rgba(var(--color-error),0.06)] p-4">
