@@ -2,8 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
-import { ALL_SERVICES } from "@/lib/services";
-import { getServiceBySlug } from "@/lib/services";
+import { ALL_SERVICES, canonicalizeCategorySlug, getServiceBySlug } from "@/lib/services";
 import { DISTRICTS } from "@/lib/districts";
 import {
   HeroSection,
@@ -39,6 +38,11 @@ export default function HomePage() {
   const [liveReviews, setLiveReviews] = useState<LiveReview[]>([]);
   const [fetchError, setFetchError] = useState<string | null>(null);
   const [loadingFeatured, setLoadingFeatured] = useState(true);
+
+  useEffect(() => {
+    const slug = canonicalizeCategorySlug(new URLSearchParams(window.location.search).get("category"));
+    if (slug) setSelectedCategory(slug);
+  }, []);
 
   const filteredServices = serviceSearch
     ? ALL_SERVICES.filter((s) => s.nameHe.includes(serviceSearch) || s.description.includes(serviceSearch))

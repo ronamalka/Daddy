@@ -11,4 +11,4 @@ Account settings for the signed-in user.
 | `/profile/prices` | Per-service prices |
 | `/profile/service-areas` | Cities and districts the seller covers |
 | `/profile/services` | Which services the seller offers |
-| `/profile/gigs` | The seller's own gigs |
+| `/profile/gigs` | The seller's own packages |

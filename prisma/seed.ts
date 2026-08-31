@@ -1,6 +1,7 @@
 import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "../src/generated/prisma/client";
 import { hash } from "bcryptjs";
+import { syncLocalGigCategories } from "../services/shared/gig-categories";
 
 const directUrl = process.env.SEED_DATABASE_URL || process.env.DATABASE_URL || "postgres://daddy:daddypass123@localhost:51214/daddy?sslmode=disable";
 const adapter = new PrismaPg({ connectionString: directUrl });
@@ -8,25 +9,9 @@ const prisma = new PrismaClient({ adapter });
 
 /** Loads demo categories, users, gigs, and related rows into the BFF database. */
 async function main() {
-  const categories = [
-    { name: "תיקונים ותחזוקת הבית", slug: "home-maintenance" },
-    { name: "רכב ותחבורה", slug: "car-transport" },
-    { name: "מיקוח ובירוקרטיה", slug: "negotiation-bureaucracy" },
-    { name: "גינון, חצר וארגון", slug: "garden-yard" },
-    { name: "ייעוץ, הדרכה וסיוע אישי", slug: "consulting-training" },
-    { name: "הובלות ושינוע", slug: "moving-lifting" },
-    { name: "טכנולוגיה ומחשבים", slug: "tech-support" },
-  ];
+  await syncLocalGigCategories(prisma);
 
-  for (const cat of categories) {
-    await prisma.category.upsert({
-      where: { slug: cat.slug },
-      update: { name: cat.name },
-      create: cat,
-    });
-  }
-
-  // Clean up old categories from previous seed
+  // Clean up leftover Fiverr-era digital categories from previous seed
   const oldSlugs = ["graphics-design", "programming-tech", "digital-marketing", "video-animation", "writing-translation", "music-audio", "business"];
   for (const slug of oldSlugs) {
     const old = await prisma.category.findUnique({ where: { slug } });
@@ -187,24 +172,24 @@ async function main() {
 
   // ── Gigs ───────────────────────────────────────────────
 
+  const assemblyCat = await prisma.category.findUnique({ where: { slug: "assembly-and-installation" } });
   const homeCat = await prisma.category.findUnique({ where: { slug: "home-maintenance" } });
-  const carCat = await prisma.category.findUnique({ where: { slug: "car-transport" } });
-  const negoCat = await prisma.category.findUnique({ where: { slug: "negotiation-bureaucracy" } });
-  const gardenCat = await prisma.category.findUnique({ where: { slug: "garden-yard" } });
+  const carCat = await prisma.category.findUnique({ where: { slug: "car-and-errands" } });
+  const negoCat = await prisma.category.findUnique({ where: { slug: "admin-and-bureaucracy" } });
+  const gardenCat = await prisma.category.findUnique({ where: { slug: "garden-and-outdoor" } });
   const techCat = await prisma.category.findUnique({ where: { slug: "tech-support" } });
-  const moveCat = await prisma.category.findUnique({ where: { slug: "moving-lifting" } });
-  const consultCat = await prisma.category.findUnique({ where: { slug: "consulting-training" } });
+  const moveCat = await prisma.category.findUnique({ where: { slug: "moving-and-organization" } });
 
   await prisma.gig.deleteMany({ where: { id: { in: ["seed-gig-1", "seed-gig-2"] } } });
 
-  if (homeCat) {
+  if (assemblyCat) {
     await prisma.gig.upsert({
       where: { id: "seed-gig-ikea" },
       update: {},
       create: {
         id: "seed-gig-ikea", title: "הרכבת רהיטי איקאה – מהקופסה לסלון",
         description: "מרכיב כל רהיט מאיקאה – ארונות, מיטות, שידות, מטבחים. מגיע עם כלים, מרכיב במקום, מפנה את הקרטונים.",
-        categoryId: homeCat.id, sellerId: seller.id,
+        categoryId: assemblyCat.id, sellerId: seller.id,
         tiers: { create: [
           { tier: "BASIC", title: "רהיט קטן", description: "שידה, כוננית או שולחן קטן", price: 150, deliveryDays: 1, revisions: 1 },
           { tier: "STANDARD", title: "רהיט בינוני", description: "ארון בגדים, מיטה זוגית", price: 300, deliveryDays: 1, revisions: 1 },
@@ -219,7 +204,7 @@ async function main() {
       create: {
         id: "seed-gig-handyman", title: "תליית מדפים, תמונות, וילונות וזרועות טלוויזיה",
         description: "תולה הכל ישר ובטוח – מדפים, מראות, תמונות, וילונות, זרועות לטלוויזיה. קידוח מקצועי בכל סוג קיר.",
-        categoryId: homeCat.id, sellerId: seller.id,
+        categoryId: assemblyCat.id, sellerId: seller.id,
         tiers: { create: [
           { tier: "BASIC", title: "פריט בודד", description: "תליית תמונה, מדף או מראה", price: 100, deliveryDays: 1, revisions: 1 },
           { tier: "STANDARD", title: "עד 5 פריטים", description: "תליית מספר פריטים באותו ביקור", price: 250, deliveryDays: 1, revisions: 1 },
@@ -235,7 +220,7 @@ async function main() {
       create: {
         id: "seed-gig-moshe-assembly", title: "הרכבת רהיטים ומדפים – באר שבע והסביבה",
         description: "מרכיב כל דבר: ארונות, מיטות, מדפים, פרגולות. מגיע עם כלים ומניסיון של 15 שנה.",
-        categoryId: homeCat.id, sellerId: seller4.id,
+        categoryId: assemblyCat.id, sellerId: seller4.id,
         tiers: { create: [
           { tier: "BASIC", title: "רהיט קטן", description: "שידה, כוננית, שולחן", price: 130, deliveryDays: 1, revisions: 1 },
           { tier: "STANDARD", title: "2-3 רהיטים", description: "ארון + מיטה + שידות", price: 350, deliveryDays: 1, revisions: 1 },
@@ -391,14 +376,14 @@ async function main() {
     });
   }
 
-  if (consultCat) {
+  if (homeCat) {
     await prisma.gig.upsert({
       where: { id: "seed-gig-diy" },
       update: {},
       create: {
         id: "seed-gig-diy", title: "שיעור DIY פרטי – לקדוח, לתקן, לבדוק נזילות",
         description: "שעה של הדרכה אישית בבית. לומדים לקדוח, לתלות, להשתמש בכלי עבודה בסיסיים.",
-        categoryId: consultCat.id, sellerId: seller.id,
+        categoryId: homeCat.id, sellerId: seller.id,
         tiers: { create: [
           { tier: "BASIC", title: "שיעור שעה", description: "הדרכה של שעה בנושא אחד", price: 150, deliveryDays: 1, revisions: 1 },
           { tier: "STANDARD", title: "שיעור + תרגול", description: "שעתיים – הסבר + תרגול", price: 280, deliveryDays: 1, revisions: 1 },
@@ -413,7 +398,7 @@ async function main() {
       create: {
         id: "seed-gig-apartment", title: "בדיקת דירה לפני מעבר – לא חותמים לפני שאני בודק",
         description: "מגיע לדירה שכורה או חדשה ובודק הכל: שקעים, לחץ מים, רטיבות, צירים, חלונות.",
-        categoryId: consultCat.id, sellerId: seller2.id,
+        categoryId: homeCat.id, sellerId: seller2.id,
         tiers: { create: [
           { tier: "BASIC", title: "בדיקה בסיסית", description: "בדיקת מים, חשמל וצירים", price: 200, deliveryDays: 1, revisions: 1 },
           { tier: "STANDARD", title: "בדיקה מקיפה", description: "בדיקה מלאה + דו״ח עם תמונות", price: 350, deliveryDays: 1, revisions: 1 },
@@ -439,6 +424,8 @@ async function main() {
       },
     });
   }
+
+  await syncLocalGigCategories(prisma);
 
   // ── Orders + Reviews (with 4-dimension ratings) ────────
 

@@ -87,14 +87,13 @@ export function Navbar() {
         {/* Desktop nav */}
         <div className="hidden items-center gap-1 md:flex">
           <NavLink href="/" icon={<MagnifyingGlass className="h-4 w-4" />}>עיון</NavLink>
-          <NavLink href="/gigs" icon={<Briefcase className="h-4 w-4" />}>שירותים</NavLink>
 
           {session?.user ? (
             <>
               {session.user.role === "SELLER" && (
                 <>
                   <NavLink href="/requests" icon={<ClipboardText className="h-4 w-4" />}>בקשות</NavLink>
-                  <NavLink href="/gigs/create" icon={<Plus className="h-4 w-4" />}>צור שירות</NavLink>
+                  <NavLink href="/gigs/create" icon={<Plus className="h-4 w-4" />}>צור חבילה</NavLink>
                 </>
               )}
               <NavLink href="/orders" icon={<Bag className="h-4 w-4" />}>
@@ -217,9 +216,6 @@ export function Navbar() {
           <MobileNavLink href="/" onClick={() => setMobileOpen(false)} icon={<MagnifyingGlass className="h-4 w-4" />}>
             עיון
           </MobileNavLink>
-          <MobileNavLink href="/gigs" onClick={() => setMobileOpen(false)} icon={<Briefcase className="h-4 w-4" />}>
-            שירותים
-          </MobileNavLink>
 
           {session?.user ? (
             <>
@@ -229,7 +225,7 @@ export function Navbar() {
                     בקשות
                   </MobileNavLink>
                   <MobileNavLink href="/gigs/create" onClick={() => setMobileOpen(false)} icon={<Plus className="h-4 w-4" />}>
-                    צור שירות
+                    צור חבילה
                   </MobileNavLink>
                 </>
               )}

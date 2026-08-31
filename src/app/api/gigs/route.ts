@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { proxyRequest, GIGS_SERVICE, USERS_SERVICE } from "@/lib/gateway";
 import { createGigSchema } from "@/lib/gig-create";
+import { resolveAllowedGigCategory } from "@/lib/gig-category";
 import { validateBody } from "@/lib/validate";
 
 /** Returns gigs with seller details. Can filter by district query param. */
@@ -62,9 +63,14 @@ export async function POST(request: Request) {
   if ("error" in result) return result.error;
 
   const user = session.user as { id: string; email: string; name: string; role: string };
+  const allowed = await resolveAllowedGigCategory(user, result.data.categoryId);
+  if ("error" in allowed) {
+    return NextResponse.json({ error: allowed.error }, { status: allowed.status });
+  }
+
   const { data, status } = await proxyRequest(GIGS_SERVICE, "/gigs", {
     method: "POST",
-    body: result.data,
+    body: { ...result.data, categoryId: allowed.slug },
     user,
   });
   return NextResponse.json(data, { status });

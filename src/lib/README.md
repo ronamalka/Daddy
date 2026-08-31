@@ -18,7 +18,8 @@ Small modules used by API routes and pages. Each exported function has a short c
 | `order-status.ts` | Colours and Hebrew labels for order status |
 | `order-update.ts` | Zod body for PATCH order status |
 | `seller-slot.ts` | Validate a chosen visit window against a seller |
-| `gig-create.ts` | Zod body for creating a gig from the seller form |
+| `gig-create.ts` | Zod body for creating a package from the seller form |
+| `gig-category.ts` | Package category must match the daddy's price list |
 | `seller-ready.ts` | Daddy onboarding checklist and post-register redirect |
 | `review-users.ts` | Attach reviewer names when gigs only store `userId` |
 | `accept-quote.ts` | Rules for accepting a seller quote |
@@ -31,7 +32,7 @@ Small modules used by API routes and pages. Each exported function has a short c
 | `disputes.ts` | Who can open a dispute, reasons, and admin payment actions |
 | `moderation-queue.ts` | Merge disputes and review flags into one admin list |
 | `session-revoke.ts` | Delete Redis session ids for a user |
-| `services.ts` | Catalogue of home services |
+| `services.ts` | Catalogue of home services and local category slugs |
 | `districts.ts` | Israeli district codes |
 | `message-validation.ts` | Zod schemas for chat |
 | `attachment-url.ts` | Allowlisted `/uploads/...` chat attachment paths |

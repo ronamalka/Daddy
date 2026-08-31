@@ -2,18 +2,10 @@
 
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import Link from "next/link";
 import { Prohibit, X } from "@phosphor-icons/react";
-
-const CATEGORIES = [
-  { id: "home-maintenance", name: "תיקונים ותחזוקת הבית" },
-  { id: "car-transport", name: "רכב ותחבורה" },
-  { id: "negotiation-bureaucracy", name: "מיקוח ובירוקרטיה" },
-  { id: "garden-yard", name: "גינון, חצר וארגון" },
-  { id: "consulting-training", name: "ייעוץ, הדרכה וסיוע אישי" },
-  { id: "moving-lifting", name: "הובלות ושינוע" },
-  { id: "tech-support", name: "טכנולוגיה ומחשבים" },
-];
+import { categoriesFromPricedServices, type ServiceCategory } from "@/lib/services";
 
 const TIERS = ["BASIC", "STANDARD", "PREMIUM"] as const;
 
@@ -46,6 +38,19 @@ export default function CreateGigPage() {
   const [faqs, setFaqs] = useState<FaqData[]>([]);
   const [requirements, setRequirements] = useState<RequirementData[]>([]);
   const [showPreview, setShowPreview] = useState(false);
+  const [catalogCategories, setCatalogCategories] = useState<ServiceCategory[]>([]);
+  const [catalogLoading, setCatalogLoading] = useState(true);
+
+  useEffect(() => {
+    fetch("/api/service-prices")
+      .then((r) => r.json())
+      .then((prices) => {
+        const slugs = Array.isArray(prices) ? prices.map((p: { serviceSlug: string }) => p.serviceSlug) : [];
+        setCatalogCategories(categoriesFromPricedServices(slugs));
+      })
+      .catch(() => setCatalogCategories([]))
+      .finally(() => setCatalogLoading(false));
+  }, []);
 
   if (!session || session.user.role !== "SELLER") {
     return (
@@ -54,7 +59,7 @@ export default function CreateGigPage() {
           <Prohibit className="h-8 w-8 text-[rgb(var(--color-error))]" />
         </div>
         <p className="text-[16px] font-medium text-[rgb(var(--color-text))]">גישה למוכרים בלבד</p>
-        <p className="mt-1 text-[14px] text-[rgb(var(--color-text-muted))]">רק מוכרים יכולים ליצור שירותים</p>
+        <p className="mt-1 text-[14px] text-[rgb(var(--color-text-muted))]">רק אבאל׳ות יכולים ליצור חבילות</p>
       </div>
     );
   }
@@ -119,8 +124,8 @@ export default function CreateGigPage() {
   return (
     <div className="mx-auto max-w-3xl px-4 py-8">
       <div className="mb-8">
-        <h1 className="text-[32px] font-bold tracking-[-0.01em] text-[rgb(var(--color-text))]">צור שירות חדש</h1>
-        <p className="mt-1 text-[14px] text-[rgb(var(--color-text-secondary))]">ספר ללקוחות מה אתה יודע לעשות — ותן להם סיבה לבחור בך</p>
+        <h1 className="text-[32px] font-bold tracking-[-0.01em] text-[rgb(var(--color-text))]">צור חבילה</h1>
+        <p className="mt-1 text-[14px] text-[rgb(var(--color-text-secondary))]">חבילה היא חבילת מחיר לקטגוריה שכבר מופיעה במחירון שלך — לא קטלוג נפרד</p>
       </div>
 
       {error && (
@@ -129,13 +134,30 @@ export default function CreateGigPage() {
         </div>
       )}
 
+      {catalogLoading ? (
+        <div className="flex items-center justify-center py-20">
+          <div className="h-10 w-10 animate-spin rounded-full border-4 border-[rgba(var(--color-primary),0.1)] border-t-[rgb(var(--color-primary))]" />
+        </div>
+      ) : catalogCategories.length === 0 ? (
+        <div className="rounded-2xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] p-10 text-center">
+          <p className="text-[16px] font-medium text-[rgb(var(--color-text))]">קודם המחירון, אחר כך חבילה</p>
+          <p className="mt-2 text-[14px] text-[rgb(var(--color-text-secondary))]">חבילה יכולה להיות רק לקטגוריה שכבר יש לה מחיר אצלך</p>
+          <Link
+            href="/profile/prices"
+            className="mt-6 inline-block rounded-xl bg-[rgb(var(--color-primary))] px-6 py-3 text-[14px] font-semibold text-white hover:bg-[rgb(var(--color-primary-hover))]"
+          >
+            לעריכת המחירון
+          </Link>
+        </div>
+      ) : (
+      <>
       <form onSubmit={handlePreview} className="space-y-6">
         {/* Basic Info */}
         <div className="rounded-2xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] p-6 shadow-[0_2px_8px_rgba(var(--color-primary),0.06)]">
           <h2 className="mb-5 text-[16px] font-bold text-[rgb(var(--color-text))]">מידע בסיסי</h2>
           <div className="space-y-5">
             <div><label className="mb-2 block text-[13px] font-semibold text-[rgb(var(--color-text-secondary))]">כותרת השירות</label><input value={title} onChange={(e) => setTitle(e.target.value)} required placeholder="אני אעשה משהו מדהים" className={inputClass} /></div>
-            <div><label className="mb-2 block text-[13px] font-semibold text-[rgb(var(--color-text-secondary))]">קטגוריה</label><select value={categoryId} onChange={(e) => setCategoryId(e.target.value)} required className={inputClass}><option value="">בחר קטגוריה</option>{CATEGORIES.map((cat) => <option key={cat.id} value={cat.id}>{cat.name}</option>)}</select></div>
+            <div><label className="mb-2 block text-[13px] font-semibold text-[rgb(var(--color-text-secondary))]">קטגוריה</label><select value={categoryId} onChange={(e) => setCategoryId(e.target.value)} required className={inputClass}><option value="">בחר קטגוריה מהמחירון</option>{catalogCategories.map((cat) => <option key={cat.slug} value={cat.slug}>{cat.nameHe}</option>)}</select></div>
             <div><label className="mb-2 block text-[13px] font-semibold text-[rgb(var(--color-text-secondary))]">תיאור</label><textarea value={description} onChange={(e) => setDescription(e.target.value)} required rows={5} placeholder="תאר את השירות שלך בפירוט..." className={inputClass} /></div>
             <div><label className="mb-2 block text-[13px] font-semibold text-[rgb(var(--color-text-secondary))]">קישור לתמונה <span className="font-normal text-[rgb(var(--color-text-muted))] text-[13px]">(אופציונלי)</span></label><input value={image} onChange={(e) => setImage(e.target.value)} placeholder="https://..." className={inputClass} /></div>
           </div>
@@ -206,7 +228,7 @@ export default function CreateGigPage() {
         </div>
 
         <button type="submit" disabled={loading} className="w-full rounded-xl bg-[rgb(var(--color-primary))] py-4 text-[15px] font-semibold text-white shadow-[0_4px_16px_rgba(var(--color-primary),0.3)] transition-all hover:bg-[rgb(var(--color-primary-hover))] hover:shadow-[0_6px_20px_rgba(var(--color-primary),0.4)] disabled:opacity-40 disabled:cursor-not-allowed disabled:shadow-none">
-          {loading ? <span className="flex items-center justify-center gap-2"><div className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />מפרסם...</span> : "פרסם שירות"}
+          {loading ? <span className="flex items-center justify-center gap-2"><div className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />מפרסם...</span> : "פרסם חבילה"}
         </button>
       </form>
 
@@ -229,7 +251,7 @@ export default function CreateGigPage() {
                 <h1 className="text-[24px] font-bold text-[#2D3436]">{title}</h1>
                 {categoryId && (
                   <span className="mt-2 inline-block rounded-[9999px] bg-[#6C5CE7]/10 px-3 py-1 text-[12px] font-medium text-[#6C5CE7]">
-                    {CATEGORIES.find((c) => c.id === categoryId)?.name}
+                    {catalogCategories.find((c) => c.slug === categoryId)?.nameHe}
                   </span>
                 )}
                 <p className="mt-3 text-[14px] leading-relaxed text-[#636E72] whitespace-pre-wrap">{description}</p>
@@ -310,12 +332,14 @@ export default function CreateGigPage() {
                     <div className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
                     מפרסם...
                   </span>
-                ) : "פרסם שירות"}
+                ) : "פרסם חבילה"}
               </button>
               </div>
             </div>
           </div>
         </div>
+      )}
+      </>
       )}
     </div>
   );

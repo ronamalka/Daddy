@@ -6,9 +6,10 @@ test.describe("Gig Browsing", () => {
     await expect(page.getByText("אבאל׳ה").first()).toBeVisible({ timeout: 10000 });
   });
 
-  test("gigs page loads and displays content", async ({ page }) => {
+  test("gigs listing redirects to the homepage catalog", async ({ page }) => {
     await page.goto("/gigs");
     await page.waitForLoadState("domcontentloaded");
+    await expect(page).toHaveURL(/\/(\?.*)?$/);
     const content = page.locator("main, [role='main'], body").first();
     await expect(content).toBeVisible();
   });

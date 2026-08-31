@@ -1,5 +1,6 @@
 import { Router, Request, Response } from "express";
 import { requireSeller } from "../../../shared/middleware";
+import { canonicalizeCategorySlug } from "../../../shared/services";
 import { prisma } from "../index";
 
 /** Routes for listing gigs and creating a new gig. */
@@ -32,7 +33,8 @@ gigsRoutes.get("/", async (req: Request, res: Response) => {
     ];
   }
   if (category) {
-    where.category = { slug: category };
+    const slug = canonicalizeCategorySlug(category) || category;
+    where.category = { slug };
   }
   if (sellerId) {
     where.sellerId = sellerId;

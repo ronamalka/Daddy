@@ -4,16 +4,7 @@ import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter, useParams } from "next/navigation";
 import { X } from "@phosphor-icons/react";
-
-const CATEGORIES = [
-  { id: "home-maintenance", name: "תיקונים ותחזוקת הבית" },
-  { id: "car-transport", name: "רכב ותחבורה" },
-  { id: "negotiation-bureaucracy", name: "מיקוח ובירוקרטיה" },
-  { id: "garden-yard", name: "גינון, חצר וארגון" },
-  { id: "consulting-training", name: "ייעוץ, הדרכה וסיוע אישי" },
-  { id: "moving-lifting", name: "הובלות ושינוע" },
-  { id: "tech-support", name: "טכנולוגיה ומחשבים" },
-];
+import { categoriesFromPricedServices, canonicalizeCategorySlug, getServicesByCategory, type ServiceCategory } from "@/lib/services";
 
 const TIERS = ["BASIC", "STANDARD", "PREMIUM"] as const;
 
@@ -41,6 +32,7 @@ export default function EditGigPage() {
   });
   const [faqs, setFaqs] = useState<FaqData[]>([]);
   const [requirements, setRequirements] = useState<RequirementData[]>([]);
+  const [catalogCategories, setCatalogCategories] = useState<ServiceCategory[]>([]);
 
   useEffect(() => {
     fetch(`/api/gigs/${params.id}`)
@@ -48,7 +40,7 @@ export default function EditGigPage() {
       .then((gig) => {
         setTitle(gig.title);
         setDescription(gig.description);
-        setCategoryId(gig.category?.id || gig.categoryId);
+        setCategoryId(canonicalizeCategorySlug(gig.category?.slug) || gig.category?.slug || "");
         setImage(gig.image || "");
         const t: Record<string, TierData> = {
           BASIC: { title: "", description: "", price: "", deliveryDays: "", revisions: "" },
@@ -70,6 +62,16 @@ export default function EditGigPage() {
         setLoading(false);
       });
   }, [params.id]);
+
+  useEffect(() => {
+    fetch("/api/service-prices")
+      .then((r) => r.json())
+      .then((prices) => {
+        const slugs = Array.isArray(prices) ? prices.map((p: { serviceSlug: string }) => p.serviceSlug) : [];
+        setCatalogCategories(categoriesFromPricedServices(slugs));
+      })
+      .catch(() => setCatalogCategories([]));
+  }, []);
 
   if (!session || session.user.role !== "SELLER") {
     return <div className="flex items-center justify-center py-20"><p className="text-[rgb(var(--color-text-secondary))]">גישה למוכרים בלבד</p></div>;
@@ -122,8 +124,8 @@ export default function EditGigPage() {
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-8">
-      <h1 className="mb-2 text-[32px] font-bold tracking-[-0.01em] text-[rgb(var(--color-text))]">עריכת שירות</h1>
-      <p className="mb-8 text-[14px] text-[rgb(var(--color-text-secondary))]">עדכן את פרטי השירות שלך</p>
+      <h1 className="mb-2 text-[32px] font-bold tracking-[-0.01em] text-[rgb(var(--color-text))]">עריכת חבילה</h1>
+      <p className="mb-8 text-[14px] text-[rgb(var(--color-text-secondary))]">אפשר לבחור רק קטגוריה שמופיעה במחירון שלך</p>
 
       {error && (
         <div className="mb-6 rounded-xl bg-[rgba(var(--color-error),0.1)] px-4 py-3 text-[14px] font-medium text-[rgb(var(--color-error))]">{error}</div>
@@ -134,7 +136,14 @@ export default function EditGigPage() {
           <h2 className="mb-5 text-[16px] font-bold text-[rgb(var(--color-text))]">מידע בסיסי</h2>
           <div className="space-y-5">
             <div><label className="mb-2 block text-[13px] font-semibold text-[rgb(var(--color-text-secondary))]">כותרת</label><input value={title} onChange={(e) => setTitle(e.target.value)} required className={inputClass} /></div>
-            <div><label className="mb-2 block text-[13px] font-semibold text-[rgb(var(--color-text-secondary))]">קטגוריה</label><select value={categoryId} onChange={(e) => setCategoryId(e.target.value)} required className={inputClass}><option value="">בחר קטגוריה</option>{CATEGORIES.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}</select></div>
+            <div><label className="mb-2 block text-[13px] font-semibold text-[rgb(var(--color-text-secondary))]">קטגוריה</label><select value={categoryId} onChange={(e) => setCategoryId(e.target.value)} required className={inputClass}><option value="">בחר קטגוריה מהמחירון</option>{(() => {
+              const options = [...catalogCategories];
+              if (categoryId && !options.some((c) => c.slug === categoryId)) {
+                const current = getServicesByCategory(categoryId);
+                if (current) options.unshift(current);
+              }
+              return options.map((c) => <option key={c.slug} value={c.slug}>{c.nameHe}</option>);
+            })()}</select></div>
             <div><label className="mb-2 block text-[13px] font-semibold text-[rgb(var(--color-text-secondary))]">תיאור</label><textarea value={description} onChange={(e) => setDescription(e.target.value)} required rows={5} className={inputClass} /></div>
             <div><label className="mb-2 block text-[13px] font-semibold text-[rgb(var(--color-text-secondary))]">קישור לתמונה</label><input value={image} onChange={(e) => setImage(e.target.value)} className={inputClass} /></div>
           </div>
