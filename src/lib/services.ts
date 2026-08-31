@@ -105,6 +105,39 @@ export const ALL_SERVICES = SERVICE_CATEGORIES.flatMap((cat) =>
   cat.services.map((s) => ({ ...s, category: cat.slug, categoryName: cat.nameHe }))
 );
 
+/** Old Fiverr-style gig slugs → the 8 local catalog categories. */
+export const LEGACY_GIG_CATEGORY_MAP: Record<string, string> = {
+  "car-transport": "car-and-errands",
+  "negotiation-bureaucracy": "admin-and-bureaucracy",
+  "garden-yard": "garden-and-outdoor",
+  "consulting-training": "home-maintenance",
+  "moving-lifting": "moving-and-organization",
+};
+
+/** Seed / leftover service slugs that predate the local catalog. */
+export const LEGACY_SERVICE_TO_CATEGORY: Record<string, string> = {
+  "faucet-repair": "home-maintenance",
+  "door-repair": "home-maintenance",
+  "paint-touch-up": "home-maintenance",
+  "car-test": "car-and-errands",
+  "car-purchase-escort": "car-and-errands",
+  "moving-help": "moving-and-organization",
+  "heavy-lifting": "moving-and-organization",
+  "smart-tv-setup": "tech-support",
+  "computer-setup": "tech-support",
+  "tech-elderly-help": "tech-support",
+  "smart-home-setup": "tech-support",
+  "printer-setup": "tech-support",
+  "bureaucracy-help": "admin-and-bureaucracy",
+  "insurance-negotiation": "admin-and-bureaucracy",
+  "apartment-inspection": "home-maintenance",
+  "tree-pruning": "garden-and-outdoor",
+  "planter-setup": "garden-and-outdoor",
+  "irrigation-setup": "garden-and-outdoor",
+  "yard-cleanup": "garden-and-outdoor",
+  "pergola-assembly": "assembly-and-installation",
+};
+
 /** Finds a service by slug, including its category. */
 export function getServiceBySlug(slug: string) {
   return ALL_SERVICES.find((s) => s.slug === slug);
@@ -113,4 +146,34 @@ export function getServiceBySlug(slug: string) {
 /** Finds a category and its services by category slug. */
 export function getServicesByCategory(categorySlug: string) {
   return SERVICE_CATEGORIES.find((c) => c.slug === categorySlug);
+}
+
+/** Maps a gig category slug (current or legacy) onto the 8 local groups. */
+export function canonicalizeCategorySlug(slug: string | null | undefined): string | null {
+  if (!slug) return null;
+  if (SERVICE_CATEGORIES.some((c) => c.slug === slug)) return slug;
+  return LEGACY_GIG_CATEGORY_MAP[slug] ?? null;
+}
+
+/** Public browse URL for providers + prices, optionally scoped to a local category. */
+export function catalogBrowsePath(category?: string | null): string {
+  const slug = canonicalizeCategorySlug(category);
+  return slug ? `/?category=${encodeURIComponent(slug)}` : "/";
+}
+
+/** Local category slug for a priced service, including leftover seed slugs. */
+export function categorySlugForService(serviceSlug: string): string | null {
+  const fromCatalog = ALL_SERVICES.find((s) => s.slug === serviceSlug);
+  if (fromCatalog) return fromCatalog.category;
+  return LEGACY_SERVICE_TO_CATEGORY[serviceSlug] ?? null;
+}
+
+/** Categories a daddy may attach a package to, based on their price list. */
+export function categoriesFromPricedServices(serviceSlugs: string[]): ServiceCategory[] {
+  const slugs = new Set<string>();
+  for (const serviceSlug of serviceSlugs) {
+    const category = categorySlugForService(serviceSlug);
+    if (category) slugs.add(category);
+  }
+  return SERVICE_CATEGORIES.filter((c) => slugs.has(c.slug));
 }

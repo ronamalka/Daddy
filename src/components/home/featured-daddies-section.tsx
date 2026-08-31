@@ -108,10 +108,10 @@ export function FeaturedDaddiesSection({ featuredDaddies, loading }: FeaturedDad
           {!loading && featuredDaddies.length === 0 && (
             <div className="col-span-full rounded-xl border border-dashed border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] px-6 py-12 text-center">
               <p className="text-sm font-semibold text-[rgb(var(--color-text))]">האבאל׳ות עוד מתארגנים</p>
-              <p className="mt-1 text-sm text-[rgb(var(--color-text-muted))]">בינתיים אפשר לעיין בכל השירותים או להצטרף בעצמך.</p>
+              <p className="mt-1 text-sm text-[rgb(var(--color-text-muted))]">בינתיים אפשר לבחור קטגוריה למעלה או להצטרף בעצמך.</p>
               <Button variant="outline" className="mt-4 gap-2" asChild>
-                <Link href="/gigs">
-                  עיין בשירותים
+                <Link href="/become-a-daddy">
+                  הצטרף כאבאל׳ה
                   <ArrowLeft className="h-4 w-4" />
                 </Link>
               </Button>

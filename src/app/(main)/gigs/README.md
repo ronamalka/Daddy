@@ -1,10 +1,10 @@
 # `gigs/`
 
-Gig marketplace pages.
+Packages a daddy offers — not a second public marketplace.
 
 | Path | Page |
 | --- | --- |
-| `/gigs` | Search and filter listings |
-| `/gigs/create` | Seller creates a gig |
-| `/gigs/[id]` | Public gig detail |
-| `/gigs/[id]/edit` | Seller edits their gig |
+| `/gigs` | Redirects to homepage browse (`/?category=` uses the 8 local slugs) |
+| `/gigs/create` | Seller creates a package in a category already on their price list |
+| `/gigs/[id]` | Public package detail |
+| `/gigs/[id]/edit` | Seller edits their package |

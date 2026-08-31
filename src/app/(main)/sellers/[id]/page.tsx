@@ -70,7 +70,7 @@ interface SellerProfile {
 const TABS = [
   { key: "reviews" as const, label: "חוות דעת" },
   { key: "prices" as const, label: "מחירון" },
-  { key: "gigs" as const, label: "שירותים" },
+  { key: "gigs" as const, label: "חבילות" },
 ] as const;
 
 type TabKey = (typeof TABS)[number]["key"];
@@ -227,7 +227,7 @@ export default function SellerProfilePage() {
           ראשי
         </Link>
         <CaretRight className="h-3 w-3" />
-        <Link href="/gigs" className="transition-colors hover:text-[rgb(var(--color-primary))]">שירותים</Link>
+        <Link href="/" className="transition-colors hover:text-[rgb(var(--color-primary))]">עיון</Link>
         <CaretRight className="h-3 w-3" />
         <span className="font-medium text-[rgb(var(--color-text))]">{seller.name}</span>
       </nav>
@@ -765,8 +765,8 @@ function GigsTab({ gigs, sellerName, sellerAvatar }: { gigs: SellerProfile["gigs
   if (gigs.length === 0) {
     return (
       <div className="rounded-2xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] p-12 text-center">
-        <p className="text-[16px] font-medium text-[rgb(var(--color-text))]">אין שירותים עדיין</p>
-        <p className="mt-1 text-[14px] text-[rgb(var(--color-text-muted))]">בעל המקצוע טרם הוסיף שירותים</p>
+        <p className="text-[16px] font-medium text-[rgb(var(--color-text))]">אין חבילות עדיין</p>
+        <p className="mt-1 text-[14px] text-[rgb(var(--color-text-muted))]">האבאל׳ה טרם הוסיף חבילות מעבר למחירון</p>
       </div>
     );
   }

@@ -1,7 +1,13 @@
 import { randomUUID } from "crypto";
+import { join } from "path";
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB per file
 const MAX_TOTAL_SIZE = 20 * 1024 * 1024; // 20MB per request
+
+/** Directory where chat and dispute uploads are stored on disk. */
+export function uploadDir(): string {
+  return process.env.UPLOAD_DIR || join(process.cwd(), "public", "uploads");
+}
 
 const ALLOWED_TYPES: Record<string, { extensions: string[]; magicBytes: number[][] }> = {
   "image/jpeg": {

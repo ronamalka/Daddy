@@ -1,11 +1,9 @@
 "use client";
 
 import React, { useRef, useEffect } from "react";
-import Link from "next/link";
 import { motion } from "framer-motion";
-import { ArrowLeft, CaretLeft } from "@phosphor-icons/react";
+import { CaretLeft } from "@phosphor-icons/react";
 import { SERVICE_CATEGORIES, ALL_SERVICES } from "@/lib/services";
-import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { CategoryIcon } from "@/components/ui/category-icon";
 
@@ -98,17 +96,9 @@ export function CategoriesSection({
 
   return (
     <section className="mx-auto max-w-6xl px-4 pt-20 pb-4">
-      <div className="mb-10 flex flex-col items-center md:flex-row md:justify-between">
-        <div className="text-center md:text-right">
-          <h2 className="text-3xl font-extrabold text-[rgb(var(--color-text))] tracking-tight">מה צריך לסדר?</h2>
-          <p className="mt-2 text-[rgb(var(--color-text-secondary))]">תבחר קטגוריה ותראה מה האבאל׳ות יודעים לעשות</p>
-        </div>
-        <Button variant="outline" className="mt-4 md:mt-0 gap-2" asChild>
-          <Link href="/gigs">
-            עיין בכל השירותים
-            <ArrowLeft className="h-4 w-4" />
-          </Link>
-        </Button>
+      <div className="mb-10 text-center md:text-right">
+        <h2 className="text-3xl font-extrabold text-[rgb(var(--color-text))] tracking-tight">מה צריך לסדר?</h2>
+        <p className="mt-2 text-[rgb(var(--color-text-secondary))]">תבחר קטגוריה ותראה מה האבאל׳ות יודעים לעשות</p>
       </div>
 
       <div className="grid grid-cols-2 gap-3 md:grid-cols-4">

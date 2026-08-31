@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { proxyRequest, GIGS_SERVICE, USERS_SERVICE } from "@/lib/gateway";
 import { attachReviewAuthors, type ReviewUserLookup } from "@/lib/review-users";
+import { resolveAllowedGigCategory } from "@/lib/gig-category";
 
 /** Returns one gig with seller profile and reviewer names attached. */
 export async function GET(_request: Request, { params }: { params: Promise<{ id: string }> }) {
@@ -78,6 +79,15 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
 
   const body = await request.json();
   const user = session.user as { id: string; email: string; name: string; role: string };
+
+  if (typeof body?.categoryId === "string" && body.categoryId) {
+    const allowed = await resolveAllowedGigCategory(user, body.categoryId, id);
+    if ("error" in allowed) {
+      return NextResponse.json({ error: allowed.error }, { status: allowed.status });
+    }
+    body.categoryId = allowed.slug;
+  }
+
   const { data, status } = await proxyRequest(GIGS_SERVICE, `/gigs/${id}`, {
     method: "PUT",
     body,

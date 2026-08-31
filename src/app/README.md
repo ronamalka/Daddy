@@ -7,6 +7,7 @@ Next.js App Router. Folders with parentheses are **route groups**: they organise
 | `(auth)/` | Login, register, password reset (no main navbar) |
 | `(main)/` | The rest of the public site (home, gigs, orders, legal pages) |
 | `api/` | JSON API that the browser calls |
+| `uploads/` | Serve files saved by `POST /api/upload` |
 
 Other files:
 

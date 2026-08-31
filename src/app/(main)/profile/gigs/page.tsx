@@ -45,14 +45,14 @@ export default function MyGigsPage() {
     <div className="mx-auto max-w-3xl px-4 py-8">
       <div className="mb-6 flex items-center justify-between">
         <div>
-          <h1 className="text-[24px] font-bold text-[#2D3436]">השירותים שלי</h1>
-          <p className="mt-1 text-[14px] text-[#636E72]">נהל את השירותים שאתה מציע</p>
+          <h1 className="text-[24px] font-bold text-[#2D3436]">החבילות שלי</h1>
+          <p className="mt-1 text-[14px] text-[#636E72]">חבילות מחיר לקטגוריות שכבר במחירון שלך</p>
         </div>
         <Link
           href="/gigs/create"
           className="rounded-[12px] bg-[#6C5CE7] px-5 py-2.5 text-[14px] font-semibold text-white transition-all hover:bg-[#5A4BD1] shadow-[0_4px_16px_rgba(108,92,231,0.3)]"
         >
-          + צור שירות חדש
+          + חבילה חדשה
         </Link>
       </div>
 
@@ -67,13 +67,13 @@ export default function MyGigsPage() {
               <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
             </svg>
           </div>
-          <h2 className="text-[18px] font-bold text-[#2D3436] mb-2">עדיין לא יצרת שירותים</h2>
-          <p className="text-[14px] text-[#636E72] mb-6">צור את השירות הראשון שלך והתחל לקבל הזמנות</p>
+          <h2 className="text-[18px] font-bold text-[#2D3436] mb-2">עדיין אין חבילות</h2>
+          <p className="text-[14px] text-[#636E72] mb-6">חבילה היא חבילת מחיר לקטגוריה שכבר במחירון — לא קטלוג נפרד</p>
           <Link
             href="/gigs/create"
             className="inline-block rounded-[12px] bg-[#6C5CE7] px-6 py-3 text-[14px] font-semibold text-white transition-all hover:bg-[#5A4BD1]"
           >
-            צור שירות ראשון
+            צור חבילה ראשונה
           </Link>
         </div>
       ) : (
