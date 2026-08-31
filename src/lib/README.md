@@ -21,6 +21,9 @@ Small modules used by API routes and pages. Each exported function has a short c
 | `gig-create.ts` | Zod body for creating a package from the seller form |
 | `gig-category.ts` | Package category must match the daddy's price list |
 | `seller-ready.ts` | Daddy onboarding checklist and post-register redirect |
+| `user-services.ts` | Parse seller service slugs and alert-mute flags |
+| `nearby-request.ts` | After a request is created, ping matching daddies |
+| `notification-feed.ts` | Merge persisted alerts with derived order/chat items |
 | `review-users.ts` | Attach reviewer names when gigs only store `userId` |
 | `accept-quote.ts` | Rules for accepting a seller quote |
 | `validate.ts` | Parse JSON bodies with Zod |

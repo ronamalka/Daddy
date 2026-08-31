@@ -169,6 +169,23 @@ describe("System Tests — Public API", () => {
     });
   });
 
+  describe("GET /api/notifications", () => {
+    it("returns 401 without auth", async () => {
+      const { status } = await fetchApi("/api/notifications");
+      expect(status).toBe(401);
+    });
+  });
+
+  describe("POST /api/notifications/mark-read", () => {
+    it("returns 401 without auth", async () => {
+      const { status } = await fetchApi("/api/notifications/mark-read", {
+        method: "POST",
+        body: JSON.stringify({ ids: [] }),
+      });
+      expect(status).toBe(401);
+    });
+  });
+
   describe("GET /api/service-requests", () => {
     it("returns 401 without auth", async () => {
       const { status } = await fetchApi("/api/service-requests");

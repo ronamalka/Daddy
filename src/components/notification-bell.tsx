@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
-import { Bell, ChatCircle, Package, ArrowsClockwise, CheckCircle, Handshake } from "@phosphor-icons/react";
+import { Bell, ChatCircle, Package, ArrowsClockwise, CheckCircle, Handshake, MapPin } from "@phosphor-icons/react";
 import { AnimatePresence, motion } from "framer-motion";
 import { DropdownMenu } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
@@ -24,9 +24,10 @@ const TYPE_ICON: Record<string, React.ReactNode> = {
   ORDER_DELIVERED: <CheckCircle className="h-4 w-4 text-[rgb(var(--color-success))]" weight="fill" />,
   ORDER_ACCEPTED: <Handshake className="h-4 w-4 text-[rgb(var(--color-primary))]" />,
   NEW_MESSAGE: <ChatCircle className="h-4 w-4 text-[rgb(var(--color-primary))]" weight="fill" />,
+  NEW_NEARBY_REQUEST: <MapPin className="h-4 w-4 text-[rgb(var(--color-primary))]" weight="fill" />,
 };
 
-/** Shows a bell with a dropdown of the user's latest order and chat alerts. */
+/** Shows a bell with a dropdown of nearby-request, order, and chat alerts. */
 export function NotificationBell() {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [open, setOpen] = useState(false);
@@ -47,13 +48,23 @@ export function NotificationBell() {
     return () => clearInterval(interval);
   }, [fetchNotifications]);
 
-  const unreadCount = notifications.filter((n) => !readIds.has(n.id)).length;
+  const unreadCount = notifications.filter((n) => !n.read && !readIds.has(n.id)).length;
 
   /** Opens or closes the menu and marks items as read when it opens. */
   function handleOpen(isOpen: boolean) {
     setOpen(isOpen);
     if (isOpen) {
       setReadIds(new Set(notifications.map((n) => n.id)));
+      const persistedIds = notifications
+        .filter((n) => n.type === "NEW_NEARBY_REQUEST" && !n.read)
+        .map((n) => n.id);
+      if (persistedIds.length > 0) {
+        fetch("/api/notifications/mark-read", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ ids: persistedIds }),
+        }).catch(() => {});
+      }
     }
   }
 
@@ -110,7 +121,7 @@ export function NotificationBell() {
               onClick={() => setOpen(false)}
               className={cn(
                 "flex items-start gap-3 px-4 py-3 transition-colors hover:bg-[rgb(var(--color-surface-elevated))]",
-                !readIds.has(n.id) && "bg-[rgba(var(--color-primary),0.04)]"
+                !n.read && !readIds.has(n.id) && "bg-[rgba(var(--color-primary),0.04)]"
               )}
             >
               <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[rgb(var(--color-surface-elevated))]">
@@ -121,7 +132,7 @@ export function NotificationBell() {
                 <p className="mt-0.5 text-[12px] leading-relaxed text-[rgb(var(--color-text-secondary))] line-clamp-2">{n.message}</p>
                 <p className="mt-1 text-[11px] text-[rgb(var(--color-text-muted))]">{timeAgo(n.createdAt)}</p>
               </div>
-              {!readIds.has(n.id) && (
+              {!n.read && !readIds.has(n.id) && (
                 <span className="mt-2 h-2 w-2 shrink-0 rounded-full bg-[rgb(var(--color-primary))]" />
               )}
             </Link>

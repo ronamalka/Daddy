@@ -102,6 +102,7 @@ model User {
   weeklyHours      WeeklyHours[]
   timeOff          TimeOff[]
   disputesOpened   Dispute[]
+  notifications    Notification[]
 }
 
 model WeeklyHours {
@@ -167,15 +168,35 @@ model ServiceArea {
 }
 
 model UserService {
-  id          String @id @default(cuid())
+  id          String  @id @default(cuid())
   userId      String
   serviceSlug String
+  alertsMuted Boolean @default(false)
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, serviceSlug])
   @@index([userId])
   @@index([serviceSlug])
+}
+
+/// In-app alerts. `type` is `NEW_NEARBY_REQUEST` for matched jobs; WhatsApp send is issue #52.
+model Notification {
+  id        String    @id @default(cuid())
+  userId    String
+  type      String
+  title     String
+  message   String
+  href      String
+  entityId  String
+  payload   Json?
+  readAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, type, entityId])
+  @@index([userId, createdAt])
 }
 
 model ServiceRequest {

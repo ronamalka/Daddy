@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { getServiceBySlug, ALL_SERVICES } from "@/lib/services";
+import { userServiceSlugs } from "@/lib/user-services";
 import { Check } from "@phosphor-icons/react";
 import { CategoryIcon } from "@/components/ui/category-icon";
 
@@ -30,7 +31,7 @@ export default function ProfilePricesPage() {
       fetch("/api/service-prices").then((r) => r.json()),
     ])
       .then(([services, existingPrices]) => {
-        const svcList: string[] = Array.isArray(services) ? services : [];
+        const svcList = userServiceSlugs(services);
         setUserServices(svcList);
 
         const priceMap = new Map<string, PriceEntry>();

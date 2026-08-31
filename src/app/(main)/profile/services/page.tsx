@@ -5,12 +5,15 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { ServicePicker } from "@/components/service-picker";
 import { Check } from "@phosphor-icons/react";
+import { getServiceBySlug } from "@/lib/services";
+import { parseUserServiceList } from "@/lib/user-services";
 
-/** Shows the form to pick which services the user offers. */
+/** Shows the form to pick which services the user offers and mute request alerts per service. */
 export default function ProfileServicesPage() {
   const { data: session } = useSession();
   const router = useRouter();
   const [services, setServices] = useState<string[]>([]);
+  const [muted, setMuted] = useState<Record<string, boolean>>({});
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -20,15 +23,15 @@ export default function ProfileServicesPage() {
     fetch("/api/user-services")
       .then((r) => r.json())
       .then((data) => {
-        if (Array.isArray(data)) {
-          setServices(data);
-        }
+        const rows = parseUserServiceList(data);
+        setServices(rows.map((row) => row.serviceSlug));
+        setMuted(Object.fromEntries(rows.map((row) => [row.serviceSlug, row.alertsMuted])));
         setLoading(false);
       })
       .catch(() => setLoading(false));
   }, []);
 
-  /** Saves the list of services this seller offers. */
+  /** Saves the list of services this seller offers and per-service request-alert mutes. */
   async function handleSave() {
     setSaving(true);
     setSaved(false);
@@ -37,11 +40,17 @@ export default function ProfileServicesPage() {
       const res = await fetch("/api/user-services", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ services }),
+        body: JSON.stringify({
+          services: services.map((slug) => ({
+            serviceSlug: slug,
+            alertsMuted: muted[slug] ?? false,
+          })),
+        }),
       });
       if (res.ok) {
-        const savedData = await res.json();
-        setServices(savedData);
+        const savedData = parseUserServiceList(await res.json());
+        setServices(savedData.map((row) => row.serviceSlug));
+        setMuted(Object.fromEntries(savedData.map((row) => [row.serviceSlug, row.alertsMuted])));
         setSaved(true);
         setTimeout(() => setSaved(false), 3000);
       } else {
@@ -84,6 +93,36 @@ export default function ProfileServicesPage() {
       ) : (
         <div className="rounded-2xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] p-6 shadow-[0_2px_8px_rgba(var(--color-primary),0.06)]">
           <ServicePicker selected={services} onChange={setServices} />
+
+          {services.length > 0 && (
+            <div className="mt-6 rounded-xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-bg))] p-4">
+              <p className="text-[14px] font-semibold text-[rgb(var(--color-text))]">התראות על בקשות באזור</p>
+              <p className="mt-1 text-[12px] text-[rgb(var(--color-text-secondary))]">
+                כשקונה מפרסם עבודה בשירות ובאזור שלך, תקבל התראה באפליקציה. אפשר לכבות לכל שירות בנפרד.
+              </p>
+              <div className="mt-3 divide-y divide-[rgb(var(--color-border-light))]">
+                {services.map((slug) => {
+                  const label = getServiceBySlug(slug)?.nameHe || slug;
+                  return (
+                    <label key={slug} className="flex items-start gap-3 py-2.5 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={!(muted[slug] ?? false)}
+                        onChange={(e) => setMuted((prev) => ({ ...prev, [slug]: !e.target.checked }))}
+                        className="mt-1 h-4 w-4"
+                      />
+                      <span>
+                        <span className="block text-[13px] font-medium text-[rgb(var(--color-text))]">{label}</span>
+                        <span className="block text-[12px] text-[rgb(var(--color-text-muted))]">
+                          {muted[slug] ? "התראות כבויות" : "התראות פעילות"}
+                        </span>
+                      </span>
+                    </label>
+                  );
+                })}
+              </div>
+            </div>
+          )}
 
           <div className="mt-6 flex items-center gap-3">
             <button
