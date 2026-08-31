@@ -65,6 +65,35 @@ describe("POST /api/messages", () => {
     );
   });
 
+  it("forwards an allowlisted attachment path", async () => {
+    const attachment = "/uploads/550e8400-e29b-41d4-a716-446655440000.jpg";
+    mockedProxy.mockResolvedValue({ data: { id: "clmsg1", attachment }, status: 201 });
+    const res = await postDm(jsonRequest("http://localhost/api/messages", {
+      receiverId: "clseller1",
+      content: "הברז",
+      attachment,
+    }));
+    expect(res.status).toBe(201);
+    expect(mockedProxy).toHaveBeenCalledWith(
+      "http://chat.test",
+      "/messages",
+      expect.objectContaining({
+        method: "POST",
+        body: { receiverId: "clseller1", content: "הברז", attachment },
+      })
+    );
+  });
+
+  it("rejects a remote attachment URL before calling chat", async () => {
+    const res = await postDm(jsonRequest("http://localhost/api/messages", {
+      receiverId: "clseller1",
+      content: "hi",
+      attachment: "https://evil.example/x.jpg",
+    }));
+    expect(res.status).toBe(400);
+    expect(mockedProxy).not.toHaveBeenCalled();
+  });
+
   it("returns 400 for the old orderId payload", async () => {
     const res = await postDm(jsonRequest("http://localhost/api/messages", {
       orderId: "550e8400-e29b-41d4-a716-446655440000",

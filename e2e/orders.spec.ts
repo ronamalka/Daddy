@@ -25,6 +25,18 @@ test.describe("Order Flow", () => {
     await expect(content).toBeVisible({ timeout: 10000 });
   });
 
+  test("inbox thread has an attach control", async ({ page }) => {
+    await loginAs(page, "buyer@daddy.com");
+    await page.goto("/inbox/seed-user-seller1");
+    await expect(page.getByRole("button", { name: "צרף תמונה או PDF" })).toBeVisible({ timeout: 10000 });
+  });
+
+  test("order thread has an attach control", async ({ page }) => {
+    await loginAs(page, "buyer@daddy.com");
+    await page.goto("/orders/ord-1");
+    await expect(page.getByRole("button", { name: "צרף תמונה או PDF" })).toBeVisible({ timeout: 10000 });
+  });
+
   test("seller orders page shows calendar of closed jobs", async ({ page }) => {
     await loginAs(page, "seller@daddy.com");
     await page.goto("/orders");

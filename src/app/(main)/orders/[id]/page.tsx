@@ -10,6 +10,8 @@ import { Dialog } from "@/components/ui/dialog";
 import { formatVisitWindow } from "@/lib/availability";
 import { DisputeDialog } from "@/components/orders/dispute-dialog";
 import { DISPUTE_REASON_LABELS, DISPUTE_STATUS_LABELS, isDisputableStatus, orderHasOpenDispute } from "@/lib/disputes";
+import { AttachmentBubble } from "@/components/chat/attachment-bubble";
+import { ComposerAttach } from "@/components/chat/composer-attach";
 
 interface GigRequirement {
   id: string;
@@ -73,6 +75,9 @@ export default function OrderDetailPage() {
   const { data: session } = useSession();
   const [order, setOrder] = useState<OrderDetail | null>(null);
   const [message, setMessage] = useState("");
+  const [attachment, setAttachment] = useState<string | null>(null);
+  const [attachError, setAttachError] = useState("");
+  const [attachBusy, setAttachBusy] = useState(false);
   const [sending, setSending] = useState(false);
   const [reviewOpen, setReviewOpen] = useState(false);
   const [sellerResponseText, setSellerResponseText] = useState("");
@@ -138,20 +143,25 @@ export default function OrderDetailPage() {
     return () => clearInterval(interval);
   }, [params.id, order?.messages?.length]);
 
-  /** Sends a message on this order. */
+  /** Sends a message on this order, with an optional photo or PDF. */
   async function sendMessage(e: React.FormEvent) {
     e.preventDefault();
-    if (!message.trim()) return;
+    if ((!message.trim() && !attachment) || attachBusy) return;
     setSending(true);
     const res = await fetch(`/api/orders/${params.id}/messages`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ content: message }),
+      body: JSON.stringify({
+        content: message,
+        ...(attachment ? { attachment } : {}),
+      }),
     });
     if (res.ok) {
       const msg = await res.json();
       setOrder((prev) => prev ? { ...prev, messages: [...prev.messages, msg] } : prev);
       setMessage("");
+      setAttachment(null);
+      setAttachError("");
     }
     setSending(false);
   }
@@ -602,18 +612,8 @@ export default function OrderDetailPage() {
                     <div className={`max-w-[320px] ${isMe ? "order-2" : "order-1"}`}>
                       <div className={`rounded-2xl px-4 py-3 ${isMe ? "rounded-br-[4px] bg-[rgb(var(--color-primary))] text-white" : "rounded-bl-[4px] bg-[rgb(var(--color-surface))] border border-[rgb(var(--color-border))] text-[rgb(var(--color-text))]"}`}>
                         <p className={`text-[12px] font-semibold mb-1 ${isMe ? "text-white/70" : "text-[rgb(var(--color-primary))]"}`}>{msg.sender?.name ?? "משתמש"}</p>
-                        {msg.attachment && (
-                          <a href={msg.attachment} target="_blank" rel="noopener noreferrer" className="mb-2 block">
-                            {/\.(jpg|jpeg|png|gif|webp)$/i.test(msg.attachment) ? (
-                              <img src={msg.attachment} alt="צרופה" className="max-w-full rounded-lg max-h-48" />
-                            ) : (
-                              <span className={`inline-flex items-center gap-1 rounded-lg px-2 py-1 text-[12px] ${isMe ? "bg-white/20" : "bg-[rgba(var(--color-primary),0.1)]"}`}>
-                                📎 קובץ מצורף
-                              </span>
-                            )}
-                          </a>
-                        )}
-                        <p className="text-[14px] leading-relaxed">{msg.content}</p>
+                        {msg.attachment && <AttachmentBubble url={msg.attachment} onPrimary={isMe} />}
+                        {msg.content ? <p className="text-[14px] leading-relaxed">{msg.content}</p> : null}
                       </div>
                       <p className={`mt-1 text-[11px] text-[rgb(var(--color-text-muted))] ${isMe ? "text-right" : "text-left"}`}>
                         {new Date(msg.createdAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
@@ -626,16 +626,28 @@ export default function OrderDetailPage() {
           )}
         </div>
 
-        <form onSubmit={sendMessage} className="flex items-center gap-3 border-t border-[rgb(var(--color-border))] p-4 bg-[rgb(var(--color-surface))]">
-          <input
-            value={message}
-            onChange={(e) => setMessage(e.target.value)}
-            placeholder="כתוב הודעה..."
-            className="flex-1 rounded-xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface-elevated))] px-4 py-3 text-[14px] text-[rgb(var(--color-text))] placeholder-[rgb(var(--color-text-muted))] focus:border-[rgb(var(--color-primary))] focus:outline-none focus:ring-2 focus:ring-[rgba(var(--color-primary),0.2)]"
-          />
-          <button type="submit" disabled={sending || !message.trim()} className="flex items-center justify-center rounded-xl bg-[rgb(var(--color-primary))] p-3 text-white hover:bg-[rgb(var(--color-primary-hover))] disabled:opacity-40 disabled:cursor-not-allowed">
-            <PaperPlaneTilt className="h-5 w-5" />
-          </button>
+        <form onSubmit={sendMessage} className="border-t border-[rgb(var(--color-border))] p-4 bg-[rgb(var(--color-surface))]">
+          <div className="flex items-center gap-3">
+            <ComposerAttach
+              value={attachment}
+              onChange={setAttachment}
+              disabled={sending}
+              onError={setAttachError}
+              onBusyChange={setAttachBusy}
+            />
+            <input
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
+              placeholder="כתוב הודעה..."
+              className="flex-1 rounded-xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface-elevated))] px-4 py-3 text-[14px] text-[rgb(var(--color-text))] placeholder-[rgb(var(--color-text-muted))] focus:border-[rgb(var(--color-primary))] focus:outline-none focus:ring-2 focus:ring-[rgba(var(--color-primary),0.2)]"
+            />
+            <button type="submit" disabled={sending || attachBusy || (!message.trim() && !attachment)} className="flex items-center justify-center rounded-xl bg-[rgb(var(--color-primary))] p-3 text-white hover:bg-[rgb(var(--color-primary-hover))] disabled:opacity-40 disabled:cursor-not-allowed">
+              <PaperPlaneTilt className="h-5 w-5" />
+            </button>
+          </div>
+          {attachError && (
+            <p className="mt-2 text-[12px] text-[rgb(var(--color-error))]">{attachError}</p>
+          )}
         </form>
       </div>
 

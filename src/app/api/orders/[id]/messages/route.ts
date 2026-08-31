@@ -29,7 +29,12 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
   const receiverId = user.id === order.buyerId ? order.sellerId : order.buyerId;
   const { data, status } = await proxyRequest(CHAT_SERVICE, "/messages", {
     method: "POST",
-    body: { content: result.data.content, orderId: id, receiverId },
+    body: {
+      content: result.data.content,
+      orderId: id,
+      receiverId,
+      ...(result.data.attachment ? { attachment: result.data.attachment } : {}),
+    },
     user,
   });
 

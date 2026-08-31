@@ -4,9 +4,12 @@ import {
   orderMessageSchema,
   markReadSchema,
   attachSender,
+  messagePreviewText,
 } from "@/lib/message-validation";
 
 const CUID = "clxyz1234567890abcdefghij";
+const UPLOAD_JPG = "/uploads/550e8400-e29b-41d4-a716-446655440000.jpg";
+const UPLOAD_PDF = "/uploads/550e8400-e29b-41d4-a716-446655440000.pdf";
 
 describe("directMessageSchema", () => {
   it("accepts receiverId + content as sent by the seller profile UI", () => {
@@ -40,13 +43,37 @@ describe("directMessageSchema", () => {
     expect(result.success).toBe(false);
   });
 
-  it("rejects extra fields", () => {
+  it("rejects a remote or scripted attachment URL", () => {
     const result = directMessageSchema.safeParse({
       receiverId: CUID,
       content: "hello",
       attachment: "https://evil.example/x",
     });
     expect(result.success).toBe(false);
+  });
+
+  it("accepts a same-origin upload path with a caption", () => {
+    const result = directMessageSchema.safeParse({
+      receiverId: CUID,
+      content: "הברז",
+      attachment: UPLOAD_JPG,
+    });
+    expect(result.success).toBe(true);
+    if (result.success) {
+      expect(result.data.attachment).toBe(UPLOAD_JPG);
+    }
+  });
+
+  it("accepts a photo-only message", () => {
+    const result = directMessageSchema.safeParse({
+      receiverId: CUID,
+      attachment: UPLOAD_JPG,
+    });
+    expect(result.success).toBe(true);
+    if (result.success) {
+      expect(result.data.content).toBe("");
+      expect(result.data.attachment).toBe(UPLOAD_JPG);
+    }
   });
 
   it("rejects empty or whitespace content", () => {
@@ -78,12 +105,23 @@ describe("orderMessageSchema", () => {
     expect(orderMessageSchema.safeParse({ content: "  " }).success).toBe(false);
   });
 
-  it("rejects extra fields such as attachment", () => {
+  it("rejects a javascript: attachment URL", () => {
     const result = orderMessageSchema.safeParse({
       content: "hello",
       attachment: "javascript:alert(1)",
     });
     expect(result.success).toBe(false);
+  });
+
+  it("accepts a PDF upload path on an order thread", () => {
+    const result = orderMessageSchema.safeParse({
+      content: "",
+      attachment: UPLOAD_PDF,
+    });
+    expect(result.success).toBe(true);
+    if (result.success) {
+      expect(result.data.attachment).toBe(UPLOAD_PDF);
+    }
   });
 });
 
@@ -131,5 +169,19 @@ describe("attachSender", () => {
     const enriched = attachSender({ id: "m1" }, { id: "u1", name: null });
     expect(enriched.sender.name).toBe("משתמש");
     expect(enriched.sender.avatar).toBeNull();
+  });
+});
+
+describe("messagePreviewText", () => {
+  it("prefers the caption when both caption and file exist", () => {
+    expect(messagePreviewText("הברז", UPLOAD_JPG)).toBe("הברז");
+  });
+
+  it("labels a photo-only message", () => {
+    expect(messagePreviewText("  ", UPLOAD_JPG)).toBe("תמונה");
+  });
+
+  it("labels a PDF-only message", () => {
+    expect(messagePreviewText("", UPLOAD_PDF)).toBe("קובץ PDF");
   });
 });

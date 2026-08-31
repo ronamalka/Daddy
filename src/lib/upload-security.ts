@@ -16,7 +16,13 @@ const ALLOWED_TYPES: Record<string, { extensions: string[]; magicBytes: number[]
     extensions: [".webp"],
     magicBytes: [[0x52, 0x49, 0x46, 0x46]],
   },
+  "application/pdf": {
+    extensions: [".pdf"],
+    magicBytes: [[0x25, 0x50, 0x44, 0x46]],
+  },
 };
+
+const UNSUPPORTED_TYPE = "סוג הקובץ לא נתמך. ניתן להעלות JPEG, PNG, WebP או PDF.";
 
 export interface UploadValidationResult {
   valid: boolean;
@@ -31,7 +37,7 @@ function checkMagicBytes(buffer: Uint8Array, expected: number[]): boolean {
   return expected.every((byte, i) => buffer[i] === byte);
 }
 
-/** Detects JPEG, PNG, or WebP from file bytes. Returns null if unknown. */
+/** Detects JPEG, PNG, WebP, or PDF from file bytes. Returns null if unknown. */
 function detectMimeType(buffer: Uint8Array): string | null {
   for (const [mime, config] of Object.entries(ALLOWED_TYPES)) {
     for (const magic of config.magicBytes) {
@@ -64,7 +70,6 @@ export function stripExifFromJpeg(buffer: Uint8Array): Uint8Array {
 
     const marker = buffer[i + 1];
 
-    // APP0-APP15 markers (0xE0-0xEF) and COM (0xFE) — skip these (contain EXIF, XMP, etc.)
     if ((marker >= 0xe1 && marker <= 0xef) || marker === 0xfe) {
       if (i + 3 >= buffer.length) break;
       const segLen = (buffer[i + 2] << 8) | buffer[i + 3];
@@ -72,7 +77,6 @@ export function stripExifFromJpeg(buffer: Uint8Array): Uint8Array {
       continue;
     }
 
-    // SOS marker (0xDA) — start of scan, copy everything from here
     if (marker === 0xda) {
       for (let j = i; j < buffer.length; j++) {
         result.push(buffer[j]);
@@ -80,7 +84,6 @@ export function stripExifFromJpeg(buffer: Uint8Array): Uint8Array {
       break;
     }
 
-    // Keep other markers (DQT, DHT, SOF, APP0/JFIF, etc.)
     if (i + 3 >= buffer.length) break;
     const segLen = (buffer[i + 2] << 8) | buffer[i + 3];
     for (let j = 0; j < 2 + segLen; j++) {
@@ -104,12 +107,8 @@ export function validateUpload(
   }
 
   const detectedType = detectMimeType(buffer);
-  if (!detectedType) {
-    return { valid: false, error: "סוג הקובץ לא נתמך. ניתן להעלות JPEG, PNG או WebP בלבד." };
-  }
-
-  if (!ALLOWED_TYPES[detectedType]) {
-    return { valid: false, error: "סוג הקובץ לא נתמך. ניתן להעלות JPEG, PNG או WebP בלבד." };
+  if (!detectedType || !ALLOWED_TYPES[detectedType]) {
+    return { valid: false, error: UNSUPPORTED_TYPE };
   }
 
   const ext = ALLOWED_TYPES[detectedType].extensions[0];

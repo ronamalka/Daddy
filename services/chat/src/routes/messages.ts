@@ -13,6 +13,7 @@ export function createMessagesRouter(repo: MessageRepo) {
       senderRole: req.user!.role,
       receiverId: req.body.receiverId,
       content: req.body.content,
+      attachment: req.body.attachment,
       orderId: req.body.orderId,
     });
 
