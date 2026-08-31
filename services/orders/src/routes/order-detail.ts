@@ -2,6 +2,7 @@ import { Router, Request, Response } from "express";
 import { requireAuth } from "../../../shared/middleware";
 import { prisma } from "../index";
 import { OrderStatus } from "../generated/prisma/client";
+import { isOpenDisputeStatus } from "../lib/disputes";
 
 /** Routes for one order: details, status changes, and buyer requirements. */
 export const orderDetailRoutes = Router();
@@ -14,6 +15,7 @@ orderDetailRoutes.get("/:id", requireAuth, async (req: Request, res: Response) =
     where: { id },
     include: {
       requirements: true,
+      disputes: { orderBy: { createdAt: "desc" } },
     },
   });
 
@@ -35,9 +37,20 @@ orderDetailRoutes.patch("/:id", requireAuth, async (req: Request, res: Response)
   const id = req.params.id as string;
   const { status } = req.body;
 
-  const order = await prisma.order.findUnique({ where: { id } });
+  const order = await prisma.order.findUnique({
+    where: { id },
+    include: { disputes: { select: { status: true } } },
+  });
   if (!order) {
     res.status(404).json({ error: "Order not found" });
+    return;
+  }
+
+  if (
+    req.user!.role !== "ADMIN" &&
+    order.disputes.some((d) => isOpenDisputeStatus(d.status))
+  ) {
+    res.status(409).json({ error: "לא ניתן לשנות סטטוס בזמן שמחלוקת פתוחה" });
     return;
   }
 

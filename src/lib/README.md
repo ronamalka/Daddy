@@ -27,6 +27,9 @@ Small modules used by API routes and pages. Each exported function has a short c
 | `turnstile.ts` | Cloudflare Turnstile verify |
 | `security-logger.ts` | JSON security lines to stdout |
 | `legal.ts` | Cookie consent and terms version |
+| `disputes.ts` | Who can open a dispute, reasons, and admin payment actions |
+| `moderation-queue.ts` | Merge disputes and review flags into one admin list |
+| `session-revoke.ts` | Delete Redis session ids for a user |
 | `services.ts` | Catalogue of home services |
 | `districts.ts` | Israeli district codes |
 | `message-validation.ts` | Zod schemas for chat |

@@ -15,6 +15,7 @@ gigDetailRoutes.get("/:id", async (req: Request, res: Response) => {
       category: true,
       tiers: { orderBy: { price: "asc" } },
       reviews: {
+        where: { hiddenAt: null },
         select: {
           id: true,
           rating: true,
@@ -179,7 +180,7 @@ gigDetailRoutes.get("/:id/related", async (req: Request, res: Response) => {
     include: {
       category: true,
       tiers: { orderBy: { price: "asc" }, take: 1 },
-      reviews: { select: { rating: true } },
+      reviews: { where: { hiddenAt: null }, select: { rating: true } },
     },
     take: 4,
     orderBy: { createdAt: "desc" },
@@ -206,6 +207,7 @@ gigDetailRoutes.get("/by-seller/:sellerId", async (req: Request, res: Response) 
       category: true,
       tiers: { orderBy: { price: "asc" }, take: 1 },
       reviews: {
+        where: { hiddenAt: null },
         select: {
           id: true,
           rating: true,
@@ -246,7 +248,7 @@ gigDetailRoutes.get("/reviews/by-seller/:sellerId", async (req: Request, res: Re
   const sellerId = req.params.sellerId as string;
 
   const reviews = await prisma.review.findMany({
-    where: { gig: { sellerId } },
+    where: { gig: { sellerId }, hiddenAt: null },
     select: { rating: true },
   });
 

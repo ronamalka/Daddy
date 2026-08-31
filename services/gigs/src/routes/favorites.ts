@@ -14,7 +14,7 @@ favoritesRoutes.get("/", requireAuth, async (req: Request, res: Response) => {
         include: {
           category: true,
           tiers: { orderBy: { price: "asc" }, take: 1 },
-          reviews: { select: { rating: true } },
+          reviews: { where: { hiddenAt: null }, select: { rating: true } },
         },
       },
     },

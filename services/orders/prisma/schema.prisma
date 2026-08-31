@@ -26,6 +26,28 @@ enum JobType {
   LOCAL_REQUEST
 }
 
+enum DisputeReason {
+  NO_SHOW
+  DAMAGE
+  DIFFERENT_PRICE
+  QUALITY
+}
+
+enum DisputeStatus {
+  OPEN
+  UNDER_REVIEW
+  RESOLVED_RELEASE
+  RESOLVED_REFUND
+  RESOLVED_SPLIT
+  CLOSED
+}
+
+enum PaymentAction {
+  RELEASE
+  REFUND
+  SPLIT
+}
+
 model Order {
   id        String      @id @default(cuid())
   jobType   JobType     @default(GIG)
@@ -44,6 +66,7 @@ model Order {
   updatedAt DateTime    @updatedAt
 
   requirements OrderRequirement[]
+  disputes     Dispute[]
 
   @@index([buyerId])
   @@index([sellerId])
@@ -61,5 +84,28 @@ model OrderRequirement {
   order Order @relation(fields: [orderId], references: [id])
 
   @@unique([orderId, requirementId])
+}
+
+model Dispute {
+  id               String         @id @default(cuid())
+  orderId          String
+  openerId         String
+  reason           DisputeReason
+  description      String
+  photos           String[]
+  status           DisputeStatus  @default(OPEN)
+  resolution       String?
+  paymentAction    PaymentAction?
+  splitBuyerAmount Float?
+  resolvedAt       DateTime?
+  resolvedBy       String?
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+
+  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@index([orderId])
+  @@index([openerId])
+  @@index([status])
 }
 

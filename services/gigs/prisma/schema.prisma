@@ -117,6 +117,7 @@ model Review {
   timelinessRating    Int?
   sellerResponse      String?
   sellerResponseAt    DateTime?
+  hiddenAt            DateTime?
   orderId             String       @unique // cross-service ref to orders-service
   gigId               String
   userId              String       // cross-service ref to users-service
@@ -129,15 +130,27 @@ model Review {
   @@index([userId])
 }
 
+enum FlagStatus {
+  OPEN
+  UNDER_REVIEW
+  DISMISSED
+  RESOLVED
+}
+
 model ReviewFlag {
-  id        String   @id @default(cuid())
-  reviewId  String
-  userId    String   // who flagged
-  reason    String
-  createdAt DateTime @default(now())
+  id         String     @id @default(cuid())
+  reviewId   String
+  userId     String
+  reason     String
+  status     FlagStatus @default(OPEN)
+  resolution String?
+  resolvedAt DateTime?
+  resolvedBy String?
+  createdAt  DateTime   @default(now())
 
   review Review @relation(fields: [reviewId], references: [id], onDelete: Cascade)
 
   @@unique([reviewId, userId])
   @@index([reviewId])
+  @@index([status])
 }

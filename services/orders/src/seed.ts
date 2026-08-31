@@ -95,6 +95,21 @@ async function main() {
     }
   }
 
+  const existingDispute = await prisma.dispute.findUnique({ where: { id: "dsp-seed-1" } });
+  if (!existingDispute) {
+    await prisma.dispute.create({
+      data: {
+        id: "dsp-seed-1",
+        orderId: "ord-18",
+        openerId: S.buyer,
+        reason: "QUALITY",
+        description: "הארון יצא עקום והדלת לא נסגרת. ביקשתי תיקון ולא חזר.",
+        photos: [],
+        status: "OPEN",
+      },
+    });
+  }
+
   console.log("Orders seed complete.");
 }
 

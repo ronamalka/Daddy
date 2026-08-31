@@ -20,6 +20,11 @@ loginRoutes.post("/", async (req: Request, res: Response) => {
     return;
   }
 
+  if (user.suspendedAt) {
+    res.status(403).json({ error: "החשבון הושעה" });
+    return;
+  }
+
   if (!user.passwordHash) {
     res.status(401).json({ error: "This account uses Google sign-in" });
     return;
