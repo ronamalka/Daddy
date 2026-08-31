@@ -90,25 +90,28 @@ export default function CreateGigPage() {
 
     const tierData = getValidTiers();
 
-    const res = await fetch("/api/gigs", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        title, description, image: image || null, categoryId,
-        tiers: tierData,
-        faqs: faqs.filter((f) => f.question && f.answer),
-        requirements: requirements.filter((r) => r.question),
-      }),
-    });
+    try {
+      const res = await fetch("/api/gigs", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title, description, image: image || null, categoryId,
+          tiers: tierData,
+          faqs: faqs.filter((f) => f.question && f.answer),
+          requirements: requirements.filter((r) => r.question),
+        }),
+      });
 
-    if (res.ok) {
-      const gig = await res.json();
-      router.push(`/gigs/${gig.id}`);
-    } else {
-      const data = await res.json();
-      setError(data.error || "יצירת השירות נכשלה");
-      setLoading(false);
+      const data = await res.json().catch(() => ({}));
+      if (res.ok && data.id) {
+        router.push(`/gigs/${data.id}`);
+        return;
+      }
+      setError((data as { error?: string }).error || "יצירת השירות נכשלה");
+    } catch {
+      setError("לא הצלחנו לפרסם. נסה שוב.");
     }
+    setLoading(false);
   }
 
   const inputClass = "w-full rounded-xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface-elevated))] px-4 py-3 text-[14px] text-[rgb(var(--color-text))] placeholder-[rgb(var(--color-text-muted))] transition-all focus:border-[rgb(var(--color-primary))] focus:outline-none focus:ring-2 focus:ring-[rgba(var(--color-primary),0.2)]";
@@ -284,14 +287,20 @@ export default function CreateGigPage() {
               )}
             </div>
 
-            <div className="sticky bottom-0 flex items-center gap-3 rounded-b-[16px] border-t border-[#E8ECF1] bg-white px-6 py-4">
+            <div className="sticky bottom-0 flex flex-col gap-3 rounded-b-[16px] border-t border-[#E8ECF1] bg-white px-6 py-4">
+              {error && (
+                <p className="text-[13px] font-medium text-[rgb(var(--color-error))]">{error}</p>
+              )}
+              <div className="flex items-center gap-3">
               <button
+                type="button"
                 onClick={() => setShowPreview(false)}
                 className="flex-1 rounded-[12px] border border-[#E8ECF1] py-3 text-[14px] font-semibold text-[#636E72] hover:bg-[#FAFBFF] transition-all"
               >
                 חזור לעריכה
               </button>
               <button
+                type="button"
                 onClick={handlePublish}
                 disabled={loading}
                 className="flex-1 rounded-[12px] bg-[#6C5CE7] py-3 text-[14px] font-semibold text-white shadow-[0_4px_16px_rgba(108,92,231,0.3)] transition-all hover:bg-[#5A4BD1] disabled:opacity-40 disabled:cursor-not-allowed"
@@ -303,6 +312,7 @@ export default function CreateGigPage() {
                   </span>
                 ) : "פרסם שירות"}
               </button>
+              </div>
             </div>
           </div>
         </div>

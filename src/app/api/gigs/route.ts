@@ -1,26 +1,8 @@
 import { NextResponse } from "next/server";
-import { z } from "zod";
 import { auth } from "@/lib/auth";
 import { proxyRequest, GIGS_SERVICE, USERS_SERVICE } from "@/lib/gateway";
+import { createGigSchema } from "@/lib/gig-create";
 import { validateBody } from "@/lib/validate";
-
-const tierSchema = z.object({
-  tier: z.string().min(1).max(50),
-  price: z.number().positive().max(100000),
-  deliveryDays: z.number().int().positive().max(365),
-  description: z.string().max(1000).optional(),
-});
-
-const createGigSchema = z.object({
-  title: z.string().min(1).max(200),
-  description: z.string().min(1).max(5000),
-  category: z.string().min(1).max(100),
-  subcategory: z.string().max(100).optional(),
-  image: z.string().url().max(500).optional().nullable(),
-  tiers: z.array(tierSchema).min(1).max(5),
-  requirements: z.array(z.string().max(500)).max(20).optional(),
-  tags: z.array(z.string().max(50)).max(10).optional(),
-}).strict();
 
 /** Returns gigs with seller details. Can filter by district query param. */
 export async function GET(request: Request) {

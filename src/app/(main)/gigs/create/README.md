@@ -1,3 +1,3 @@
 # `create/`
 
-The `/gigs/create` page. A seller writes a new gig (title, photos, prices, area).
+The `/gigs/create` page. A seller writes a new gig (title, prices, FAQs) and publishes it.
