@@ -131,9 +131,12 @@ describe("System Tests — Public API", () => {
   });
 
   describe("GET /api/locations", () => {
-    it("returns 200", async () => {
-      const { status } = await fetchApi("/api/locations");
+    it("returns 200 with districts even if the government city list is down", async () => {
+      const { status, body } = await fetchApi("/api/locations");
       expect(status).toBe(200);
+      expect(Array.isArray(body.districts)).toBe(true);
+      expect(body.districts.length).toBeGreaterThan(0);
+      expect(Array.isArray(body.cities)).toBe(true);
     });
   });
 
