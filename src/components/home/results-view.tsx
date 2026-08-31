@@ -81,7 +81,11 @@ export function ResultsView({
                 {p.bio && <p className="mb-4 text-xs text-[rgb(var(--color-text-secondary))] line-clamp-2 leading-relaxed">{p.bio}</p>}
                 <div className="flex items-center gap-2 text-xs">
                   <Badge variant="default">{p.completedOrders} הזמנות</Badge>
-                  <Badge variant="warning">{p.reviewCount} ביקורות</Badge>
+                  {p.avgRating ? (
+                    <Badge variant="warning">{p.avgRating.toFixed(1)}/10 · {p.reviewCount} ביקורות</Badge>
+                  ) : (
+                    <Badge variant="warning">{p.reviewCount} ביקורות</Badge>
+                  )}
                   <Badge variant="success">{p.services.length} שירותים</Badge>
                 </div>
               </Link>

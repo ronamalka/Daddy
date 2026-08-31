@@ -8,5 +8,6 @@
 | `services.ts` | Same service catalogue as the website |
 | `gig-categories.ts` | Upsert the 8 local gig categories and remap leftover slugs |
 | `districts.ts` | Israeli district names |
+| `review-ratings.ts` | 1–10 Midrag scale, overall average, leftover 1–5 detection |
 
 Services import this folder as `../../shared/...`.

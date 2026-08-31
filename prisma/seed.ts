@@ -496,6 +496,7 @@ async function main() {
           id: rev.id,
           orderId: rev.orderId,
           gigId: rev.gigId,
+          sellerId: rev.sellerId,
           userId: rev.buyerId,
           rating: overall,
           comment: rev.comment,

@@ -1,18 +1,13 @@
 import { NextResponse } from "next/server";
 import { proxyRequest, USERS_SERVICE, GIGS_SERVICE, ORDERS_SERVICE } from "@/lib/gateway";
 
-interface GigReview {
+interface SellerReview {
   rating: number;
   userId?: string;
   ratingAttitude?: number | null;
   ratingTimeliness?: number | null;
   ratingPrice?: number | null;
   ratingQuality?: number | null;
-  [key: string]: unknown;
-}
-
-interface GigWithReviews {
-  reviews?: GigReview[];
   [key: string]: unknown;
 }
 
@@ -26,14 +21,18 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
     return NextResponse.json({ error: "Seller not found" }, { status: 404 });
   }
 
-  const [gigsRes, ordersRes] = await Promise.all([
+  const [gigsRes, reviewsRes, ordersRes] = await Promise.all([
     proxyRequest(GIGS_SERVICE, `/gigs/by-seller/${id}`).catch(() => ({ data: null, status: 502 })),
+    proxyRequest(GIGS_SERVICE, `/reviews/by-seller/${id}`).catch(() => ({ data: null, status: 502 })),
     proxyRequest(ORDERS_SERVICE, `/orders/count-by-seller/${id}`).catch(() => ({ data: null, status: 502 })),
   ]);
 
   const seller = sellerRes.data;
-  const gigs: GigWithReviews[] = Array.isArray(gigsRes.data) ? gigsRes.data : [];
-  const rawReviews: GigReview[] = gigs.flatMap((g) => g.reviews || []);
+  const gigs = Array.isArray(gigsRes.data) ? gigsRes.data : [];
+  const listed = reviewsRes.data;
+  const rawReviews: SellerReview[] = Array.isArray(listed?.reviews)
+    ? listed.reviews
+    : gigs.flatMap((g: { reviews?: SellerReview[] }) => g.reviews || []);
 
   const reviewerIds = [...new Set(
     rawReviews.map((r) => r.userId).filter((id): id is string => typeof id === "string" && id.length > 0)

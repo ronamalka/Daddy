@@ -2,6 +2,12 @@
 
 Packages (price tiers), favorites, and reviews. Public browse of people + prices lives on the website homepage, not here.
 
+## Reviews (issue #92)
+
+Stored scores are **1–10** overall plus four criteria (attitude, timeliness, price, quality). Local jobs (`gigId` null) are allowed; `sellerId` comes from the order so the daddy can reply and averages include those jobs.
+
+Leftover **1–5** rows (overall and every present criterion ≤ 5) are doubled once in `migrateReviewScaleAndSeller` during gigs seed. Seed data is already 1–10 and is left alone. Production: re-seed or run the same helper once.
+
 ## Category migration (issue #94)
 
 Gig `Category.slug` values are the **8 local catalog slugs** from `services/shared/services.ts` (`assembly-and-installation`, `home-maintenance`, …). Seed calls `syncLocalGigCategories()` which:
@@ -16,5 +22,5 @@ Re-seed is enough for existing demo data. Custom rows on a retired slug are rema
 - `src/routes/gigs.ts` — list and create
 - `src/routes/gig-detail.ts` — one gig, update, related
 - `src/routes/favorites.ts` — saved gigs
-- `src/routes/reviews.ts` — create, flag, respond, admin queue
+- `src/routes/reviews.ts` — create (1–10, optional `gigId`), list by seller, flag, respond, admin queue
 - `src/routes/recent-reviews.ts` — homepage feed

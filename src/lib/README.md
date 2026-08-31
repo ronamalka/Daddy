@@ -25,6 +25,7 @@ Small modules used by API routes and pages. Each exported function has a short c
 | `nearby-request.ts` | After a request is created, ping matching daddies |
 | `notification-feed.ts` | Merge persisted alerts with derived order/chat items |
 | `review-users.ts` | Attach reviewer names when gigs only store `userId` |
+| `review-ratings.ts` | 1–10 scale helpers shared with gigs-service |
 | `accept-quote.ts` | Rules for accepting a seller quote |
 | `validate.ts` | Parse JSON bodies with Zod |
 | `upload-security.ts` | File type checks and EXIF strip |

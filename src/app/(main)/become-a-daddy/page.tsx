@@ -29,9 +29,9 @@ const STEPS: { step: string; title: string; desc: string; Icon: PhosphorIcon; co
 ];
 
 const TESTIMONIALS = [
-  { name: "משה כהן, 62", city: "באר שבע", service: "הרכבת רהיטים", text: "פרשתי לפני שנתיים. ישבתי בבית, השתגעתי. עכשיו אני עושה 3-4 עבודות בשבוע ומרגיש שוב שימושי. והנכדים חושבים שאני גיבור.", rating: 5 },
-  { name: "יוסי לוי, 58", city: "חיפה", service: "תיקונים קטנים", text: "הילדים עפו מהבית, הבית שקט מדי. התחלתי לתקן דברים לשכנים, ואז נרשמתי לאבאל׳ה. הטלפון לא מפסיק. אני שוב מרגיש שצריכים אותי.", rating: 5 },
-  { name: "אבי ישראלי, 55", city: "תל אביב", service: "הרכבת רהיטים", text: "30 שנה בנגרות. אמרו לי ׳תנוח, מגיע לך׳. אבל מה אני אעשה — אשב מול הטלוויזיה? עכשיו אני מרכיב ארונות לזוגות צעירים, ותמיד יוצא עם בדיחה טובה.", rating: 5 },
+  { name: "משה כהן, 62", city: "באר שבע", service: "הרכבת רהיטים", text: "פרשתי לפני שנתיים. ישבתי בבית, השתגעתי. עכשיו אני עושה 3-4 עבודות בשבוע ומרגיש שוב שימושי. והנכדים חושבים שאני גיבור.", rating: 10 },
+  { name: "יוסי לוי, 58", city: "חיפה", service: "תיקונים קטנים", text: "הילדים עפו מהבית, הבית שקט מדי. התחלתי לתקן דברים לשכנים, ואז נרשמתי לאבאל׳ה. הטלפון לא מפסיק. אני שוב מרגיש שצריכים אותי.", rating: 9 },
+  { name: "אבי ישראלי, 55", city: "תל אביב", service: "הרכבת רהיטים", text: "30 שנה בנגרות. אמרו לי ׳תנוח, מגיע לך׳. אבל מה אני אעשה — אשב מול הטלוויזיה? עכשיו אני מרכיב ארונות לזוגות צעירים, ותמיד יוצא עם בדיחה טובה.", rating: 10 },
 ];
 
 /** Shows why and how to join as a daddy (service provider). */
@@ -109,10 +109,9 @@ export default function BecomeADaddyPage() {
           {TESTIMONIALS.map((t, i) => (
             <div key={i} className="relative rounded-2xl bg-[rgb(var(--color-surface))] p-6 shadow-[var(--shadow-md)] border border-[rgb(var(--color-border))]/60">
               <div className="absolute -top-3 right-6 flex h-8 w-8 items-center justify-center rounded-full bg-[rgb(var(--color-accent))] text-[14px] font-bold text-white shadow-sm">&ldquo;</div>
-              <div className="flex gap-0.5 mb-3 mt-1">
-                {Array.from({ length: t.rating }).map((_, j) => (
-                  <Star key={j} className="h-4 w-4 text-[rgb(var(--color-accent-yellow))] " weight="fill" />
-                ))}
+              <div className="flex items-center gap-1 mb-3 mt-1" aria-label={`דירוג ${t.rating} מתוך 10`}>
+                <Star className="h-4 w-4 text-[rgb(var(--color-accent-yellow))] " weight="fill" />
+                <span className="text-[13px] font-bold text-[rgb(var(--color-text))]">{t.rating}/10</span>
               </div>
               <p className="text-[14px] leading-relaxed text-[rgb(var(--color-text))] mb-4">{t.text}</p>
               <div className="flex items-center justify-between border-t border-[rgb(var(--color-border))] pt-3">

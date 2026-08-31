@@ -6,7 +6,7 @@
 | --- | --- |
 | `/` (`page.tsx`) | Home: search, featured helpers, how it works |
 | `gigs/` | Browse, view, create, and edit gig listings |
-| `sellers/` | Public helper profile |
+| `sellers/` | Public helper profile (1–10 reviews, including local jobs) |
 | `orders/` | Buyer and seller job list, calendar, and order detail |
 | `requests/` | Local job requests and quotes |
 | `inbox/` | Direct messages |

@@ -13,7 +13,7 @@ export async function GET() {
 
   const [ordersRes, reviewsRes, favoritesRes] = await Promise.all([
     proxyRequest(ORDERS_SERVICE, "/orders/stats", { user }),
-    proxyRequest(GIGS_SERVICE, `/gigs/reviews/by-seller/${user.id}`),
+    proxyRequest(GIGS_SERVICE, `/reviews/by-seller/${user.id}`),
     proxyRequest(GIGS_SERVICE, `/gigs/favorites/count/${user.id}`),
   ]);
 

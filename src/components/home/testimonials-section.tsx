@@ -31,10 +31,9 @@ export function TestimonialsSection({ liveReviews }: TestimonialsSectionProps) {
                 transition={{ duration: 0.3, delay: 0.1 * i }}
                 className="relative rounded-xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] p-6"
               >
-                <div className="flex gap-0.5 mb-3">
-                  {Array.from({ length: r.rating }).map((_, j) => (
-                    <Star key={j} className="h-4 w-4 text-[rgb(var(--color-accent-yellow))]" weight="fill" />
-                  ))}
+                <div className="flex gap-0.5 mb-3" aria-label={`דירוג ${r.rating} מתוך 10`}>
+                  <Star className="h-4 w-4 text-[rgb(var(--color-accent-yellow))]" weight="fill" />
+                  <span className="text-sm font-bold text-[rgb(var(--color-text))]">{r.rating}/10</span>
                 </div>
                 {isLive && (r.ratingQuality || r.ratingAttitude || r.ratingTimeliness || r.ratingPrice) && (
                   <div className="mb-3 flex flex-wrap gap-1.5">

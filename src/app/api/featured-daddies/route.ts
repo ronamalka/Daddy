@@ -12,7 +12,7 @@ export async function GET() {
   const enriched = await Promise.all(
     sellers.map(async (s: { id: string; name: string; avatar: string | null; bio: string | null; city: string | null; services: string[]; serviceAreas: unknown[]; startingPrice: number | null }) => {
       const [{ data: reviewData }, { data: ordersData }] = await Promise.all([
-        proxyRequest(GIGS_SERVICE, `/gigs/reviews/by-seller/${s.id}`).catch(() => ({ data: null, status: 502 })),
+        proxyRequest(GIGS_SERVICE, `/reviews/by-seller/${s.id}`).catch(() => ({ data: null, status: 502 })),
         proxyRequest(ORDERS_SERVICE, `/orders/count-by-seller/${s.id}`).catch(() => ({ data: null, status: 502 })),
       ]);
 

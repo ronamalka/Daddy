@@ -119,14 +119,16 @@ model Review {
   sellerResponseAt    DateTime?
   hiddenAt            DateTime?
   orderId             String       @unique // cross-service ref to orders-service
-  gigId               String
+  gigId               String?      // null for local jobs (LOCAL_REQUEST)
+  sellerId            String       @default("") // from the order; backfilled from gig for old rows
   userId              String       // cross-service ref to users-service
   createdAt           DateTime     @default(now())
 
-  gig   Gig          @relation(fields: [gigId], references: [id])
+  gig   Gig?         @relation(fields: [gigId], references: [id])
   flags ReviewFlag[]
 
   @@index([gigId])
+  @@index([sellerId])
   @@index([userId])
 }
 

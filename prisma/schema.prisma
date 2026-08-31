@@ -389,14 +389,18 @@ model Review {
   sellerResponseAt    DateTime?
   hiddenAt            DateTime?
   orderId             String    @unique
-  gigId               String
+  gigId               String?   // null for local jobs (LOCAL_REQUEST)
+  sellerId            String    @default("")
   userId              String
   createdAt           DateTime  @default(now())
 
   order Order        @relation(fields: [orderId], references: [id])
-  gig   Gig          @relation(fields: [gigId], references: [id])
+  gig   Gig?         @relation(fields: [gigId], references: [id])
   user  User         @relation(fields: [userId], references: [id])
   flags ReviewFlag[]
+
+  @@index([gigId])
+  @@index([sellerId])
 }
 
 model ReviewFlag {

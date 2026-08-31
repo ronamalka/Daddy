@@ -150,7 +150,7 @@ export default function ProfilePage() {
                 {stats?.avgRating ? (
                   <>
                     <Star className="h-5 w-5 text-[rgb(var(--color-accent-yellow))]" weight="fill" />
-                    <p className="text-[24px] font-bold text-[rgb(var(--color-accent-yellow))]">{stats.avgRating}</p>
+                    <p className="text-[24px] font-bold text-[rgb(var(--color-accent-yellow))]">{stats.avgRating}/10</p>
                   </>
                 ) : (
                   <p className="text-[24px] font-bold text-[rgb(var(--color-accent-yellow))]">--</p>

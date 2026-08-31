@@ -289,7 +289,7 @@ export default function SellerProfilePage() {
                 {seller.avgRating > 0 && (
                   <span className="flex items-center gap-1">
                     <Star className="h-3.5 w-3.5 text-[rgb(var(--color-accent-yellow))]" weight="fill" />
-                    {seller.avgRating.toFixed(1)} ({seller.totalReviews})
+                    {seller.avgRating.toFixed(1)}/10 ({seller.totalReviews})
                   </span>
                 )}
               </div>
@@ -594,7 +594,7 @@ function ReviewsTab({ reviews }: { reviews: ReviewData[] }) {
             </div>
             <div className="flex items-center gap-1 rounded-full bg-[rgba(var(--color-accent-yellow),0.15)] px-3 py-1.5">
               <Star className="h-3.5 w-3.5 text-[rgb(var(--color-accent-yellow))]" weight="fill" />
-              <span className="text-[13px] font-bold text-[rgb(var(--color-warning))]">{review.rating}</span>
+              <span className="text-[13px] font-bold text-[rgb(var(--color-warning))]">{review.rating}/10</span>
             </div>
           </div>
 
