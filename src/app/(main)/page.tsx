@@ -15,23 +15,20 @@ import {
   TestimonialsSection,
   CtaSection,
   ResultsView,
-  RequestsView,
 } from "@/components/home";
-import type { Provider, ServiceRequest, FeaturedDaddy, LiveReview } from "@/components/home/types";
-import { VisitWindowFields, visitWindowToIso, type VisitWindowValue } from "@/components/visit-window-fields";
+import type { Provider, FeaturedDaddy, LiveReview } from "@/components/home/types";
+import { visitWindowToIso, type VisitWindowValue } from "@/components/visit-window-fields";
 
 /** Shows the home page with search, featured daddies, and how the site works. */
 export default function HomePage() {
   const { data: session } = useSession();
-  const [view, setView] = useState<"browse" | "results" | "requests">("browse");
+  const [view, setView] = useState<"browse" | "results">("browse");
   const [selectedCategory, setSelectedCategory] = useState("");
   const [selectedService, setSelectedService] = useState("");
   const [selectedDistrict, setSelectedDistrict] = useState("");
   const [serviceSearch, setServiceSearch] = useState("");
   const [providers, setProviders] = useState<Provider[]>([]);
-  const [requests, setRequests] = useState<ServiceRequest[]>([]);
   const [loadingProviders, setLoadingProviders] = useState(false);
-  const [loadingRequests, setLoadingRequests] = useState(false);
   const [showRequestForm, setShowRequestForm] = useState(false);
   const [reqTitle, setReqTitle] = useState("");
   const [reqDesc, setReqDesc] = useState("");
@@ -96,44 +93,40 @@ export default function HomePage() {
     return () => { cancelled = true; };
   }, [selectedService, selectedDistrict]);
 
-  /** Loads open service requests, optionally filtered by district. */
-  function loadRequests(district?: string) {
-    setLoadingRequests(true);
-    const p = new URLSearchParams();
-    const d = district !== undefined ? district : selectedDistrict;
-    if (d) p.set("district", d);
-    fetch(`/api/service-requests?${p}`)
-      .then((r) => r.json())
-      .then((data) => { setRequests(Array.isArray(data) ? data : []); setLoadingRequests(false); })
-      .catch(() => setLoadingRequests(false));
-  }
-
   /** Sends a new service request from the homepage form. */
   async function submitRequest() {
     if (!reqTitle.trim() || !reqDesc.trim() || !reqWindow?.date) return;
     setSubmitting(true);
     const districtName = selectedDistrict ? DISTRICTS[Number(selectedDistrict)] : null;
     const { slotStart, slotEnd } = visitWindowToIso(reqWindow);
-    await fetch("/api/service-requests", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        title: reqTitle,
-        description: reqDesc,
-        serviceSlug: selectedService || null,
-        districtCode: selectedDistrict ? Number(selectedDistrict) : null,
-        districtName,
-        slotStart,
-        slotEnd,
-      }),
-    });
+    try {
+      const res = await fetch("/api/service-requests", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title: reqTitle,
+          description: reqDesc,
+          serviceSlug: selectedService || null,
+          districtCode: selectedDistrict ? Number(selectedDistrict) : null,
+          districtName,
+          slotStart,
+          slotEnd,
+        }),
+      });
+      if (!res.ok) {
+        setSubmitting(false);
+        return;
+      }
+      setSubmitted(true);
+      setReqTitle("");
+      setReqDesc("");
+      setReqWindow(null);
+      setShowRequestForm(false);
+      setTimeout(() => setSubmitted(false), 4000);
+    } catch {
+      // Keep the form open so the buyer can retry.
+    }
     setSubmitting(false);
-    setSubmitted(true);
-    setReqTitle("");
-    setReqDesc("");
-    setReqWindow(null);
-    setShowRequestForm(false);
-    setTimeout(() => setSubmitted(false), 4000);
   }
 
   /** Clears the current search and returns to the browse view. */
@@ -174,19 +167,6 @@ export default function HomePage() {
     );
   }
 
-  if (view === "requests") {
-    return (
-      <RequestsView
-        requests={requests}
-        loadingRequests={loadingRequests}
-        selectedDistrict={selectedDistrict}
-        setSelectedDistrict={setSelectedDistrict}
-        loadRequests={loadRequests}
-        resetSearch={resetSearch}
-      />
-    );
-  }
-
   return (
     <div className="min-h-screen">
       <HeroSection
@@ -223,11 +203,7 @@ export default function HomePage() {
 
       <TestimonialsSection liveReviews={liveReviews} />
 
-      <CtaSection
-        session={session}
-        setView={setView}
-        loadRequests={loadRequests}
-      />
+      <CtaSection session={session} />
     </div>
   );
 }

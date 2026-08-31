@@ -1,19 +1,48 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
-import { proxyRequest, REQUESTS_SERVICE } from "@/lib/gateway";
+import { proxyRequest, REQUESTS_SERVICE, USERS_SERVICE } from "@/lib/gateway";
 import { verifyTurnstileToken } from "@/lib/turnstile";
 import { detectBot } from "@/lib/bot-detection";
 import { isTwoHourLocalWindow, parseSlotIso } from "@/lib/availability";
 
-/** Returns open service requests. Query params are passed through. */
+/** Loads a public display name for a user, or a Hebrew fallback. */
+async function loadBuyer(id: string): Promise<{ id: string; name: string }> {
+  const { data } = await proxyRequest(USERS_SERVICE, `/sellers/${id}`);
+  if (data?.id && typeof data.name === "string") {
+    return { id: data.id, name: data.name };
+  }
+  return { id, name: "משתמש" };
+}
+
+/** Adds a buyer name to each listed request so the seller UI can render it. */
+async function withBuyerNames(rows: Array<{ buyerId: string }>) {
+  const ids = [...new Set(rows.map((row) => row.buyerId))];
+  const people = await Promise.all(ids.map((id) => loadBuyer(id)));
+  const map = Object.fromEntries(people.map((person) => [person.id, person]));
+  return rows.map((row) => ({
+    ...row,
+    buyer: map[row.buyerId] || { id: row.buyerId, name: "משתמש" },
+  }));
+}
+
+/** Returns service requests the signed-in user is allowed to see. */
 export async function GET(request: NextRequest) {
+  const session = await auth();
+  if (!session?.user) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   const params = request.nextUrl.searchParams.toString();
   const path = params ? `/service-requests?${params}` : "/service-requests";
-  const { data, status } = await proxyRequest(REQUESTS_SERVICE, path);
-  if (status >= 500 || !data) {
-    return NextResponse.json([], { status: 200 });
+  const user = session.user as { id: string; email: string; name: string; role: string };
+  const { data, status } = await proxyRequest(REQUESTS_SERVICE, path, { user });
+  if (!Array.isArray(data)) {
+    if (status >= 500 || !data) {
+      return NextResponse.json([], { status: 200 });
+    }
+    return NextResponse.json(data, { status });
   }
-  return NextResponse.json(data, { status });
+  return NextResponse.json(await withBuyerNames(data), { status });
 }
 
 /** Creates a service request after bot, CAPTCHA, and visit-window checks. */
@@ -80,5 +109,11 @@ export async function POST(request: NextRequest) {
     body: cleanBody,
     user,
   });
+  if (!data) {
+    return NextResponse.json(
+      { error: "שגיאה בשליחת הבקשה" },
+      { status: status >= 400 ? status : 502 }
+    );
+  }
   return NextResponse.json(data, { status });
 }

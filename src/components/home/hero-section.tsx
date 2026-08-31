@@ -12,7 +12,7 @@ interface HeroSectionProps {
   setServiceSearch: (v: string) => void;
   selectedService: string;
   setSelectedService: (v: string) => void;
-  setView: (v: "browse" | "results" | "requests") => void;
+  setView: (v: "browse" | "results") => void;
   filteredServices: typeof ALL_SERVICES;
 }
 

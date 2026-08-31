@@ -14,6 +14,7 @@ import {
   Plus,
   Shield,
   Briefcase,
+  ClipboardText,
   MagnifyingGlass,
 } from "@phosphor-icons/react";
 import { NotificationBell } from "@/components/notification-bell";
@@ -91,7 +92,10 @@ export function Navbar() {
           {session?.user ? (
             <>
               {session.user.role === "SELLER" && (
-                <NavLink href="/gigs/create" icon={<Plus className="h-4 w-4" />}>צור שירות</NavLink>
+                <>
+                  <NavLink href="/requests" icon={<ClipboardText className="h-4 w-4" />}>בקשות</NavLink>
+                  <NavLink href="/gigs/create" icon={<Plus className="h-4 w-4" />}>צור שירות</NavLink>
+                </>
               )}
               <NavLink href="/orders" icon={<Bag className="h-4 w-4" />}>
                 {session.user.role === "SELLER" ? "עבודות" : "הזמנות"}
@@ -220,9 +224,14 @@ export function Navbar() {
           {session?.user ? (
             <>
               {session.user.role === "SELLER" && (
-                <MobileNavLink href="/gigs/create" onClick={() => setMobileOpen(false)} icon={<Plus className="h-4 w-4" />}>
-                  צור שירות
-                </MobileNavLink>
+                <>
+                  <MobileNavLink href="/requests" onClick={() => setMobileOpen(false)} icon={<ClipboardText className="h-4 w-4" />}>
+                    בקשות
+                  </MobileNavLink>
+                  <MobileNavLink href="/gigs/create" onClick={() => setMobileOpen(false)} icon={<Plus className="h-4 w-4" />}>
+                    צור שירות
+                  </MobileNavLink>
+                </>
               )}
               <MobileNavLink href="/orders" onClick={() => setMobileOpen(false)} icon={<Bag className="h-4 w-4" />}>
                 {session.user.role === "SELLER" ? "עבודות" : "הזמנות"}
