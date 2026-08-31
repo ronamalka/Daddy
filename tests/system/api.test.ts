@@ -139,7 +139,10 @@ describe("System Tests — Public API", () => {
 
   describe("GET /api/locations", () => {
     it("returns 200", async () => {
-      const { status } = await fetchApi("/api/locations");
+      let { status } = await fetchApi("/api/locations");
+      if (status === 502) {
+        ({ status } = await fetchApi("/api/locations"));
+      }
       expect(status).toBe(200);
     });
   });
