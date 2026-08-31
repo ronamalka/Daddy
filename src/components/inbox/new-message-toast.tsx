@@ -5,6 +5,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { ChatCircle } from "@phosphor-icons/react";
 import { AnimatePresence, motion } from "framer-motion";
 import type { Conversation } from "@/components/inbox/messenger";
+import { messagePreviewText } from "@/lib/message-validation";
 
 /** Popup toast when a new chat arrives and the inbox for that person is not open. */
 export function NewMessageToast() {
@@ -43,7 +44,7 @@ export function NewMessageToast() {
         if (unread > prev && !alreadyOpen) {
           show({
             name: row.otherUser.name,
-            preview: row.lastMessage.content,
+            preview: messagePreviewText(row.lastMessage.content, row.lastMessage.attachment),
             href: `/inbox/${row.otherUserId}`,
           });
         }

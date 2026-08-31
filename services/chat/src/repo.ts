@@ -9,6 +9,7 @@ export function prismaMessageRepo(prisma: PrismaClient): MessageRepo {
       const message = await prisma.message.create({
         data: {
           content: data.content,
+          attachment: data.attachment,
           senderId: data.senderId,
           receiverId: data.receiverId,
           orderId: data.orderId,

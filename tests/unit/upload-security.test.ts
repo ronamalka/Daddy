@@ -4,6 +4,10 @@ import {
   validateTotalSize,
   stripExifFromJpeg,
 } from "../../src/lib/upload-security";
+import {
+  isAllowedAttachmentUrl,
+  isImageAttachment,
+} from "../../src/lib/attachment-url";
 
 const JPEG_MAGIC = new Uint8Array([0xff, 0xd8, 0xff, 0xe0, 0x00, 0x10, 0x4a, 0x46, 0x49, 0x46]);
 const PNG_MAGIC = new Uint8Array([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 0x00, 0x00]);
@@ -39,6 +43,16 @@ describe("validateUpload", () => {
     );
     expect(result.valid).toBe(true);
     expect(result.sanitizedName).toMatch(/^[0-9a-f-]+\.webp$/);
+  });
+
+  it("accepts valid PDF", () => {
+    const result = validateUpload(
+      { name: "receipt.pdf", size: 2048, type: "application/pdf" },
+      new Uint8Array([0x25, 0x50, 0x44, 0x46, 0x2d, 0x31, 0x2e, 0x34])
+    );
+    expect(result.valid).toBe(true);
+    expect(result.sanitizedName).toMatch(/^[0-9a-f-]+\.pdf$/);
+    expect(result.detectedType).toBe("application/pdf");
   });
 
   it("rejects files exceeding 5MB", () => {
@@ -172,5 +186,23 @@ describe("stripExifFromJpeg", () => {
       }
     }
     expect(hasApp0).toBe(true);
+  });
+});
+
+describe("isAllowedAttachmentUrl", () => {
+  const ok = "/uploads/550e8400-e29b-41d4-a716-446655440000.jpg";
+
+  it("accepts a relative /uploads UUID path", () => {
+    expect(isAllowedAttachmentUrl(ok)).toBe(true);
+    expect(isImageAttachment(ok)).toBe(true);
+  });
+
+  it("rejects remote URLs even if the path looks like an upload", () => {
+    expect(isAllowedAttachmentUrl(`https://evil.example${ok}`)).toBe(false);
+  });
+
+  it("rejects javascript: and data: URLs", () => {
+    expect(isAllowedAttachmentUrl("javascript:alert(1)")).toBe(false);
+    expect(isAllowedAttachmentUrl("data:image/jpeg;base64,xxxx")).toBe(false);
   });
 });

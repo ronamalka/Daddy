@@ -16,6 +16,7 @@ export type SendMessageInput = {
   senderRole?: string;
   receiverId: string;
   content: string;
+  attachment?: string | null;
   orderId?: string | null;
 };
 
@@ -38,9 +39,24 @@ export type ConversationPreview = {
   unreadCount: number;
 };
 
+const ATTACHMENT_PATH =
+  /^\/uploads\/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\.(jpg|jpeg|png|webp|pdf)$/i;
+
+/** Accepts a same-origin /uploads/... path, or null if the field was omitted. */
+export function parseAttachment(value: unknown): { ok: true; url: string | null } | { ok: false } {
+  if (value === undefined || value === null || value === "") {
+    return { ok: true, url: null };
+  }
+  if (typeof value !== "string" || value.length > 200 || !ATTACHMENT_PATH.test(value)) {
+    return { ok: false };
+  }
+  return { ok: true, url: value };
+}
+
 export interface MessageRepo {
   create(data: {
     content: string;
+    attachment: string | null;
     senderId: string;
     receiverId: string;
     orderId: string | null;
@@ -94,13 +110,20 @@ function trimContent(content: unknown): string {
   return typeof content === "string" ? content.trim() : "";
 }
 
-/** Create a message after checking the receiver and the text. */
+/** Create a message after checking the receiver, the text, and any upload path. */
 export function sendMessage(repo: MessageRepo, input: SendMessageInput): Promise<ChatResult<MessageRecord>> {
   const content = trimContent(input.content);
   const { senderId, receiverId, orderId } = input;
+  const attachment = parseAttachment(input.attachment);
 
-  if (!receiverId || !content) {
+  if (!attachment.ok) {
+    return Promise.resolve({ ok: false, status: 400, error: "Invalid attachment" });
+  }
+  if (!receiverId) {
     return Promise.resolve({ ok: false, status: 400, error: "receiverId and content required" });
+  }
+  if (!content && !attachment.url) {
+    return Promise.resolve({ ok: false, status: 400, error: "content or attachment required" });
   }
   if (typeof receiverId !== "string" || receiverId.length > 64) {
     return Promise.resolve({ ok: false, status: 400, error: "Invalid receiverId" });
@@ -114,6 +137,7 @@ export function sendMessage(repo: MessageRepo, input: SendMessageInput): Promise
 
   return repo.create({
     content,
+    attachment: attachment.url,
     senderId,
     receiverId,
     orderId: orderId || null,
@@ -179,7 +203,7 @@ export function createInMemoryRepo(): MessageRepo & { records: MessageRecord[] }
       const message: MessageRecord = {
         id: `msg-${++seq}`,
         content: data.content,
-        attachment: null,
+        attachment: data.attachment ?? null,
         orderId: data.orderId,
         senderId: data.senderId,
         receiverId: data.receiverId,

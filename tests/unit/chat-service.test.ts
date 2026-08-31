@@ -143,6 +143,30 @@ describe("chat service send/receive", () => {
     expect(unscoped).toMatchObject({ ok: false, status: 400 });
   });
 
+  it("persists an allowlisted photo and rejects a remote URL", async () => {
+    const repo = createInMemoryRepo();
+    const path = "/uploads/550e8400-e29b-41d4-a716-446655440000.jpg";
+
+    const photo = await sendMessage(repo, {
+      senderId: buyer,
+      receiverId: seller,
+      content: "",
+      attachment: path,
+    });
+    expect(photo.ok).toBe(true);
+    if (!photo.ok) return;
+    expect(photo.data.content).toBe("");
+    expect(photo.data.attachment).toBe(path);
+
+    const remote = await sendMessage(repo, {
+      senderId: buyer,
+      receiverId: seller,
+      content: "look",
+      attachment: "https://evil.example/x.jpg",
+    });
+    expect(remote).toMatchObject({ ok: false, status: 400, error: "Invalid attachment" });
+  });
+
   it("keeps every message between two people in a single conversation", async () => {
     const repo = createInMemoryRepo();
     await sendMessage(repo, {

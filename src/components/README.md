@@ -16,6 +16,7 @@ Reusable pieces of the interface. Subfolders group related screens.
 | `profile-progress.tsx` | Daddy onboarding meter and checklist |
 | `home/` | Homepage sections |
 | `inbox/` | Messenger UI |
+| `chat/` | Attachment bubble and paperclip composer |
 | `orders/` | Order cards, seller calendar, and dispute dialog |
 | `admin/` | Moderation queue |
 | `ui/` | Small primitives (button, dialog, sheet) |

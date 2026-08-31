@@ -6,6 +6,9 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { ChatCircle, Lock, MagnifyingGlass, PaperPlaneTilt, CaretRight } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
+import { messagePreviewText } from "@/lib/message-validation";
+import { AttachmentBubble } from "@/components/chat/attachment-bubble";
+import { ComposerAttach } from "@/components/chat/composer-attach";
 
 export interface Conversation {
   otherUserId: string;
@@ -13,6 +16,7 @@ export interface Conversation {
   lastMessage: {
     id: string;
     content: string;
+    attachment?: string | null;
     senderId: string;
     receiverId: string;
     orderId: string | null;
@@ -24,6 +28,7 @@ export interface Conversation {
 interface ChatMessage {
   id: string;
   content: string;
+  attachment: string | null;
   senderId: string;
   receiverId: string;
   orderId: string | null;
@@ -96,6 +101,9 @@ export function MessengerInbox({ peerId }: { peerId?: string }) {
   const [query, setQuery] = useState("");
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [draft, setDraft] = useState("");
+  const [attachment, setAttachment] = useState<string | null>(null);
+  const [attachError, setAttachError] = useState("");
+  const [attachBusy, setAttachBusy] = useState(false);
   const [sending, setSending] = useState(false);
   const [newFromId, setNewFromId] = useState<string | null>(null);
   const [orderTitles, setOrderTitles] = useState<Record<string, string>>({});
@@ -149,6 +157,9 @@ export function MessengerInbox({ peerId }: { peerId?: string }) {
     if (!peerId || !me) return;
     const otherId = peerId;
     seededNew.current = null;
+    setAttachment(null);
+    setAttachError("");
+    setDraft("");
     let cancelled = false;
 
     /** Loads messages with this person and optionally marks them as read. */
@@ -188,23 +199,33 @@ export function MessengerInbox({ peerId }: { peerId?: string }) {
   const filtered = useMemo(() => {
     const q = query.trim();
     if (!q) return conversations;
-    return conversations.filter((c) => c.otherUser.name.includes(q) || c.lastMessage.content.includes(q));
+    return conversations.filter(
+      (c) =>
+        c.otherUser.name.includes(q) ||
+        messagePreviewText(c.lastMessage.content, c.lastMessage.attachment).includes(q)
+    );
   }, [conversations, query]);
 
-  /** Posts the draft message to the open conversation. */
+  /** Posts the draft message (and optional upload) to the open conversation. */
   async function send(e: React.FormEvent) {
     e.preventDefault();
-    if (!draft.trim() || !peerId || sending) return;
+    if ((!draft.trim() && !attachment) || !peerId || sending || attachBusy) return;
     setSending(true);
     const res = await fetch("/api/messages", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ receiverId: peerId, content: draft }),
+      body: JSON.stringify({
+        receiverId: peerId,
+        content: draft,
+        ...(attachment ? { attachment } : {}),
+      }),
     });
     if (res.ok) {
       const created = await res.json();
       setMessages((prev) => [...prev, created]);
       setDraft("");
+      setAttachment(null);
+      setAttachError("");
       emitMessagesChanged();
       loadConversations();
     }
@@ -284,7 +305,7 @@ export function MessengerInbox({ peerId }: { peerId?: string }) {
                   <div className="mt-0.5 flex items-center justify-between gap-2">
                     <p className={cn("truncate text-[13px]", unread ? "font-medium text-[rgb(var(--color-text))]" : "text-[rgb(var(--color-text-muted))]")}>
                       {mine ? "את/ה: " : ""}
-                      {c.lastMessage.content}
+                      {messagePreviewText(c.lastMessage.content, c.lastMessage.attachment)}
                     </p>
                     {unread && (
                       <span className="flex h-5 min-w-5 shrink-0 items-center justify-center rounded-full bg-[rgb(var(--color-primary))] px-1.5 text-[10px] font-bold text-white">
@@ -362,7 +383,8 @@ export function MessengerInbox({ peerId }: { peerId?: string }) {
                             : "rounded-ee-md border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] text-[rgb(var(--color-text))]"
                         )}
                       >
-                        {msg.content}
+                        {msg.attachment && <AttachmentBubble url={msg.attachment} onPrimary={isMe} />}
+                        {msg.content ? msg.content : null}
                       </div>
                       <p className={cn("mt-1 text-[11px] text-[rgb(var(--color-text-muted))]", isMe ? "text-end" : "text-start")}>
                         {new Date(msg.createdAt).toLocaleTimeString("he-IL", { hour: "2-digit", minute: "2-digit" })}
@@ -379,6 +401,13 @@ export function MessengerInbox({ peerId }: { peerId?: string }) {
 
       <form onSubmit={send} className="border-t border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] px-4 py-3">
         <div className="mx-auto flex max-w-2xl items-end gap-2">
+          <ComposerAttach
+            value={attachment}
+            onChange={setAttachment}
+            disabled={sending}
+            onError={setAttachError}
+            onBusyChange={setAttachBusy}
+          />
           <input
             value={draft}
             onChange={(e) => setDraft(e.target.value)}
@@ -387,13 +416,16 @@ export function MessengerInbox({ peerId }: { peerId?: string }) {
           />
           <button
             type="submit"
-            disabled={sending || !draft.trim()}
+            disabled={sending || attachBusy || (!draft.trim() && !attachment)}
             className="flex h-11 w-11 items-center justify-center rounded-full bg-[rgb(var(--color-primary))] text-white transition-opacity hover:bg-[rgb(var(--color-primary-hover))] disabled:opacity-40"
             aria-label="שלח"
           >
             <PaperPlaneTilt className="h-5 w-5" />
           </button>
         </div>
+        {attachError && (
+          <p className="mx-auto mt-2 max-w-2xl text-[12px] text-[rgb(var(--color-error))]">{attachError}</p>
+        )}
       </form>
     </div>
   ) : (
