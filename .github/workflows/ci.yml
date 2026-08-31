@@ -133,6 +133,22 @@ jobs:
               exit 1
             fi
           done
+          echo "Waiting for Redis on port 6379..."
+          redis_ready=false
+          for i in $(seq 1 30); do
+            if docker compose -f docker-compose.yml -f docker-compose.ci.yml exec -T redis redis-cli ping | grep -q PONG; then
+              echo "Redis is ready"
+              redis_ready=true
+              break
+            fi
+            echo "Waiting for Redis... ($i/30)"
+            sleep 2
+          done
+          if [ "$redis_ready" = false ]; then
+            echo "ERROR: Redis did not start in time"
+            docker compose -f docker-compose.yml -f docker-compose.ci.yml logs redis
+            exit 1
+          fi
 
       - name: Install service dependencies for migrations
         run: |
@@ -200,6 +216,7 @@ jobs:
           DATABASE_URL: "postgresql://daddy:daddypass123@localhost:5432/daddy_users"
           AUTH_SECRET: "ci-test-secret-at-least-32-characters-long"
           AUTH_TRUST_HOST: "true"
+          REDIS_URL: "redis://localhost:6379"
           GOOGLE_CLIENT_ID: "test-google-client-id"
           GOOGLE_CLIENT_SECRET: "test-google-client-secret"
           USERS_SERVICE_URL: "http://localhost:4001"

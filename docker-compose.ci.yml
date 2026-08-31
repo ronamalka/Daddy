@@ -1,4 +1,10 @@
 services:
+  # Next.js runs on the CI host (not in compose), so Redis must be reachable
+  # at localhost:6379. Without this, login hangs on lockout checks forever.
+  redis:
+    ports:
+      - "6379:6379"
+
   users-service:
     ports:
       - "4001:4001"

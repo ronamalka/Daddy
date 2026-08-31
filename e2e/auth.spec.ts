@@ -1,5 +1,6 @@
 import { test, expect } from "@playwright/test";
 import { stubCookieConsent } from "./cookies";
+import { loginAs } from "./login";
 
 test.describe("Auth Flow", () => {
   test.beforeEach(async ({ page }) => {
@@ -18,7 +19,9 @@ test.describe("Auth Flow", () => {
 
   test("login page loads and shows form", async ({ page }) => {
     await page.goto("/login");
-    await expect(page.getByText("ברוך הבא חזרה")).toBeVisible({ timeout: 10000 });
+    await expect(page.getByRole("heading", { name: "שוב פה? יופי, חיכינו לך" })).toBeVisible({
+      timeout: 10000,
+    });
     await expect(page.getByPlaceholder("you@example.com")).toBeVisible();
   });
 
@@ -28,29 +31,27 @@ test.describe("Auth Flow", () => {
     await page.getByPlaceholder("הזן את הסיסמה שלך").fill("wrongpassword");
     await page.getByRole("button", { name: "התחבר" }).click();
 
-    await expect(
-      page.getByText(/שגיאה|שגוי|לא נכון|invalid|credentials/i).first()
-    ).toBeVisible({ timeout: 10000 });
+    await expect(page.getByRole("alert")).toBeVisible({ timeout: 10000 });
+    await expect(page.getByText(/שגוי/)).toBeVisible();
   });
 
   test("login with valid credentials redirects to home", async ({ page }) => {
-    await page.goto("/login");
-    await page.getByPlaceholder("you@example.com").fill("admin@daddy.com");
-    await page.getByPlaceholder("הזן את הסיסמה שלך").fill("password123");
-    await page.getByRole("button", { name: "התחבר" }).click();
-    await page.waitForURL("/", { timeout: 15000 });
+    await loginAs(page, "admin@daddy.com");
   });
 
   test("register rejects duplicate email", async ({ page }) => {
     await page.goto("/register");
     await page.getByPlaceholder("ישראל ישראלי").fill("Test User");
     await page.getByPlaceholder("you@example.com").fill("admin@daddy.com");
-    await page.getByPlaceholder("לפחות 6 תווים").fill("password123");
-
+    await page.getByPlaceholder(/לפחות 8 תווים/).fill("Password1!");
+    await page.getByRole("checkbox", { name: /תנאי השימוש/ }).check();
+    await page.getByRole("checkbox", { name: /18/ }).check();
     await page.getByRole("button", { name: "המשך" }).click();
-    await expect(
-      page.getByText(/קיים|נמצא|duplicate|exists/i).first()
-    ).toBeVisible({ timeout: 10000 });
+    await expect(page.getByRole("heading", { name: "איפה אתה פועל?" })).toBeVisible();
+    await page.getByRole("button", { name: "דלג, אבחר אחר כך" }).click();
+    await expect(page.getByText(/קיים|נמצא|duplicate|exists|already/i).first()).toBeVisible({
+      timeout: 10000,
+    });
   });
 
   test("protected pages redirect unauthenticated users", async ({ page }) => {
