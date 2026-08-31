@@ -18,6 +18,7 @@ export const SEED_IDS = {
   buyer: "seed-user-buyer1",
   buyer2: "seed-user-buyer2",
   buyer3: "seed-user-buyer3",
+  incompleteSeller: "seed-user-incomplete",
 };
 
 /** Loads demo buyers, sellers, and an admin into daddy_users. */
@@ -35,6 +36,14 @@ async function main() {
     { id: SEED_IDS.buyer, name: "דנה לקוחה", email: "buyer@daddy.com", passwordHash, role: "BUYER" as const, city: "תל אביב", districtCode: 5, cityCode: 5000 },
     { id: SEED_IDS.buyer2, name: "מיכל הקונה", email: "buyer2@daddy.com", passwordHash, role: "BUYER" as const, city: "חיפה", districtCode: 3, cityCode: 4000 },
     { id: SEED_IDS.buyer3, name: "שי הלקוח", email: "buyer3@daddy.com", passwordHash, role: "BUYER" as const, city: "ירושלים", districtCode: 1, cityCode: 3000 },
+    {
+      id: SEED_IDS.incompleteSeller,
+      name: "אבא לא מוכן",
+      email: "incomplete@daddy.com",
+      passwordHash,
+      role: "SELLER" as const,
+      bio: "נרשם אבל עוד אין מחיר, אזור, או שעות.",
+    },
   ];
 
   for (const u of users) {
