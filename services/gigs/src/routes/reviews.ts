@@ -2,6 +2,11 @@ import { Router, Request, Response } from "express";
 import { requireAuth, requireAdmin } from "../../../shared/middleware";
 import { prisma } from "../index";
 import { FlagStatus } from "../generated/prisma/client";
+import {
+  areTenPointCriteria,
+  isTenPointRating,
+  overallFromCriteria,
+} from "../lib/review-ratings";
 
 /** Routes for creating reviews, looking them up, flagging, and seller replies. */
 export const reviewsRoutes = Router();
@@ -33,6 +38,42 @@ reviewsRoutes.get("/by-order/:orderId", async (req: Request, res: Response) => {
   }
 
   res.json(review);
+});
+
+/** List visible reviews for one daddy, including local jobs with no gig. */
+reviewsRoutes.get("/by-seller/:sellerId", async (req: Request, res: Response) => {
+  const sellerId = req.params.sellerId as string;
+
+  const reviews = await prisma.review.findMany({
+    where: { sellerId, hiddenAt: null },
+    select: {
+      id: true,
+      rating: true,
+      comment: true,
+      ratingAttitude: true,
+      ratingTimeliness: true,
+      ratingPrice: true,
+      ratingQuality: true,
+      sellerResponse: true,
+      sellerResponseAt: true,
+      userId: true,
+      gigId: true,
+      sellerId: true,
+      createdAt: true,
+    },
+    orderBy: { createdAt: "desc" },
+  });
+
+  const avgRating =
+    reviews.length > 0
+      ? reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length
+      : 0;
+
+  res.json({
+    reviews,
+    reviewCount: reviews.length,
+    avgRating: Math.round(avgRating * 10) / 10,
+  });
 });
 
 /** Flag a review as a problem, unless it is the user's own review. */
@@ -75,7 +116,7 @@ reviewsRoutes.post("/:id/flag", requireAuth, async (req: Request, res: Response)
   res.status(201).json(flag);
 });
 
-/** Let the gig's seller reply to a review once. */
+/** Let the job's seller reply to a review once (gig or local job). */
 reviewsRoutes.post("/:id/respond", requireAuth, async (req: Request, res: Response) => {
   const id = req.params.id as string;
 
@@ -89,7 +130,8 @@ reviewsRoutes.post("/:id/respond", requireAuth, async (req: Request, res: Respon
     return;
   }
 
-  if (review.gig.sellerId !== req.user!.id) {
+  const sellerId = review.sellerId || review.gig?.sellerId;
+  if (sellerId !== req.user!.id) {
     res.status(403).json({ error: "Only the seller can respond" });
     return;
   }
@@ -113,31 +155,45 @@ reviewsRoutes.post("/:id/respond", requireAuth, async (req: Request, res: Respon
   res.json(updated);
 });
 
-/** Create a review for a completed order. */
+/** Create a review for a completed order (package or local job). */
 reviewsRoutes.post("/", requireAuth, async (req: Request, res: Response) => {
-  const { orderId, gigId, rating, comment, ratingAttitude, ratingTimeliness, ratingPrice, ratingQuality } = req.body;
+  const { orderId, gigId, sellerId, rating, comment, ratingAttitude, ratingTimeliness, ratingPrice, ratingQuality } = req.body;
 
-  if (!orderId || !gigId || !rating || !comment) {
+  if (!orderId || !sellerId || !comment) {
     res.status(400).json({ error: "Missing fields" });
     return;
   }
 
-  if (typeof rating !== "number" || rating < 1 || rating > 5) {
-    res.status(400).json({ error: "Rating must be between 1 and 5" });
+  if (!areTenPointCriteria(ratingAttitude, ratingTimeliness, ratingPrice, ratingQuality)) {
+    res.status(400).json({ error: "All ratings must be between 1 and 10" });
     return;
   }
 
-  const subRatings = [ratingAttitude, ratingTimeliness, ratingPrice, ratingQuality];
-  for (const r of subRatings) {
-    if (r !== undefined && r !== null && (typeof r !== "number" || r < 1 || r > 5)) {
-      res.status(400).json({ error: "Sub-ratings must be between 1 and 5" });
-      return;
-    }
+  const overall = isTenPointRating(rating)
+    ? rating
+    : overallFromCriteria(ratingAttitude, ratingTimeliness, ratingPrice, ratingQuality);
+
+  if (!isTenPointRating(overall)) {
+    res.status(400).json({ error: "Rating must be between 1 and 10" });
+    return;
   }
 
   if (typeof comment !== "string" || comment.trim().length === 0 || comment.length > 2000) {
     res.status(400).json({ error: "Comment must be between 1 and 2000 characters" });
     return;
+  }
+
+  const linkedGigId = typeof gigId === "string" && gigId.trim() ? gigId.trim() : null;
+  if (linkedGigId) {
+    const gig = await prisma.gig.findUnique({ where: { id: linkedGigId }, select: { sellerId: true } });
+    if (!gig) {
+      res.status(400).json({ error: "Gig not found" });
+      return;
+    }
+    if (gig.sellerId !== sellerId) {
+      res.status(400).json({ error: "Seller does not match gig" });
+      return;
+    }
   }
 
   const existing = await prisma.review.findUnique({ where: { orderId } });
@@ -149,14 +205,15 @@ reviewsRoutes.post("/", requireAuth, async (req: Request, res: Response) => {
   const review = await prisma.review.create({
     data: {
       orderId,
-      gigId,
+      gigId: linkedGigId,
+      sellerId,
       userId: req.user!.id,
-      rating,
+      rating: overall,
       comment: comment.trim(),
-      ratingAttitude: ratingAttitude ?? null,
-      ratingTimeliness: ratingTimeliness ?? null,
-      ratingPrice: ratingPrice ?? null,
-      ratingQuality: ratingQuality ?? null,
+      ratingAttitude,
+      ratingTimeliness,
+      ratingPrice,
+      ratingQuality,
     },
   });
 

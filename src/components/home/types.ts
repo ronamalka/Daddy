@@ -8,6 +8,7 @@ export interface Provider {
   serviceAreas: { districtName: string; cityName: string | null; districtCode: number }[];
   completedOrders: number;
   reviewCount: number;
+  avgRating?: number;
 }
 
 export interface ServiceRequest {

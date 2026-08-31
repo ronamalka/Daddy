@@ -11,17 +11,17 @@ describe("Average Rating Calculation", () => {
   });
 
   it("calculates average correctly", () => {
-    const reviews = [{ rating: 5 }, { rating: 3 }, { rating: 4 }];
-    expect(calcAvgRating(reviews)).toBe(4);
+    const reviews = [{ rating: 10 }, { rating: 8 }, { rating: 9 }];
+    expect(calcAvgRating(reviews)).toBe(9);
   });
 
   it("handles single review", () => {
-    expect(calcAvgRating([{ rating: 5 }])).toBe(5);
+    expect(calcAvgRating([{ rating: 10 }])).toBe(10);
   });
 
   it("handles decimal averages", () => {
-    const reviews = [{ rating: 4 }, { rating: 5 }];
-    expect(calcAvgRating(reviews)).toBe(4.5);
+    const reviews = [{ rating: 9 }, { rating: 10 }];
+    expect(calcAvgRating(reviews)).toBe(9.5);
   });
 });
 

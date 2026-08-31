@@ -31,20 +31,30 @@ describe("GET /api/sellers/:id", () => {
           status: 200,
         };
       }
+      if (url === "http://gigs.test" && path.startsWith("/reviews/by-seller")) {
+        return {
+          data: {
+            reviews: [
+              {
+                id: "rev1",
+                rating: 9,
+                comment: "מעולה",
+                userId: "seed-user-buyer1",
+                createdAt: "2026-01-01T00:00:00.000Z",
+              },
+            ],
+            reviewCount: 1,
+            avgRating: 9,
+          },
+          status: 200,
+        };
+      }
       if (url === "http://gigs.test") {
         return {
           data: [
             {
               id: "gig1",
-              reviews: [
-                {
-                  id: "rev1",
-                  rating: 9,
-                  comment: "מעולה",
-                  userId: "seed-user-buyer1",
-                  createdAt: "2026-01-01T00:00:00.000Z",
-                },
-              ],
+              reviews: [],
             },
           ],
           status: 200,
@@ -77,12 +87,22 @@ describe("GET /api/sellers/:id", () => {
           status: 200,
         };
       }
+      if (url === "http://gigs.test" && path.startsWith("/reviews/by-seller")) {
+        return {
+          data: {
+            reviews: [{ id: "rev1", rating: 8, comment: "טוב", userId: "gone" }],
+            reviewCount: 1,
+            avgRating: 8,
+          },
+          status: 200,
+        };
+      }
       if (url === "http://gigs.test") {
         return {
           data: [
             {
               id: "gig1",
-              reviews: [{ id: "rev1", rating: 8, comment: "טוב", userId: "gone" }],
+              reviews: [],
             },
           ],
           status: 200,
@@ -99,5 +119,49 @@ describe("GET /api/sellers/:id", () => {
     });
     const body = await res.json();
     expect(body.allReviews[0].user.name).toBe("משתמש");
+  });
+
+  it("includes local-job reviews that have no gigId", async () => {
+    mockedProxy.mockImplementation(async (url: string, path: string) => {
+      if (url === "http://users.test" && path === "/sellers/seed-user-seller1") {
+        return { data: { id: "seed-user-seller1", name: "יוסי" }, status: 200 };
+      }
+      if (url === "http://users.test" && path === "/sellers/seed-user-buyer1") {
+        return { data: { id: "seed-user-buyer1", name: "דנה", city: "חיפה" }, status: 200 };
+      }
+      if (url === "http://gigs.test" && path.startsWith("/reviews/by-seller")) {
+        return {
+          data: {
+            reviews: [
+              {
+                id: "rev-local",
+                rating: 9,
+                comment: "השידה יציבה",
+                userId: "seed-user-buyer1",
+                gigId: null,
+              },
+            ],
+            reviewCount: 1,
+            avgRating: 9,
+          },
+          status: 200,
+        };
+      }
+      if (url === "http://gigs.test") {
+        return { data: [], status: 200 };
+      }
+      if (url === "http://orders.test") {
+        return { data: { completedOrders: 1 }, status: 200 };
+      }
+      return { data: null, status: 404 };
+    });
+
+    const res = await GET(new Request("http://localhost/api/sellers/seed-user-seller1"), {
+      params: Promise.resolve({ id: "seed-user-seller1" }),
+    });
+    const body = await res.json();
+    expect(body.allReviews).toHaveLength(1);
+    expect(body.allReviews[0].gigId).toBeNull();
+    expect(body.avgRating).toBe(9);
   });
 });

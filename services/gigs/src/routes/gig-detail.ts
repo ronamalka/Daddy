@@ -243,28 +243,7 @@ gigDetailRoutes.get("/stats/counts", async (_req: Request, res: Response) => {
   res.json({ gigs: count });
 });
 
-/** Return review count and average rating for one seller. */
-gigDetailRoutes.get("/reviews/by-seller/:sellerId", async (req: Request, res: Response) => {
-  const sellerId = req.params.sellerId as string;
-
-  const reviews = await prisma.review.findMany({
-    where: { gig: { sellerId }, hiddenAt: null },
-    select: { rating: true },
-  });
-
-  const avgRating =
-    reviews.length > 0
-      ? reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length
-      : 0;
-
-  res.json({
-    reviewCount: reviews.length,
-    avgRating: Math.round(avgRating * 10) / 10,
-  });
-});
-
-/** Count how many gigs one user has favorited. */
-gigDetailRoutes.get("/favorites/count/:userId", async (req: Request, res: Response) => {
+  gigDetailRoutes.get("/favorites/count/:userId", async (req: Request, res: Response) => {
   const userId = req.params.userId as string;
   const count = await prisma.favorite.count({ where: { userId } });
   res.json({ favoritesCount: count });

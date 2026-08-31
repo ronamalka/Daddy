@@ -8,4 +8,4 @@ Current user.
 | `/api/profile/readiness` | GET | Daddy onboarding checklist |
 | `/api/profile/become-seller` | POST | Buyer → seller after contractor confirmation |
 | `/api/profile/password` | PUT | Change password |
-| `/api/profile/stats` | GET | Counts for the profile page |
+| `/api/profile/stats` | GET | Counts for the profile page (avg rating is 1–10) |

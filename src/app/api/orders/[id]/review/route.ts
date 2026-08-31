@@ -3,6 +3,7 @@ import { auth } from "@/lib/auth";
 import { proxyRequest, GIGS_SERVICE, ORDERS_SERVICE } from "@/lib/gateway";
 import { verifyTurnstileToken } from "@/lib/turnstile";
 import { detectBot } from "@/lib/bot-detection";
+import { areTenPointCriteria, overallFromCriteria } from "@/lib/review-ratings";
 
 /** Submits a buyer review for a completed order after bot and CAPTCHA checks. */
 export async function POST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
@@ -66,22 +67,27 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     return NextResponse.json({ error: "Comment is required" }, { status: 400 });
   }
 
+  if (!order.sellerId) {
+    return NextResponse.json({ error: "Order is missing a seller" }, { status: 400 });
+  }
+
   const attitude = Number(ratingAttitude);
   const timeliness = Number(ratingTimeliness);
   const price = Number(ratingPrice);
   const quality = Number(ratingQuality);
 
-  if ([attitude, timeliness, price, quality].some((v) => !v || v < 1 || v > 10)) {
+  if (!areTenPointCriteria(attitude, timeliness, price, quality)) {
     return NextResponse.json({ error: "All ratings must be between 1 and 10" }, { status: 400 });
   }
 
-  const overall = Math.round((attitude + timeliness + price + quality) / 4);
+  const overall = overallFromCriteria(attitude, timeliness, price, quality);
 
   const { data, status } = await proxyRequest(GIGS_SERVICE, "/reviews", {
     method: "POST",
     body: {
       orderId,
-      gigId: order.gigId,
+      gigId: order.gigId || null,
+      sellerId: order.sellerId,
       rating: overall,
       comment,
       ratingAttitude: attitude,

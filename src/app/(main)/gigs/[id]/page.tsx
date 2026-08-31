@@ -236,7 +236,7 @@ export default function GigDetailPage() {
               <div className="flex items-center gap-2 text-[13px]">
                 <div className="flex items-center gap-1">
                   <Star className="h-4 w-4 text-[rgb(var(--color-accent-yellow))] " weight="fill" />
-                  <span className="font-bold text-[rgb(var(--color-text))]">{(gig.avgRating ?? 0).toFixed(1)}</span>
+                  <span className="font-bold text-[rgb(var(--color-text))]">{(gig.avgRating ?? 0).toFixed(1)}/10</span>
                 </div>
                 <span className="text-[rgb(var(--color-text-muted))]">({gig.reviewCount} ביקורות)</span>
                 {gig.seller?.city && <span className="text-[rgb(var(--color-text-muted))]">· {gig.seller.city}</span>}
@@ -330,14 +330,9 @@ export default function GigDetailPage() {
                       </div>
                       <div className="flex-1">
                         <p className="text-[14px] font-semibold text-[rgb(var(--color-text))]">{review.user?.name || "משתמש"}</p>
-                        <div className="flex items-center gap-0.5">
-                          {Array.from({ length: 5 }, (_, i) => (
-                            <Star
-                              key={i}
-                              className={`h-3.5 w-3.5 ${i < review.rating ? "text-[rgb(var(--color-accent-yellow))]" : "text-[rgb(var(--color-border))]"}`}
-                              weight={i < review.rating ? "fill" : "regular"}
-                            />
-                          ))}
+                        <div className="flex items-center gap-1" aria-label={`דירוג ${review.rating} מתוך 10`}>
+                          <Star className="h-3.5 w-3.5 text-[rgb(var(--color-accent-yellow))]" weight="fill" />
+                          <span className="text-[12px] font-bold text-[rgb(var(--color-text))]">{review.rating}/10</span>
                         </div>
                       </div>
                       <span className="text-[12px] text-[rgb(var(--color-text-muted))]">

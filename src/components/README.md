@@ -6,7 +6,7 @@ Reusable pieces of the interface. Subfolders group related screens.
 | --- | --- |
 | `navbar.tsx` / `footer.tsx` | Site chrome |
 | `session-provider.tsx` / `csrf-provider.tsx` | Auth session and CSRF `fetch` patch |
-| `gig-card.tsx` | One gig in a grid or list |
+| `review-form.tsx` | Buyer 1–10 Midrag scores after a completed job |
 | `slot-picker.tsx` / `visit-window-fields.tsx` | Choose a two-hour visit |
 | `service-picker.tsx` / `location-picker.tsx` | Services and cities |
 | `notification-bell.tsx` | Header alerts (orders, chat, nearby requests) |

@@ -6,7 +6,6 @@ import { ArrowLeft, Star, MapPin } from "@phosphor-icons/react";
 import { ALL_SERVICES } from "@/lib/services";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { cn } from "@/lib/utils";
 import type { FeaturedDaddy } from "./types";
 
 interface FeaturedDaddiesSectionProps {
@@ -49,7 +48,7 @@ export function FeaturedDaddiesSection({ featuredDaddies, loading }: FeaturedDad
                       <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-gradient-to-br from-[rgb(var(--color-primary))] to-[rgb(var(--color-primary-light))] text-lg font-bold text-white shadow-md">
                         {d.name?.[0] ?? "א"}
                       </div>
-                      {d.avgRating >= 4.5 && (
+                      {d.avgRating >= 9 && (
                         <div className="absolute -top-1 -left-1 flex h-5 w-5 items-center justify-center rounded-full bg-[rgb(var(--color-accent-yellow))] shadow-sm">
                           <Star className="h-3 w-3 text-white" weight="fill" />
                         </div>
@@ -64,11 +63,10 @@ export function FeaturedDaddiesSection({ featuredDaddies, loading }: FeaturedDad
                         </p>
                       )}
                       {d.avgRating > 0 && (
-                        <div className="flex items-center gap-1 mt-1" aria-label={`דירוג ${d.avgRating.toFixed(1)} מתוך 5, ${d.reviewCount} ביקורות`}>
-                          {Array.from({ length: 5 }).map((_, j) => (
-                            <Star key={j} aria-hidden="true" className={cn("h-3 w-3", j < Math.round(d.avgRating) ? "text-[rgb(var(--color-accent-yellow))]" : "text-[rgb(var(--color-border))]")} weight={j < Math.round(d.avgRating) ? "fill" : "regular"} />
-                          ))}
-                          <span className="text-xs text-[rgb(var(--color-text-muted))] mr-1">({d.reviewCount})</span>
+                        <div className="flex items-center gap-1 mt-1" aria-label={`דירוג ${d.avgRating.toFixed(1)} מתוך 10, ${d.reviewCount} ביקורות`}>
+                          <Star className="h-3 w-3 text-[rgb(var(--color-accent-yellow))]" weight="fill" />
+                          <span className="text-xs font-bold text-[rgb(var(--color-text))]">{d.avgRating.toFixed(1)}/10</span>
+                          <span className="text-xs text-[rgb(var(--color-text-muted))]">({d.reviewCount})</span>
                         </div>
                       )}
                     </div>

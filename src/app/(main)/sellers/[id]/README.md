@@ -1,3 +1,3 @@
 # `[id]/`
 
-The `/sellers/:id` page. Public profile of one helper.
+The `/sellers/:id` page. Public profile of one helper. Ratings are 1–10 (packages and local jobs).

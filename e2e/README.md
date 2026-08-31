@@ -6,7 +6,7 @@ These tests run a real browser against the running app.
 | --- | --- |
 | `auth.spec.ts` | Login and related screens |
 | `gigs.spec.ts` | Gig listing and detail |
-| `orders.spec.ts` | Orders list and booking flow |
+| `reviews.spec.ts` | Complete a local job, submit a 1–10 review, see it on the daddy profile |
 | `disputes.spec.ts` | Buyer opens a dispute from the order page |
 | `admin.spec.ts` | Admin moderation queue |
 | `pages.spec.ts` | Public marketing and legal pages |

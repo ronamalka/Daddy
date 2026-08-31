@@ -98,6 +98,20 @@ async function main() {
       slotEnd: new Date("2026-09-05T15:00:00.000Z"),
       dueDate: new Date("2026-09-05T15:00:00.000Z"),
     },
+    {
+      id: "ord-23",
+      jobType: "LOCAL_REQUEST" as const,
+      gigId: null,
+      title: "הרכבת שידה בסלון",
+      buyerId: S.buyer,
+      sellerId: S.seller,
+      tier: null,
+      price: 220,
+      status: "DELIVERED" as const,
+      slotStart: new Date("2026-09-06T13:00:00.000Z"),
+      slotEnd: new Date("2026-09-06T15:00:00.000Z"),
+      dueDate: new Date("2026-09-06T15:00:00.000Z"),
+    },
   ];
 
   for (const order of orders) {
