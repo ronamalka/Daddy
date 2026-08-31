@@ -80,6 +80,19 @@ gigDetailRoutes.put("/:id", requireAuth, async (req: Request, res: Response) => 
 
   const { title, description, image, categoryId, tiers, faqs, requirements } = req.body;
 
+  let resolvedCategoryId = categoryId as string | undefined;
+  if (resolvedCategoryId) {
+    const category = await prisma.category.findFirst({
+      where: { OR: [{ id: resolvedCategoryId }, { slug: resolvedCategoryId }] },
+      select: { id: true },
+    });
+    if (!category) {
+      res.status(400).json({ error: "קטגוריה לא נמצאה" });
+      return;
+    }
+    resolvedCategoryId = category.id;
+  }
+
   /** Update the gig and replace tiers, FAQs, and requirements together. */
   await prisma.$transaction(async (tx) => {
     await tx.gig.update({
@@ -88,7 +101,7 @@ gigDetailRoutes.put("/:id", requireAuth, async (req: Request, res: Response) => 
         ...(title && { title }),
         ...(description && { description }),
         ...(image !== undefined && { image }),
-        ...(categoryId && { categoryId }),
+        ...(resolvedCategoryId && { categoryId: resolvedCategoryId }),
       },
     });
 
