@@ -59,7 +59,7 @@ test.describe("Daddy onboarding", () => {
     await expect(page.getByRole("button", { name: "הפוך לאבאל׳ה" })).toBeVisible({ timeout: 10000 });
     await expect(page.getByText(/עוסק עצמאי/)).toBeVisible();
     await page.getByRole("button", { name: "הפוך לאבאל׳ה" }).click();
-    await expect(page.getByRole("alert")).toBeVisible();
+    await expect(page.getByText(/יש לאשר את תנאי השימוש/)).toBeVisible();
   });
 
   test("featured and provider search omit incomplete sellers", async ({ page }) => {
