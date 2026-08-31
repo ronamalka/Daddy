@@ -13,6 +13,7 @@ ordersRoutes.get("/", requireAuth, async (req: Request, res: Response) => {
     where: orderListWhere(req.user!.id),
     include: {
       requirements: true,
+      disputes: { select: { status: true } },
     },
     orderBy: { createdAt: "desc" },
   });

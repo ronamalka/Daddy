@@ -83,7 +83,7 @@ adminDisputeRoutes.get("/disputes", requireAdmin, async (req: Request, res: Resp
   const disputes = await prisma.dispute.findMany({
     where: status ? { status: status as DisputeStatus } : undefined,
     include: {
-      order: { select: { id: true, price: true, buyerId: true, sellerId: true, title: true, status: true } },
+      order: { select: { id: true, price: true, buyerId: true, sellerId: true, title: true, status: true, gigId: true } },
     },
     orderBy: { createdAt: "desc" },
   });
@@ -131,7 +131,7 @@ adminDisputeRoutes.patch("/disputes/:id", requireAdmin, async (req: Request, res
         resolvedBy: isFinal ? req.user!.id : dispute.resolvedBy,
       },
       include: {
-        order: { select: { id: true, price: true, buyerId: true, sellerId: true, title: true, status: true } },
+        order: { select: { id: true, price: true, buyerId: true, sellerId: true, title: true, status: true, gigId: true } },
       },
     });
     if (resolved.orderStatus) {

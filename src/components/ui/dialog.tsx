@@ -10,10 +10,12 @@ interface DialogProps {
   onOpenChange: (open: boolean) => void;
   children: React.ReactNode;
   className?: string;
+  labelledBy?: string;
+  ariaLabel?: string;
 }
 
 /** Centered modal overlay that locks scrolling and closes on Escape or backdrop click. */
-export function Dialog({ open, onOpenChange, children, className }: DialogProps) {
+export function Dialog({ open, onOpenChange, children, className, labelledBy, ariaLabel }: DialogProps) {
   React.useEffect(() => {
     if (open) {
       document.body.style.overflow = "hidden";
@@ -51,6 +53,10 @@ export function Dialog({ open, onOpenChange, children, className }: DialogProps)
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 8 }}
             transition={{ type: "spring", damping: 25, stiffness: 300 }}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby={labelledBy}
+            aria-label={ariaLabel}
             className={cn(
               "fixed left-1/2 top-1/2 z-50 w-[90%] max-w-md -translate-x-1/2 -translate-y-1/2",
               "rounded-2xl bg-[rgb(var(--color-surface))] p-6 shadow-2xl border border-[rgb(var(--color-border))]",
@@ -59,6 +65,7 @@ export function Dialog({ open, onOpenChange, children, className }: DialogProps)
           >
             <button
               onClick={() => onOpenChange(false)}
+              aria-label="סגירה"
               className="absolute top-4 start-4 rounded-full p-1.5 text-[rgb(var(--color-text-muted))] hover:bg-[rgb(var(--color-surface-elevated))] hover:text-[rgb(var(--color-text))] transition-colors"
             >
               <X className="h-4 w-4" />

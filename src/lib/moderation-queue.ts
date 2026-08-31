@@ -47,7 +47,13 @@ export interface DisputeQueueSource {
   photos?: string[] | null;
   orderId: string;
   openerId: string;
-  order?: { price: number; buyerId: string; sellerId: string; title?: string | null };
+  order?: {
+    price: number;
+    buyerId: string;
+    sellerId: string;
+    title?: string | null;
+    gigId?: string | null;
+  };
 }
 
 export interface FlagQueueSource {
@@ -79,10 +85,21 @@ function nameOf(id: string, names: Record<string, string>): QueueParty {
   return { id, name: names[id] || "משתמש" };
 }
 
+/** Job title for a queue card: gig name, local-job title, or a generic fallback. */
+export function queueJobTitle(
+  order: { title?: string | null; gigId?: string | null } | undefined,
+  gigTitles: Record<string, string> = {}
+): string {
+  if (order?.gigId && gigTitles[order.gigId]) return gigTitles[order.gigId];
+  if (order?.title) return order.title;
+  return "הזמנה";
+}
+
 /** Turns a dispute row into a queue card. */
 export function disputeToQueueItem(
   dispute: DisputeQueueSource,
-  names: Record<string, string>
+  names: Record<string, string>,
+  gigTitles: Record<string, string> = {}
 ): QueueItem {
   const buyerId = dispute.order?.buyerId;
   const sellerId = dispute.order?.sellerId;
@@ -93,7 +110,7 @@ export function disputeToQueueItem(
     type: "DISPUTE",
     status: dispute.status,
     createdAt: iso(dispute.createdAt),
-    title: dispute.order?.title || "הזמנה",
+    title: queueJobTitle(dispute.order, gigTitles),
     reason: dispute.reason,
     description: dispute.description,
     photos: dispute.photos ?? [],
@@ -128,14 +145,15 @@ export function flagToQueueItem(
   };
 }
 
-/** Merges disputes and flags, newest first. ID checks are empty until trust onboarding lands. */
+/** Merges disputes and flags, newest first. ID checks are empty until trust onboarding (#53) lands. */
 export function mergeQueueItems(
   disputes: DisputeQueueSource[],
   flags: FlagQueueSource[],
-  names: Record<string, string>
+  names: Record<string, string>,
+  gigTitles: Record<string, string> = {}
 ): QueueItem[] {
   const items = [
-    ...disputes.map((d) => disputeToQueueItem(d, names)),
+    ...disputes.map((d) => disputeToQueueItem(d, names, gigTitles)),
     ...flags.map((f) => flagToQueueItem(f, names)),
   ];
   return items.sort((a, b) => (a.createdAt < b.createdAt ? 1 : a.createdAt > b.createdAt ? -1 : 0));

@@ -86,6 +86,18 @@ async function main() {
       slotEnd: new Date("2026-09-03T15:00:00.000Z"),
       dueDate: new Date("2026-09-03T15:00:00.000Z"),
     },
+    {
+      id: "ord-22",
+      gigId: "seed-gig-handyman",
+      buyerId: S.buyer,
+      sellerId: S.seller,
+      tier: "BASIC" as const,
+      price: 170,
+      status: "DELIVERED" as const,
+      slotStart: new Date("2026-09-05T13:00:00.000Z"),
+      slotEnd: new Date("2026-09-05T15:00:00.000Z"),
+      dueDate: new Date("2026-09-05T15:00:00.000Z"),
+    },
   ];
 
   for (const order of orders) {
