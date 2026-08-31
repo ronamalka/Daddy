@@ -21,8 +21,8 @@ export interface ServiceRequest {
   createdAt: string;
   slotStart?: string | null;
   slotEnd?: string | null;
-  buyer: { id: string; name: string };
-  _count: { responses: number };
+  buyer?: { id: string; name: string };
+  _count?: { responses: number };
 }
 
 export interface FeaturedDaddy {

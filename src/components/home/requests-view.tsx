@@ -61,7 +61,7 @@ export function RequestsView({
                     <div>
                       <h3 className="text-base font-bold text-[rgb(var(--color-text))] group-hover:text-[rgb(var(--color-primary))] transition-colors">{req.title}</h3>
                       <div className="flex items-center gap-2 mt-1.5 text-xs text-[rgb(var(--color-text-muted))]">
-                        <span className="flex items-center gap-1"><User className="h-3 w-3" />{req.buyer.name}</span>
+                        <span className="flex items-center gap-1"><User className="h-3 w-3" />{req.buyer?.name || "לקוח"}</span>
                         {req.districtName && <span>· {req.cityName || req.districtName}</span>}
                         {svc && <span>· {svc.nameHe}</span>}
                         {req.slotStart && req.slotEnd && (
@@ -70,7 +70,7 @@ export function RequestsView({
                         <span>· {new Date(req.createdAt).toLocaleDateString("he-IL")}</span>
                       </div>
                     </div>
-                    <Badge variant="success">{req._count.responses} הצעות</Badge>
+                    <Badge variant="success">{req._count?.responses ?? 0} הצעות</Badge>
                   </div>
                   <p className="text-sm text-[rgb(var(--color-text-secondary))] line-clamp-2 mb-4 leading-relaxed">{req.description}</p>
                   <Link href={`/requests/${req.id}`} className="inline-flex items-center gap-1 text-sm font-bold text-[rgb(var(--color-primary))] hover:text-[rgb(var(--color-primary-hover))] transition-colors">

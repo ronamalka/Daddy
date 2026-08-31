@@ -51,6 +51,11 @@ test.describe("Public Pages", () => {
     await expect(page.getByText(/התחבר|כניסה/i).first()).toBeVisible({ timeout: 5000 });
   });
 
+  test("open requests page requires auth", async ({ page }) => {
+    await page.goto("/requests");
+    await expect(page.getByText(/התחבר|כניסה/i).first()).toBeVisible({ timeout: 5000 });
+  });
+
   test("profile page requires auth", async ({ page }) => {
     await page.goto("/profile");
     await expect(page.getByText(/התחבר|כניסה/i).first()).toBeVisible({ timeout: 5000 });

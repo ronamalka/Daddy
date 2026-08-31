@@ -7,12 +7,10 @@ import type { Session } from "next-auth";
 
 interface CtaSectionProps {
   session: Session | null;
-  setView: (v: "browse" | "results" | "requests") => void;
-  loadRequests: (district?: string) => void;
 }
 
 /** Bottom call-to-action that changes copy based on whether the user is signed in. */
-export function CtaSection({ session, setView, loadRequests }: CtaSectionProps) {
+export function CtaSection({ session }: CtaSectionProps) {
   return (
     <section className="mx-auto max-w-6xl px-4 py-16">
       <div className="overflow-hidden rounded-2xl bg-gradient-to-br from-[rgb(var(--color-primary))] to-[rgb(var(--color-primary-light))] p-8 md:p-12 text-center relative">
@@ -38,10 +36,12 @@ export function CtaSection({ session, setView, loadRequests }: CtaSectionProps) 
               variant="secondary"
               size="lg"
               className="mt-6 bg-white text-[rgb(var(--color-primary))] hover:bg-white/90 gap-2"
-              onClick={() => { setView("requests"); loadRequests(); }}
+              asChild
             >
-              צפה בבקשות פתוחות
-              <ArrowLeft className="h-4 w-4" />
+              <Link href="/requests">
+                צפה בבקשות פתוחות
+                <ArrowLeft className="h-4 w-4" />
+              </Link>
             </Button>
           ) : (
             <Button variant="secondary" size="lg" className="mt-6 bg-white text-[rgb(var(--color-primary))] hover:bg-white/90 gap-2" asChild>
