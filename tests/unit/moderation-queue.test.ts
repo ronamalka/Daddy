@@ -5,6 +5,7 @@ import {
   resolveFlagAction,
   flagToQueueItem,
   disputeToQueueItem,
+  queueJobTitle,
 } from "@/lib/moderation-queue";
 
 const names = {
@@ -58,6 +59,25 @@ describe("mergeQueueItems", () => {
     );
     expect(items.map((i) => i.id)).toEqual(["f1", "d1"]);
   });
+
+  it("uses the gig title when the order itself has none", () => {
+    const items = mergeQueueItems(
+      [{
+        id: "d1",
+        status: "OPEN",
+        createdAt: "2026-08-01T09:00:00.000Z",
+        reason: "QUALITY",
+        description: "עקום",
+        orderId: "ord-1",
+        openerId: "buyer-1",
+        order: { price: 150, buyerId: "buyer-1", sellerId: "seller-1", gigId: "gig-ikea" },
+      }],
+      [],
+      names,
+      { "gig-ikea": "הרכבת איקאה" }
+    );
+    expect(items[0].title).toBe("הרכבת איקאה");
+  });
 });
 
 describe("filterQueueItems", () => {
@@ -108,5 +128,19 @@ describe("resolveFlagAction", () => {
 
   it("rejects an unknown action", () => {
     expect(resolveFlagAction("explode").ok).toBe(false);
+  });
+});
+
+describe("queueJobTitle", () => {
+  it("prefers the gig catalogue title over a missing order title", () => {
+    expect(queueJobTitle({ gigId: "g1" }, { g1: "הרכבה" })).toBe("הרכבה");
+  });
+
+  it("uses the local-job title when there is no gig", () => {
+    expect(queueJobTitle({ title: "תיקון דלת" })).toBe("תיקון דלת");
+  });
+
+  it("falls back to a generic label", () => {
+    expect(queueJobTitle(undefined)).toBe("הזמנה");
   });
 });

@@ -12,6 +12,14 @@ test.describe("Public Pages", () => {
     await expect(content).toBeVisible();
   });
 
+  test("how-it-works FAQ links a dispute to the orders page", async ({ page }) => {
+    await page.goto("/how-it-works");
+    await page.getByRole("button", { name: "מה אם לא מרוצה מהשירות?" }).click();
+    const link = page.getByRole("link", { name: "פתחו מחלוקת מדף ההזמנה" });
+    await expect(link).toBeVisible();
+    await expect(link).toHaveAttribute("href", "/orders");
+  });
+
   test("terms page states the platform is an intermediary", async ({ page }) => {
     await page.goto("/terms");
     await expect(page.getByRole("heading", { name: "תנאי שימוש" })).toBeVisible();

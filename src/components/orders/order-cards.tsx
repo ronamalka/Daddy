@@ -5,6 +5,7 @@ import Image from "next/image";
 import { Archive } from "@phosphor-icons/react";
 import { formatVisitWindow } from "@/lib/availability";
 import { STATUS_COLORS, STATUS_LABELS } from "@/lib/order-status";
+import { orderHasOpenDispute } from "@/lib/disputes";
 import type { OrderListItem } from "@/components/orders/types";
 
 /** Stack of order cards with status, visit time, and the other party, or an empty state. */
@@ -73,11 +74,18 @@ export function OrderCards({
                 </p>
               )}
             </div>
-            <span
-              className={`flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-[12px] font-semibold ${colors.bg} ${colors.text}`}
-            >
-              <span className={`h-1.5 w-1.5 rounded-full ${colors.dot}`} />
-              {STATUS_LABELS[order.status] || order.status}
+            <span className="flex flex-col items-end gap-1">
+              <span
+                className={`flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-[12px] font-semibold ${colors.bg} ${colors.text}`}
+              >
+                <span className={`h-1.5 w-1.5 rounded-full ${colors.dot}`} />
+                {STATUS_LABELS[order.status] || order.status}
+              </span>
+              {orderHasOpenDispute(order.disputes) && (
+                <span className="rounded-full bg-[rgba(var(--color-error),0.1)] px-2.5 py-0.5 text-[11px] font-semibold text-[rgb(var(--color-error))]">
+                  מחלוקת פתוחה
+                </span>
+              )}
             </span>
           </Link>
         );

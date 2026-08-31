@@ -3,12 +3,12 @@ import { z } from "zod";
 import { auth } from "@/lib/auth";
 import { proxyRequest, ORDERS_SERVICE } from "@/lib/gateway";
 import { validateBody } from "@/lib/validate";
-import { DISPUTE_REASONS, MAX_DISPUTE_PHOTOS, MAX_DISPUTE_DESCRIPTION } from "@/lib/disputes";
+import { DISPUTE_REASONS, MAX_DISPUTE_PHOTOS, MAX_DISPUTE_DESCRIPTION, isAllowedPhotoUrl } from "@/lib/disputes";
 
 const createDisputeSchema = z.object({
   reason: z.enum(DISPUTE_REASONS),
   description: z.string().trim().min(1).max(MAX_DISPUTE_DESCRIPTION),
-  photos: z.array(z.string().min(1)).max(MAX_DISPUTE_PHOTOS).optional().default([]),
+  photos: z.array(z.string().min(1).refine(isAllowedPhotoUrl, "כתובת תמונה לא תקינה")).max(MAX_DISPUTE_PHOTOS).optional().default([]),
 }).strict();
 
 /** Opens a dispute on an in-progress or delivered order. */

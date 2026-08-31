@@ -34,6 +34,11 @@ export function isOpenDisputeStatus(status: string): boolean {
   return (OPEN_DISPUTE_STATUSES as readonly string[]).includes(status);
 }
 
+/** True if this order currently has a dispute waiting on admin. */
+export function orderHasOpenDispute(disputes?: { status: string }[] | null): boolean {
+  return Boolean(disputes?.some((d) => isOpenDisputeStatus(d.status)));
+}
+
 /** True if this user is the buyer or the daddy on the order. */
 export function isOrderParty(actorId: string, buyerId: string, sellerId: string): boolean {
   return actorId === buyerId || actorId === sellerId;

@@ -3,7 +3,7 @@ import { auth } from "@/lib/auth";
 import { proxyRequest, ORDERS_SERVICE, GIGS_SERVICE, USERS_SERVICE } from "@/lib/gateway";
 import { mergeQueueItems, type DisputeQueueSource, type FlagQueueSource } from "@/lib/moderation-queue";
 
-/** Unified admin queue: disputes, review flags, and (later) ID checks. */
+/** Unified admin queue: disputes, review flags, and (later, #53) ID checks. */
 export async function GET() {
   const session = await auth();
   if (!session?.user || (session.user as { role: string }).role !== "ADMIN") {
@@ -31,7 +31,17 @@ export async function GET() {
 
   const disputes = Array.isArray(disputesRes.data) ? (disputesRes.data as DisputeQueueSource[]) : [];
   const flags = Array.isArray(flagsRes.data) ? (flagsRes.data as FlagQueueSource[]) : [];
-  const items = mergeQueueItems(disputes, flags, names);
+
+  const gigIds = [...new Set(
+    disputes.map((d) => d.order?.gigId).filter((id): id is string => Boolean(id))
+  )];
+  const gigTitles: Record<string, string> = {};
+  await Promise.all(gigIds.map(async (id) => {
+    const { data: gig } = await proxyRequest(GIGS_SERVICE, `/gigs/${id}`);
+    if (gig && typeof gig.title === "string" && gig.title) gigTitles[id] = gig.title;
+  }));
+
+  const items = mergeQueueItems(disputes, flags, names, gigTitles);
 
   return NextResponse.json({
     items,
