@@ -7,26 +7,30 @@ const attachmentSchema = z
   .string()
   .refine(isAllowedAttachmentUrl, { message: "Invalid attachment" });
 
+const messageBodyFields = {
+  content: z.string().max(5000).optional().default(""),
+  attachment: attachmentSchema.optional(),
+};
+
 /** Caption plus optional upload path; at least one of the two is required. */
-function withCaptionAndAttachment<T extends z.ZodRawShape>(shape: T) {
-  return z
-    .object({
-      content: z.string().max(5000).optional().default(""),
-      attachment: attachmentSchema.optional(),
-      ...shape,
-    })
-    .strict()
-    .transform((data) => ({ ...data, content: data.content.trim() }))
-    .refine((data) => data.content.length > 0 || Boolean(data.attachment), {
-      message: "content or attachment required",
-    });
+function requireCaptionOrFile(data: { content: string; attachment?: string }) {
+  return data.content.length > 0 || Boolean(data.attachment);
 }
 
-export const directMessageSchema = withCaptionAndAttachment({
-  receiverId: entityId,
-});
+export const directMessageSchema = z
+  .object({
+    ...messageBodyFields,
+    receiverId: entityId,
+  })
+  .strict()
+  .transform((data) => ({ ...data, content: data.content.trim() }))
+  .refine(requireCaptionOrFile, { message: "content or attachment required" });
 
-export const orderMessageSchema = withCaptionAndAttachment({});
+export const orderMessageSchema = z
+  .object(messageBodyFields)
+  .strict()
+  .transform((data) => ({ ...data, content: data.content.trim() }))
+  .refine(requireCaptionOrFile, { message: "content or attachment required" });
 
 export const markReadSchema = z
   .object({
