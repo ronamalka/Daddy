@@ -128,6 +128,13 @@ describe("System Tests — Public API", () => {
         expect(seller).toHaveProperty("completedOrders");
       }
     });
+
+    it("omits incomplete daddy profiles", async () => {
+      const { status, body } = await fetchApi("/api/featured-daddies");
+      expect(status).toBe(200);
+      const ids = (body as { id: string }[]).map((s) => s.id);
+      expect(ids).not.toContain("seed-user-incomplete");
+    });
   });
 
   describe("GET /api/locations", () => {
@@ -141,6 +148,14 @@ describe("System Tests — Public API", () => {
     it("returns 200", async () => {
       const { status } = await fetchApi("/api/providers");
       expect(status).toBe(200);
+    });
+
+    it("omits incomplete daddy profiles", async () => {
+      const { status, body } = await fetchApi("/api/providers");
+      expect(status).toBe(200);
+      const ids = (body as { id: string }[]).map((s) => s.id);
+      expect(ids).not.toContain("seed-user-incomplete");
+      expect(ids).toContain("seed-user-seller1");
     });
   });
 
