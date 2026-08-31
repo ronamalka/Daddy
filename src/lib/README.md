@@ -38,5 +38,5 @@ Small modules used by API routes and pages. Each exported function has a short c
 | `services.ts` | Catalogue of home services and local category slugs |
 | `districts.ts` | Israeli district codes |
 | `message-validation.ts` | Zod schemas for chat |
-| `attachment-url.ts` | Allowlisted `/uploads/...` chat attachment paths |
+| `attachment-url.ts` | Allowlisted `/uploads/...` chat attachment paths and content types |
 | `utils.ts` | `cn()` — merge Tailwind classes |

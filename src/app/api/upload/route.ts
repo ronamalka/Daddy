@@ -6,9 +6,9 @@ import {
   validateUpload,
   validateTotalSize,
   stripExifFromJpeg,
+  uploadDir,
 } from "@/lib/upload-security";
 
-const UPLOAD_DIR = process.env.UPLOAD_DIR || join(process.cwd(), "public", "uploads");
 const UPLOAD_BASE_URL = process.env.UPLOAD_BASE_URL || "/uploads";
 
 /** Saves uploaded files after size and type checks. Requires a signed-in user. */
@@ -49,7 +49,8 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: totalError }, { status: 400 });
   }
 
-  await mkdir(UPLOAD_DIR, { recursive: true });
+  const dir = uploadDir();
+  await mkdir(dir, { recursive: true });
 
   const results: { url: string; name: string }[] = [];
 
@@ -73,7 +74,7 @@ export async function POST(request: NextRequest) {
       outputBuffer = Buffer.from(inputBuffer);
     }
 
-    const filePath = join(UPLOAD_DIR, validation.sanitizedName!);
+    const filePath = join(dir, validation.sanitizedName!);
     await writeFile(filePath, outputBuffer);
 
     results.push({

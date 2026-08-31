@@ -6,7 +6,9 @@ import {
 } from "../../src/lib/upload-security";
 import {
   isAllowedAttachmentUrl,
+  isAllowedAttachmentFilename,
   isImageAttachment,
+  attachmentContentType,
 } from "../../src/lib/attachment-url";
 
 const JPEG_MAGIC = new Uint8Array([0xff, 0xd8, 0xff, 0xe0, 0x00, 0x10, 0x4a, 0x46, 0x49, 0x46]);
@@ -204,5 +206,12 @@ describe("isAllowedAttachmentUrl", () => {
   it("rejects javascript: and data: URLs", () => {
     expect(isAllowedAttachmentUrl("javascript:alert(1)")).toBe(false);
     expect(isAllowedAttachmentUrl("data:image/jpeg;base64,xxxx")).toBe(false);
+  });
+
+  it("accepts a UUID filename and maps its content type", () => {
+    expect(isAllowedAttachmentFilename("550e8400-e29b-41d4-a716-446655440000.jpg")).toBe(true);
+    expect(isAllowedAttachmentFilename("../550e8400-e29b-41d4-a716-446655440000.jpg")).toBe(false);
+    expect(attachmentContentType("550e8400-e29b-41d4-a716-446655440000.jpg")).toBe("image/jpeg");
+    expect(attachmentContentType("550e8400-e29b-41d4-a716-446655440000.pdf")).toBe("application/pdf");
   });
 });
