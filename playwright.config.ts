@@ -4,6 +4,9 @@ export default defineConfig({
   testDir: "./e2e",
   timeout: 30000,
   retries: 1,
+  // One worker so credential logins do not trip the shared in-memory auth rate limit.
+  workers: 1,
+  fullyParallel: false,
   use: {
     baseURL: process.env.E2E_BASE_URL || "http://localhost:3000",
     headless: true,
