@@ -1,3 +1,3 @@
 # `tests/system/`
 
-Broader API tests (`api.test.ts`) that exercise HTTP handlers with more of the stack than a unit test.
+Broader API tests (`api.test.ts`) that exercise HTTP handlers with more of the stack than a unit test. Includes featured/provider search omitting incomplete daddy profiles.
