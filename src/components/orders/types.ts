@@ -11,4 +11,5 @@ export interface OrderListItem {
   gig: { id: string; title: string; image: string | null };
   buyer: { id: string; name: string };
   seller: { id: string; name: string };
+  disputes?: { status: string }[];
 }

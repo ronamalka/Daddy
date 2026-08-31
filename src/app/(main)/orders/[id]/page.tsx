@@ -9,7 +9,7 @@ import { Star, Handshake, Clock, Coins, Tag, ClipboardText, ChatCircle, PaperPla
 import { Dialog } from "@/components/ui/dialog";
 import { formatVisitWindow } from "@/lib/availability";
 import { DisputeDialog } from "@/components/orders/dispute-dialog";
-import { DISPUTE_REASON_LABELS, DISPUTE_STATUS_LABELS, isDisputableStatus, isOpenDisputeStatus } from "@/lib/disputes";
+import { DISPUTE_REASON_LABELS, DISPUTE_STATUS_LABELS, isDisputableStatus, orderHasOpenDispute } from "@/lib/disputes";
 
 interface GigRequirement {
   id: string;
@@ -381,7 +381,7 @@ export default function OrderDetailPage() {
           {isBuyer && order.status === "COMPLETED" && !order.review && (
             <button onClick={() => setReviewOpen(true)} className="flex items-center gap-2 rounded-xl bg-[rgb(var(--color-accent-yellow))] px-5 py-2.5 text-[14px] font-semibold text-[rgb(var(--color-text))] transition-all hover:opacity-80">כתוב חוות דעת</button>
           )}
-          {(isBuyer || isSeller) && isDisputableStatus(order.status) && !order.disputes?.some((d) => isOpenDisputeStatus(d.status)) && (
+          {(isBuyer || isSeller) && isDisputableStatus(order.status) && !orderHasOpenDispute(order.disputes) && (
             <button
               onClick={() => setDisputeOpen(true)}
               className="flex items-center gap-2 rounded-xl border-2 border-[rgba(var(--color-error),0.25)] bg-[rgba(var(--color-error),0.05)] px-5 py-2.5 text-[14px] font-semibold text-[rgb(var(--color-error))] transition-all hover:bg-[rgba(var(--color-error),0.1)]"

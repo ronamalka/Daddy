@@ -156,10 +156,10 @@ export function ModerationQueue({ items, onRefresh }: ModerationQueueProps) {
         </ul>
       )}
 
-      <Dialog open={!!splitItem} onOpenChange={(o) => { if (!o) setSplitItem(null); }}>
+      <Dialog open={!!splitItem} onOpenChange={(o) => { if (!o) setSplitItem(null); }} labelledBy="split-dialog-title">
         {splitItem && (
           <div className="pt-2">
-            <h3 className="mb-2 text-[16px] font-bold text-[rgb(var(--color-text))]">פיצול תשלום</h3>
+            <h3 id="split-dialog-title" className="mb-2 text-[16px] font-bold text-[rgb(var(--color-text))]">פיצול תשלום</h3>
             <p className="mb-4 text-[13px] text-[rgb(var(--color-text-secondary))]">
               מחיר ההזמנה ₪{splitItem.orderPrice}. הזינו כמה יוחזר ללקוח. התשלום עצמו עדיין לא פעיל — הפעולה תירשם בלבד.
             </p>

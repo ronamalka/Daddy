@@ -84,14 +84,14 @@ export function DisputeDialog({ open, onOpenChange, orderId, onCreated }: Disput
   }
 
   return (
-    <Dialog open={open} onOpenChange={(next) => { if (!next) reset(); onOpenChange(next); }} className="max-w-lg">
+    <Dialog open={open} onOpenChange={(next) => { if (!next) reset(); onOpenChange(next); }} className="max-w-lg" labelledBy="dispute-dialog-title">
       <div className="pt-2">
         <div className="mb-4 flex items-center gap-3">
           <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[rgba(var(--color-error),0.1)]">
             <Warning className="h-5 w-5 text-[rgb(var(--color-error))]" weight="fill" />
           </div>
           <div>
-            <h3 className="text-[16px] font-bold text-[rgb(var(--color-text))]">פתיחת מחלוקת</h3>
+            <h3 id="dispute-dialog-title" className="text-[16px] font-bold text-[rgb(var(--color-text))]">פתיחת מחלוקת</h3>
             <p className="text-[13px] text-[rgb(var(--color-text-secondary))]">
               צוות אבאל׳ה יבדוק ויעזור לתווך בין הצדדים
             </p>

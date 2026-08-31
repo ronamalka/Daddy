@@ -5,6 +5,7 @@ import {
   isOpenDisputeStatus,
   parseDisputeInput,
   resolveDisputeAction,
+  orderHasOpenDispute,
   MAX_DISPUTE_PHOTOS,
 } from "@/lib/disputes";
 
@@ -145,5 +146,17 @@ describe("isOpenDisputeStatus", () => {
     expect(isOpenDisputeStatus("OPEN")).toBe(true);
     expect(isOpenDisputeStatus("UNDER_REVIEW")).toBe(true);
     expect(isOpenDisputeStatus("CLOSED")).toBe(false);
+  });
+});
+
+describe("orderHasOpenDispute", () => {
+  it("is true when any dispute is still waiting on admin", () => {
+    expect(orderHasOpenDispute([{ status: "CLOSED" }, { status: "OPEN" }])).toBe(true);
+  });
+
+  it("is false with no disputes or only resolved ones", () => {
+    expect(orderHasOpenDispute(undefined)).toBe(false);
+    expect(orderHasOpenDispute([])).toBe(false);
+    expect(orderHasOpenDispute([{ status: "RESOLVED_REFUND" }])).toBe(false);
   });
 });

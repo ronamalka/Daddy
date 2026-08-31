@@ -1,5 +1,5 @@
 /** Current published terms version. Bump this when legal copy changes. */
-export const TERMS_VERSION = "2026-08-30";
+export const TERMS_VERSION = "2026-08-31";
 
 export const LEGAL_CONTACTS = {
   legal: "legal@abale.co.il",
