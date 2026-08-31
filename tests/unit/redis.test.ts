@@ -30,8 +30,10 @@ describe("Redis Client", () => {
     expect(MockRedis).toHaveBeenCalledWith(
       expect.any(String),
       expect.objectContaining({
-        maxRetriesPerRequest: 3,
+        maxRetriesPerRequest: 1,
         lazyConnect: true,
+        enableOfflineQueue: false,
+        connectTimeout: 1500,
       })
     );
   });

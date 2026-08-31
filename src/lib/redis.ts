@@ -8,8 +8,14 @@ let redis: Redis | null = null;
 export function getRedis(): Redis {
   if (!redis) {
     redis = new Redis(REDIS_URL, {
-      maxRetriesPerRequest: 3,
+      maxRetriesPerRequest: 1,
       lazyConnect: true,
+      enableOfflineQueue: false,
+      connectTimeout: 1500,
+      retryStrategy(times) {
+        if (times > 2) return null;
+        return Math.min(times * 200, 500);
+      },
     });
     redis.on("error", (err) => {
       console.error("[redis] Connection error:", err.message);
