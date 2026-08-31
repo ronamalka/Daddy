@@ -18,6 +18,7 @@ import { availabilityRoutes } from "./routes/availability";
 import { loginRoutes } from "./routes/login";
 import { oauthRoutes } from "./routes/oauth";
 import { passwordResetRoutes } from "./routes/password-reset";
+import { notificationsRoutes } from "./routes/notifications";
 
 const pool = new pg.Pool({ connectionString: process.env.DATABASE_URL });
 const adapter = new PrismaPg(pool);
@@ -49,6 +50,7 @@ app.use("/user-services", userServicesRoutes);
 app.use("/locations", locationsRoutes);
 app.use("/featured-daddies", featuredRoutes);
 app.use("/availability", availabilityRoutes);
+app.use("/notifications", notificationsRoutes);
 
 /** Start the users HTTP server. */
 app.listen(PORT, "0.0.0.0", () => {

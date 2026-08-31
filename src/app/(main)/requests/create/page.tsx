@@ -5,9 +5,9 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useState, useRef, useCallback, useEffect, Suspense } from "react";
 import Link from "next/link";
 import { SERVICE_CATEGORIES } from "@/lib/services";
-import { DISTRICTS } from "@/lib/districts";
 import { UserCircle } from "@phosphor-icons/react";
 import { TurnstileWidget } from "@/components/turnstile-widget";
+import { LocationPicker } from "@/components/location-picker";
 import { VisitWindowFields, visitWindowToIso, type VisitWindowValue } from "@/components/visit-window-fields";
 
 /** Shows the form to post a new service request. */
@@ -25,7 +25,12 @@ function CreateRequestPage() {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [serviceSlug, setServiceSlug] = useState("");
-  const [districtCode, setDistrictCode] = useState("");
+  const [location, setLocation] = useState<{
+    cityCode: number;
+    cityName: string;
+    districtCode: number;
+    districtName: string;
+  } | null>(null);
   const [visitWindow, setVisitWindow] = useState<VisitWindowValue | null>(null);
 
   useEffect(() => {
@@ -56,14 +61,22 @@ function CreateRequestPage() {
     );
   }
 
-  const districtName = districtCode ? DISTRICTS[Number(districtCode)] : undefined;
-
   /** Creates a new service request from the form. */
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
     setError("");
 
+    if (!serviceSlug) {
+      setError("יש לבחור סוג שירות");
+      setLoading(false);
+      return;
+    }
+    if (!location) {
+      setError("יש לבחור עיר");
+      setLoading(false);
+      return;
+    }
     if (!visitWindow?.date) {
       setError("יש לבחור חלון ביקור של שעתיים");
       setLoading(false);
@@ -78,9 +91,11 @@ function CreateRequestPage() {
       body: JSON.stringify({
         title,
         description,
-        serviceSlug: serviceSlug || undefined,
-        districtCode: districtCode ? Number(districtCode) : undefined,
-        districtName,
+        serviceSlug,
+        districtCode: location.districtCode,
+        districtName: location.districtName,
+        cityCode: location.cityCode,
+        cityName: location.cityName,
         slotStart,
         slotEnd,
         turnstileToken,
@@ -153,12 +168,14 @@ function CreateRequestPage() {
         </div>
 
         <div className="rounded-xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] p-6 shadow-[0_2px_8px_rgba(var(--color-primary),0.06)]">
-          <h2 className="mb-5 text-[16px] font-bold text-[rgb(var(--color-text))]">פרטים נוספים <span className="font-normal text-[rgb(var(--color-text-muted))] text-[13px]">(אופציונלי)</span></h2>
+          <h2 className="mb-5 text-[16px] font-bold text-[rgb(var(--color-text))]">שירות ומיקום</h2>
           <div className="space-y-5">
             <div>
-              <label className="mb-2 block text-[13px] font-semibold text-[rgb(var(--color-text-secondary))]">סוג שירות</label>
-              <select value={serviceSlug} onChange={(e) => setServiceSlug(e.target.value)} className={inputClass}>
-                <option value="">בחר שירות (אופציונלי)</option>
+              <label className="mb-2 block text-[13px] font-semibold text-[rgb(var(--color-text-secondary))]">
+                סוג שירות <span className="font-normal text-[rgb(var(--color-error))]">*</span>
+              </label>
+              <select value={serviceSlug} onChange={(e) => setServiceSlug(e.target.value)} required className={inputClass}>
+                <option value="">בחר שירות</option>
                 {SERVICE_CATEGORIES.map((cat) => (
                   <optgroup key={cat.slug} label={cat.nameHe}>
                     {cat.services.map((svc) => (
@@ -170,13 +187,12 @@ function CreateRequestPage() {
             </div>
 
             <div>
-              <label className="mb-2 block text-[13px] font-semibold text-[rgb(var(--color-text-secondary))]">אזור</label>
-              <select value={districtCode} onChange={(e) => setDistrictCode(e.target.value)} className={inputClass}>
-                <option value="">בחר מחוז (אופציונלי)</option>
-                {Object.entries(DISTRICTS).map(([code, name]) => (
-                  <option key={code} value={code}>{name}</option>
-                ))}
-              </select>
+              <LocationPicker
+                mode="single"
+                label="עיר"
+                value={location ? { cityCode: location.cityCode, districtCode: location.districtCode } : undefined}
+                onChange={setLocation}
+              />
             </div>
           </div>
         </div>
@@ -190,7 +206,7 @@ function CreateRequestPage() {
 
         <button
           type="submit"
-          disabled={loading || !visitWindow?.date}
+          disabled={loading || !visitWindow?.date || !serviceSlug || !location}
           className="w-full rounded-xl bg-[rgb(var(--color-primary))] py-4 text-[15px] font-semibold text-white shadow-[0_4px_16px_rgba(var(--color-primary),0.3)] transition-all hover:bg-[rgb(var(--color-primary-hover))] hover:shadow-[0_6px_20px_rgba(var(--color-primary),0.4)] disabled:opacity-40 disabled:cursor-not-allowed"
         >
           {loading ? (

@@ -4,6 +4,7 @@ import { proxyRequest, REQUESTS_SERVICE, USERS_SERVICE } from "@/lib/gateway";
 import { verifyTurnstileToken } from "@/lib/turnstile";
 import { detectBot } from "@/lib/bot-detection";
 import { isTwoHourLocalWindow, parseSlotIso } from "@/lib/availability";
+import { notifyNearbySellers } from "@/lib/nearby-request";
 
 /** Loads a public display name for a user, or a Hebrew fallback. */
 async function loadBuyer(id: string): Promise<{ id: string; name: string }> {
@@ -114,6 +115,9 @@ export async function POST(request: NextRequest) {
       { error: "שגיאה בשליחת הבקשה" },
       { status: status >= 400 ? status : 502 }
     );
+  }
+  if (status < 400) {
+    await notifyNearbySellers(user, data);
   }
   return NextResponse.json(data, { status });
 }
