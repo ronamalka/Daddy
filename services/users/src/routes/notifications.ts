@@ -1,5 +1,6 @@
 import { Router, Request, Response } from "express";
-import { requireAuth } from "../../../shared/middleware";
+import { requireAuth, requireInternal } from "../../../shared/middleware";
+import { dispatchExternalChannels } from "../../../shared/notify";
 import { prisma } from "../index";
 import { searchableSellerWhere } from "../seller-ready";
 import {
@@ -149,4 +150,132 @@ notificationsRoutes.post("/nearby-request", requireAuth, async (req: Request, re
   });
 
   res.json({ notified: created.count, eventType: NOTIFICATION_TYPE_NEARBY_REQUEST });
+});
+
+/**
+ * Internal endpoint called by other services to create an in-app notification
+ * AND dispatch to WhatsApp / SMS / email based on user preferences.
+ *
+ * Body: { userId, type, title, message, href?, entityId? }
+ */
+notificationsRoutes.post("/send", requireInternal, async (req: Request, res: Response) => {
+  const userId = toText(req.body?.userId);
+  const type = toText(req.body?.type);
+  const title = toText(req.body?.title);
+  const message = toText(req.body?.message);
+  const href = toText(req.body?.href) || "/";
+  const entityId = toText(req.body?.entityId) || "";
+
+  if (!userId || !type || !title || !message) {
+    res.status(400).json({ error: "userId, type, title, and message are required" });
+    return;
+  }
+
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: {
+      id: true,
+      phone: true,
+      email: true,
+      notifyWhatsapp: true,
+      notifySms: true,
+      notifyEmail: true,
+    },
+  });
+
+  if (!user) {
+    res.status(404).json({ error: "User not found" });
+    return;
+  }
+
+  // Create in-app notification (skip duplicates for idempotency)
+  await prisma.notification.upsert({
+    where: {
+      userId_type_entityId: { userId, type, entityId },
+    },
+    update: {},
+    create: {
+      userId,
+      type,
+      title,
+      message,
+      href,
+      entityId,
+    },
+  });
+
+  // Dispatch to external channels based on user preferences
+  await dispatchExternalChannels(
+    { userId, phone: user.phone, email: user.email, type, title, message, href, entityId },
+    { whatsapp: user.notifyWhatsapp, sms: user.notifySms, email: user.notifyEmail },
+  );
+
+  res.json({ sent: true });
+});
+
+/** Returns the notification preferences of the signed-in user. */
+notificationsRoutes.get("/preferences", requireAuth, async (req: Request, res: Response) => {
+  const user = await prisma.user.findUnique({
+    where: { id: req.user!.id },
+    select: {
+      notifyWhatsapp: true,
+      notifySms: true,
+      notifyEmail: true,
+      marketingConsent: true,
+      marketingConsentAt: true,
+    },
+  });
+
+  if (!user) {
+    res.status(404).json({ error: "משתמש לא נמצא" });
+    return;
+  }
+
+  res.json({
+    notifyWhatsapp: user.notifyWhatsapp,
+    notifySms: user.notifySms,
+    notifyEmail: user.notifyEmail,
+    marketingConsent: user.marketingConsent,
+    marketingConsentAt: user.marketingConsentAt ? user.marketingConsentAt.toISOString() : null,
+  });
+});
+
+/** Updates the notification preferences of the signed-in user. */
+notificationsRoutes.put("/preferences", requireAuth, async (req: Request, res: Response) => {
+  const { notifyWhatsapp, notifySms, notifyEmail, marketingConsent } = req.body;
+
+  const data: Record<string, unknown> = {};
+
+  if (typeof notifyWhatsapp === "boolean") data.notifyWhatsapp = notifyWhatsapp;
+  if (typeof notifySms === "boolean") data.notifySms = notifySms;
+  if (typeof notifyEmail === "boolean") data.notifyEmail = notifyEmail;
+  if (typeof marketingConsent === "boolean") {
+    data.marketingConsent = marketingConsent;
+    data.marketingConsentAt = marketingConsent ? new Date() : null;
+  }
+
+  if (Object.keys(data).length === 0) {
+    res.status(400).json({ error: "לא סופקו שדות לעדכון" });
+    return;
+  }
+
+  const updated = await prisma.user.update({
+    where: { id: req.user!.id },
+    data,
+    select: {
+      notifyWhatsapp: true,
+      notifySms: true,
+      notifyEmail: true,
+      marketingConsent: true,
+      marketingConsentAt: true,
+    },
+  });
+
+  res.json({
+    notifyWhatsapp: updated.notifyWhatsapp,
+    notifySms: updated.notifySms,
+    notifyEmail: updated.notifyEmail,
+    marketingConsent: updated.marketingConsent,
+    marketingConsentAt: updated.marketingConsentAt ? updated.marketingConsentAt.toISOString() : null,
+  });
 });

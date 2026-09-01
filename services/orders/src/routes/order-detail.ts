@@ -1,5 +1,7 @@
 import { Router, Request, Response } from "express";
 import { requireAuth } from "../../../shared/middleware";
+import { sendNotification } from "../../../shared/internal-client";
+import { buildNotification } from "../../../shared/notification-templates";
 import { prisma } from "../index";
 import { OrderStatus } from "../generated/prisma/client";
 import { isOpenDisputeStatus } from "../lib/disputes";
@@ -94,6 +96,16 @@ orderDetailRoutes.patch("/:id", requireAuth, async (req: Request, res: Response)
       data: result.data,
     });
     res.json(updated);
+
+    // Notify both parties about the cancellation (fire-and-forget)
+    const cancelNote = buildNotification("ORDER_CANCELLED", {
+      orderId: id,
+      service: order.title || undefined,
+    });
+    const otherParty = isBuyer ? order.sellerId : order.buyerId;
+    sendNotification({ userId: otherParty, ...cancelNote, entityId: id }).catch(() => {});
+    sendNotification({ userId: req.user!.id, ...cancelNote, entityId: id }).catch(() => {});
+
     return;
   }
 
@@ -134,6 +146,11 @@ orderDetailRoutes.patch("/:id", requireAuth, async (req: Request, res: Response)
       },
     });
     res.json(updated);
+
+    // Notify buyer to confirm completion (fire-and-forget)
+    const deliverNote = buildNotification("CONFIRM_COMPLETION", { orderId: id });
+    sendNotification({ userId: order.buyerId, ...deliverNote, entityId: id }).catch(() => {});
+
     return;
   }
 
@@ -143,6 +160,15 @@ orderDetailRoutes.patch("/:id", requireAuth, async (req: Request, res: Response)
   });
 
   res.json(updated);
+
+  // Fire-and-forget notifications for status transitions
+  if (status === "IN_PROGRESS") {
+    const note = buildNotification("ORDER_IN_PROGRESS", {
+      orderId: id,
+      service: order.title || undefined,
+    });
+    sendNotification({ userId: order.buyerId, ...note, entityId: id }).catch(() => {});
+  }
 });
 
 /** Save the buyer's answers to the gig's requirement questions. */

@@ -26,6 +26,11 @@ model User {
   cityCode     Int?
   districtCode Int?
   acceptingJobs Boolean  @default(true)
+  notifyWhatsapp   Boolean @default(true)
+  notifySms        Boolean @default(false)
+  notifyEmail      Boolean @default(true)
+  marketingConsent Boolean @default(false)
+  marketingConsentAt DateTime?
   suspendedAt   DateTime?
   suspendReason String?
   createdAt     DateTime @default(now())
