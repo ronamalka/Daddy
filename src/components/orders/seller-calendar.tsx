@@ -14,6 +14,8 @@ import {
   shiftMonth,
 } from "@/lib/order-views";
 import { STATUS_COLORS, STATUS_LABELS } from "@/lib/order-status";
+import { WazeNavigate } from "@/components/orders/waze-navigate";
+import { canShowSellerWaze } from "@/lib/waze";
 import type { OrderListItem } from "@/components/orders/types";
 
 /** Month calendar of a seller's booked jobs, with a day list of visits. */
@@ -137,24 +139,39 @@ export function SellerCalendar({ orders }: { orders: OrderListItem[] }) {
             <div className="space-y-2">
               {selectedJobs.map((job) => {
                 const colors = STATUS_COLORS[job.status] || STATUS_COLORS.PENDING;
+                const showWaze = canShowSellerWaze({
+                  isSeller: true,
+                  status: job.status,
+                  street: job.visit?.street,
+                  streetVisible: job.visit?.streetVisible,
+                });
                 return (
-                  <Link
+                  <div
                     key={job.id}
-                    href={`/orders/${job.id}`}
-                    className="block rounded-xl border border-[rgb(var(--color-border))] p-3 hover:border-[rgb(var(--color-primary))]"
+                    className="rounded-xl border border-[rgb(var(--color-border))] p-3 hover:border-[rgb(var(--color-primary))]"
                   >
-                    <div className="flex items-center justify-between gap-2">
-                      <p className="truncate text-[14px] font-semibold text-[rgb(var(--color-text))]">{job.gig.title}</p>
-                      <span className={`rounded-full px-2 py-0.5 text-[11px] font-semibold ${colors.bg} ${colors.text}`}>
-                        {STATUS_LABELS[job.status] || job.status}
-                      </span>
-                    </div>
-                    <p className="mt-1 flex items-center gap-1.5 text-[13px] text-[rgb(var(--color-primary))]">
-                      <Clock className="h-3.5 w-3.5" />
-                      {formatVisitWindow(new Date(job.slotStart!), new Date(job.slotEnd!))}
-                    </p>
-                    <p className="mt-1 text-[12px] text-[rgb(var(--color-text-secondary))]">קונה: {job.buyer.name}</p>
-                  </Link>
+                    <Link href={`/orders/${job.id}`} className="block">
+                      <div className="flex items-center justify-between gap-2">
+                        <p className="truncate text-[14px] font-semibold text-[rgb(var(--color-text))]">{job.gig.title}</p>
+                        <span className={`rounded-full px-2 py-0.5 text-[11px] font-semibold ${colors.bg} ${colors.text}`}>
+                          {STATUS_LABELS[job.status] || job.status}
+                        </span>
+                      </div>
+                      <p className="mt-1 flex items-center gap-1.5 text-[13px] text-[rgb(var(--color-primary))]">
+                        <Clock className="h-3.5 w-3.5" />
+                        {formatVisitWindow(new Date(job.slotStart!), new Date(job.slotEnd!))}
+                      </p>
+                      <p className="mt-1 text-[12px] text-[rgb(var(--color-text-secondary))]">קונה: {job.buyer.name}</p>
+                    </Link>
+                    {showWaze && job.visit && (
+                      <WazeNavigate
+                        street={job.visit.street}
+                        cityName={job.visit.cityName}
+                        districtName={job.visit.districtName}
+                        compact
+                      />
+                    )}
+                  </div>
                 );
               })}
             </div>

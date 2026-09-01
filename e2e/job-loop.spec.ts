@@ -75,10 +75,18 @@ test.describe("Real job loop", () => {
       await expect(buyer.page.getByRole("heading", { name: title })).toBeVisible();
       await expect(buyer.page.getByText("ממתין").first()).toBeVisible();
       await expect(buyer.page.getByText(/ביקור:/)).toBeVisible();
+      await expect(buyer.page.getByRole("link", { name: "נווט ב-Waze" })).toHaveCount(0);
+      await expect(buyer.page.getByText("נחלת בנימין 88")).toHaveCount(0);
 
       const orderUrl = buyer.page.url();
       await seller.page.goto(orderUrl);
       await expect(seller.page.getByRole("heading", { name: title })).toBeVisible({ timeout: 10000 });
+      await expect(seller.page.getByText("נחלת בנימין 88")).toBeVisible();
+      await expect(seller.page.getByText("קומה 4")).toBeVisible();
+      const waze = seller.page.getByRole("link", { name: "נווט ב-Waze" });
+      await expect(waze).toBeVisible();
+      await expect(waze).toHaveAttribute("href", /waze\.com\/ul/);
+      await expect(waze).toHaveAttribute("href", /navigate=yes/);
       await seller.page.getByRole("button", { name: "קבל הזמנה" }).click();
       await expect(seller.page.getByText("בעבודה").first()).toBeVisible({ timeout: 10000 });
       await seller.page.getByRole("button", { name: "סמן כנמסר" }).click();

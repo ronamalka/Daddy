@@ -11,6 +11,8 @@ import Link from "next/link";
 import { QuotePriceBreakdown } from "@/components/quote-price-breakdown";
 import { QuoteCompareTable } from "@/components/quote-compare";
 import { MaterialsFields } from "@/components/materials-fields";
+import { WazeNavigate } from "@/components/orders/waze-navigate";
+import { canShowSellerWaze } from "@/lib/waze";
 import { quoteTotal } from "@/lib/quote-price";
 
 interface ServiceRequestDetail {
@@ -155,6 +157,13 @@ export default function RequestDetailPage() {
   const isSeller = session?.user?.role === "SELLER";
   const isBuyer = session?.user?.id === request.buyer?.id;
   const alreadyResponded = request.responses.some((r) => r.seller?.id === session?.user?.id);
+  const selectedQuote = request.responses.find((r) => r.selected || r.id === request.selectedResponseId);
+  const isAssignedSeller = Boolean(selectedQuote && session?.user?.id === selectedQuote.seller?.id);
+  const showWaze = canShowSellerWaze({
+    isSeller: isAssignedSeller,
+    street: request.street,
+    streetVisible: request.streetVisible,
+  });
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-8">
@@ -218,9 +227,17 @@ export default function RequestDetailPage() {
               הרחוב ייחשף אחרי שהלקוח יקבל הצעה
             </p>
           )}
+          {showWaze && (
+            <WazeNavigate
+              street={request.street}
+              cityName={request.cityName}
+              districtName={request.districtName}
+              compact
+            />
+          )}
         </div>
 
-        {request.orderId && isBuyer && (
+        {request.orderId && (isBuyer || isAssignedSeller) && (
           <Link
             href={`/orders/${request.orderId}`}
             className="mt-4 inline-flex rounded-xl bg-[rgb(var(--color-primary))] px-4 py-2 text-[13px] font-semibold text-white hover:bg-[rgb(var(--color-primary-hover))]"
