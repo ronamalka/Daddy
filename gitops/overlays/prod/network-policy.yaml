@@ -10,6 +10,29 @@ spec:
     - Ingress
     - Egress
 ---
+# OpenShift DNS pods listen on 5353. A default-deny that only allows :53 never
+# reaches dns-default, so getaddrinfo fails (Google OAuth, postgres, data.gov.il).
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-openshift-dns
+  labels:
+    app.kubernetes.io/part-of: daddy
+spec:
+  podSelector: {}
+  policyTypes:
+    - Egress
+  egress:
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: openshift-dns
+      ports:
+        - port: 5353
+          protocol: UDP
+        - port: 5353
+          protocol: TCP
+---
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:

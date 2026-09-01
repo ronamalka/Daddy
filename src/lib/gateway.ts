@@ -26,8 +26,14 @@ interface ProxyOptions {
 export async function proxyRequest(serviceUrl: string, path: string, options: ProxyOptions = {}) {
   const { method = "GET", body, user } = options;
 
+  const serviceSignature = crypto
+    .createHmac("sha256", INTER_SERVICE_SECRET)
+    .update("service-call")
+    .digest("hex");
+
   const headers: Record<string, string> = {
     "Content-Type": "application/json",
+    "x-service-signature": serviceSignature,
   };
 
   if (user) {
