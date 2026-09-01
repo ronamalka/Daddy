@@ -36,5 +36,5 @@ loginRoutes.post("/", async (req: Request, res: Response) => {
     return;
   }
 
-  res.json({ id: user.id, email: user.email, name: user.name, role: user.role });
+  res.json({ id: user.id, email: user.email, name: user.name, role: user.role, emailVerified: user.emailVerified });
 });

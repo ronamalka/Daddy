@@ -2,10 +2,10 @@
 
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { ReviewForm } from "@/components/review-form";
-import { Star, Handshake, Clock, Coins, Tag, ClipboardText, ChatCircle, PaperPlaneTilt, ArrowsClockwise, Warning, Scales } from "@phosphor-icons/react";
+import { Star, Handshake, Clock, Coins, Tag, ClipboardText, ChatCircle, PaperPlaneTilt, ArrowsClockwise, Warning, Scales, ArrowClockwise, Receipt, FilePdf } from "@phosphor-icons/react";
 import { Dialog } from "@/components/ui/dialog";
 import { formatVisitWindow } from "@/lib/availability";
 import { DisputeDialog } from "@/components/orders/dispute-dialog";
@@ -44,6 +44,8 @@ interface OrderDetail {
   pendingMaterialsEstimate?: number | null;
   materialsUpdatedAt?: string | null;
   materialsAcknowledgedAt?: string | null;
+  onTheWayAt?: string | null;
+  onTheWayEta?: string | null;
   status: string;
   dueDate: string | null;
   slotStart: string | null;
@@ -96,11 +98,18 @@ interface OrderDetail {
     streetVisible: boolean;
     hasStreet: boolean;
   } | null;
+  invoice?: {
+    id: string;
+    invoiceNumber: number;
+    issuedAt: string;
+  } | null;
+  sellerHasTaxProfile?: boolean;
 }
 
 const STATUS_STYLE: Record<string, { bg: string; text: string; label: string }> = {
   PENDING: { bg: "bg-[rgba(var(--color-accent-yellow),0.15)]", text: "text-[rgb(var(--color-warning))]", label: "ממתין" },
   IN_PROGRESS: { bg: "bg-[rgba(var(--color-primary),0.1)]", text: "text-[rgb(var(--color-primary))]", label: "בעבודה" },
+  ON_THE_WAY: { bg: "bg-[rgba(var(--color-accent),0.15)]", text: "text-[rgb(var(--color-accent))]", label: "בדרך" },
   DELIVERED: { bg: "bg-[rgba(var(--color-primary-light),0.15)]", text: "text-[rgb(var(--color-primary-hover))]", label: "נמסר" },
   COMPLETED: { bg: "bg-[rgba(var(--color-success),0.15)]", text: "text-[rgb(var(--color-success))]", label: "הושלם" },
   CANCELLED: { bg: "bg-[rgba(var(--color-error),0.1)]", text: "text-[rgb(var(--color-error))]", label: "בוטל" },
@@ -109,6 +118,7 @@ const STATUS_STYLE: Record<string, { bg: string; text: string; label: string }> 
 /** Shows one order's status, messages, and review form. */
 export default function OrderDetailPage() {
   const params = useParams();
+  const router = useRouter();
   const { data: session } = useSession();
   const [order, setOrder] = useState<OrderDetail | null>(null);
   const [message, setMessage] = useState("");
@@ -139,16 +149,43 @@ export default function OrderDetailPage() {
   const [materialsBusy, setMaterialsBusy] = useState(false);
   const [materialsError, setMaterialsError] = useState("");
   const [payment, setPayment] = useState<OrderDetail["payment"]>(null);
+  const [onMyWayBusy, setOnMyWayBusy] = useState(false);
+  const [onMyWayEtaInput, setOnMyWayEtaInput] = useState("");
+  const [invoiceBusy, setInvoiceBusy] = useState(false);
+  const [invoiceError, setInvoiceError] = useState("");
 
   useEffect(() => {
     fetch(`/api/orders/${params.id}`)
       .then((r) => r.json())
-      .then((data) => {
+      .then(async (data) => {
         if (!data?.id || !data?.buyer || !data?.seller) {
           setLoadError(true);
           return;
         }
         setLoadError(false);
+
+        // Check if invoice exists
+        try {
+          const invRes = await fetch(`/api/orders/${params.id}/invoice`);
+          if (invRes.ok) {
+            const inv = await invRes.json();
+            if (inv?.id) {
+              data.invoice = { id: inv.id, invoiceNumber: inv.invoiceNumber, issuedAt: inv.issuedAt };
+            }
+          }
+        } catch {}
+
+        // Check if seller has tax profile (for seller viewing their own completed orders)
+        if (session?.user?.id === data.seller?.id && data.status === "COMPLETED" && !data.invoice) {
+          try {
+            const profileRes = await fetch("/api/profile");
+            if (profileRes.ok) {
+              const profile = await profileRes.json();
+              data.sellerHasTaxProfile = Boolean(profile?.osekType && profile?.legalName);
+            }
+          } catch {}
+        }
+
         setOrder(data);
         if (data.requirements?.length > 0) {
           setReqsSubmitted(true);
@@ -164,7 +201,7 @@ export default function OrderDetailPage() {
         }).catch(() => {});
       })
       .catch(() => setLoadError(true));
-  }, [params.id]);
+  }, [params.id, session?.user?.id]);
 
   useEffect(() => {
     if (!order) return;
@@ -257,6 +294,57 @@ export default function OrderDetailPage() {
       setMaterialsError("לא הצלחנו לעדכן חומרים");
     }
     setMaterialsBusy(false);
+  }
+
+  /** Seller announces they are on their way to the buyer. */
+  async function sendOnMyWay() {
+    setOnMyWayBusy(true);
+    setStatusError("");
+    try {
+      const res = await fetch(`/api/orders/${params.id}/on-the-way`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ eta: onMyWayEtaInput || undefined }),
+      });
+      if (res.ok) {
+        const updated = await res.json();
+        setOrder((prev) => prev ? {
+          ...prev,
+          status: updated.status,
+          onTheWayAt: updated.onTheWayAt,
+          onTheWayEta: updated.onTheWayEta,
+        } : prev);
+        setOnMyWayEtaInput("");
+      } else {
+        const data = await res.json().catch(() => ({}));
+        setStatusError((data as { error?: string }).error || "לא הצלחנו לעדכן סטטוס");
+      }
+    } catch {
+      setStatusError("לא הצלחנו לעדכן סטטוס");
+    }
+    setOnMyWayBusy(false);
+  }
+
+  /** Generates a tax invoice for this completed order. */
+  async function generateInvoice() {
+    setInvoiceBusy(true);
+    setInvoiceError("");
+    try {
+      const res = await fetch(`/api/orders/${params.id}/invoice`, { method: "POST" });
+      const data = await res.json().catch(() => ({}));
+      if (res.ok && data?.id) {
+        setOrder((prev) =>
+          prev
+            ? { ...prev, invoice: { id: data.id, invoiceNumber: data.invoiceNumber, issuedAt: data.issuedAt } }
+            : prev
+        );
+      } else {
+        setInvoiceError((data as { error?: string }).error || "לא הצלחנו להנפיק חשבונית");
+      }
+    } catch {
+      setInvoiceError("לא הצלחנו להנפיק חשבונית");
+    }
+    setInvoiceBusy(false);
   }
 
   /** Posts the seller's reply to the buyer's review. */
@@ -400,7 +488,10 @@ export default function OrderDetailPage() {
     now: new Date(now),
   });
   const hasOpenDispute = orderHasOpenDispute(order.disputes);
-  const showBuyerDisputeInsteadOfCancel = isBuyer && order.status === "IN_PROGRESS" && !hasOpenDispute;
+  const showBuyerDisputeInsteadOfCancel = isBuyer && (order.status === "IN_PROGRESS" || order.status === "ON_THE_WAY") && !hasOpenDispute;
+  const isBookedDay = order.slotStart
+    ? new Date(order.slotStart).toISOString().slice(0, 10) === new Date().toISOString().slice(0, 10)
+    : false;
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-8">
@@ -441,6 +532,23 @@ export default function OrderDetailPage() {
             <span className="text-[14px] font-medium text-[rgb(var(--color-text))]">
               ביקור: {formatVisitWindow(new Date(order.slotStart), new Date(order.slotEnd))}
             </span>
+          </div>
+        )}
+
+        {/* On-the-way banner for buyer */}
+        {order.status === "ON_THE_WAY" && isBuyer && (
+          <div className="mb-5 flex items-center gap-3 rounded-xl bg-[rgba(var(--color-accent),0.12)] px-4 py-3">
+            <span className="text-[20px]" role="img" aria-label="car">🚗</span>
+            <div>
+              <p className="text-[14px] font-semibold text-[rgb(var(--color-text))]">
+                האבאל׳ה בדרך אליך!
+              </p>
+              {order.onTheWayEta && (
+                <p className="text-[13px] text-[rgb(var(--color-text-secondary))]">
+                  זמן הגעה משוער: {order.onTheWayEta}
+                </p>
+              )}
+            </div>
           </div>
         )}
 
@@ -568,7 +676,24 @@ export default function OrderDetailPage() {
               <button disabled={statusBusy} onClick={() => setCancelOpen(true)} className="flex items-center gap-2 rounded-xl border-2 border-[rgba(var(--color-error),0.2)] bg-[rgba(var(--color-error),0.05)] px-5 py-2.5 text-[14px] font-semibold text-[rgb(var(--color-error))] transition-all hover:bg-[rgba(var(--color-error),0.1)] disabled:opacity-50">דחה הזמנה</button>
             </>
           )}
-          {isSeller && order.status === "IN_PROGRESS" && (
+          {isSeller && order.status === "IN_PROGRESS" && isBookedDay && (
+            <div className="flex items-center gap-2">
+              <input
+                value={onMyWayEtaInput}
+                onChange={(e) => setOnMyWayEtaInput(e.target.value)}
+                placeholder="זמן הגעה (לא חובה)"
+                className="rounded-xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface-elevated))] px-3 py-2.5 text-[13px] text-[rgb(var(--color-text))] placeholder-[rgb(var(--color-text-muted))] focus:border-[rgb(var(--color-primary))] focus:outline-none w-40"
+              />
+              <button
+                disabled={onMyWayBusy || statusBusy}
+                onClick={sendOnMyWay}
+                className="flex items-center gap-2 rounded-xl bg-[rgb(var(--color-accent))] px-5 py-2.5 text-[14px] font-semibold text-white transition-all hover:opacity-90 disabled:opacity-50"
+              >
+                {onMyWayBusy ? "שולח..." : "אני בדרך!"}
+              </button>
+            </div>
+          )}
+          {isSeller && (order.status === "IN_PROGRESS" || order.status === "ON_THE_WAY") && (
             <button disabled={statusBusy} onClick={() => setDeliverOpen(true)} className="flex items-center gap-2 rounded-xl bg-[rgb(var(--color-primary))] px-5 py-2.5 text-[14px] font-semibold text-white transition-all hover:bg-[rgb(var(--color-primary-hover))] disabled:opacity-50">סמן כנמסר</button>
           )}
           {isBuyer && order.status === "DELIVERED" && (
@@ -595,6 +720,21 @@ export default function OrderDetailPage() {
           {isBuyer && order.status === "COMPLETED" && !order.review && (
             <button onClick={() => setReviewOpen(true)} className="flex items-center gap-2 rounded-xl bg-[rgb(var(--color-accent-yellow))] px-5 py-2.5 text-[14px] font-semibold text-[rgb(var(--color-text))] transition-all hover:opacity-80">כתוב חוות דעת</button>
           )}
+          {isBuyer && order.status === "COMPLETED" && (
+            <button
+              onClick={() => {
+                if (order.gig.id) {
+                  router.push(`/gigs/${order.gig.id}`);
+                } else {
+                  router.push(`/sellers/${order.seller.id}`);
+                }
+              }}
+              className="flex items-center gap-2 rounded-xl border-2 border-[rgba(var(--color-primary),0.2)] bg-[rgba(var(--color-primary),0.05)] px-5 py-2.5 text-[14px] font-semibold text-[rgb(var(--color-primary))] transition-all hover:bg-[rgba(var(--color-primary),0.1)]"
+            >
+              <ArrowClockwise className="h-4 w-4" />
+              הזמן שוב
+            </button>
+          )}
           {(isBuyer || isSeller) && isDisputableStatus(order.status) && !hasOpenDispute && !showBuyerDisputeInsteadOfCancel && (
             <button
               onClick={() => setDisputeOpen(true)}
@@ -604,7 +744,40 @@ export default function OrderDetailPage() {
               פתיחת מחלוקת
             </button>
           )}
+          {isSeller && order.status === "COMPLETED" && !order.invoice && order.sellerHasTaxProfile && (
+            <button
+              disabled={invoiceBusy}
+              onClick={generateInvoice}
+              className="flex items-center gap-2 rounded-xl bg-[rgb(var(--color-accent))] px-5 py-2.5 text-[14px] font-semibold text-white transition-all hover:opacity-90 disabled:opacity-50"
+            >
+              <Receipt className="h-4 w-4" />
+              {invoiceBusy ? "מנפיק..." : "הנפק חשבונית"}
+            </button>
+          )}
+          {isSeller && order.status === "COMPLETED" && !order.invoice && !order.sellerHasTaxProfile && (
+            <a
+              href="/profile/tax"
+              className="flex items-center gap-2 rounded-xl border-2 border-[rgba(var(--color-accent),0.3)] bg-[rgba(var(--color-accent),0.08)] px-5 py-2.5 text-[14px] font-semibold text-[rgb(var(--color-accent))] transition-all hover:bg-[rgba(var(--color-accent),0.15)]"
+            >
+              <Receipt className="h-4 w-4" />
+              הגדר פרופיל עסקי להנפקת חשבונית
+            </a>
+          )}
+          {order.invoice && (
+            <a
+              href={`/api/orders/${order.id}/invoice/pdf`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-2 rounded-xl bg-[rgb(var(--color-primary))] px-5 py-2.5 text-[14px] font-semibold text-white transition-all hover:bg-[rgb(var(--color-primary-hover))]"
+            >
+              <FilePdf className="h-4 w-4" />
+              הורד חשבונית #{order.invoice.invoiceNumber}
+            </a>
+          )}
         </div>
+        {invoiceError && (
+          <p role="alert" className="mt-3 text-[13px] font-medium text-[rgb(var(--color-error))]">{invoiceError}</p>
+        )}
         {statusError && (
           <p role="alert" className="mt-3 text-[13px] font-medium text-[rgb(var(--color-error))]">{statusError}</p>
         )}

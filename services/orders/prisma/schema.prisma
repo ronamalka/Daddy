@@ -10,6 +10,7 @@ datasource db {
 enum OrderStatus {
   PENDING
   IN_PROGRESS
+  ON_THE_WAY
   DELIVERED
   COMPLETED
   CANCELLED
@@ -95,6 +96,8 @@ model Order {
   cancelledById         String?
   cancellationFee       Float                 @default(0)
   cancellationFeeStatus CancellationFeeStatus @default(NONE)
+  onTheWayAt            DateTime?
+  onTheWayEta           String?
   deliveryPhotos        String[]              @default([])
   deliveryNote          String?
   createdAt DateTime    @default(now())
@@ -103,12 +106,36 @@ model Order {
   requirements OrderRequirement[]
   disputes     Dispute[]
   payments     Payment[]
+  invoice      Invoice?
 
   @@index([buyerId])
   @@index([sellerId])
   @@index([gigId])
   @@index([requestId])
   @@index([sellerId, slotStart])
+}
+
+model Invoice {
+  id               String   @id @default(cuid())
+  orderId          String   @unique
+  invoiceNumber    Int      @unique @default(autoincrement())
+  sellerLegalName  String
+  sellerOsekNumber String?
+  sellerOsekType   String   // "patur" or "murshe"
+  sellerAddress    String?
+  buyerName        String
+  serviceDescription String
+  laborAmount      Float
+  materialsAmount  Float?
+  subtotal         Float
+  vatRate          Float    @default(0)
+  vatAmount        Float    @default(0)
+  total            Float
+  issuedAt         DateTime @default(now())
+
+  order Order @relation(fields: [orderId], references: [id])
+
+  @@index([orderId])
 }
 
 model OrderRequirement {

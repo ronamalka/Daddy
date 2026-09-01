@@ -5,6 +5,7 @@ const BASE_URL = process.env.E2E_BASE_URL || "http://localhost:3000";
 
 /** Signs in with a seeded account and waits until the home page loads. */
 export async function loginAs(page: Page, email: string, password = "password123") {
+  const loginTimeout = process.env.CI ? 45000 : 15000;
   await stubCookieConsent(page);
   for (let attempt = 0; attempt < 3; attempt++) {
     await page.goto("/login");
@@ -12,7 +13,7 @@ export async function loginAs(page: Page, email: string, password = "password123
     await page.getByPlaceholder("הזן את הסיסמה שלך").fill(password);
     await page.getByRole("button", { name: "התחבר" }).click();
     try {
-      await page.waitForURL((url) => url.pathname === "/", { timeout: 30000 });
+      await page.waitForURL((url) => url.pathname === "/", { timeout: loginTimeout });
       return;
     } catch (error) {
       const blocked = await page.getByText(/Too many requests|יותר מדי/).isVisible().catch(() => false);

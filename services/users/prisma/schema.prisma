@@ -25,25 +25,61 @@ model User {
   city         String?
   cityCode     Int?
   districtCode Int?
+  emailVerified  Boolean  @default(false)
   acceptingJobs Boolean  @default(true)
   payoutBankAccount  String?
   payoutBankBranch   String?
   payoutAccountNumber String?
+  notifyWhatsapp   Boolean @default(true)
+  notifySms        Boolean @default(false)
+  notifyEmail      Boolean @default(true)
+  marketingConsent Boolean @default(false)
+  marketingConsentAt DateTime?
+  osekType       String?
+  osekNumber     String?
+  legalName      String?
+  businessAddress String?
   suspendedAt   DateTime?
   suspendReason String?
+  phoneVerified    Boolean  @default(false)
+  phoneVerifiedAt  DateTime?
+  identityStatus   String   @default("NONE")
+  identityPhoto    String?
+  identityReviewedAt DateTime?
+  identityReviewedBy String?
+  licenseStatus    String?
+  licensePhoto     String?
+  licenseType      String?
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
-  serviceAreas    ServiceArea[]
-  userServices    UserService[]
-  servicePrices   ServicePrice[]
-  passwordResets  PasswordReset[]
-  weeklyHours     WeeklyHours[]
-  timeOff         TimeOff[]
-  notifications   Notification[]
+  serviceAreas        ServiceArea[]
+  userServices        UserService[]
+  servicePrices       ServicePrice[]
+  passwordResets      PasswordReset[]
+  emailVerifications  EmailVerification[]
+  weeklyHours         WeeklyHours[]
+  timeOff             TimeOff[]
+  notifications       Notification[]
+  phoneOtps           PhoneOtp[]
+  savedAddresses      SavedAddress[]
 }
 
 model PasswordReset {
+  id        String   @id @default(cuid())
+  userId    String
+  token     String   @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([token])
+}
+
+model EmailVerification {
   id        String   @id @default(cuid())
   userId    String
   token     String   @unique
@@ -147,6 +183,25 @@ model TimeOff {
   @@index([userId])
 }
 
+model SavedAddress {
+  id           String   @id @default(cuid())
+  userId       String
+  label        String
+  cityCode     Int?
+  cityName     String?
+  districtCode Int?
+  districtName String?
+  street       String?
+  floor        String?
+  accessNotes  String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
 /// CBS localities for pickers. Request path reads this table only; data.gov.il is a daily background refresh.
 model City {
   code         Int      @id
@@ -164,4 +219,20 @@ model CityCatalog {
   id        Int       @id @default(1)
   source    String    @default("snapshot")
   fetchedAt DateTime?
+}
+
+model PhoneOtp {
+  id        String   @id @default(cuid())
+  userId    String
+  phone     String
+  code      String
+  expiresAt DateTime
+  usedAt    DateTime?
+  attempts  Int      @default(0)
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([phone, code])
 }

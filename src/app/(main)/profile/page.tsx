@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
-import { Lock, MapPin, Package, CurrencyDollar, Star, User, Envelope, Shield, CalendarBlank, CreditCard } from "@phosphor-icons/react";
+import { Lock, MapPin, Package, CurrencyDollar, Star, User, Envelope, Shield, CalendarBlank, CreditCard, Bell, ShieldCheck, House, Receipt } from "@phosphor-icons/react";
 import { ProfileProgress } from "@/components/profile-progress";
 import type { ProfileReadinessResponse } from "@/lib/seller-ready";
 
@@ -93,6 +93,13 @@ export default function ProfilePage() {
                 אזורי שירות
               </Link>
               <Link
+                href="/profile/addresses"
+                className="rounded-full border border-[rgb(var(--color-border))] px-4 py-1.5 text-[13px] font-semibold text-[rgb(var(--color-text-secondary))] hover:border-[rgb(var(--color-accent))] hover:text-[rgb(var(--color-accent))] transition-all flex items-center gap-1.5"
+              >
+                <House className="h-3.5 w-3.5" />
+                כתובות
+              </Link>
+              <Link
                 href="/profile/services"
                 className="rounded-full border border-[rgb(var(--color-border))] px-4 py-1.5 text-[13px] font-semibold text-[rgb(var(--color-text-secondary))] hover:border-[rgb(var(--color-primary))] hover:text-[rgb(var(--color-primary))] transition-all flex items-center gap-1.5"
               >
@@ -122,6 +129,13 @@ export default function ProfilePage() {
                   זמינות
                 </Link>
               )}
+              <Link
+                href="/profile/verification"
+                className="rounded-full border border-[rgb(var(--color-border))] px-4 py-1.5 text-[13px] font-semibold text-[rgb(var(--color-text-secondary))] hover:border-[rgb(var(--color-success))] hover:text-[rgb(var(--color-success))] transition-all flex items-center gap-1.5"
+              >
+                <ShieldCheck className="h-3.5 w-3.5" />
+                אימותים
+              </Link>
               {session.user.role === "SELLER" && (
                 <Link
                   href="/profile/gigs"
@@ -131,6 +145,22 @@ export default function ProfilePage() {
                     <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 12h16.5m-16.5 3.75h16.5M3.75 19.5h16.5M5.625 4.5h12.75a1.875 1.875 0 010 3.75H5.625a1.875 1.875 0 010-3.75z" />
                   </svg>
                   החבילות שלי
+                </Link>
+              )}
+              <Link
+                href="/profile/notifications"
+                className="rounded-full border border-[rgb(var(--color-border))] px-4 py-1.5 text-[13px] font-semibold text-[rgb(var(--color-text-secondary))] hover:border-[rgb(var(--color-accent))] hover:text-[rgb(var(--color-accent))] transition-all flex items-center gap-1.5"
+              >
+                <Bell className="h-3.5 w-3.5" />
+                התראות
+              </Link>
+              {session.user.role === "SELLER" && (
+                <Link
+                  href="/profile/tax"
+                  className="rounded-full border border-[rgb(var(--color-border))] px-4 py-1.5 text-[13px] font-semibold text-[rgb(var(--color-text-secondary))] hover:border-[rgb(var(--color-accent))] hover:text-[rgb(var(--color-accent))] transition-all flex items-center gap-1.5"
+                >
+                  <Receipt className="h-3.5 w-3.5" />
+                  פרופיל עסקי
                 </Link>
               )}
             </div>

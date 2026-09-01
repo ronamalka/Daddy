@@ -16,6 +16,10 @@ const profileUpdateSchema = z.object({
   payoutBankAccount: z.string().max(50).optional().nullable(),
   payoutBankBranch: z.string().max(50).optional().nullable(),
   payoutAccountNumber: z.string().max(50).optional().nullable(),
+  osekType: z.enum(["patur", "murshe"]).optional().nullable(),
+  osekNumber: z.string().max(20).optional().nullable(),
+  legalName: z.string().max(200).optional().nullable(),
+  businessAddress: z.string().max(300).optional().nullable(),
 });
 
 /** Returns the signed-in user's profile. */

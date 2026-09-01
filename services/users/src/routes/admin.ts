@@ -88,3 +88,75 @@ adminRoutes.post("/users/:id/unsuspend", requireAdmin, async (req: Request, res:
   });
   res.json(updated);
 });
+
+/** List users with PENDING identity or license verification. */
+adminRoutes.get("/verifications", requireAdmin, async (_req: Request, res: Response) => {
+  const users = await prisma.user.findMany({
+    where: {
+      OR: [
+        { identityStatus: "PENDING" },
+        { licenseStatus: "PENDING" },
+      ],
+    },
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      phone: true,
+      identityStatus: true,
+      identityPhoto: true,
+      licenseStatus: true,
+      licensePhoto: true,
+      licenseType: true,
+      createdAt: true,
+    },
+    orderBy: { createdAt: "desc" },
+  });
+  res.json(users);
+});
+
+/** Approve or reject identity/license verification for a user. */
+adminRoutes.post("/verifications/:userId/review", requireAdmin, async (req: Request, res: Response) => {
+  const userId = String(req.params.userId);
+  const { type, decision } = req.body as { type?: string; decision?: string };
+
+  if (!type || !["identity", "license"].includes(type)) {
+    res.status(400).json({ error: "סוג אימות לא תקין (identity או license)" });
+    return;
+  }
+  if (!decision || !["APPROVED", "REJECTED"].includes(decision)) {
+    res.status(400).json({ error: "החלטה לא תקינה (APPROVED או REJECTED)" });
+    return;
+  }
+
+  const target = await prisma.user.findUnique({ where: { id: userId } });
+  if (!target) {
+    res.status(404).json({ error: "המשתמש לא נמצא" });
+    return;
+  }
+
+  const data: Record<string, unknown> = {};
+  if (type === "identity") {
+    data.identityStatus = decision;
+    data.identityReviewedAt = new Date();
+    data.identityReviewedBy = req.user!.id;
+  } else {
+    data.licenseStatus = decision;
+  }
+
+  const updated = await prisma.user.update({
+    where: { id: userId },
+    data,
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      identityStatus: true,
+      identityReviewedAt: true,
+      licenseStatus: true,
+      licenseType: true,
+    },
+  });
+
+  res.json(updated);
+});

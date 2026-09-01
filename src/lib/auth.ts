@@ -123,6 +123,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           role: user.role,
           weakPassword,
           hasPassword: true,
+          isEmailVerified: user.emailVerified ?? false,
         };
       },
     }),
@@ -155,6 +156,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         user.id = dbUser.id;
         user.role = dbUser.role;
         user.hasPassword = Boolean(dbUser.hasPassword);
+        user.isEmailVerified = dbUser.emailVerified ?? true;
         logSecurityEvent("login_success", {
           email: dbUser.email,
           userId: dbUser.id,
@@ -170,6 +172,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         token.role = user.role;
         token.weakPassword = user.weakPassword || false;
         token.hasPassword = user.hasPassword !== false;
+        token.isEmailVerified = user.isEmailVerified ?? false;
         token.jti = crypto.randomUUID();
         token.iat = Math.floor(Date.now() / 1000);
 
@@ -185,12 +188,15 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       }
 
       if (trigger === "update" && session) {
-        const update = session as { weakPassword?: boolean; role?: string };
+        const update = session as { weakPassword?: boolean; role?: string; isEmailVerified?: boolean };
         if (typeof update.weakPassword === "boolean") {
           token.weakPassword = update.weakPassword;
         }
         if (update.role === "SELLER") {
           token.role = "SELLER";
+        }
+        if (typeof update.isEmailVerified === "boolean") {
+          token.isEmailVerified = update.isEmailVerified;
         }
       }
 
@@ -225,6 +231,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         session.user.role = token.role as string;
         session.user.weakPassword = token.weakPassword || false;
         session.user.hasPassword = token.hasPassword !== false;
+        session.user.isEmailVerified = token.isEmailVerified ?? false;
       }
       return session;
     },

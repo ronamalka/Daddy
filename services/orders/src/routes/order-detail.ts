@@ -1,5 +1,7 @@
 import { Router, Request, Response } from "express";
 import { requireAuth } from "../../../shared/middleware";
+import { sendNotification } from "../../../shared/internal-client";
+import { buildNotification } from "../../../shared/notification-templates";
 import { prisma } from "../index";
 import { OrderStatus } from "../generated/prisma/client";
 import { isOpenDisputeStatus } from "../lib/disputes";
@@ -60,7 +62,8 @@ orderDetailRoutes.patch("/:id", requireAuth, async (req: Request, res: Response)
 
   const allowed: Record<string, { by: string[]; from: OrderStatus[] }> = {
     IN_PROGRESS: { by: ["seller"], from: ["PENDING"] },
-    DELIVERED: { by: ["seller"], from: ["IN_PROGRESS"] },
+    ON_THE_WAY: { by: ["seller"], from: ["IN_PROGRESS"] },
+    DELIVERED: { by: ["seller"], from: ["IN_PROGRESS", "ON_THE_WAY"] },
     COMPLETED: { by: ["buyer"], from: ["DELIVERED"] },
   };
 
@@ -95,6 +98,16 @@ orderDetailRoutes.patch("/:id", requireAuth, async (req: Request, res: Response)
       data: result.data,
     });
     res.json(updated);
+
+    // Notify both parties about the cancellation (fire-and-forget)
+    const cancelNote = buildNotification("ORDER_CANCELLED", {
+      orderId: id,
+      service: order.title || undefined,
+    });
+    const otherParty = isBuyer ? order.sellerId : order.buyerId;
+    sendNotification({ userId: otherParty, ...cancelNote, entityId: id }).catch(() => {});
+    sendNotification({ userId: req.user!.id, ...cancelNote, entityId: id }).catch(() => {});
+
     return;
   }
 
@@ -120,6 +133,29 @@ orderDetailRoutes.patch("/:id", requireAuth, async (req: Request, res: Response)
     return;
   }
 
+  if (status === "ON_THE_WAY") {
+    if (order.slotStart) {
+      const slotDay = new Date(order.slotStart).toISOString().slice(0, 10);
+      const today = new Date().toISOString().slice(0, 10);
+      if (slotDay !== today) {
+        res.status(400).json({ error: "אפשר לעדכן ״בדרך״ רק ביום הביקור" });
+        return;
+      }
+    }
+
+    const { eta } = req.body;
+    const updated = await prisma.order.update({
+      where: { id },
+      data: {
+        status,
+        onTheWayAt: new Date(),
+        onTheWayEta: typeof eta === "string" && eta.trim() ? eta.trim() : null,
+      },
+    });
+    res.json(updated);
+    return;
+  }
+
   if (status === "DELIVERED") {
     const evidence = parseDeliveryEvidence(req.body);
     if (!evidence.ok) {
@@ -135,6 +171,11 @@ orderDetailRoutes.patch("/:id", requireAuth, async (req: Request, res: Response)
       },
     });
     res.json(updated);
+
+    // Notify buyer to confirm completion (fire-and-forget)
+    const deliverNote = buildNotification("CONFIRM_COMPLETION", { orderId: id });
+    sendNotification({ userId: order.buyerId, ...deliverNote, entityId: id }).catch(() => {});
+
     return;
   }
 
@@ -151,6 +192,15 @@ orderDetailRoutes.patch("/:id", requireAuth, async (req: Request, res: Response)
   }
 
   res.json(updated);
+
+  // Fire-and-forget notifications for status transitions
+  if (status === "IN_PROGRESS") {
+    const note = buildNotification("ORDER_IN_PROGRESS", {
+      orderId: id,
+      service: order.title || undefined,
+    });
+    sendNotification({ userId: order.buyerId, ...note, entityId: id }).catch(() => {});
+  }
 });
 
 /** Save the buyer's answers to the gig's requirement questions. */

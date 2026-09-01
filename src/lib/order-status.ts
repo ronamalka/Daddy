@@ -10,6 +10,11 @@ export const STATUS_COLORS: Record<string, { bg: string; text: string; dot: stri
     text: "text-[rgb(var(--color-primary))]",
     dot: "bg-[rgb(var(--color-primary))]",
   },
+  ON_THE_WAY: {
+    bg: "bg-[rgba(var(--color-accent),0.15)]",
+    text: "text-[rgb(var(--color-accent))]",
+    dot: "bg-[rgb(var(--color-accent))]",
+  },
   DELIVERED: {
     bg: "bg-[rgba(var(--color-primary-light),0.15)]",
     text: "text-[rgb(var(--color-primary-hover))]",
@@ -30,6 +35,7 @@ export const STATUS_COLORS: Record<string, { bg: string; text: string; dot: stri
 export const STATUS_LABELS: Record<string, string> = {
   PENDING: "ממתין",
   IN_PROGRESS: "בעבודה",
+  ON_THE_WAY: "בדרך",
   DELIVERED: "נמסר",
   COMPLETED: "הושלם",
   CANCELLED: "בוטל",

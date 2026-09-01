@@ -20,11 +20,16 @@ describe("isCredentialAuthPath", () => {
 
   it("rate-limits credential callback POSTs", () => {
     expect(isCredentialAuthPath("/api/auth/callback/credentials", "POST")).toBe(true);
-    expect(isCredentialAuthPath("/api/auth/signin", "POST")).toBe(true);
+    expect(isCredentialAuthPath("/api/auth/signin/credentials", "POST")).toBe(true);
   });
 
   it("does not put signout in the tight auth bucket", () => {
     expect(isCredentialAuthPath("/api/auth/signout", "POST")).toBe(false);
+  });
+
+  it("does not rate-limit Google OAuth as credential auth", () => {
+    expect(isCredentialAuthPath("/api/auth/signin/google", "POST")).toBe(false);
+    expect(isCredentialAuthPath("/api/auth/callback/google", "POST")).toBe(false);
   });
 
   it("rate-limits register and password-reset", () => {
