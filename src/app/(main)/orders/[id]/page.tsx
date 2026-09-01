@@ -2,10 +2,10 @@
 
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { ReviewForm } from "@/components/review-form";
-import { Star, Handshake, Clock, Coins, Tag, ClipboardText, ChatCircle, PaperPlaneTilt, ArrowsClockwise, Warning, Scales, Receipt, FilePdf } from "@phosphor-icons/react";
+import { Star, Handshake, Clock, Coins, Tag, ClipboardText, ChatCircle, PaperPlaneTilt, ArrowsClockwise, Warning, Scales, ArrowClockwise, Receipt, FilePdf } from "@phosphor-icons/react";
 import { Dialog } from "@/components/ui/dialog";
 import { formatVisitWindow } from "@/lib/availability";
 import { DisputeDialog } from "@/components/orders/dispute-dialog";
@@ -103,6 +103,7 @@ const STATUS_STYLE: Record<string, { bg: string; text: string; label: string }> 
 /** Shows one order's status, messages, and review form. */
 export default function OrderDetailPage() {
   const params = useParams();
+  const router = useRouter();
   const { data: session } = useSession();
   const [order, setOrder] = useState<OrderDetail | null>(null);
   const [message, setMessage] = useState("");
@@ -623,6 +624,21 @@ export default function OrderDetailPage() {
           )}
           {isBuyer && order.status === "COMPLETED" && !order.review && (
             <button onClick={() => setReviewOpen(true)} className="flex items-center gap-2 rounded-xl bg-[rgb(var(--color-accent-yellow))] px-5 py-2.5 text-[14px] font-semibold text-[rgb(var(--color-text))] transition-all hover:opacity-80">כתוב חוות דעת</button>
+          )}
+          {isBuyer && order.status === "COMPLETED" && (
+            <button
+              onClick={() => {
+                if (order.gig.id) {
+                  router.push(`/gigs/${order.gig.id}`);
+                } else {
+                  router.push(`/sellers/${order.seller.id}`);
+                }
+              }}
+              className="flex items-center gap-2 rounded-xl border-2 border-[rgba(var(--color-primary),0.2)] bg-[rgba(var(--color-primary),0.05)] px-5 py-2.5 text-[14px] font-semibold text-[rgb(var(--color-primary))] transition-all hover:bg-[rgba(var(--color-primary),0.1)]"
+            >
+              <ArrowClockwise className="h-4 w-4" />
+              הזמן שוב
+            </button>
           )}
           {(isBuyer || isSeller) && isDisputableStatus(order.status) && !hasOpenDispute && !showBuyerDisputeInsteadOfCancel && (
             <button
