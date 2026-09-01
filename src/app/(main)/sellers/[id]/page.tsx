@@ -12,8 +12,9 @@ import { getServiceBySlug } from "@/lib/services";
 import {
   MapPin, Star, Handshake, Clock, Coins, CaretRight,
   House, SealCheck, ChatCircleDots, PaperPlaneTilt,
-  CalendarBlank, ShieldCheck, CheckCircle,
+  CalendarBlank, ShieldCheck, CheckCircle, Heart,
 } from "@phosphor-icons/react";
+import { VerificationBadge } from "@/components/verification-badge";
 import { CategoryIcon } from "@/components/ui/category-icon";
 import { DAY_LABELS_HE, minutesToTimeLabel } from "@/lib/availability";
 import { SlotPicker, type SlotOption } from "@/components/slot-picker";
@@ -63,6 +64,10 @@ interface SellerProfile {
     buyerSuppliesMaterials?: boolean | null;
   }[];
   acceptingJobs?: boolean;
+  phoneVerified?: boolean;
+  identityStatus?: string;
+  licenseStatus?: string;
+  licenseType?: string;
   weeklyHours?: { dayOfWeek: number; startMin: number; endMin: number }[];
   allReviews: ReviewData[];
   gigs: {
@@ -155,6 +160,8 @@ export default function SellerProfilePage() {
   const [msgSending, setMsgSending] = useState(false);
   const [msgError, setMsgError] = useState("");
   const [activeTab, setActiveTab] = useState<TabKey>("reviews");
+  const [isFavorited, setIsFavorited] = useState(false);
+  const [favBusy, setFavBusy] = useState(false);
 
   const sellerId = typeof params.id === "string" ? params.id : params.id?.[0];
 
@@ -183,6 +190,34 @@ export default function SellerProfilePage() {
         setNotFound(true);
       });
   }, [sellerId]);
+
+  useEffect(() => {
+    if (!sellerId || !session?.user) return;
+    fetch(`/api/favorite-sellers/check?sellerId=${sellerId}`)
+      .then((r) => r.json())
+      .then((data) => {
+        if (data && typeof data.favorited === "boolean") {
+          setIsFavorited(data.favorited);
+        }
+      })
+      .catch(() => {});
+  }, [sellerId, session?.user]);
+
+  /** Toggle this seller as a favorite. */
+  async function toggleFavorite() {
+    if (!sellerId || favBusy) return;
+    setFavBusy(true);
+    const res = await fetch("/api/favorite-sellers", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ sellerId }),
+    });
+    if (res.ok) {
+      const data = await res.json();
+      setIsFavorited(data.favorited);
+    }
+    setFavBusy(false);
+  }
 
   /** Sends a message to this seller and opens the inbox. */
   async function sendMessage(e: React.FormEvent) {
@@ -283,6 +318,20 @@ export default function SellerProfilePage() {
                     מאומת
                   </span>
                 )}
+                {session?.user && session.user.id !== seller.id && (
+                  <button
+                    type="button"
+                    onClick={toggleFavorite}
+                    disabled={favBusy}
+                    aria-label={isFavorited ? "הסר ממועדפים" : "הוסף למועדפים"}
+                    className="rounded-full p-1.5 transition-colors hover:bg-[rgba(var(--color-error),0.1)] disabled:opacity-40"
+                  >
+                    <Heart
+                      className={`h-6 w-6 transition-colors ${isFavorited ? "text-[rgb(var(--color-error))]" : "text-[rgb(var(--color-text-muted))]"}`}
+                      weight={isFavorited ? "fill" : "regular"}
+                    />
+                  </button>
+                )}
               </div>
               <div className="mt-1.5 flex flex-wrap items-center justify-center sm:justify-start gap-3 text-[13px] text-[rgb(var(--color-text-secondary))]">
                 {seller.city && (
@@ -354,6 +403,18 @@ export default function SellerProfilePage() {
               </span>
             )}
           </div>
+
+          {/* Verification Badges */}
+          {(seller.phoneVerified || (seller.identityStatus && seller.identityStatus !== "NONE") || (seller.licenseStatus && seller.licenseStatus !== "NONE")) && (
+            <div className="mt-3">
+              <VerificationBadge
+                phoneVerified={seller.phoneVerified}
+                identityStatus={seller.identityStatus}
+                licenseStatus={seller.licenseStatus}
+                licenseType={seller.licenseType}
+              />
+            </div>
+          )}
 
           {/* Service areas */}
           {seller.serviceAreas.length > 0 && (

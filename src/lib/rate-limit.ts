@@ -40,12 +40,16 @@ export function isCredentialAuthPath(pathname: string, method: string): boolean 
     pathname.includes("/session") ||
     pathname.includes("/csrf") ||
     pathname.includes("/providers") ||
-    pathname.includes("/signout")
+    pathname.includes("/signout") ||
+    pathname.includes("/signin/google") ||
+    pathname.includes("/callback/google")
   ) {
     return false;
   }
 
-  return true;
+  // Only credential-based auth (email/password) should be in the tight bucket.
+  // The path that remains is /api/auth/callback/credentials.
+  return pathname.includes("/callback/credentials") || pathname.includes("/signin/credentials");
 }
 
 /** Tight public GET budget for scrapeable teasers (no session required). */
