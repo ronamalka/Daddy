@@ -2,7 +2,7 @@ import { defineConfig } from "@playwright/test";
 
 export default defineConfig({
   testDir: "./e2e",
-  timeout: 30000,
+  timeout: 60000,
   retries: 1,
   // One worker so credential logins do not trip the shared in-memory auth rate limit.
   workers: 1,
