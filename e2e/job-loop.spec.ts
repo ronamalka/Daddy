@@ -100,7 +100,7 @@ test.describe("Real job loop", () => {
     // /gigs/:id still exists for packages, but this is the live book-with-slot loop.
     await loginAs(page, "buyer@daddy.com");
     await page.goto("/sellers/seed-user-seller1");
-    await expect(page.getByRole("heading", { name: "יוסי הגולדן" })).toBeVisible({ timeout: 20000 });
+    await expect(page.getByRole("heading", { name: "יוסי הגולדן", exact: true })).toBeVisible({ timeout: 20000 });
     await page.getByRole("button", { name: /מחירון/ }).click();
     await expect(page.getByText("בחרו חלון ביקור של שעתיים")).toBeVisible({ timeout: 10000 });
     await page.getByRole("button", { name: /\d{2}:\d{2}/ }).first().click();
