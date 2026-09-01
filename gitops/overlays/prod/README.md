@@ -4,9 +4,9 @@ Kustomize overlay for production (`daddy-prod`). Promote only after a release ta
 
 Argo tracks **`main`** and does **not** auto-sync. Image SHAs come from `gitops/base` on `main` after CI.
 
-This overlay includes `network-policy.yaml` (default-deny plus the ingress/egress the app needs). Keep that file in sync with `../stg/network-policy.yaml`.
+This overlay includes `network-policy.yaml` (default-deny, app rules, and ACME HTTP-01 for Let's Encrypt). Keep the app rules in sync with `../stg/network-policy.yaml`.
 
-The public production hostname is **`aballeh.com`** (also `www.aballeh.com`). The cluster default route stays as a fallback.
+The public production hostname is **`aballeh.com`** (also `www.aballeh.com`). TLS is a Let's Encrypt cert (`certificate.yaml`) mounted on the Routes via `externalCertificate`. The cluster default route stays as a fallback.
 
 Point DNS at the OpenShift router (apex often needs ALIAS/ANAME, not CNAME):
 
@@ -15,7 +15,7 @@ aballeh.com      ALIAS/ANAME  af00024a83ee24d72b37ba10cf8f9024-1027604931.us-eas
 www.aballeh.com  CNAME        router-default.apps.cluster-x8bxx.x8bxx.sandbox2963.opentlc.com
 ```
 
-Until a certificate for `aballeh.com` is attached to the Route, browsers may warn on TLS (the router still presents the cluster wildcard cert). Add Google redirect URI `https://aballeh.com/api/auth/callback/google`.
+Add the Google redirect URI `https://aballeh.com/api/auth/callback/google`.
 
 ## First production cut
 

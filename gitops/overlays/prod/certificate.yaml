@@ -1,0 +1,31 @@
+apiVersion: cert-manager.io/v1
+kind: Issuer
+metadata:
+  name: letsencrypt-aballeh
+  labels:
+    app.kubernetes.io/part-of: daddy
+spec:
+  acme:
+    email: legal@aballeh.com
+    server: https://acme-v02.api.letsencrypt.org/directory
+    privateKeySecretRef:
+      name: letsencrypt-aballeh-account
+    solvers:
+      - http01:
+          ingress:
+            ingressClassName: openshift-default
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: aballeh-tls
+  labels:
+    app.kubernetes.io/part-of: daddy
+spec:
+  secretName: aballeh-tls
+  issuerRef:
+    name: letsencrypt-aballeh
+    kind: Issuer
+  dnsNames:
+    - aballeh.com
+    - www.aballeh.com

@@ -7,6 +7,8 @@ resources:
   - ../../base
   - network-policy.yaml
   - app-route-custom.yaml
+  - certificate.yaml
+  - router-rbac.yaml
 
 patches:
   - target:
