@@ -59,7 +59,8 @@ orderDetailRoutes.patch("/:id", requireAuth, async (req: Request, res: Response)
 
   const allowed: Record<string, { by: string[]; from: OrderStatus[] }> = {
     IN_PROGRESS: { by: ["seller"], from: ["PENDING"] },
-    DELIVERED: { by: ["seller"], from: ["IN_PROGRESS"] },
+    ON_THE_WAY: { by: ["seller"], from: ["IN_PROGRESS"] },
+    DELIVERED: { by: ["seller"], from: ["IN_PROGRESS", "ON_THE_WAY"] },
     COMPLETED: { by: ["buyer"], from: ["DELIVERED"] },
   };
 
@@ -116,6 +117,29 @@ orderDetailRoutes.patch("/:id", requireAuth, async (req: Request, res: Response)
 
   if (status === "IN_PROGRESS" && !canStartWork(order)) {
     res.status(409).json({ error: "הלקוח צריך לאשר את עדכון החומרים לפני תחילת העבודה" });
+    return;
+  }
+
+  if (status === "ON_THE_WAY") {
+    if (order.slotStart) {
+      const slotDay = new Date(order.slotStart).toISOString().slice(0, 10);
+      const today = new Date().toISOString().slice(0, 10);
+      if (slotDay !== today) {
+        res.status(400).json({ error: "אפשר לעדכן ״בדרך״ רק ביום הביקור" });
+        return;
+      }
+    }
+
+    const { eta } = req.body;
+    const updated = await prisma.order.update({
+      where: { id },
+      data: {
+        status,
+        onTheWayAt: new Date(),
+        onTheWayEta: typeof eta === "string" && eta.trim() ? eta.trim() : null,
+      },
+    });
+    res.json(updated);
     return;
   }
 

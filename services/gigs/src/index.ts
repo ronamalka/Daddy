@@ -9,6 +9,7 @@ import { gigDetailRoutes } from "./routes/gig-detail";
 import { favoritesRoutes } from "./routes/favorites";
 import { reviewsRoutes } from "./routes/reviews";
 import { recentReviewsRoutes } from "./routes/recent-reviews";
+import { favoriteSellerRoutes } from "./routes/favorite-sellers";
 
 const pool = new pg.Pool({ connectionString: process.env.DATABASE_URL });
 const adapter = new PrismaPg(pool);
@@ -31,6 +32,7 @@ app.use("/gigs", gigDetailRoutes);
 app.use("/favorites", favoritesRoutes);
 app.use("/reviews", reviewsRoutes);
 app.use("/recent-reviews", recentReviewsRoutes);
+app.use("/favorite-sellers", favoriteSellerRoutes);
 
 /** Start the gigs HTTP server. */
 app.listen(PORT, "0.0.0.0", () => {

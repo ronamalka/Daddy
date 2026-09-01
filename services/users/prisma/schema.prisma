@@ -26,6 +26,10 @@ model User {
   cityCode     Int?
   districtCode Int?
   acceptingJobs Boolean  @default(true)
+  osekType       String?  // "patur" or "murshe"
+  osekNumber     String?  // business registration number
+  legalName      String?  // business legal name
+  businessAddress String? // business address for invoice
   suspendedAt   DateTime?
   suspendReason String?
   phoneVerified    Boolean  @default(false)
@@ -48,6 +52,7 @@ model User {
   timeOff         TimeOff[]
   notifications   Notification[]
   phoneOtps       PhoneOtp[]
+  savedAddresses  SavedAddress[]
 }
 
 model PasswordReset {
@@ -151,6 +156,25 @@ model TimeOff {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, date])
+  @@index([userId])
+}
+
+model SavedAddress {
+  id           String   @id @default(cuid())
+  userId       String
+  label        String
+  cityCode     Int?
+  cityName     String?
+  districtCode Int?
+  districtName String?
+  street       String?
+  floor        String?
+  accessNotes  String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
   @@index([userId])
 }
 
