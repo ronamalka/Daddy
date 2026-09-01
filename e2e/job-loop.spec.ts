@@ -35,7 +35,7 @@ test.describe("Real job loop", () => {
         .selectOption("furniture-assembly");
       await buyer.page.getByPlaceholder("לדוגמה: הרצל 12").fill("נחלת בנימין 88");
       await buyer.page.getByPlaceholder("לדוגמה: 3").fill("4");
-      await buyer.page.getByRole("radio", { name: "בוקר" }).click();
+      await buyer.page.getByRole("group", { name: "חלון מועדף" }).getByText("בוקר", { exact: true }).click();
       await pickTelAvivCity(buyer.page);
       await waitForBotWindow(openedAt);
 
