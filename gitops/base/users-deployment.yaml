@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: users-service
-          image: quay.io/rh_ee_rmalka/daddy-users-service:081251de
+          image: quay.io/rh_ee_rmalka/daddy-users-service:4145a125
           ports:
             - containerPort: 4001
           env:
