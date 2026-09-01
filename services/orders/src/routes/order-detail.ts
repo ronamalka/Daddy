@@ -5,6 +5,7 @@ import { OrderStatus } from "../generated/prisma/client";
 import { isOpenDisputeStatus } from "../lib/disputes";
 import { buyerCancelPatch, sellerDeclinePatch } from "../lib/cancellation";
 import { canStartWork } from "../lib/materials";
+import { parseDeliveryEvidence } from "../../../shared/delivery-photos";
 
 /** Routes for one order: details, status changes, and buyer requirements. */
 export const orderDetailRoutes = Router();
@@ -132,6 +133,24 @@ orderDetailRoutes.patch("/:id", requireAuth, async (req: Request, res: Response)
 
   if (status === "IN_PROGRESS" && !canStartWork(order)) {
     res.status(409).json({ error: "הלקוח צריך לאשר את עדכון החומרים לפני תחילת העבודה" });
+    return;
+  }
+
+  if (status === "DELIVERED") {
+    const evidence = parseDeliveryEvidence(req.body);
+    if (!evidence.ok) {
+      res.status(400).json({ error: evidence.error });
+      return;
+    }
+    const updated = await prisma.order.update({
+      where: { id },
+      data: {
+        status,
+        deliveryPhotos: evidence.value.photos,
+        deliveryNote: evidence.value.note,
+      },
+    });
+    res.json(updated);
     return;
   }
 

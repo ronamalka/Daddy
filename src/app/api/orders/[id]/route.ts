@@ -60,7 +60,7 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
   return NextResponse.json(enriched);
 }
 
-/** Updates an order status (accept, deliver, complete, cancel, or request a revision). */
+/** Updates an order status (accept, deliver with photos, complete, cancel, or request a revision). */
 export async function PATCH(request: Request, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const session = await auth();
