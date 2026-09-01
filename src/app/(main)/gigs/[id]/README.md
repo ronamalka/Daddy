@@ -1,3 +1,3 @@
 # `[id]/`
 
-The `/gigs/:id` page. Buyers see the offer, reviews, and a way to book a visit slot. `layout.tsx` sets `generateMetadata` and Service JSON-LD.
+The `/gigs/:id` page. Buyers see the offer, reviews, a visit-slot booking control, and the 24-hour cancellation policy. `layout.tsx` sets `generateMetadata` and Service JSON-LD.

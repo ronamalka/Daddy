@@ -7,6 +7,7 @@ import Link from "next/link";
 import { GigCard } from "@/components/gig-card";
 import { Heart, Star, Clock, ArrowsClockwise, ChatCircle, CaretDown } from "@phosphor-icons/react";
 import { MarketplaceDisclaimer } from "@/components/marketplace-disclaimer";
+import { CancellationPolicyNote } from "@/components/cancellation-policy-note";
 import { SlotPicker, type SlotOption } from "@/components/slot-picker";
 
 interface GigDetail {
@@ -506,6 +507,9 @@ export default function GigDetailPage() {
 
                 <div className="mt-4">
                   <MarketplaceDisclaimer compact />
+                </div>
+                <div className="mt-3">
+                  <CancellationPolicyNote compact />
                 </div>
 
                 {/* Contact seller */}

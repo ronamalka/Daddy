@@ -28,7 +28,7 @@ describe("Average Rating Calculation", () => {
 describe("Order Status Transitions", () => {
   const VALID_TRANSITIONS: Record<string, string[]> = {
     PENDING: ["IN_PROGRESS", "CANCELLED"],
-    IN_PROGRESS: ["DELIVERED", "CANCELLED"],
+    IN_PROGRESS: ["DELIVERED"],
     DELIVERED: ["COMPLETED", "IN_PROGRESS"],
     COMPLETED: [],
     CANCELLED: [],
@@ -52,6 +52,10 @@ describe("Order Status Transitions", () => {
 
   it("IN_PROGRESS -> DELIVERED is valid", () => {
     expect(canTransition("IN_PROGRESS", "DELIVERED")).toBe(true);
+  });
+
+  it("IN_PROGRESS -> CANCELLED is invalid — open a dispute instead", () => {
+    expect(canTransition("IN_PROGRESS", "CANCELLED")).toBe(false);
   });
 
   it("COMPLETED -> anything is invalid", () => {

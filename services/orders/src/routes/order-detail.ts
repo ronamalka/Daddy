@@ -3,6 +3,7 @@ import { requireAuth } from "../../../shared/middleware";
 import { prisma } from "../index";
 import { OrderStatus } from "../generated/prisma/client";
 import { isOpenDisputeStatus } from "../lib/disputes";
+import { buyerCancelPatch, sellerDeclinePatch } from "../lib/cancellation";
 
 /** Routes for one order: details, status changes, and buyer requirements. */
 export const orderDetailRoutes = Router();
@@ -58,8 +59,6 @@ orderDetailRoutes.patch("/:id", requireAuth, async (req: Request, res: Response)
     IN_PROGRESS: { by: ["seller"], from: ["PENDING"] },
     DELIVERED: { by: ["seller"], from: ["IN_PROGRESS"] },
     COMPLETED: { by: ["buyer"], from: ["DELIVERED"] },
-    CANCELLED: { by: ["buyer", "seller"], from: ["PENDING"] },
-    REVISION: { by: ["buyer"], from: ["DELIVERED"] },
   };
 
   if (status === "REVISION") {
@@ -74,6 +73,40 @@ orderDetailRoutes.patch("/:id", requireAuth, async (req: Request, res: Response)
     const updated = await prisma.order.update({
       where: { id },
       data: { status: "IN_PROGRESS" },
+    });
+    res.json(updated);
+    return;
+  }
+
+  if (status === "CANCELLED") {
+    const isBuyer = order.buyerId === req.user!.id;
+    const isSeller = order.sellerId === req.user!.id;
+    if (!isBuyer && !isSeller && req.user!.role !== "ADMIN") {
+      res.status(403).json({ error: "Forbidden" });
+      return;
+    }
+
+    const result = isBuyer
+      ? buyerCancelPatch({
+          status: order.status,
+          price: order.price,
+          slotStart: order.slotStart,
+          slotEnd: order.slotEnd,
+          actorId: req.user!.id,
+        })
+      : sellerDeclinePatch({
+          status: order.status,
+          actorId: req.user!.id,
+        });
+
+    if (!result.ok) {
+      res.status(result.status).json({ error: result.error });
+      return;
+    }
+
+    const updated = await prisma.order.update({
+      where: { id },
+      data: result.data,
     });
     res.json(updated);
     return;

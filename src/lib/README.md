@@ -34,6 +34,7 @@ Small modules used by API routes and pages. Each exported function has a short c
 | `turnstile.ts` | Cloudflare Turnstile verify |
 | `security-logger.ts` | JSON security lines to stdout |
 | `legal.ts` | Cookie consent and terms version |
+| `cancellation.ts` | 24-hour free cancel, late fee (one hour or ₪50), and recorded obligation |
 | `site-url.ts` | Public origin for canonical / sitemap / Open Graph |
 | `seo.ts` | Per-page metadata, JSON-LD, and sitemap list parsers |
 | `disputes.ts` | Who can open a dispute, reasons, and admin payment actions |
