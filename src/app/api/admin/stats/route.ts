@@ -13,8 +13,8 @@ export async function GET() {
 
   const [usersRes, gigsRes, ordersRes] = await Promise.all([
     proxyRequest(USERS_SERVICE, "/admin/stats", { user }),
-    proxyRequest(GIGS_SERVICE, "/gigs/stats/counts"),
-    proxyRequest(ORDERS_SERVICE, "/orders/stats/admin"),
+    proxyRequest(GIGS_SERVICE, "/gigs/stats/counts", { user }),
+    proxyRequest(ORDERS_SERVICE, "/orders/stats/admin", { user }),
   ]);
 
   return NextResponse.json({
