@@ -91,7 +91,6 @@ const STATUS_STYLE: Record<string, { bg: string; text: string; label: string }> 
   IN_PROGRESS: { bg: "bg-[rgba(var(--color-primary),0.1)]", text: "text-[rgb(var(--color-primary))]", label: "בעבודה" },
   DELIVERED: { bg: "bg-[rgba(var(--color-primary-light),0.15)]", text: "text-[rgb(var(--color-primary-hover))]", label: "נמסר" },
   COMPLETED: { bg: "bg-[rgba(var(--color-success),0.15)]", text: "text-[rgb(var(--color-success))]", label: "הושלם" },
-  REVISION: { bg: "bg-[rgba(var(--color-accent-yellow),0.15)]", text: "text-[rgb(var(--color-warning))]", label: "תיקון" },
   CANCELLED: { bg: "bg-[rgba(var(--color-error),0.1)]", text: "text-[rgb(var(--color-error))]", label: "בוטל" },
 };
 
@@ -280,8 +279,14 @@ export default function OrderDetailPage() {
   /** Reloads the order after a review is posted. */
   function handleReviewSubmitted() {
     fetch(`/api/orders/${params.id}`)
-      .then((r) => r.json())
-      .then(setOrder);
+      .then((r) => {
+        if (!r.ok) return;
+        return r.json();
+      })
+      .then((data) => {
+        if (data) setOrder(data);
+      })
+      .catch(() => {});
     setReviewOpen(false);
   }
 
@@ -316,7 +321,7 @@ export default function OrderDetailPage() {
     const res = await fetch(`/api/orders/${params.id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ status: "REVISION" }),
+      body: JSON.stringify({ status: "IN_PROGRESS" }),
     });
     if (res.ok) {
       const updated = await res.json();
@@ -539,7 +544,7 @@ export default function OrderDetailPage() {
               <button disabled={statusBusy} onClick={() => setCancelOpen(true)} className="flex items-center gap-2 rounded-xl border-2 border-[rgba(var(--color-error),0.2)] bg-[rgba(var(--color-error),0.05)] px-5 py-2.5 text-[14px] font-semibold text-[rgb(var(--color-error))] transition-all hover:bg-[rgba(var(--color-error),0.1)] disabled:opacity-50">דחה הזמנה</button>
             </>
           )}
-          {isSeller && (order.status === "IN_PROGRESS" || order.status === "REVISION") && (
+          {isSeller && order.status === "IN_PROGRESS" && (
             <button disabled={statusBusy} onClick={() => setDeliverOpen(true)} className="flex items-center gap-2 rounded-xl bg-[rgb(var(--color-primary))] px-5 py-2.5 text-[14px] font-semibold text-white transition-all hover:bg-[rgb(var(--color-primary-hover))] disabled:opacity-50">סמן כנמסר</button>
           )}
           {isBuyer && order.status === "DELIVERED" && (

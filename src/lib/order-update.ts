@@ -24,7 +24,7 @@ const deliveredSchema = z
 
 const otherStatusSchema = z
   .object({
-    status: z.enum(["IN_PROGRESS", "COMPLETED", "CANCELLED", "REVISION"]),
+    status: z.enum(["IN_PROGRESS", "COMPLETED", "CANCELLED"]),
   })
   .strict();
 

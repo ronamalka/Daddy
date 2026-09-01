@@ -11,6 +11,7 @@ export default function EditProfilePage() {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("");
   const [name, setName] = useState("");
   const [bio, setBio] = useState("");
   const [phone, setPhone] = useState("");
@@ -57,13 +58,21 @@ export default function EditProfilePage() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setSaving(true);
-    const res = await fetch("/api/profile", {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name, bio: bio || null, phone: phone || null, city: city || null, cityCode: cityCode ?? null, districtCode: districtCode ?? null, avatar: avatar || null }),
-    });
-    if (res.ok) {
-      router.push("/profile");
+    setError("");
+    try {
+      const res = await fetch("/api/profile", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, bio: bio || null, phone: phone || null, city: city || null, cityCode: cityCode ?? null, districtCode: districtCode ?? null, avatar: avatar || null }),
+      });
+      if (res.ok) {
+        router.push("/profile");
+      } else {
+        const data = await res.json().catch(() => ({}));
+        setError((data as { error?: string }).error || "לא הצלחנו לשמור את השינויים");
+      }
+    } catch {
+      setError("לא הצלחנו לשמור את השינויים");
     }
     setSaving(false);
   }
@@ -152,6 +161,10 @@ export default function EditProfilePage() {
             </div>
           </div>
         </div>
+
+        {error && (
+          <p role="alert" className="text-[13px] font-medium text-[rgb(var(--color-error))]">{error}</p>
+        )}
 
         <button type="submit" disabled={saving} className="w-full rounded-xl bg-[rgb(var(--color-primary))] py-4 text-[15px] font-semibold text-white shadow-[0_4px_16px_rgba(var(--color-primary),0.3)] transition-all hover:bg-[rgb(var(--color-primary-hover))] disabled:opacity-40 disabled:cursor-not-allowed">
           {saving ? "שומר..." : "שמור שינויים"}
