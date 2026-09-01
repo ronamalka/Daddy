@@ -6,6 +6,17 @@ Argo tracks **`main`** and does **not** auto-sync. Image SHAs come from `gitops/
 
 This overlay includes `network-policy.yaml` (default-deny plus the ingress/egress the app needs). Keep that file in sync with `../stg/network-policy.yaml`.
 
+The public production hostname is **`aballeh.com`** (also `www.aballeh.com`). The cluster default route stays as a fallback.
+
+Point DNS at the OpenShift router (apex often needs ALIAS/ANAME, not CNAME):
+
+```
+aballeh.com      ALIAS/ANAME  af00024a83ee24d72b37ba10cf8f9024-1027604931.us-east-2.elb.amazonaws.com
+www.aballeh.com  CNAME        router-default.apps.cluster-x8bxx.x8bxx.sandbox2963.opentlc.com
+```
+
+Until a certificate for `aballeh.com` is attached to the Route, browsers may warn on TLS (the router still presents the cluster wildcard cert). Add Google redirect URI `https://aballeh.com/api/auth/callback/google`.
+
 ## First production cut
 
 1. Confirm `daddy-stg` is healthy on the build you want.
@@ -35,15 +46,15 @@ oc create secret generic postgres-secret -n "$NS" \
 
 oc create secret generic daddy-app-secret -n "$NS" \
   --from-literal=AUTH_SECRET="$AUTH_SECRET" \
-  --from-literal=AUTH_URL=https://daddy-app-daddy-prod.apps.cluster-x8bxx.x8bxx.sandbox2963.opentlc.com \
-  --from-literal=NEXT_PUBLIC_BASE_URL=https://daddy-app-daddy-prod.apps.cluster-x8bxx.x8bxx.sandbox2963.opentlc.com \
+  --from-literal=AUTH_URL=https://aballeh.com \
+  --from-literal=NEXT_PUBLIC_BASE_URL=https://aballeh.com \
   --from-literal=INTER_SERVICE_SECRET="$ISS" \
   --from-literal=GOOGLE_CLIENT_ID="$GOOGLE_CLIENT_ID" \
   --from-literal=GOOGLE_CLIENT_SECRET="$GOOGLE_CLIENT_SECRET" \
   --dry-run=client -o yaml | oc apply -f -
 ```
 
-5. Add the production Google redirect URI `https://daddy-app-daddy-prod.apps.cluster-x8bxx.x8bxx.sandbox2963.opentlc.com/api/auth/callback/google`.
+5. Add the production Google redirect URI `https://aballeh.com/api/auth/callback/google`.
 6. `oc apply -k gitops/argocd` if `daddy-prod` is not registered yet.
 7. Sync `daddy-prod` from the Argo UI.
 
