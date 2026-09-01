@@ -1,3 +1,4 @@
+import { LEGAL_CONTACTS } from "@/lib/legal";
 import { pageMetadata } from "@/lib/seo";
 
 export const metadata = pageMetadata({
@@ -78,8 +79,8 @@ export default function AccessibilityPage() {
           <div className="mt-3 rounded-xl bg-[rgb(var(--color-surface-elevated))] p-5 space-y-2">
             <p><strong className="text-[rgb(var(--color-text))]">רכז נגישות:</strong> צוות אבאל׳ה</p>
             <p><strong className="text-[rgb(var(--color-text))]">דוא״ל:</strong>{" "}
-              <a href="mailto:accessibility@abale.co.il" className="text-[rgb(var(--color-primary))] hover:underline" dir="ltr">
-                accessibility@abale.co.il
+              <a href={`mailto:${LEGAL_CONTACTS.accessibility}`} className="text-[rgb(var(--color-primary))] hover:underline" dir="ltr">
+                {LEGAL_CONTACTS.accessibility}
               </a>
             </p>
             <p><strong className="text-[rgb(var(--color-text))]">טלפון:</strong>{" "}

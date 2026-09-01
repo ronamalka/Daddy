@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Wrench, House, MagnifyingGlass, Envelope } from "@phosphor-icons/react/dist/ssr";
+import { LEGAL_CONTACTS } from "@/lib/legal";
 
 /** Shows a friendly 404 screen when a page does not exist. */
 export default function NotFound() {
@@ -44,7 +45,7 @@ export default function NotFound() {
 
         <div className="mt-6">
           <Link
-            href="mailto:support@daddy.co.il"
+            href={`mailto:${LEGAL_CONTACTS.support}`}
             className="inline-flex items-center gap-1.5 text-[14px] text-[rgb(var(--color-text-muted))] transition-colors hover:text-[rgb(var(--color-primary))]"
           >
             <Envelope className="h-4 w-4" />
