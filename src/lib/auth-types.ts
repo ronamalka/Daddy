@@ -6,6 +6,7 @@ declare module "next-auth" {
     role?: string;
     weakPassword?: boolean;
     hasPassword?: boolean;
+    isEmailVerified?: boolean;
   }
   interface Session {
     user: {
@@ -15,6 +16,7 @@ declare module "next-auth" {
       role: string;
       weakPassword?: boolean;
       hasPassword?: boolean;
+      isEmailVerified?: boolean;
     };
   }
 }
@@ -25,6 +27,7 @@ declare module "next-auth/jwt" {
     role?: string;
     weakPassword?: boolean;
     hasPassword?: boolean;
+    isEmailVerified?: boolean;
     jti?: string;
   }
 }

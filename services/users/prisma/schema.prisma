@@ -25,22 +25,38 @@ model User {
   city         String?
   cityCode     Int?
   districtCode Int?
-  acceptingJobs Boolean  @default(true)
-  suspendedAt   DateTime?
-  suspendReason String?
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  emailVerified  Boolean  @default(false)
+  acceptingJobs  Boolean  @default(true)
+  suspendedAt    DateTime?
+  suspendReason  String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 
-  serviceAreas    ServiceArea[]
-  userServices    UserService[]
-  servicePrices   ServicePrice[]
-  passwordResets  PasswordReset[]
-  weeklyHours     WeeklyHours[]
-  timeOff         TimeOff[]
-  notifications   Notification[]
+  serviceAreas        ServiceArea[]
+  userServices        UserService[]
+  servicePrices       ServicePrice[]
+  passwordResets      PasswordReset[]
+  emailVerifications  EmailVerification[]
+  weeklyHours         WeeklyHours[]
+  timeOff             TimeOff[]
+  notifications       Notification[]
 }
 
 model PasswordReset {
+  id        String   @id @default(cuid())
+  userId    String
+  token     String   @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([token])
+}
+
+model EmailVerification {
   id        String   @id @default(cuid())
   userId    String
   token     String   @unique

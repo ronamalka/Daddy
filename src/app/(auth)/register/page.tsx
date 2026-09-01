@@ -35,6 +35,7 @@ function RegisterForm() {
   const searchParams = useSearchParams();
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [registered, setRegistered] = useState(false);
   const [step, setStep] = useState(1);
 
   const [name, setName] = useState("");
@@ -104,8 +105,12 @@ function RegisterForm() {
       setError("החשבון נוצר אבל ההתחברות נכשלה. נסה להתחבר מחדש.");
       setLoading(false);
     } else {
-      router.push(postRegisterPath(role, searchParams.get("next")));
-      router.refresh();
+      setRegistered(true);
+      // Brief pause to show the "check your email" message before redirect
+      setTimeout(() => {
+        router.push(postRegisterPath(role, searchParams.get("next")));
+        router.refresh();
+      }, 2000);
     }
   }
 
@@ -187,6 +192,15 @@ function RegisterForm() {
         <p className="mb-6 text-center text-[14px] text-[rgb(var(--color-text-secondary))]">
           {stepDescs[step - 1]}
         </p>
+
+        {registered && (
+          <div role="status" className="mb-4 flex items-center gap-2 rounded-xl bg-green-50 px-4 py-3 text-[14px] text-green-700">
+            <svg className="h-4 w-4 flex-shrink-0" viewBox="0 0 20 20" fill="currentColor">
+              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+            </svg>
+            <span>החשבון נוצר! שלחנו אימייל אימות לכתובת שלך.</span>
+          </div>
+        )}
 
         {error && (
           <div role="alert" className="mb-4 flex items-center gap-2 rounded-xl bg-[rgba(var(--color-error),0.1)] px-4 py-3 text-[14px] text-[rgb(var(--color-error))]">
