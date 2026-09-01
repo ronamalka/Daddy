@@ -103,7 +103,7 @@ async function main() {
 
   const priceData = [
     { userId: S.seller, serviceSlug: "furniture-assembly", price: 200, description: "רהיט בינוני, כולל כלים" },
-    { userId: S.seller, serviceSlug: "tv-mounting", price: 250, description: "כולל קידוח והסתרת כבלים" },
+    { userId: S.seller, serviceSlug: "tv-mounting", price: 250, description: "כולל קידוח והסתרת כבלים", materialsEstimate: 80, buyerSuppliesMaterials: false },
     { userId: S.seller, serviceSlug: "shelf-hanging", price: 100, description: "מדף בודד, כל סוג קיר" },
     { userId: S.seller, serviceSlug: "bill-negotiation", price: 80, description: "חברה אחת, תשלום רק אם חסכתי" },
     { userId: S.seller2, serviceSlug: "car-test", price: 200, description: "כולל נסיעה למכון" },
@@ -127,8 +127,20 @@ async function main() {
   for (const p of priceData) {
     await prisma.servicePrice.upsert({
       where: { userId_serviceSlug: { userId: p.userId, serviceSlug: p.serviceSlug } },
-      update: { price: p.price, description: p.description },
-      create: p,
+      update: {
+        price: p.price,
+        description: p.description,
+        materialsEstimate: "materialsEstimate" in p ? p.materialsEstimate ?? null : null,
+        buyerSuppliesMaterials: "buyerSuppliesMaterials" in p ? p.buyerSuppliesMaterials !== false : true,
+      },
+      create: {
+        userId: p.userId,
+        serviceSlug: p.serviceSlug,
+        price: p.price,
+        description: p.description,
+        materialsEstimate: "materialsEstimate" in p ? p.materialsEstimate ?? null : null,
+        buyerSuppliesMaterials: "buyerSuppliesMaterials" in p ? p.buyerSuppliesMaterials !== false : true,
+      },
     });
   }
 

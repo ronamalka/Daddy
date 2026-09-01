@@ -7,6 +7,10 @@ import { getServiceBySlug } from "@/lib/services";
 import { CategoryIcon } from "@/components/ui/category-icon";
 import { formatVisitWindow } from "@/lib/availability";
 import Link from "next/link";
+import { QuotePriceBreakdown } from "@/components/quote-price-breakdown";
+import { QuoteCompareTable } from "@/components/quote-compare";
+import { MaterialsFields } from "@/components/materials-fields";
+import { quoteTotal } from "@/lib/quote-price";
 
 interface ServiceRequestDetail {
   id: string;
@@ -24,6 +28,9 @@ interface ServiceRequestDetail {
     id: string;
     message: string;
     proposedPrice: number | null;
+    laborPrice?: number | null;
+    materialsEstimate?: number | null;
+    buyerSuppliesMaterials?: boolean | null;
     selected?: boolean;
     createdAt: string;
     seller: { id: string; name: string };
@@ -41,6 +48,8 @@ export default function RequestDetailPage() {
   const [loading, setLoading] = useState(true);
   const [responseMsg, setResponseMsg] = useState("");
   const [proposedPrice, setProposedPrice] = useState("");
+  const [materialsEstimate, setMaterialsEstimate] = useState("");
+  const [buyerSuppliesMaterials, setBuyerSuppliesMaterials] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState("");
@@ -70,12 +79,17 @@ export default function RequestDetailPage() {
         body: JSON.stringify({
           message: responseMsg,
           proposedPrice: proposedPrice ? Number(proposedPrice) : null,
+          laborPrice: proposedPrice ? Number(proposedPrice) : null,
+          materialsEstimate: materialsEstimate ? Number(materialsEstimate) : null,
+          buyerSuppliesMaterials,
         }),
       });
       if (res.ok) {
         setSubmitted(true);
         setResponseMsg("");
         setProposedPrice("");
+        setMaterialsEstimate("");
+        setBuyerSuppliesMaterials(true);
         const updated = await fetch(`/api/service-requests/${params.id}/respond`);
         const data = await updated.json();
         if (data.request) setRequest(data.request);
@@ -196,6 +210,8 @@ export default function RequestDetailPage() {
         </h2>
         {error && <p className="mb-3 text-[13px] text-[rgb(var(--color-error))]">{error}</p>}
 
+        <QuoteCompareTable quotes={request.responses} />
+
         {request.responses.length === 0 ? (
           <div className="rounded-xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] p-6 text-center">
             <p className="text-[14px] text-[rgb(var(--color-text-muted))]">עדיין אין הצעות — היה הראשון!</p>
@@ -212,9 +228,9 @@ export default function RequestDetailPage() {
                     <span className="text-[14px] font-semibold text-[rgb(var(--color-text))]">{resp.seller?.name || "משתמש"}</span>
                   </div>
                   <div className="flex items-center gap-3">
-                    {resp.proposedPrice != null && (
+                    {quoteTotal(resp) != null && (
                       <span className="rounded-full bg-[rgba(var(--color-accent-yellow),0.15)] px-3 py-1 text-[13px] font-bold text-[rgb(var(--color-warning))]">
-                        ₪{resp.proposedPrice}
+                        ₪{quoteTotal(resp)}
                       </span>
                     )}
                     <span className="text-[12px] text-[rgb(var(--color-text-muted))]">
@@ -223,7 +239,12 @@ export default function RequestDetailPage() {
                   </div>
                 </div>
                 <p className="text-[14px] text-[rgb(var(--color-text-secondary))]">{resp.message}</p>
-                {isBuyer && request.status === "OPEN" && resp.proposedPrice != null && resp.proposedPrice > 0 && (
+                {quoteTotal(resp) != null && (
+                  <div className="mt-2">
+                    <QuotePriceBreakdown quote={resp} />
+                  </div>
+                )}
+                {isBuyer && request.status === "OPEN" && quoteTotal(resp) != null && (
                   <button
                     onClick={() => handleAcceptQuote(resp.id)}
                     disabled={acceptingId !== null}
@@ -231,7 +252,7 @@ export default function RequestDetailPage() {
                   >
                     {acceptingId === resp.id
                       ? "סוגרים עבודה..."
-                      : `קבלו את ההצעה של ${resp.seller?.name || "אבא"} ב-₪${resp.proposedPrice}`}
+                      : `קבלו את ההצעה של ${resp.seller?.name || "אבא"} ב-₪${quoteTotal(resp)}`}
                   </button>
                 )}
                 {resp.selected && (
@@ -257,24 +278,32 @@ export default function RequestDetailPage() {
             rows={4}
             className="mb-3 w-full rounded-xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-bg))] px-4 py-3 text-[14px] text-[rgb(var(--color-text))] placeholder-[rgb(var(--color-text-muted))] focus:border-[rgb(var(--color-primary))] focus:outline-none resize-none"
           />
-          <div className="flex flex-wrap items-center gap-3">
-            <div className="flex items-center gap-2">
-              <span className="text-[14px] text-[rgb(var(--color-text-secondary))]">מחיר מוצע:</span>
-              <div className="flex items-center rounded-xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-bg))]">
-                <span className="px-3 text-[14px] text-[rgb(var(--color-text-muted))]">₪</span>
-                <input
-                  type="number"
-                  value={proposedPrice}
-                  onChange={(e) => setProposedPrice(e.target.value)}
-                  placeholder="אופציונלי"
-                  className="w-24 rounded-r-xl bg-transparent py-2.5 text-[14px] text-[rgb(var(--color-text))] placeholder-[rgb(var(--color-text-muted))] focus:outline-none"
-                />
+          <div className="flex flex-col gap-3">
+            <div className="flex flex-wrap items-center gap-3">
+              <div className="flex items-center gap-2">
+                <span className="text-[14px] text-[rgb(var(--color-text-secondary))]">מחיר עבודה:</span>
+                <div className="flex items-center rounded-xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-bg))]">
+                  <span className="px-3 text-[14px] text-[rgb(var(--color-text-muted))]">₪</span>
+                  <input
+                    type="number"
+                    value={proposedPrice}
+                    onChange={(e) => setProposedPrice(e.target.value)}
+                    placeholder="אופציונלי"
+                    className="w-24 rounded-r-xl bg-transparent py-2.5 text-[14px] text-[rgb(var(--color-text))] placeholder-[rgb(var(--color-text-muted))] focus:outline-none"
+                  />
+                </div>
               </div>
             </div>
+            <MaterialsFields
+              buyerSuppliesMaterials={buyerSuppliesMaterials}
+              onBuyerSuppliesChange={setBuyerSuppliesMaterials}
+              materialsEstimate={materialsEstimate}
+              onMaterialsChange={setMaterialsEstimate}
+            />
             <button
               onClick={handleSubmitResponse}
               disabled={submitting || !responseMsg.trim()}
-              className="rounded-xl bg-[rgb(var(--color-primary))] px-6 py-2.5 text-[14px] font-semibold text-white hover:bg-[rgb(var(--color-primary-hover))] disabled:opacity-40"
+              className="self-start rounded-xl bg-[rgb(var(--color-primary))] px-6 py-2.5 text-[14px] font-semibold text-white hover:bg-[rgb(var(--color-primary-hover))] disabled:opacity-40"
             >
               {submitting ? "שולח..." : "שלח הצעה"}
             </button>

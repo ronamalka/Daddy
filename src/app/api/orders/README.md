@@ -10,3 +10,4 @@ Bookings.
 | `/api/orders/[id]/requirements` | POST | Extra notes |
 | `/api/orders/[id]/review` | POST | Leave a 1–10 review (package or local job) |
 | `/api/orders/[id]/dispute` | GET, POST | List / open a dispute |
+| `/api/orders/[id]/materials` | POST | One-time materials estimate + buyer ack |

@@ -3,6 +3,7 @@ import { requireAuth } from "../../../shared/middleware";
 import { prisma } from "../index";
 import { parseRequiredSlot } from "../lib/slots";
 import { orderListWhere } from "../lib/order-list";
+import { laborAmount, quoteTotal } from "../lib/quote-price";
 
 /** Routes for listing orders, creating them, and reading booking stats. */
 export const ordersRoutes = Router();
@@ -24,12 +25,34 @@ ordersRoutes.get("/", requireAuth, async (req: Request, res: Response) => {
 /** Create a gig order or a local-request order with a visit window. */
 ordersRoutes.post("/", requireAuth, async (req: Request, res: Response) => {
   const jobType = req.body.jobType === "LOCAL_REQUEST" ? "LOCAL_REQUEST" : "GIG";
-  const { gigId, sellerId, tier, price, slotStart, slotEnd, title, requestId } = req.body;
+  const {
+    gigId,
+    sellerId,
+    tier,
+    price,
+    laborPrice,
+    materialsEstimate,
+    buyerSuppliesMaterials,
+    slotStart,
+    slotEnd,
+    title,
+    requestId,
+  } = req.body;
 
-  if (!sellerId || price == null) {
+  const labor = laborAmount({ laborPrice, price });
+  if (!sellerId || labor == null) {
     res.status(400).json({ error: "Missing fields" });
     return;
   }
+
+  const buyerSupplies = buyerSuppliesMaterials !== false;
+  const materials =
+    materialsEstimate != null && Number(materialsEstimate) > 0 ? Number(materialsEstimate) : null;
+  const total = quoteTotal({
+    laborPrice: labor,
+    materialsEstimate: materials,
+    buyerSuppliesMaterials: buyerSupplies,
+  }) ?? labor;
 
   if (jobType === "GIG" && (!gigId || !tier)) {
     res.status(400).json({ error: "Missing fields" });
@@ -83,7 +106,10 @@ ordersRoutes.post("/", requireAuth, async (req: Request, res: Response) => {
           buyerId: req.user!.id,
           sellerId,
           tier: jobType === "GIG" ? tier : null,
-          price,
+          price: total,
+          laborPrice: jobType === "LOCAL_REQUEST" ? labor : null,
+          materialsEstimate: jobType === "LOCAL_REQUEST" ? materials : null,
+          buyerSuppliesMaterials: jobType === "LOCAL_REQUEST" ? buyerSupplies : true,
           dueDate: slot.end,
           slotStart: slot.start,
           slotEnd: slot.end,

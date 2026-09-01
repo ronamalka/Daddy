@@ -31,11 +31,22 @@ servicePricesRoutes.post("/", requireAuth, async (req: Request, res: Response) =
     await prisma.servicePrice.createMany({
       data: prices
         .filter((p: { serviceSlug: string; price: number }) => p.serviceSlug && p.price > 0)
-        .map((p: { serviceSlug: string; price: number; description?: string }) => ({
+        .map((p: {
+          serviceSlug: string;
+          price: number;
+          description?: string;
+          materialsEstimate?: number | null;
+          buyerSuppliesMaterials?: boolean;
+        }) => ({
           userId,
           serviceSlug: p.serviceSlug,
           price: Number(p.price),
           description: p.description || null,
+          materialsEstimate:
+            p.materialsEstimate != null && Number(p.materialsEstimate) > 0
+              ? Number(p.materialsEstimate)
+              : null,
+          buyerSuppliesMaterials: p.buyerSuppliesMaterials !== false,
         })),
     });
   }

@@ -103,11 +103,13 @@ model Notification {
 }
 
 model ServicePrice {
-  id          String   @id @default(cuid())
-  userId      String
-  serviceSlug String
-  price       Float
-  description String?
+  id                     String   @id @default(cuid())
+  userId                 String
+  serviceSlug            String
+  price                  Float
+  materialsEstimate      Float?
+  buyerSuppliesMaterials Boolean  @default(true)
+  description            String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 

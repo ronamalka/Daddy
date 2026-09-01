@@ -56,9 +56,15 @@ model Order {
   title     String?
   buyerId   String      // cross-service ref to users-service
   sellerId  String      // cross-service ref to users-service
-  tier      GigTier?
-  price     Float
-  status    OrderStatus @default(PENDING)
+  tier                     GigTier?
+  price                    Float
+  laborPrice               Float?
+  materialsEstimate        Float?
+  buyerSuppliesMaterials   Boolean      @default(true)
+  pendingMaterialsEstimate Float?
+  materialsUpdatedAt       DateTime?
+  materialsAcknowledgedAt  DateTime?
+  status                   OrderStatus  @default(PENDING)
   dueDate   DateTime?
   slotStart DateTime?
   slotEnd   DateTime?

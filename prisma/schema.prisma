@@ -228,13 +228,16 @@ model ServiceRequest {
 }
 
 model RequestResponse {
-  id            String   @id @default(cuid())
-  requestId     String
-  sellerId      String
-  message       String
-  proposedPrice Float?
-  selected      Boolean  @default(false)
-  createdAt     DateTime @default(now())
+  id                     String   @id @default(cuid())
+  requestId              String
+  sellerId               String
+  message                String
+  proposedPrice          Float?
+  laborPrice             Float?
+  materialsEstimate      Float?
+  buyerSuppliesMaterials Boolean  @default(true)
+  selected               Boolean  @default(false)
+  createdAt              DateTime @default(now())
 
   request ServiceRequest @relation(fields: [requestId], references: [id], onDelete: Cascade)
   seller  User           @relation("SellerResponses", fields: [sellerId], references: [id])
@@ -340,9 +343,15 @@ model Order {
   title     String?
   buyerId   String
   sellerId  String
-  tier      GigTier?
-  price     Float
-  status    OrderStatus @default(PENDING)
+  tier                       GigTier?
+  price                      Float
+  laborPrice                 Float?
+  materialsEstimate          Float?
+  buyerSuppliesMaterials     Boolean      @default(true)
+  pendingMaterialsEstimate   Float?
+  materialsUpdatedAt         DateTime?
+  materialsAcknowledgedAt    DateTime?
+  status                     OrderStatus  @default(PENDING)
   dueDate   DateTime?
   slotStart DateTime?
   slotEnd   DateTime?
@@ -449,11 +458,13 @@ model Dispute {
 }
 
 model ServicePrice {
-  id          String @id @default(cuid())
-  userId      String
-  serviceSlug String
-  price       Float
-  description String?
+  id                     String @id @default(cuid())
+  userId                 String
+  serviceSlug            String
+  price                  Float
+  materialsEstimate      Float?
+  buyerSuppliesMaterials Boolean @default(true)
+  description            String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 

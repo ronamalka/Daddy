@@ -41,13 +41,16 @@ model ServiceRequest {
 }
 
 model RequestResponse {
-  id            String   @id @default(cuid())
-  requestId     String
-  sellerId      String   // cross-service ref to users-service
-  message       String
-  proposedPrice Float?
-  selected      Boolean  @default(false)
-  createdAt     DateTime @default(now())
+  id                     String   @id @default(cuid())
+  requestId              String
+  sellerId               String   // cross-service ref to users-service
+  message                String
+  proposedPrice          Float?
+  laborPrice             Float?
+  materialsEstimate      Float?
+  buyerSuppliesMaterials Boolean  @default(true)
+  selected               Boolean  @default(false)
+  createdAt              DateTime @default(now())
 
   request ServiceRequest @relation(fields: [requestId], references: [id], onDelete: Cascade)
 
