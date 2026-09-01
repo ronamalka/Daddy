@@ -4,7 +4,7 @@ Kustomize overlay for production (`daddy-prod`). Promote only after a release ta
 
 Argo tracks **`main`** and does **not** auto-sync. Image SHAs come from `gitops/base` on `main` after CI.
 
-This overlay includes `network-policy.yaml` (default-deny, app rules, and ACME HTTP-01 for Let's Encrypt). Keep the app rules in sync with `../stg/network-policy.yaml`.
+This overlay includes `network-policy.yaml` (default-deny plus the ingress/egress the app needs, including OpenShift DNS on UDP/TCP 5353). Keep that file in sync with `../stg/network-policy.yaml`.
 
 The public production hostname is **`aballeh.com`** (also `www.aballeh.com`). TLS is a Let's Encrypt cert (`certificate.yaml`) mounted on the Routes via `externalCertificate`. The cluster default route stays as a fallback.
 
