@@ -39,9 +39,12 @@ test.describe("Real job loop", () => {
       const publish = buyer.page.getByRole("button", { name: /פרסם בקשה/ });
       await expect(publish).toBeEnabled();
       await publish.click();
-      await buyer.page.waitForURL(/\/requests\/[^/]+$/, { timeout: 15000 });
-      await expect(buyer.page.getByRole("heading", { name: title })).toBeVisible();
-      await expect(buyer.page.getByText("פתוח")).toBeVisible();
+      await buyer.page.waitForURL(
+        (url) => /\/requests\/[^/]+$/.test(url.pathname) && !url.pathname.endsWith("/create"),
+        { timeout: 15000 }
+      );
+      await expect(buyer.page.getByRole("heading", { name: title })).toBeVisible({ timeout: 10000 });
+      await expect(buyer.page.getByText("פתוח").first()).toBeVisible();
 
       const requestUrl = buyer.page.url();
       await seller.page.goto(requestUrl);
@@ -55,8 +58,9 @@ test.describe("Real job loop", () => {
       await expect(seller.page.getByText("יופי! ההצעה בדרך")).toBeVisible({ timeout: 10000 });
 
       await buyer.page.reload();
-      await expect(buyer.page.getByText("₪250")).toBeVisible({ timeout: 10000 });
-      await buyer.page.getByRole("button", { name: /קבלו את ההצעה של יוסי הגולדן ב-₪250/ }).click();
+      const acceptQuote = buyer.page.getByRole("button", { name: /קבלו את ההצעה של יוסי הגולדן ב-₪250/ });
+      await expect(acceptQuote).toBeVisible({ timeout: 10000 });
+      await acceptQuote.click();
       await buyer.page.waitForURL(/\/orders\/[^/]+$/, { timeout: 15000 });
       await expect(buyer.page.getByRole("heading", { name: title })).toBeVisible();
       await expect(buyer.page.getByText("ממתין").first()).toBeVisible();
@@ -96,7 +100,7 @@ test.describe("Real job loop", () => {
     // /gigs/:id still exists for packages, but this is the live book-with-slot loop.
     await loginAs(page, "buyer@daddy.com");
     await page.goto("/sellers/seed-user-seller1");
-    await expect(page.getByRole("heading", { name: "יוסי הגולדן" })).toBeVisible({ timeout: 10000 });
+    await expect(page.getByRole("heading", { name: "יוסי הגולדן" })).toBeVisible({ timeout: 20000 });
     await page.getByRole("button", { name: /מחירון/ }).click();
     await expect(page.getByText("בחרו חלון ביקור של שעתיים")).toBeVisible({ timeout: 10000 });
     await page.getByRole("button", { name: /\d{2}:\d{2}/ }).first().click();

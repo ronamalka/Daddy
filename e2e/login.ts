@@ -6,11 +6,20 @@ const BASE_URL = process.env.E2E_BASE_URL || "http://localhost:3000";
 /** Signs in with a seeded account and waits until the home page loads. */
 export async function loginAs(page: Page, email: string, password = "password123") {
   await stubCookieConsent(page);
-  await page.goto("/login");
-  await page.getByPlaceholder("you@example.com").fill(email);
-  await page.getByPlaceholder("הזן את הסיסמה שלך").fill(password);
-  await page.getByRole("button", { name: "התחבר" }).click();
-  await page.waitForURL((url) => url.pathname === "/", { timeout: 15000 });
+  for (let attempt = 0; attempt < 3; attempt++) {
+    await page.goto("/login");
+    await page.getByPlaceholder("you@example.com").fill(email);
+    await page.getByPlaceholder("הזן את הסיסמה שלך").fill(password);
+    await page.getByRole("button", { name: "התחבר" }).click();
+    try {
+      await page.waitForURL((url) => url.pathname === "/", { timeout: 15000 });
+      return;
+    } catch (error) {
+      const blocked = await page.getByText(/Too many requests|יותר מדי/).isVisible().catch(() => false);
+      if (!blocked || attempt === 2) throw error;
+      await page.waitForTimeout(5000);
+    }
+  }
 }
 
 /** Opens a fresh browser context, signs in, and returns both so two users can act at once. */

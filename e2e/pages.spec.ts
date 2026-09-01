@@ -95,7 +95,7 @@ test.describe("Public Pages", () => {
 test.describe("Navigation", () => {
   test("navbar contains expected links", async ({ page }) => {
     await page.goto("/");
-    await expect(page.getByText(/שירותים/i).first()).toBeVisible();
+    await expect(page.getByRole("link", { name: "עיון" }).first()).toBeVisible();
   });
 
   test("mobile viewport renders correctly", async ({ page }) => {
@@ -125,7 +125,7 @@ test.describe("Navigation", () => {
     expect(box!.height).toBeGreaterThan(700);
 
     await expect(menu.getByRole("link", { name: "עיון" })).toBeVisible();
-    await expect(menu.getByRole("link", { name: "שירותים" })).toBeVisible();
+    await expect(menu.getByRole("link", { name: "התחברות" })).toBeVisible();
 
     const trappedInNav = await menu.evaluate((el) => !!el.closest("nav"));
     expect(trappedInNav).toBe(false);
