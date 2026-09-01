@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
-import { Lock, MapPin, Package, CurrencyDollar, Star, User, Envelope, Shield, CalendarBlank, Receipt } from "@phosphor-icons/react";
+import { Lock, MapPin, Package, CurrencyDollar, Star, User, Envelope, Shield, CalendarBlank, House, Receipt } from "@phosphor-icons/react";
 import { ProfileProgress } from "@/components/profile-progress";
 import type { ProfileReadinessResponse } from "@/lib/seller-ready";
 
@@ -91,6 +91,13 @@ export default function ProfilePage() {
               >
                 <MapPin className="h-3.5 w-3.5" />
                 אזורי שירות
+              </Link>
+              <Link
+                href="/profile/addresses"
+                className="rounded-full border border-[rgb(var(--color-border))] px-4 py-1.5 text-[13px] font-semibold text-[rgb(var(--color-text-secondary))] hover:border-[rgb(var(--color-accent))] hover:text-[rgb(var(--color-accent))] transition-all flex items-center gap-1.5"
+              >
+                <House className="h-3.5 w-3.5" />
+                כתובות
               </Link>
               <Link
                 href="/profile/services"

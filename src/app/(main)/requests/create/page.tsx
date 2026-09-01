@@ -8,6 +8,7 @@ import { SERVICE_CATEGORIES } from "@/lib/services";
 import { UserCircle } from "@phosphor-icons/react";
 import { TurnstileWidget } from "@/components/turnstile-widget";
 import { LocationPicker } from "@/components/location-picker";
+import { AddressPicker } from "@/components/address-picker";
 import { RequestPhotosField } from "@/components/request-photos-field";
 import { VisitWindowFields, visitWindowToIso, type VisitWindowValue } from "@/components/visit-window-fields";
 import { PREFERRED_WINDOWS, PREFERRED_WINDOW_LABELS, type PreferredWindow } from "@/lib/request-details";
@@ -41,6 +42,7 @@ function CreateRequestPage() {
   const [photoError, setPhotoError] = useState("");
   const [uploadingPhotos, setUploadingPhotos] = useState(false);
   const [unlisted, setUnlisted] = useState(false);
+  const [selectedAddressId, setSelectedAddressId] = useState<string | null>(null);
 
   useEffect(() => {
     const preset = searchParams.get("service");
@@ -239,12 +241,32 @@ function CreateRequestPage() {
               </select>
             </div>
 
+            <AddressPicker
+              selectedId={selectedAddressId}
+              onSelect={(addr) => {
+                setSelectedAddressId(addr.id);
+                if (addr.cityCode && addr.cityName && addr.districtCode && addr.districtName) {
+                  setLocation({
+                    cityCode: addr.cityCode,
+                    cityName: addr.cityName,
+                    districtCode: addr.districtCode,
+                    districtName: addr.districtName,
+                  });
+                }
+                setStreet(addr.street ?? "");
+                setFloor(addr.floor ?? "");
+              }}
+            />
+
             <div>
               <LocationPicker
                 mode="single"
                 label="עיר"
                 value={location ? { cityCode: location.cityCode, districtCode: location.districtCode } : undefined}
-                onChange={setLocation}
+                onChange={(val) => {
+                  setLocation(val);
+                  setSelectedAddressId(null);
+                }}
               />
             </div>
 
@@ -255,7 +277,7 @@ function CreateRequestPage() {
               <input
                 id="request-street"
                 value={street}
-                onChange={(e) => setStreet(e.target.value)}
+                onChange={(e) => { setStreet(e.target.value); setSelectedAddressId(null); }}
                 autoComplete="street-address"
                 placeholder="לדוגמה: הרצל 12"
                 className={inputClass}
@@ -272,7 +294,7 @@ function CreateRequestPage() {
               <input
                 id="request-floor"
                 value={floor}
-                onChange={(e) => setFloor(e.target.value)}
+                onChange={(e) => { setFloor(e.target.value); setSelectedAddressId(null); }}
                 placeholder="לדוגמה: 3"
                 className={inputClass}
               />
