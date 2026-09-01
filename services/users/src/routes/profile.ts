@@ -22,6 +22,10 @@ profileRoutes.get("/", requireAuth, async (req: Request, res: Response) => {
       city: true,
       cityCode: true,
       districtCode: true,
+      osekType: true,
+      osekNumber: true,
+      legalName: true,
+      businessAddress: true,
       createdAt: true,
     },
   });
@@ -95,9 +99,14 @@ profileRoutes.post("/become-seller", requireAuth, async (req: Request, res: Resp
   res.json(updated);
 });
 
-/** Update the current user's name, bio, phone, city, or avatar. */
+/** Update the current user's name, bio, phone, city, avatar, or tax profile. */
 profileRoutes.put("/", requireAuth, async (req: Request, res: Response) => {
-  const { name, bio, phone, city, cityCode, districtCode, avatar } = req.body;
+  const { name, bio, phone, city, cityCode, districtCode, avatar, osekType, osekNumber, legalName, businessAddress } = req.body;
+
+  if (osekType !== undefined && osekType !== null && osekType !== "patur" && osekType !== "murshe") {
+    res.status(400).json({ error: "סוג עוסק לא תקין. יש לבחור פטור או מורשה." });
+    return;
+  }
 
   const updated = await prisma.user.update({
     where: { id: req.user!.id },
@@ -109,6 +118,10 @@ profileRoutes.put("/", requireAuth, async (req: Request, res: Response) => {
       ...(cityCode !== undefined && { cityCode }),
       ...(districtCode !== undefined && { districtCode }),
       ...(avatar !== undefined && { avatar }),
+      ...(osekType !== undefined && { osekType }),
+      ...(osekNumber !== undefined && { osekNumber }),
+      ...(legalName !== undefined && { legalName }),
+      ...(businessAddress !== undefined && { businessAddress }),
     },
     select: {
       id: true,
@@ -121,6 +134,10 @@ profileRoutes.put("/", requireAuth, async (req: Request, res: Response) => {
       city: true,
       cityCode: true,
       districtCode: true,
+      osekType: true,
+      osekNumber: true,
+      legalName: true,
+      businessAddress: true,
     },
   });
 
