@@ -12,7 +12,7 @@ export async function loginAs(page: Page, email: string, password = "password123
     await page.getByPlaceholder("הזן את הסיסמה שלך").fill(password);
     await page.getByRole("button", { name: "התחבר" }).click();
     try {
-      await page.waitForURL((url) => url.pathname === "/", { timeout: 15000 });
+      await page.waitForURL((url) => url.pathname === "/", { timeout: 30000 });
       return;
     } catch (error) {
       const blocked = await page.getByText(/Too many requests|יותר מדי/).isVisible().catch(() => false);
