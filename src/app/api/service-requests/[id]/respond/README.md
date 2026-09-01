@@ -1,4 +1,4 @@
 # `respond/`
 
 `GET /api/service-requests/:id/respond` — quotes on this request.  
-`POST` — seller sends a price.
+`POST` — seller sends labor, optional materials, and who supplies the parts.

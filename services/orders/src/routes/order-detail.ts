@@ -3,6 +3,7 @@ import { requireAuth } from "../../../shared/middleware";
 import { prisma } from "../index";
 import { OrderStatus } from "../generated/prisma/client";
 import { isOpenDisputeStatus } from "../lib/disputes";
+import { canStartWork } from "../lib/materials";
 
 /** Routes for one order: details, status changes, and buyer requirements. */
 export const orderDetailRoutes = Router();
@@ -93,6 +94,11 @@ orderDetailRoutes.patch("/:id", requireAuth, async (req: Request, res: Response)
 
   if (!isAllowed || !rule.from.includes(order.status)) {
     res.status(403).json({ error: "Forbidden" });
+    return;
+  }
+
+  if (status === "IN_PROGRESS" && !canStartWork(order)) {
+    res.status(409).json({ error: "הלקוח צריך לאשר את עדכון החומרים לפני תחילת העבודה" });
     return;
   }
 

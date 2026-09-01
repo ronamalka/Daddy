@@ -31,7 +31,13 @@ sellerRoutes.get("/:id", async (req: Request, res: Response) => {
         select: { serviceSlug: true },
       },
       servicePrices: {
-        select: { serviceSlug: true, price: true, description: true },
+        select: {
+          serviceSlug: true,
+          price: true,
+          description: true,
+          materialsEstimate: true,
+          buyerSuppliesMaterials: true,
+        },
         orderBy: { createdAt: "asc" },
       },
     },

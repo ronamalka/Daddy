@@ -17,6 +17,8 @@ import {
 import { CategoryIcon } from "@/components/ui/category-icon";
 import { DAY_LABELS_HE, minutesToTimeLabel } from "@/lib/availability";
 import { SlotPicker, type SlotOption } from "@/components/slot-picker";
+import { QuotePriceBreakdown } from "@/components/quote-price-breakdown";
+import { quoteTotal } from "@/lib/quote-price";
 
 interface ReviewData {
   id: string;
@@ -52,7 +54,13 @@ interface SellerProfile {
   } | null;
   serviceAreas: { districtCode: number; districtName: string; cityCode: number | null; cityName: string | null }[];
   userServices: { serviceSlug: string }[];
-  servicePrices: { serviceSlug: string; price: number; description: string | null }[];
+  servicePrices: {
+    serviceSlug: string;
+    price: number;
+    description: string | null;
+    materialsEstimate?: number | null;
+    buyerSuppliesMaterials?: boolean | null;
+  }[];
   acceptingJobs?: boolean;
   weeklyHours?: { dayOfWeek: number; startMin: number; endMin: number }[];
   allReviews: ReviewData[];
@@ -657,13 +665,18 @@ function PricesTab({
     setBookingSlug(sp.serviceSlug);
     setBookError("");
     const svc = getServiceBySlug(sp.serviceSlug);
+    const labor = sp.price;
+    const total = quoteTotal(sp) ?? labor;
     const res = await fetch("/api/orders", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         jobType: "LOCAL_REQUEST",
         sellerId,
-        price: sp.price,
+        price: total,
+        laborPrice: labor,
+        materialsEstimate: sp.materialsEstimate ?? null,
+        buyerSuppliesMaterials: sp.buyerSuppliesMaterials !== false,
         title: svc?.nameHe || sp.serviceSlug,
         serviceSlug: sp.serviceSlug,
         slotStart: selectedSlot.slotStart,
@@ -718,10 +731,12 @@ function PricesTab({
                   {sp.description && (
                     <p className="mt-0.5 text-[12px] text-[rgb(var(--color-text-muted))]">{sp.description}</p>
                   )}
+                  <div className="mt-1">
+                    <QuotePriceBreakdown quote={sp} size="sm" />
+                  </div>
                 </div>
               </div>
               <div className="flex items-center gap-3">
-                <span className="text-[17px] font-bold text-[rgb(var(--color-primary))]">₪{sp.price}</span>
                 {!isOwnProfile && (
                   isLoggedIn ? (
                     <div className="flex items-center gap-2">
@@ -732,7 +747,7 @@ function PricesTab({
                           disabled={bookingSlug !== null || !selectedSlot}
                           className="rounded-lg bg-[rgb(var(--color-primary))] px-3 py-1.5 text-[12px] font-semibold text-white hover:bg-[rgb(var(--color-primary-hover))] disabled:opacity-40"
                         >
-                          {bookingSlug === sp.serviceSlug ? "מזמין..." : `הזמן ב-₪${sp.price}`}
+                          {bookingSlug === sp.serviceSlug ? "מזמין..." : `הזמן ב-₪${quoteTotal(sp) ?? sp.price}`}
                         </button>
                       )}
                       <Link

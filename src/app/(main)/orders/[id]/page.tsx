@@ -12,6 +12,8 @@ import { DisputeDialog } from "@/components/orders/dispute-dialog";
 import { DISPUTE_REASON_LABELS, DISPUTE_STATUS_LABELS, isDisputableStatus, orderHasOpenDispute } from "@/lib/disputes";
 import { AttachmentBubble } from "@/components/chat/attachment-bubble";
 import { ComposerAttach } from "@/components/chat/composer-attach";
+import { QuotePriceBreakdown } from "@/components/quote-price-breakdown";
+import { canShowMaterialsUpdateForm, hasPendingMaterialsAck } from "@/lib/materials";
 
 interface GigRequirement {
   id: string;
@@ -30,6 +32,12 @@ interface OrderDetail {
   jobType?: string;
   tier: string | null;
   price: number;
+  laborPrice?: number | null;
+  materialsEstimate?: number | null;
+  buyerSuppliesMaterials?: boolean | null;
+  pendingMaterialsEstimate?: number | null;
+  materialsUpdatedAt?: string | null;
+  materialsAcknowledgedAt?: string | null;
   status: string;
   dueDate: string | null;
   slotStart: string | null;
@@ -97,6 +105,9 @@ export default function OrderDetailPage() {
   const [loadError, setLoadError] = useState(false);
   const [statusBusy, setStatusBusy] = useState(false);
   const [statusError, setStatusError] = useState("");
+  const [materialsInput, setMaterialsInput] = useState("");
+  const [materialsBusy, setMaterialsBusy] = useState(false);
+  const [materialsError, setMaterialsError] = useState("");
 
   useEffect(() => {
     fetch(`/api/orders/${params.id}`)
@@ -187,6 +198,33 @@ export default function OrderDetailPage() {
       setStatusError("לא הצלחנו לעדכן את ההזמנה");
     }
     setStatusBusy(false);
+  }
+
+  /** Seller proposes a one-time materials estimate, or buyer acknowledges it. */
+  async function submitMaterials(action: "propose" | "ack") {
+    setMaterialsBusy(true);
+    setMaterialsError("");
+    try {
+      const res = await fetch(`/api/orders/${params.id}/materials`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(
+          action === "ack"
+            ? { action: "ack" }
+            : { materialsEstimate: Number(materialsInput) }
+        ),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (res.ok) {
+        setOrder((prev) => prev ? { ...prev, ...data } : prev);
+        setMaterialsInput("");
+      } else {
+        setMaterialsError((data as { error?: string }).error || "לא הצלחנו לעדכן חומרים");
+      }
+    } catch {
+      setMaterialsError("לא הצלחנו לעדכן חומרים");
+    }
+    setMaterialsBusy(false);
   }
 
   /** Posts the seller's reply to the buyer's review. */
@@ -329,6 +367,11 @@ export default function OrderDetailPage() {
               <span className="text-[rgb(var(--color-border))]">|</span>
               <span>{new Date(order.createdAt).toLocaleDateString("he-IL")}</span>
             </div>
+            {(order.laborPrice != null || order.materialsEstimate != null || order.buyerSuppliesMaterials === false) && (
+              <div className="mt-2">
+                <QuotePriceBreakdown quote={order} />
+              </div>
+            )}
           </div>
           <span className={`rounded-full px-4 py-1.5 text-[13px] font-semibold ${statusInfo.bg} ${statusInfo.text}`}>
             {statusInfo.label}
@@ -365,11 +408,76 @@ export default function OrderDetailPage() {
           </div>
         )}
 
+        {/* Materials vs labor */}
+        {hasPendingMaterialsAck(order) && (
+          <div className="mb-5 rounded-xl border border-[rgba(var(--color-accent-yellow),0.35)] bg-[rgba(var(--color-accent-yellow),0.12)] px-4 py-3">
+            <p className="text-[14px] font-semibold text-[rgb(var(--color-text))]">
+              עדכון חומרים ממתין לאישור: ₪{order.pendingMaterialsEstimate}
+            </p>
+            <p className="mt-1 text-[13px] text-[rgb(var(--color-text-secondary))]">
+              העבודה ₪{order.laborPrice ?? order.price}. אחרי אישור הסה״כ יהיה ₪
+              {(order.laborPrice ?? order.price) + (order.pendingMaterialsEstimate ?? 0)}.
+            </p>
+            {isBuyer && (
+              <button
+                type="button"
+                disabled={materialsBusy}
+                onClick={() => submitMaterials("ack")}
+                className="mt-3 rounded-xl bg-[rgb(var(--color-primary))] px-4 py-2 text-[13px] font-semibold text-white hover:bg-[rgb(var(--color-primary-hover))] disabled:opacity-40"
+              >
+                {materialsBusy ? "מאשר..." : "אשר הערכת חומרים"}
+              </button>
+            )}
+            {isSeller && (
+              <p className="mt-2 text-[13px] text-[rgb(var(--color-text-muted))]">
+                אי אפשר להתחיל עבודה עד שהלקוח מאשר.
+              </p>
+            )}
+          </div>
+        )}
+        {isSeller && canShowMaterialsUpdateForm(order) && (
+          <div className="mb-5 rounded-xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-bg))] px-4 py-3">
+            <p className="text-[14px] font-semibold text-[rgb(var(--color-text))]">עדכון חומרים חד-פעמי</p>
+            <p className="mt-1 text-[13px] text-[rgb(var(--color-text-secondary))]">
+              אפשר לעדכן את הערכת החומרים פעם אחת לפני תחילת העבודה. הלקוח יצטרך לאשר.
+            </p>
+            <div className="mt-3 flex flex-wrap items-center gap-2">
+              <div className="flex items-center rounded-xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))]">
+                <span className="px-3 text-[14px] text-[rgb(var(--color-text-muted))]">₪</span>
+                <input
+                  type="number"
+                  value={materialsInput}
+                  onChange={(e) => setMaterialsInput(e.target.value)}
+                  placeholder="הערכת חומרים"
+                  className="w-32 rounded-r-xl bg-transparent py-2 text-[14px] text-[rgb(var(--color-text))] placeholder-[rgb(var(--color-text-muted))] focus:outline-none"
+                />
+              </div>
+              <button
+                type="button"
+                disabled={materialsBusy || !materialsInput}
+                onClick={() => submitMaterials("propose")}
+                className="rounded-xl bg-[rgb(var(--color-primary))] px-4 py-2 text-[13px] font-semibold text-white hover:bg-[rgb(var(--color-primary-hover))] disabled:opacity-40"
+              >
+                {materialsBusy ? "שולח..." : "שלח לאישור הלקוח"}
+              </button>
+            </div>
+          </div>
+        )}
+        {materialsError && (
+          <p role="alert" className="mb-4 text-[13px] font-medium text-[rgb(var(--color-error))]">{materialsError}</p>
+        )}
+
         {/* Action Buttons */}
         <div className="flex flex-wrap gap-3">
           {isSeller && order.status === "PENDING" && (
             <>
-              <button disabled={statusBusy} onClick={() => updateStatus("IN_PROGRESS")} className="flex items-center gap-2 rounded-xl bg-[rgb(var(--color-primary))] px-5 py-2.5 text-[14px] font-semibold text-white transition-all hover:bg-[rgb(var(--color-primary-hover))] disabled:opacity-50">{statusBusy ? "מעדכן..." : "קבל הזמנה"}</button>
+              <button
+                disabled={statusBusy || hasPendingMaterialsAck(order)}
+                onClick={() => updateStatus("IN_PROGRESS")}
+                className="flex items-center gap-2 rounded-xl bg-[rgb(var(--color-primary))] px-5 py-2.5 text-[14px] font-semibold text-white transition-all hover:bg-[rgb(var(--color-primary-hover))] disabled:opacity-50"
+              >
+                {statusBusy ? "מעדכן..." : "קבל הזמנה"}
+              </button>
               <button disabled={statusBusy} onClick={() => setCancelOpen(true)} className="flex items-center gap-2 rounded-xl border-2 border-[rgba(var(--color-error),0.2)] bg-[rgba(var(--color-error),0.05)] px-5 py-2.5 text-[14px] font-semibold text-[rgb(var(--color-error))] transition-all hover:bg-[rgba(var(--color-error),0.1)] disabled:opacity-50">דחה הזמנה</button>
             </>
           )}
