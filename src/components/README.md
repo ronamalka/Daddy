@@ -9,6 +9,7 @@ Reusable pieces of the interface. Subfolders group related screens.
 | `review-form.tsx` | Buyer 1–10 Midrag scores after a completed job |
 | `slot-picker.tsx` / `visit-window-fields.tsx` | Choose a two-hour visit |
 | `request-photos-field.tsx` | Upload request or delivery photos via `/api/upload` |
+| `quote-compare.tsx` | Side-by-side quote cards (price, rating, area, note) with sort |
 | `service-picker.tsx` / `location-picker.tsx` | Services and cities |
 | `notification-bell.tsx` | Header alerts (orders, chat, nearby requests) |
 | `cookie-consent-banner.tsx` | Cookie choice (Israeli privacy practice) |

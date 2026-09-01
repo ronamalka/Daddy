@@ -98,6 +98,44 @@ async function main() {
     });
   }
 
+  const quotes = [
+    {
+      id: "sreq-1-quote-yossi",
+      requestId: "sreq-1",
+      sellerId: "seed-user-seller1",
+      message: "אגיע עם מקדחה, פלס, וכל הברגים. ארון PAX זה הבית שלי.",
+      proposedPrice: 250,
+      laborPrice: 250,
+      materialsEstimate: null as number | null,
+      buyerSuppliesMaterials: true,
+    },
+    {
+      id: "sreq-1-quote-moshe",
+      requestId: "sreq-1",
+      sellerId: "seed-user-seller4",
+      message: "כל רהיט עד שעתיים. הלקוח מביא את הארון, אני מביא כלים.",
+      proposedPrice: 180,
+      laborPrice: 180,
+      materialsEstimate: null as number | null,
+      buyerSuppliesMaterials: true,
+    },
+  ];
+
+  for (const quote of quotes) {
+    await prisma.requestResponse.upsert({
+      where: { requestId_sellerId: { requestId: quote.requestId, sellerId: quote.sellerId } },
+      create: quote,
+      update: {
+        message: quote.message,
+        proposedPrice: quote.proposedPrice,
+        laborPrice: quote.laborPrice,
+        materialsEstimate: quote.materialsEstimate,
+        buyerSuppliesMaterials: quote.buyerSuppliesMaterials,
+        selected: false,
+      },
+    });
+  }
+
   console.log("Requests seed complete.");
 }
 

@@ -9,11 +9,12 @@ import { formatVisitWindow } from "@/lib/availability";
 import { preferredWindowLabel } from "@/lib/request-details";
 import Link from "next/link";
 import { QuotePriceBreakdown } from "@/components/quote-price-breakdown";
-import { QuoteCompareTable } from "@/components/quote-compare";
+import { QuoteCompare } from "@/components/quote-compare";
 import { MaterialsFields } from "@/components/materials-fields";
 import { WazeNavigate } from "@/components/orders/waze-navigate";
 import { canShowSellerWaze } from "@/lib/waze";
 import { quoteTotal } from "@/lib/quote-price";
+import { shouldShowQuoteCompare, type AreaOverlap } from "@/lib/quote-compare";
 
 interface ServiceRequestDetail {
   id: string;
@@ -22,6 +23,8 @@ interface ServiceRequestDetail {
   serviceSlug: string | null;
   districtName: string | null;
   cityName: string | null;
+  cityCode?: number | null;
+  districtCode?: number | null;
   street?: string | null;
   floor?: string | null;
   preferredWindow?: string | null;
@@ -42,7 +45,13 @@ interface ServiceRequestDetail {
     buyerSuppliesMaterials?: boolean | null;
     selected?: boolean;
     createdAt: string;
-    seller: { id: string; name: string };
+    seller: {
+      id: string;
+      name: string;
+      avgRating?: number;
+      reviewCount?: number;
+      areaOverlap?: AreaOverlap;
+    };
   }[];
   selectedResponseId?: string | null;
   orderId?: string | null;
@@ -164,9 +173,13 @@ export default function RequestDetailPage() {
     street: request.street,
     streetVisible: request.streetVisible,
   });
+  const showCompare = shouldShowQuoteCompare(request.responses);
+  const listQuotes = showCompare
+    ? request.responses.filter((resp) => quoteTotal(resp) == null)
+    : request.responses;
 
   return (
-    <div className="mx-auto max-w-3xl px-4 py-8">
+    <div className="mx-auto max-w-4xl px-4 py-8">
       <button onClick={() => router.back()} className="mb-4 text-[13px] text-[rgb(var(--color-primary))] hover:text-[rgb(var(--color-primary-hover))]">
         → חזרה
       </button>
@@ -262,15 +275,23 @@ export default function RequestDetailPage() {
         </h2>
         {error && <p className="mb-3 text-[13px] text-[rgb(var(--color-error))]">{error}</p>}
 
-        <QuoteCompareTable quotes={request.responses} />
+        <QuoteCompare
+          quotes={request.responses}
+          cityName={request.cityName}
+          districtName={request.districtName}
+          canAccept={isBuyer && request.status === "OPEN"}
+          resolved={request.status !== "OPEN"}
+          acceptingId={acceptingId}
+          onAccept={handleAcceptQuote}
+        />
 
         {request.responses.length === 0 ? (
           <div className="rounded-xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] p-6 text-center">
             <p className="text-[14px] text-[rgb(var(--color-text-muted))]">עדיין אין הצעות — היה הראשון!</p>
           </div>
-        ) : (
+        ) : listQuotes.length > 0 ? (
           <div className="space-y-3">
-            {request.responses.map((resp) => (
+            {listQuotes.map((resp) => (
               <div key={resp.id} className="rounded-xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] p-5">
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center gap-2">
@@ -316,7 +337,7 @@ export default function RequestDetailPage() {
               </div>
             ))}
           </div>
-        )}
+        ) : null}
       </div>
 
       {/* Response form (for sellers only) */}

@@ -1,38 +1,7 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
-import { proxyRequest, REQUESTS_SERVICE, USERS_SERVICE } from "@/lib/gateway";
-
-type Person = { id: string; name: string; avatar?: string | null };
-
-/** Loads a user's public name and avatar, or a fallback if the lookup fails. */
-async function loadPerson(id: string): Promise<Person> {
-  const { data } = await proxyRequest(USERS_SERVICE, `/sellers/${id}`);
-  if (data?.id && typeof data.name === "string") {
-    return { id: data.id, name: data.name, avatar: data.avatar ?? null };
-  }
-  return { id, name: "משתמש", avatar: null };
-}
-
-/** Adds buyer and seller names to a service request and its quote replies. */
-async function enrichRequest(request: {
-  buyerId: string;
-  responses?: { sellerId: string }[];
-}) {
-  const sellerIds = [...new Set((request.responses || []).map((row) => row.sellerId))];
-  const [buyer, ...sellers] = await Promise.all([
-    loadPerson(request.buyerId),
-    ...sellerIds.map((id) => loadPerson(id)),
-  ]);
-  const sellerMap = Object.fromEntries(sellers.map((s) => [s.id, s]));
-  return {
-    ...request,
-    buyer,
-    responses: (request.responses || []).map((row) => ({
-      ...row,
-      seller: sellerMap[row.sellerId] || { id: row.sellerId, name: "משתמש" },
-    })),
-  };
-}
+import { proxyRequest, REQUESTS_SERVICE } from "@/lib/gateway";
+import { enrichRequestWithQuoteSellers } from "@/lib/enrich-request-quotes";
 
 /** Lets a seller send a quote on a service request. */
 export async function POST(request: Request, { params }: { params: Promise<{ id: string }> }) {
@@ -52,7 +21,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
   return NextResponse.json(data, { status });
 }
 
-/** Returns one service request with buyer and seller names filled in. */
+/** Returns one service request with buyer names, ratings, and area overlap on each quote. */
 export async function GET(_request: Request, { params }: { params: Promise<{ id: string }> }) {
   const session = await auth();
   if (!session?.user) {
@@ -65,5 +34,5 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
   if (status !== 200 || !data?.request) {
     return NextResponse.json(data ?? { error: "Request not found" }, { status });
   }
-  return NextResponse.json({ request: await enrichRequest(data.request) }, { status });
+  return NextResponse.json({ request: await enrichRequestWithQuoteSellers(data.request) }, { status });
 }
