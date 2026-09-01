@@ -27,6 +27,7 @@ const moshe = {
 };
 const chatOnly = {
   id: "q-chat",
+  laborPrice: null,
   message: "אפשר לדבר?",
   seller: { name: "דן", avgRating: 10, reviewCount: 1, areaOverlap: "district" as const },
 };
