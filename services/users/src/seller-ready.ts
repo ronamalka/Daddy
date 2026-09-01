@@ -1,3 +1,5 @@
+import { extraProviderWhere, parseProviderSearchQuery, serviceAreaWhere, type ProviderSearchQuery } from "./provider-search";
+
 export const SELLER_READY_KEYS = [
   "pricedService",
   "serviceArea",
@@ -55,10 +57,14 @@ interface SearchableSellerFilters {
   service?: string;
   district?: string;
   cityCode?: string;
+  minPrice?: string;
+  maxPrice?: string;
+  pricing?: string;
 }
 
 /** Prisma where-clause for sellers who may appear in search and featured lists. */
 export function searchableSellerWhere(filters: SearchableSellerFilters = {}) {
+  const parsed = parseProviderSearchQuery(filters as ProviderSearchQuery);
   const and: object[] = [
     { phone: { not: null } },
     { phone: { not: "" } },
@@ -66,18 +72,12 @@ export function searchableSellerWhere(filters: SearchableSellerFilters = {}) {
     { avatar: { not: "" } },
     { servicePrices: { some: { price: { gt: 0 } } } },
     { weeklyHours: { some: {} } },
+    { serviceAreas: serviceAreaWhere({ cityCode: parsed.cityCode, district: parsed.district }) },
+    ...extraProviderWhere(parsed),
   ];
 
-  if (filters.cityCode) {
-    and.push({ serviceAreas: { some: { cityCode: Number(filters.cityCode) } } });
-  } else if (filters.district) {
-    and.push({ serviceAreas: { some: { districtCode: Number(filters.district) } } });
-  } else {
-    and.push({ serviceAreas: { some: {} } });
-  }
-
-  if (filters.service) {
-    and.push({ userServices: { some: { serviceSlug: filters.service } } });
+  if (parsed.service) {
+    and.push({ userServices: { some: { serviceSlug: parsed.service } } });
   }
 
   return {

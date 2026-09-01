@@ -160,6 +160,74 @@ describe("System Tests — Public API", () => {
       expect(ids).not.toContain("seed-user-incomplete");
       expect(ids).toContain("seed-user-seller1");
     });
+
+    it("returns city search fields and ServicePrice tags", async () => {
+      const { status, body } = await fetchApi(
+        "/api/providers?service=furniture-assembly&cityCode=5000&district=5&sortBy=price"
+      );
+      expect(status).toBe(200);
+      const rows = body as {
+        id: string;
+        hasFixedPrice?: boolean;
+        acceptsQuotes?: boolean;
+        startingPrice?: number | null;
+        matchTier?: string | null;
+      }[];
+      expect(Array.isArray(rows)).toBe(true);
+      const ids = rows.map((p) => p.id);
+      expect(ids).toContain("seed-user-seller1");
+      expect(ids).not.toContain("seed-user-seller4");
+      const yossi = rows.find((p) => p.id === "seed-user-seller1");
+      expect(yossi?.hasFixedPrice).toBe(true);
+      expect(yossi?.acceptsQuotes).toBe(true);
+      expect(yossi?.startingPrice).toBe(200);
+      expect(yossi?.matchTier).toBe("city");
+    });
+
+    it("does not treat Eilat as Be'er Sheva just because both are in the South", async () => {
+      const { status, body } = await fetchApi(
+        "/api/providers?service=furniture-assembly&cityCode=2600&district=6&sortBy=distance"
+      );
+      expect(status).toBe(200);
+      const rows = body as { id: string; matchTier?: string | null; distanceKm?: number | null }[];
+      const moshe = rows.find((p) => p.id === "seed-user-seller4");
+      expect(moshe?.matchTier).toBe("district");
+      expect(moshe?.distanceKm).toBeGreaterThan(180);
+      expect(rows.some((p) => p.id === "seed-user-seller1")).toBe(false);
+    });
+
+    it("sorts furniture assembly by starting ServicePrice", async () => {
+      const { status, body } = await fetchApi("/api/providers?service=furniture-assembly&sortBy=price");
+      expect(status).toBe(200);
+      const rows = body as { id: string; startingPrice?: number | null }[];
+      const priced = rows.filter((p) => p.startingPrice != null);
+      const prices = priced.map((p) => p.startingPrice as number);
+      expect(prices).toEqual([...prices].sort((a, b) => a - b));
+      expect(priced[0]?.id).toBe("seed-user-seller4");
+    });
+
+    it("applies a ServicePrice range like the old gig catalog", async () => {
+      const cheap = await fetchApi("/api/providers?service=furniture-assembly&maxPrice=100");
+      expect(cheap.status).toBe(200);
+      const cheapIds = (cheap.body as { id: string }[]).map((p) => p.id);
+      expect(cheapIds).not.toContain("seed-user-seller1");
+      expect(cheapIds).not.toContain("seed-user-seller4");
+
+      const mid = await fetchApi("/api/providers?service=furniture-assembly&minPrice=100&maxPrice=250");
+      expect(mid.status).toBe(200);
+      const midIds = (mid.body as { id: string }[]).map((p) => p.id);
+      expect(midIds).toContain("seed-user-seller1");
+      expect(midIds).toContain("seed-user-seller4");
+    });
+
+    it("tags a listed service without a price as quote-only", async () => {
+      const { status, body } = await fetchApi("/api/providers?service=picture-hanging&pricing=quote");
+      expect(status).toBe(200);
+      const rows = body as { id: string; hasFixedPrice?: boolean; startingPrice?: number | null }[];
+      const yossi = rows.find((p) => p.id === "seed-user-seller1");
+      expect(yossi?.hasFixedPrice).toBe(false);
+      expect(yossi?.startingPrice).toBeNull();
+    });
   });
 
   describe("GET /api/profile/readiness", () => {

@@ -9,6 +9,14 @@ import { DISTRICTS } from "@/lib/districts";
 
 export const DISTRICT_LIST = Object.entries(DISTRICTS).map(([code, name]) => ({ code: Number(code), name }));
 
+export const PRICE_PRESETS = [
+  { id: "any", label: "כל מחיר", min: null as number | null, max: null as number | null },
+  { id: "to100", label: "עד ₪100", min: null, max: 100 },
+  { id: "100-250", label: "₪100–250", min: 100, max: 250 },
+  { id: "250-500", label: "₪250–500", min: 250, max: 500 },
+  { id: "500+", label: "₪500+", min: 500, max: null },
+] as const;
+
 export const POPULAR_SEARCHES = [
   { label: "ברז שלא מפסיק לבכות", query: "תיקונים קטנים" },
   { label: "ארון שמסרב להתרכב", query: "הרכבת רהיטים" },

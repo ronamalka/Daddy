@@ -6,19 +6,22 @@ import { MagnifyingGlass, X, CaretLeft } from "@phosphor-icons/react";
 import { ALL_SERVICES } from "@/lib/services";
 import { POPULAR_SEARCHES } from "./data";
 import { CategoryIcon } from "@/components/ui/category-icon";
+import { CityFilter, type SelectedCity } from "@/components/city-filter";
 
 interface HeroSectionProps {
   serviceSearch: string;
   setServiceSearch: (v: string) => void;
   selectedService: string;
   setSelectedService: (v: string) => void;
+  selectedCity: SelectedCity | null;
+  setSelectedCity: (v: SelectedCity | null) => void;
   setView: (v: "browse" | "results") => void;
   filteredServices: typeof ALL_SERVICES;
 }
 
 /** Home hero with logo, slogan, and a service search box. */
 export function HeroSection({
-  serviceSearch, setServiceSearch, setSelectedService, setView, filteredServices,
+  serviceSearch, setServiceSearch, setSelectedService, selectedCity, setSelectedCity, setView, filteredServices,
 }: HeroSectionProps) {
   return (
     <section className="relative overflow-hidden">
@@ -71,8 +74,9 @@ export function HeroSection({
             transition={{ duration: 0.5, delay: 0.3 }}
             className="mx-auto max-w-2xl"
           >
-            <div className="relative">
-              <div className="flex overflow-hidden rounded-xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] shadow-lg transition-shadow focus-within:shadow-xl focus-within:border-[rgb(var(--color-primary-light))]">
+            <div className="space-y-2">
+              <div className="relative">
+                <div className="flex overflow-hidden rounded-xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] shadow-lg transition-shadow focus-within:shadow-xl focus-within:border-[rgb(var(--color-primary-light))]">
                 <div className="flex flex-1 items-center gap-3 px-5">
                   <MagnifyingGlass className="h-5 w-5 flex-shrink-0 text-[rgb(var(--color-text-muted))]" />
                   <input
@@ -95,7 +99,7 @@ export function HeroSection({
               </div>
 
               {serviceSearch && filteredServices.length > 0 && (
-                <div className="absolute z-20 mt-2 max-h-72 w-full overflow-y-auto rounded-xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] shadow-xl">
+                <div className="absolute z-20 top-full mt-2 max-h-72 w-full overflow-y-auto rounded-xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] shadow-xl">
                   {filteredServices.slice(0, 12).map((svc) => (
                     <button
                       key={svc.slug}
@@ -114,6 +118,9 @@ export function HeroSection({
                   ))}
                 </div>
               )}
+              </div>
+
+              <CityFilter value={selectedCity} onChange={setSelectedCity} />
             </div>
 
             <div className="mt-5 flex flex-wrap items-center justify-center gap-2 text-sm">

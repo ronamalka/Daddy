@@ -6,9 +6,14 @@ export interface Provider {
   city: string | null;
   services: string[];
   serviceAreas: { districtName: string; cityName: string | null; districtCode: number }[];
-  completedOrders: number;
+  completedOrders?: number;
   reviewCount: number;
   avgRating?: number;
+  startingPrice?: number | null;
+  hasFixedPrice?: boolean;
+  acceptsQuotes?: boolean;
+  matchTier?: "city" | "district" | null;
+  distanceKm?: number | null;
 }
 
 export interface ServiceRequest {
