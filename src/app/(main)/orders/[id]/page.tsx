@@ -43,6 +43,8 @@ interface OrderDetail {
   pendingMaterialsEstimate?: number | null;
   materialsUpdatedAt?: string | null;
   materialsAcknowledgedAt?: string | null;
+  onTheWayAt?: string | null;
+  onTheWayEta?: string | null;
   status: string;
   dueDate: string | null;
   slotStart: string | null;
@@ -89,6 +91,7 @@ interface OrderDetail {
 const STATUS_STYLE: Record<string, { bg: string; text: string; label: string }> = {
   PENDING: { bg: "bg-[rgba(var(--color-accent-yellow),0.15)]", text: "text-[rgb(var(--color-warning))]", label: "ממתין" },
   IN_PROGRESS: { bg: "bg-[rgba(var(--color-primary),0.1)]", text: "text-[rgb(var(--color-primary))]", label: "בעבודה" },
+  ON_THE_WAY: { bg: "bg-[rgba(var(--color-accent),0.15)]", text: "text-[rgb(var(--color-accent))]", label: "בדרך" },
   DELIVERED: { bg: "bg-[rgba(var(--color-primary-light),0.15)]", text: "text-[rgb(var(--color-primary-hover))]", label: "נמסר" },
   COMPLETED: { bg: "bg-[rgba(var(--color-success),0.15)]", text: "text-[rgb(var(--color-success))]", label: "הושלם" },
   CANCELLED: { bg: "bg-[rgba(var(--color-error),0.1)]", text: "text-[rgb(var(--color-error))]", label: "בוטל" },
@@ -126,6 +129,8 @@ export default function OrderDetailPage() {
   const [materialsInput, setMaterialsInput] = useState("");
   const [materialsBusy, setMaterialsBusy] = useState(false);
   const [materialsError, setMaterialsError] = useState("");
+  const [onMyWayBusy, setOnMyWayBusy] = useState(false);
+  const [onMyWayEtaInput, setOnMyWayEtaInput] = useState("");
 
   useEffect(() => {
     fetch(`/api/orders/${params.id}`)
@@ -243,6 +248,35 @@ export default function OrderDetailPage() {
       setMaterialsError("לא הצלחנו לעדכן חומרים");
     }
     setMaterialsBusy(false);
+  }
+
+  /** Seller announces they are on their way to the buyer. */
+  async function sendOnMyWay() {
+    setOnMyWayBusy(true);
+    setStatusError("");
+    try {
+      const res = await fetch(`/api/orders/${params.id}/on-the-way`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ eta: onMyWayEtaInput || undefined }),
+      });
+      if (res.ok) {
+        const updated = await res.json();
+        setOrder((prev) => prev ? {
+          ...prev,
+          status: updated.status,
+          onTheWayAt: updated.onTheWayAt,
+          onTheWayEta: updated.onTheWayEta,
+        } : prev);
+        setOnMyWayEtaInput("");
+      } else {
+        const data = await res.json().catch(() => ({}));
+        setStatusError((data as { error?: string }).error || "לא הצלחנו לעדכן סטטוס");
+      }
+    } catch {
+      setStatusError("לא הצלחנו לעדכן סטטוס");
+    }
+    setOnMyWayBusy(false);
   }
 
   /** Posts the seller's reply to the buyer's review. */
@@ -386,7 +420,10 @@ export default function OrderDetailPage() {
     now: new Date(now),
   });
   const hasOpenDispute = orderHasOpenDispute(order.disputes);
-  const showBuyerDisputeInsteadOfCancel = isBuyer && order.status === "IN_PROGRESS" && !hasOpenDispute;
+  const showBuyerDisputeInsteadOfCancel = isBuyer && (order.status === "IN_PROGRESS" || order.status === "ON_THE_WAY") && !hasOpenDispute;
+  const isBookedDay = order.slotStart
+    ? new Date(order.slotStart).toISOString().slice(0, 10) === new Date().toISOString().slice(0, 10)
+    : false;
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-8">
@@ -427,6 +464,23 @@ export default function OrderDetailPage() {
             <span className="text-[14px] font-medium text-[rgb(var(--color-text))]">
               ביקור: {formatVisitWindow(new Date(order.slotStart), new Date(order.slotEnd))}
             </span>
+          </div>
+        )}
+
+        {/* On-the-way banner for buyer */}
+        {order.status === "ON_THE_WAY" && isBuyer && (
+          <div className="mb-5 flex items-center gap-3 rounded-xl bg-[rgba(var(--color-accent),0.12)] px-4 py-3">
+            <span className="text-[20px]" role="img" aria-label="car">🚗</span>
+            <div>
+              <p className="text-[14px] font-semibold text-[rgb(var(--color-text))]">
+                האבאל׳ה בדרך אליך!
+              </p>
+              {order.onTheWayEta && (
+                <p className="text-[13px] text-[rgb(var(--color-text-secondary))]">
+                  זמן הגעה משוער: {order.onTheWayEta}
+                </p>
+              )}
+            </div>
           </div>
         )}
 
@@ -544,7 +598,24 @@ export default function OrderDetailPage() {
               <button disabled={statusBusy} onClick={() => setCancelOpen(true)} className="flex items-center gap-2 rounded-xl border-2 border-[rgba(var(--color-error),0.2)] bg-[rgba(var(--color-error),0.05)] px-5 py-2.5 text-[14px] font-semibold text-[rgb(var(--color-error))] transition-all hover:bg-[rgba(var(--color-error),0.1)] disabled:opacity-50">דחה הזמנה</button>
             </>
           )}
-          {isSeller && order.status === "IN_PROGRESS" && (
+          {isSeller && order.status === "IN_PROGRESS" && isBookedDay && (
+            <div className="flex items-center gap-2">
+              <input
+                value={onMyWayEtaInput}
+                onChange={(e) => setOnMyWayEtaInput(e.target.value)}
+                placeholder="זמן הגעה (לא חובה)"
+                className="rounded-xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface-elevated))] px-3 py-2.5 text-[13px] text-[rgb(var(--color-text))] placeholder-[rgb(var(--color-text-muted))] focus:border-[rgb(var(--color-primary))] focus:outline-none w-40"
+              />
+              <button
+                disabled={onMyWayBusy || statusBusy}
+                onClick={sendOnMyWay}
+                className="flex items-center gap-2 rounded-xl bg-[rgb(var(--color-accent))] px-5 py-2.5 text-[14px] font-semibold text-white transition-all hover:opacity-90 disabled:opacity-50"
+              >
+                {onMyWayBusy ? "שולח..." : "אני בדרך!"}
+              </button>
+            </div>
+          )}
+          {isSeller && (order.status === "IN_PROGRESS" || order.status === "ON_THE_WAY") && (
             <button disabled={statusBusy} onClick={() => setDeliverOpen(true)} className="flex items-center gap-2 rounded-xl bg-[rgb(var(--color-primary))] px-5 py-2.5 text-[14px] font-semibold text-white transition-all hover:bg-[rgb(var(--color-primary-hover))] disabled:opacity-50">סמן כנמסר</button>
           )}
           {isBuyer && order.status === "DELIVERED" && (
