@@ -4,6 +4,7 @@ import { signIn } from "next-auth/react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { googleAuthErrorMessage } from "@/lib/oauth-errors";
 import { safeInAppPath } from "@/lib/seller-ready";
 
 /** Shows the login form so users can sign in. */
@@ -15,8 +16,12 @@ export default function LoginPage() {
   const [nextPath, setNextPath] = useState("/");
 
   useEffect(() => {
-    const next = new URLSearchParams(window.location.search).get("next");
-    setNextPath(safeInAppPath(next) ?? "/");
+    const params = new URLSearchParams(window.location.search);
+    setNextPath(safeInAppPath(params.get("next")) ?? "/");
+    const oauthError = params.get("error");
+    if (oauthError) {
+      setError(googleAuthErrorMessage(oauthError, params.get("code")));
+    }
   }, []);
 
   /** Signs the user in with email and password. */
@@ -33,7 +38,12 @@ export default function LoginPage() {
     });
 
     if (result?.error) {
-      setError("אימייל או סיסמה שגויים");
+      const code = "code" in result ? String(result.code ?? "") : "";
+      setError(
+        code === "google_account"
+          ? googleAuthErrorMessage(result.error, "google_account")
+          : "אימייל או סיסמה שגויים"
+      );
       setLoading(false);
     } else {
       router.push(nextPath);

@@ -4,7 +4,7 @@
 | --- | --- |
 | `login.ts` | `POST /login` |
 | `register.ts` | `POST /register` |
-| `oauth.ts` | `POST /oauth` (Google user upsert) |
+| `oauth.ts` | `POST /oauth` (Google user upsert; new users honor `role` BUYER/SELLER) |
 | `password-reset.ts` | Reset request and confirm |
 | `profile.ts` | Current user profile, readiness, become-seller |
 | `admin.ts` | Admin user list, suspend, unsuspend |

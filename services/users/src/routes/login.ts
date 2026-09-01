@@ -26,7 +26,7 @@ loginRoutes.post("/", async (req: Request, res: Response) => {
   }
 
   if (!user.passwordHash) {
-    res.status(401).json({ error: "This account uses Google sign-in" });
+    res.status(401).json({ error: "This account uses Google sign-in", code: "GOOGLE_ACCOUNT" });
     return;
   }
 

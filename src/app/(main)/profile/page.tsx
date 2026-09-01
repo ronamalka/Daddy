@@ -188,13 +188,19 @@ export default function ProfilePage() {
               <AccountRow icon="shield" label="תפקיד" value={roleStyle.label} />
               <div className="h-px bg-[rgb(var(--color-border-light))]" />
               <div className="flex items-center justify-between gap-3">
-                <AccountRow icon="shield" label="סיסמה" value="••••••••" />
-                <Link
-                  href="/profile/password"
-                  className="text-[13px] font-semibold text-[rgb(var(--color-primary))] hover:text-[rgb(var(--color-primary-hover))]"
-                >
-                  עדכן
-                </Link>
+                <AccountRow
+                  icon="shield"
+                  label="סיסמה"
+                  value={session.user.hasPassword === false ? "התחברות עם Google" : "••••••••"}
+                />
+                {session.user.hasPassword !== false && (
+                  <Link
+                    href="/profile/password"
+                    className="text-[13px] font-semibold text-[rgb(var(--color-primary))] hover:text-[rgb(var(--color-primary-hover))]"
+                  >
+                    עדכן
+                  </Link>
+                )}
               </div>
             </div>
           </div>

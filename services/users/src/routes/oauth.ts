@@ -4,14 +4,28 @@ import { prisma } from "../index";
 /** Routes for Google (and similar) sign-in. */
 export const oauthRoutes = Router();
 
-/** Find or create a buyer from OAuth email and name. */
-oauthRoutes.post("/", async (req: Request, res: Response) => {
-  const { email, name, avatar } = req.body;
+function publicUser(user: { id: string; email: string; name: string; role: string; passwordHash: string | null }) {
+  return {
+    id: user.id,
+    email: user.email,
+    name: user.name,
+    role: user.role,
+    hasPassword: Boolean(user.passwordHash),
+  };
+}
 
-  if (!email || !name) {
+/** Find or create a user from a verified Google email and name. */
+oauthRoutes.post("/", async (req: Request, res: Response) => {
+  const { email, name, avatar, role } = req.body;
+
+  if (!email) {
     res.status(400).json({ error: "Missing fields" });
     return;
   }
+
+  const displayName =
+    typeof name === "string" && name.trim() ? name.trim().slice(0, 100) : email.split("@")[0];
+  const requestedRole = role === "SELLER" ? "SELLER" : "BUYER";
 
   let user = await prisma.user.findUnique({ where: { email } });
 
@@ -26,18 +40,18 @@ oauthRoutes.post("/", async (req: Request, res: Response) => {
         data: { avatar },
       });
     }
-    res.json({ id: user.id, email: user.email, name: user.name, role: user.role });
+    res.json(publicUser(user));
     return;
   }
 
   user = await prisma.user.create({
     data: {
-      name,
+      name: displayName,
       email,
       avatar: avatar || null,
-      role: "BUYER",
+      role: requestedRole,
     },
   });
 
-  res.json({ id: user.id, email: user.email, name: user.name, role: user.role });
+  res.json(publicUser(user));
 });

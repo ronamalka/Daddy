@@ -10,6 +10,7 @@ import { PasswordStrength } from "@/components/password-strength";
 import { TurnstileWidget } from "@/components/turnstile-widget";
 import { LegalConsentFields } from "@/components/legal-consent-fields";
 import { TERMS_VERSION } from "@/lib/legal";
+import { oauthIntentCookie } from "@/lib/oauth-intent";
 import { postRegisterPath } from "@/lib/seller-ready";
 
 interface ServiceAreaEntry {
@@ -139,6 +140,7 @@ function RegisterForm() {
   async function handleGoogleSignUp() {
     if (!ensureLegalConsent()) return;
     setGoogleLoading(true);
+    document.cookie = oauthIntentCookie(role);
     await signIn("google", { callbackUrl: postRegisterPath(role, searchParams.get("next")) });
   }
 

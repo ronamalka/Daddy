@@ -4,8 +4,10 @@ Small modules used by API routes and pages. Each exported function has a short c
 
 | File | Purpose |
 | --- | --- |
-| `auth.ts` | NextAuth: credentials, Google, JWT session, Redis `jti` |
-| `auth-types.ts` | Extra fields on the session (`role`, `weakPassword`) |
+| `auth.ts` | NextAuth: credentials, Google (web-server OAuth), JWT session, Redis `jti` |
+| `auth-types.ts` | Extra fields on the session (`role`, `weakPassword`, `hasPassword`) |
+| `oauth-intent.ts` | Buyer/seller cookie that survives the Google redirect |
+| `oauth-errors.ts` | Hebrew messages for Auth.js / Google OAuth errors |
 | `gateway.ts` | HMAC-signed HTTP calls to microservices |
 | `prisma.ts` | Prisma client for the Next.js process |
 | `redis.ts` | Shared Redis connection |
@@ -30,6 +32,9 @@ Small modules used by API routes and pages. Each exported function has a short c
 | `request-details.ts` | Request photos (max 4), street/floor, morning/afternoon/weekend, street redaction |
 | `delivery-photos.ts` | Completion photos (1–6) and optional note when marking delivered |
 | `accept-quote.ts` | Rules for accepting a seller quote |
+| `quote-price.ts` | Labor vs materials total on a quote |
+| `quote-compare.ts` | Sort and label quotes for the buyer compare view |
+| `enrich-request-quotes.ts` | Attach seller rating and service-area overlap to request quotes |
 | `validate.ts` | Parse JSON bodies with Zod |
 | `upload-security.ts` | File type checks and EXIF strip |
 | `bot-detection.ts` | Honeypot and "submitted too fast" checks |
