@@ -16,4 +16,4 @@
 | `service-prices.ts` | Prices per service |
 | `user-services.ts` | Offered service slugs and per-service alert mute |
 | `notifications.ts` | Persisted alerts; match nearby requests |
-| `locations.ts` | City/district lookup |
+| `locations.ts` | City/district lookup from the local catalog |

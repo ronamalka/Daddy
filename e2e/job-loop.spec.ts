@@ -144,15 +144,19 @@ function futureVisitDate(minDays = 10): string {
   throw new Error("No Sunday–Thursday visit date in range");
 }
 
-/** Picks Tel Aviv district then the first matching city in the location picker. */
+/** Picks Tel Aviv district then Tel Aviv-Yafo from the local city catalog. */
 async function pickTelAvivCity(page: Page) {
   await expect(page.getByText("אזור")).toBeVisible({ timeout: 15000 });
-  await page.getByRole("button", { name: "תל אביב", exact: true }).click();
+  const district = page.getByRole("button", { name: "תל אביב", exact: true });
+  await district.click({ timeout: 10000 });
   const search = page.getByPlaceholder("חפש עיר...");
-  await expect(search).toBeVisible();
-  await search.fill("תל אביב");
-  const city = page.locator("div.max-h-48 button").first();
-  await expect(city).toBeVisible({ timeout: 15000 });
+  if (!(await search.isVisible().catch(() => false))) {
+    await district.click({ timeout: 5000 });
+  }
+  await expect(search).toBeVisible({ timeout: 10000 });
+  await search.fill("תל אביב - יפו");
+  const city = page.locator("div.max-h-48").getByRole("button", { name: "תל אביב - יפו" });
+  await expect(city).toBeVisible({ timeout: 10000 });
   await city.click();
 }
 
