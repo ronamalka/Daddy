@@ -122,10 +122,18 @@ serviceRequestsRoutes.get("/:id", requireAuth, async (req: Request, res: Respons
   res.json({ request: serviceRequest });
 });
 
+/** Parses an optional positive money amount from a quote payload. */
+function optionalMoney(value: unknown): number | null {
+  if (value == null || value === "") return null;
+  const amount = Number(value);
+  if (!Number.isFinite(amount) || amount <= 0) return null;
+  return amount;
+}
+
 /** Let a seller send a quote on an open request. */
 serviceRequestsRoutes.post("/:id/respond", requireAuth, requireSeller, async (req: Request, res: Response) => {
   const id = req.params.id as string;
-  const { message, proposedPrice } = req.body;
+  const { message, proposedPrice, laborPrice, materialsEstimate, buyerSuppliesMaterials } = req.body;
 
   if (!message?.trim()) {
     res.status(400).json({ error: "Message is required" });
@@ -157,12 +165,19 @@ serviceRequestsRoutes.post("/:id/respond", requireAuth, requireSeller, async (re
     return;
   }
 
+  const labor = optionalMoney(laborPrice) ?? optionalMoney(proposedPrice);
+  const materials = optionalMoney(materialsEstimate);
+  const buyerSupplies = buyerSuppliesMaterials !== false;
+
   const response = await prisma.requestResponse.create({
     data: {
       requestId: id,
       sellerId: req.user!.id,
       message,
-      proposedPrice: proposedPrice ? Number(proposedPrice) : null,
+      proposedPrice: labor,
+      laborPrice: labor,
+      materialsEstimate: materials,
+      buyerSuppliesMaterials: buyerSupplies,
     },
   });
 

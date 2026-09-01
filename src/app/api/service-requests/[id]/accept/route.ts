@@ -5,6 +5,7 @@ import { proxyRequest, REQUESTS_SERVICE, ORDERS_SERVICE, CHAT_SERVICE } from "@/
 import { validateBody } from "@/lib/validate";
 import { validateAcceptQuote } from "@/lib/accept-quote";
 import { parseRequiredVisitSlot } from "@/lib/seller-slot";
+import { laborAmount, quoteTotal } from "@/lib/quote-price";
 
 const acceptQuoteSchema = z.object({
   responseId: z.string().min(1).max(50),
@@ -41,6 +42,9 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
       requestId: string;
       sellerId: string;
       proposedPrice: number | null;
+      laborPrice?: number | null;
+      materialsEstimate?: number | null;
+      buyerSuppliesMaterials?: boolean | null;
       message: string;
     }[];
   };
@@ -62,12 +66,17 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
     return NextResponse.json({ error: parsedSlot.error }, { status: parsedSlot.status });
   }
 
+  const labor = laborAmount(quote!);
+  const total = quoteTotal(quote!) ?? labor;
   const { data: order, status: orderStatus } = await proxyRequest(ORDERS_SERVICE, "/orders", {
     method: "POST",
     body: {
       jobType: "LOCAL_REQUEST",
       sellerId: quote!.sellerId,
-      price: quote!.proposedPrice,
+      price: total,
+      laborPrice: labor,
+      materialsEstimate: quote!.materialsEstimate ?? null,
+      buyerSuppliesMaterials: quote!.buyerSuppliesMaterials !== false,
       title: serviceRequest.title,
       requestId: serviceRequest.id,
       serviceSlug: serviceRequest.serviceSlug,
@@ -107,7 +116,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
   await proxyRequest(CHAT_SERVICE, "/messages", {
     method: "POST",
     body: {
-      content: `קיבלתי את ההצעה ב-₪${quote!.proposedPrice}. חלון הביקור נשמר.`,
+      content: `קיבלתי את ההצעה ב-₪${total}. חלון הביקור נשמר.`,
       orderId: order.id,
       receiverId: quote!.sellerId,
     },

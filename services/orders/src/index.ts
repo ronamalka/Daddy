@@ -7,6 +7,7 @@ import { applySecurity, generalRateLimit } from "../../shared/security";
 import { ordersRoutes } from "./routes/orders";
 import { orderDetailRoutes } from "./routes/order-detail";
 import { disputeRoutes, adminDisputeRoutes } from "./routes/disputes";
+import { materialsRoutes } from "./routes/materials";
 
 const pool = new pg.Pool({ connectionString: process.env.DATABASE_URL });
 const adapter = new PrismaPg(pool);
@@ -26,6 +27,7 @@ app.get("/health", (_req, res) => {
 
 app.use("/orders", ordersRoutes);
 app.use("/orders", disputeRoutes);
+app.use("/orders", materialsRoutes);
 app.use("/orders", orderDetailRoutes);
 app.use("/admin", adminDisputeRoutes);
 

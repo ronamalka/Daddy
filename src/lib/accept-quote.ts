@@ -1,3 +1,5 @@
+import { laborAmount } from "@/lib/quote-price";
+
 export type QuoteRequest = {
   id: string;
   buyerId: string;
@@ -9,6 +11,9 @@ export type QuoteResponse = {
   requestId: string;
   sellerId: string;
   proposedPrice: number | null;
+  laborPrice?: number | null;
+  materialsEstimate?: number | null;
+  buyerSuppliesMaterials?: boolean | null;
 };
 
 export type AcceptQuoteResult =
@@ -42,8 +47,8 @@ export function validateAcceptQuote(input: {
     return { ok: false, status: 404, error: "ההצעה לא נמצאה" };
   }
 
-  if (input.response.proposedPrice == null || input.response.proposedPrice <= 0) {
-    return { ok: false, status: 400, error: "לכל הצעה שמתקבלת חייב להיות מחיר" };
+  if (laborAmount(input.response) == null) {
+    return { ok: false, status: 400, error: "לכל הצעה שמתקבלת חייב להיות מחיר עבודה" };
   }
 
   return { ok: true };

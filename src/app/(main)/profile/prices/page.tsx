@@ -7,11 +7,15 @@ import { getServiceBySlug, ALL_SERVICES } from "@/lib/services";
 import { userServiceSlugs } from "@/lib/user-services";
 import { Check } from "@phosphor-icons/react";
 import { CategoryIcon } from "@/components/ui/category-icon";
+import { MaterialsFields } from "@/components/materials-fields";
+import { quoteTotal } from "@/lib/quote-price";
 
 interface PriceEntry {
   serviceSlug: string;
   price: number;
   description: string;
+  materialsEstimate: number;
+  buyerSuppliesMaterials: boolean;
 }
 
 /** Shows the form to set prices for each offered service. */
@@ -41,12 +45,20 @@ export default function ProfilePricesPage() {
               serviceSlug: p.serviceSlug,
               price: p.price,
               description: p.description || "",
+              materialsEstimate: p.materialsEstimate || 0,
+              buyerSuppliesMaterials: p.buyerSuppliesMaterials !== false,
             });
           }
         }
 
         const merged = svcList.map((slug) =>
-          priceMap.get(slug) || { serviceSlug: slug, price: 0, description: "" }
+          priceMap.get(slug) || {
+            serviceSlug: slug,
+            price: 0,
+            description: "",
+            materialsEstimate: 0,
+            buyerSuppliesMaterials: true,
+          }
         );
         setPrices(merged);
         setLoading(false);
@@ -54,12 +66,20 @@ export default function ProfilePricesPage() {
       .catch(() => setLoading(false));
   }, []);
 
-  /** Updates the price or description for one listed service. */
-  function updatePrice(slug: string, field: "price" | "description", value: string) {
+  /** Updates one field on a listed service price. */
+  function updatePrice(
+    slug: string,
+    field: "price" | "description" | "materialsEstimate",
+    value: string
+  ) {
     setPrices((prev) =>
       prev.map((p) =>
         p.serviceSlug === slug
-          ? { ...p, [field]: field === "price" ? Number(value) || 0 : value }
+          ? {
+              ...p,
+              [field]:
+                field === "description" ? value : Number(value) || 0,
+            }
           : p
       )
     );
@@ -131,7 +151,7 @@ export default function ProfilePricesPage() {
         <div className="rounded-xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] shadow-[0_2px_8px_rgba(var(--color-primary),0.06)]">
           <div className="px-6 py-4 bg-[rgb(var(--color-bg))] border-b border-[rgb(var(--color-border-light))] rounded-t-xl">
             <p className="text-[13px] text-[rgb(var(--color-text-secondary))]">
-              הגדר מחיר לכל שירות. שירותים ללא מחיר לא יופיעו במחירון הפומבי שלך.
+              הגדר מחיר עבודה לכל שירות, וציין אם החומרים כלולים או שהלקוח מביא אותם. שירותים ללא מחיר לא יופיעו במחירון הפומבי שלך.
             </p>
           </div>
 
@@ -149,7 +169,7 @@ export default function ProfilePricesPage() {
                   </div>
                   <div className="flex flex-wrap gap-3">
                     <div className="flex items-center rounded-xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-bg))]">
-                      <span className="px-3 text-[14px] text-[rgb(var(--color-text-muted))]">₪</span>
+                      <span className="px-3 text-[13px] text-[rgb(var(--color-text-muted))]">עבודה ₪</span>
                       <input
                         type="number"
                         value={entry.price || ""}
@@ -162,9 +182,38 @@ export default function ProfilePricesPage() {
                       type="text"
                       value={entry.description}
                       onChange={(e) => updatePrice(entry.serviceSlug, "description", e.target.value)}
-                      placeholder="פירוט (אופציונלי) — למשל: כולל חומרים"
+                      placeholder="פירוט (אופציונלי)"
                       className="flex-1 min-w-[200px] rounded-xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-bg))] px-4 py-2.5 text-[13px] text-[rgb(var(--color-text))] placeholder-[rgb(var(--color-text-muted))] focus:border-[rgb(var(--color-primary))] focus:outline-none"
                     />
+                  </div>
+                  <div className="mt-3">
+                    <MaterialsFields
+                      name={`materials-who-${entry.serviceSlug}`}
+                      buyerSuppliesMaterials={entry.buyerSuppliesMaterials}
+                      onBuyerSuppliesChange={(value) =>
+                        setPrices((prev) =>
+                          prev.map((p) =>
+                            p.serviceSlug === entry.serviceSlug
+                              ? { ...p, buyerSuppliesMaterials: value }
+                              : p
+                          )
+                        )
+                      }
+                      materialsEstimate={entry.materialsEstimate ? String(entry.materialsEstimate) : ""}
+                      onMaterialsChange={(value) =>
+                        updatePrice(entry.serviceSlug, "materialsEstimate", value)
+                      }
+                    />
+                    {entry.price > 0 && (
+                      <p className="mt-2 text-[12px] text-[rgb(var(--color-text-muted))]">
+                        סה״כ לתשלום בהזמנה מיידית: ₪
+                        {quoteTotal({
+                          laborPrice: entry.price,
+                          materialsEstimate: entry.materialsEstimate || null,
+                          buyerSuppliesMaterials: entry.buyerSuppliesMaterials,
+                        })}
+                      </p>
+                    )}
                   </div>
                 </div>
               );

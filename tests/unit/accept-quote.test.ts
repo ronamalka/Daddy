@@ -70,6 +70,17 @@ describe("validateAcceptQuote", () => {
     if (!result.ok) expect(result.status).toBe(400);
   });
 
+  it("accepts a quote that only has laborPrice", () => {
+    expect(
+      validateAcceptQuote({
+        actorId: "buyer-1",
+        actorRole: "BUYER",
+        request,
+        response: { ...quote, proposedPrice: null, laborPrice: 220 },
+      })
+    ).toEqual({ ok: true });
+  });
+
   it("rejects a missing quote", () => {
     const result = validateAcceptQuote({
       actorId: "buyer-1",

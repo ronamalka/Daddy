@@ -16,6 +16,9 @@ const createLocalOrderSchema = z.object({
   jobType: z.literal("LOCAL_REQUEST"),
   sellerId: z.string().min(1).max(50),
   price: z.number().positive().max(100000),
+  laborPrice: z.number().positive().max(100000).optional(),
+  materialsEstimate: z.number().min(0).max(100000).nullable().optional(),
+  buyerSuppliesMaterials: z.boolean().optional(),
   title: z.string().min(1).max(200),
   serviceSlug: z.string().max(100).optional(),
   requestId: z.string().min(1).max(50).optional(),
@@ -112,7 +115,7 @@ export async function POST(request: Request) {
   }
 
   if ("jobType" in result.data) {
-    const { sellerId, price, title, serviceSlug, requestId } = result.data;
+    const { sellerId, price, title, serviceSlug, requestId, laborPrice, materialsEstimate, buyerSuppliesMaterials } = result.data;
     if (sellerId === user.id) {
       return NextResponse.json({ error: "לא ניתן להזמין את עצמך" }, { status: 400 });
     }
@@ -129,6 +132,9 @@ export async function POST(request: Request) {
         jobType: "LOCAL_REQUEST",
         sellerId,
         price,
+        laborPrice,
+        materialsEstimate,
+        buyerSuppliesMaterials,
         title,
         serviceSlug,
         requestId,
