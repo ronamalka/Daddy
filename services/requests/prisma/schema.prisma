@@ -13,6 +13,12 @@ enum RequestStatus {
   CLOSED
 }
 
+enum PreferredWindow {
+  MORNING
+  AFTERNOON
+  WEEKEND
+}
+
 model ServiceRequest {
   id           String        @id @default(cuid())
   title        String
@@ -23,6 +29,10 @@ model ServiceRequest {
   districtName String?
   cityCode     Int?
   cityName     String?
+  street             String?
+  floor              String?
+  preferredWindow    PreferredWindow?
+  photos             String[]        @default([])
   status             RequestStatus @default(OPEN)
   unlisted           Boolean       @default(false)
   slotStart          DateTime?

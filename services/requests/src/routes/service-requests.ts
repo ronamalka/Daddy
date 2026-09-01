@@ -6,6 +6,7 @@ import {
   mapRequestTeasers,
   requestTeaserWhere,
 } from "../../../shared/request-teaser";
+import { parseRequestDetails, redactRequestStreet } from "../../../shared/request-details";
 import { prisma } from "../index";
 
 /** Routes for local service requests, seller quotes, and accepting a quote. */
@@ -33,15 +34,24 @@ serviceRequestsRoutes.get("/", requireAuth, async (req: Request, res: Response) 
     where: baseWhere,
     include: {
       _count: { select: { responses: true } },
+      responses: {
+        where: { selected: true },
+        select: { id: true, sellerId: true, selected: true },
+      },
     },
     orderBy: { createdAt: "desc" },
     take: 50,
   });
 
-  res.json(requests);
+  res.json(
+    requests.map((row) => {
+      const { responses: _selected, ...redacted } = redactRequestStreet(row, user);
+      return redacted;
+    })
+  );
 });
 
-/** Create a new local service request with a visit window. */
+/** Create a new local service request with location details, photos, and a visit window. */
 serviceRequestsRoutes.post("/", requireAuth, async (req: Request, res: Response) => {
   const { title, description, serviceSlug, districtCode, districtName, cityCode, cityName, slotStart, slotEnd } = req.body;
 
@@ -52,6 +62,12 @@ serviceRequestsRoutes.post("/", requireAuth, async (req: Request, res: Response)
 
   if (!slotStart || !slotEnd) {
     res.status(400).json({ error: "A 2-hour visit window is required" });
+    return;
+  }
+
+  const details = parseRequestDetails(req.body);
+  if (!details.ok) {
+    res.status(400).json({ error: details.error });
     return;
   }
 
@@ -72,6 +88,10 @@ serviceRequestsRoutes.post("/", requireAuth, async (req: Request, res: Response)
       districtName: districtName || null,
       cityCode: cityCode ? Number(cityCode) : null,
       cityName: cityName || null,
+      street: details.value.street,
+      floor: details.value.floor,
+      preferredWindow: details.value.preferredWindow,
+      photos: details.value.photos,
       unlisted: req.body.unlisted === true,
       slotStart: start,
       slotEnd: end,
@@ -119,7 +139,7 @@ serviceRequestsRoutes.get("/:id", requireAuth, async (req: Request, res: Respons
     return;
   }
 
-  res.json({ request: serviceRequest });
+  res.json({ request: redactRequestStreet(serviceRequest, user) });
 });
 
 /** Parses an optional positive money amount from a quote payload. */

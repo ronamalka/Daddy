@@ -512,7 +512,7 @@ async function main() {
   // ── Service Requests ───────────────────────────────────
 
   const requests = [
-    { id: "sreq-1", title: "צריך עזרה בהרכבת ארון גדול", description: "קניתי ארון PAX 3 דלתות מאיקאה ואין לי כלים או ידע להרכיב. גר בתל אביב, צריך מישהו שיגיע השבוע.", serviceSlug: "furniture-assembly", buyerId: buyer.id, districtCode: 5, districtName: "תל אביב" },
+    { id: "sreq-1", title: "צריך עזרה בהרכבת ארון גדול", description: "קניתי ארון PAX 3 דלתות מאיקאה ואין לי כלים או ידע להרכיב. גר בתל אביב, צריך מישהו שיגיע השבוע.", serviceSlug: "furniture-assembly", buyerId: buyer.id, districtCode: 5, districtName: "תל אביב", street: "הרצל 12", floor: "3", preferredWindow: "MORNING" as const },
     { id: "sreq-2", title: "WiFi חלש בחדרים – צריך פתרון", description: "הראוטר בסלון ובחדרי השינה כמעט אין אינטרנט. צריך מישהו שיגדיר mesh או מאריך טווח.", serviceSlug: "wifi-setup", buyerId: buyer2.id, districtCode: 3, districtName: "חיפה" },
     { id: "sreq-3", title: "גיזום עצים ושיחים – חצר גדולה", description: "חצר של 200 מ״ר עם 3 עצי זית ושיחים שצריך לגזום. צריך מישהו עם ניסיון וכלים.", serviceSlug: "tree-pruning", buyerId: buyer3.id, districtCode: 1, districtName: "ירושלים" },
   ];

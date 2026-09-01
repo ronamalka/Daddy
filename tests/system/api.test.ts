@@ -209,6 +209,8 @@ describe("System Tests — Public API", () => {
         expect(row).not.toHaveProperty("buyer");
         expect(row).not.toHaveProperty("phone");
         expect(row).not.toHaveProperty("photos");
+        expect(row).not.toHaveProperty("street");
+        expect(JSON.stringify(body)).not.toContain("הרצל");
         expect(JSON.stringify(body)).not.toContain("בקשה פרטית — לא אמורה להופיע באתר");
       }
     });

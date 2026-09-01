@@ -7,6 +7,7 @@ test.describe("Public Pages", () => {
     await expect(page.getByText("צריך עזרה בהרכבת ארון גדול")).toBeVisible({ timeout: 10000 });
     await expect(page.getByText("בקשה פרטית — לא אמורה להופיע באתר")).toHaveCount(0);
     await expect(page.getByText("קניתי ארון PAX")).toHaveCount(0);
+    await expect(page.getByText("הרצל 12")).toHaveCount(0);
   });
 
   test("how it works page loads", async ({ page }) => {
@@ -78,6 +79,7 @@ test.describe("Public Pages", () => {
     await expect(page.getByRole("link", { name: /התחברו כדי להגיב/ }).first()).toBeVisible();
     await expect(page.getByText("בקשה פרטית — לא אמורה להופיע באתר")).toHaveCount(0);
     await expect(page.getByText("קניתי ארון PAX")).toHaveCount(0);
+    await expect(page.getByText("הרצל 12")).toHaveCount(0);
   });
 
   test("profile page requires auth", async ({ page }) => {
