@@ -1,0 +1,48 @@
+FROM node:22-alpine
+
+WORKDIR /app/services
+
+# Install shared deps first (cached layer)
+COPY services/shared/package.json services/shared/package-lock.json* shared/
+RUN cd shared && npm install
+
+# Install each service's deps (seeds only need prisma + pg + bcryptjs + tsx)
+COPY services/users/package.json services/users/package-lock.json* users/
+COPY services/gigs/package.json services/gigs/package-lock.json* gigs/
+COPY services/orders/package.json services/orders/package-lock.json* orders/
+COPY services/requests/package.json services/requests/package-lock.json* requests/
+COPY services/chat/package.json services/chat/package-lock.json* chat/
+
+RUN for svc in users gigs orders requests chat; do \
+      cd /app/services/$svc && npm install; \
+    done
+
+# Copy Prisma schemas
+COPY services/users/prisma/ users/prisma/
+COPY services/gigs/prisma/ gigs/prisma/
+COPY services/orders/prisma/ orders/prisma/
+COPY services/requests/prisma/ requests/prisma/
+COPY services/chat/prisma/ chat/prisma/
+
+# Copy shared source and seed scripts
+COPY services/shared/ shared/
+COPY services/tsconfig.base.json /app/services/tsconfig.base.json
+COPY services/users/src/ users/src/
+COPY services/gigs/src/ gigs/src/
+COPY services/orders/src/ orders/src/
+COPY services/requests/src/ requests/src/
+COPY services/chat/src/ chat/src/
+COPY services/users/tsconfig.json users/tsconfig.json
+COPY services/gigs/tsconfig.json gigs/tsconfig.json
+COPY services/orders/tsconfig.json orders/tsconfig.json
+COPY services/requests/tsconfig.json requests/tsconfig.json
+COPY services/chat/tsconfig.json chat/tsconfig.json
+
+# Copy the seed runner script
+COPY services/seed-all.sh /app/services/seed-all.sh
+RUN chmod +x /app/services/seed-all.sh
+
+# OpenShift runs containers with a random UID in gid 0
+RUN chgrp -R 0 /app && chmod -R g=u /app
+
+USER 1001

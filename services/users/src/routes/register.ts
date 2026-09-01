@@ -1,6 +1,7 @@
 import { Router, Request, Response } from "express";
 import { hash } from "bcryptjs";
-import { prisma } from "../index";
+import { prisma } from "../db";
+import { createAndSendVerification } from "./email-verify";
 
 /** Routes for creating a new account. */
 export const registerRoutes = Router();
@@ -64,5 +65,10 @@ registerRoutes.post("/", async (req: Request, res: Response) => {
     },
   });
 
-  res.json({ id: user.id, name: user.name, email: user.email, role: user.role });
+  // Send verification email (non-blocking -- don't fail registration if email fails)
+  createAndSendVerification(user.id, user.email, user.name).catch((err) => {
+    console.error("[register] Failed to send verification email:", err);
+  });
+
+  res.json({ id: user.id, name: user.name, email: user.email, role: user.role, emailVerified: false });
 });

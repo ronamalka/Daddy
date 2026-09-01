@@ -4,13 +4,14 @@ import { prisma } from "../index";
 /** Routes for Google (and similar) sign-in. */
 export const oauthRoutes = Router();
 
-function publicUser(user: { id: string; email: string; name: string; role: string; passwordHash: string | null }) {
+function publicUser(user: { id: string; email: string; name: string; role: string; passwordHash: string | null; emailVerified: boolean }) {
   return {
     id: user.id,
     email: user.email,
     name: user.name,
     role: user.role,
     hasPassword: Boolean(user.passwordHash),
+    emailVerified: user.emailVerified,
   };
 }
 
@@ -50,6 +51,7 @@ oauthRoutes.post("/", async (req: Request, res: Response) => {
       email,
       avatar: avatar || null,
       role: requestedRole,
+      emailVerified: true,
     },
   });
 

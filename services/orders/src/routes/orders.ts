@@ -1,5 +1,7 @@
 import { Router, Request, Response } from "express";
 import { requireAuth, requireAdmin, requireInternal } from "../../../shared/middleware";
+import { sendNotification } from "../../../shared/internal-client";
+import { buildNotification } from "../../../shared/notification-templates";
 import { prisma } from "../index";
 import { parseRequiredSlot } from "../lib/slots";
 import { orderListWhere } from "../lib/order-list";
@@ -118,6 +120,15 @@ ordersRoutes.post("/", requireAuth, async (req: Request, res: Response) => {
     });
 
     res.status(201).json(order);
+
+    // Notify seller about the new order (fire-and-forget)
+    const note = buildNotification("ORDER_BOOKED", {
+      orderId: order.id,
+      service: order.title || undefined,
+      price: order.price,
+      date: order.slotStart ? order.slotStart.toLocaleDateString("he-IL") : undefined,
+    });
+    sendNotification({ userId: sellerId, ...note, entityId: order.id }).catch(() => {});
   } catch (err) {
     if (err instanceof Error && err.message === "SLOT_CONFLICT") {
       res.status(409).json({ error: "That visit window is already booked" });

@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
-import { Users, Briefcase, Bag, CurrencyDollar, Prohibit } from "@phosphor-icons/react";
+import { Users, Briefcase, Bag, CurrencyDollar, Prohibit, ShieldCheck } from "@phosphor-icons/react";
+import Link from "next/link";
 import type { ReactNode } from "react";
 import { ModerationQueue } from "@/components/admin/moderation-queue";
 import type { QueueItem } from "@/lib/moderation-queue";
@@ -139,6 +140,17 @@ export default function AdminPage() {
             </p>
           </div>
         ))}
+      </div>
+
+      {/* Quick Actions */}
+      <div className="mb-8">
+        <Link
+          href="/admin/verifications"
+          className="inline-flex items-center gap-2 rounded-xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] px-5 py-3 text-[14px] font-semibold text-[rgb(var(--color-text))] shadow-[var(--shadow-sm)] hover:border-[rgb(var(--color-primary))] hover:text-[rgb(var(--color-primary))] transition-all"
+        >
+          <ShieldCheck className="h-5 w-5" />
+          בדיקת אימותים
+        </Link>
       </div>
 
       <ModerationQueue

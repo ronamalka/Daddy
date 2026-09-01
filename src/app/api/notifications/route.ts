@@ -48,6 +48,18 @@ export async function GET() {
       });
     }
 
+    if (asBuyer && order.status === "ON_THE_WAY") {
+      notifications.push({
+        id: `on-the-way-${order.id}`,
+        type: "ORDER_ON_THE_WAY",
+        title: "האבאל׳ה בדרך!",
+        message: order.onTheWayEta ? `זמן הגעה משוער: ${order.onTheWayEta}` : "בעל המקצוע יצא אליך",
+        href: `/orders/${order.id}`,
+        createdAt: order.onTheWayAt || order.updatedAt || order.createdAt,
+        read: false,
+      });
+    }
+
     if (asBuyer && order.status === "IN_PROGRESS") {
       notifications.push({
         id: `accepted-${order.id}`,
