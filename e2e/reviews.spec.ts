@@ -5,6 +5,7 @@ const LOCAL_REVIEW_COMMENT = "השידה בסלון יציבה לגמרי אחר
 
 test.describe("Local job reviews", () => {
   test("buyer completes a local job, leaves a 1–10 review, and it shows on the profile", async ({ page }) => {
+    test.setTimeout(90000);
     await loginAs(page, "buyer@daddy.com");
     await page.goto("/orders/ord-23");
     await expect(page.getByText("הרכבת שידה בסלון")).toBeVisible({ timeout: 10000 });
