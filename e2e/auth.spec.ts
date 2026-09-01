@@ -20,8 +20,10 @@ test.describe("Auth Flow", () => {
   test("register Google requires legal consent", async ({ page }) => {
     await page.goto("/register");
     await page.getByRole("button", { name: "הרשמה עם Google" }).click();
-    await expect(page.getByRole("alert")).toBeVisible({ timeout: 10000 });
-    await expect(page.getByText(/תנאי השימוש|גיל 18/)).toBeVisible();
+    // Next.js also mounts `#__next-route-announcer__` with role="alert".
+    await expect(
+      page.getByRole("alert").filter({ hasText: /תנאי השימוש|גיל 18/ })
+    ).toBeVisible({ timeout: 10000 });
   });
 
   test("login page offers Google sign-in", async ({ page }) => {
@@ -35,8 +37,9 @@ test.describe("Auth Flow", () => {
 
   test("login shows Hebrew when Google OAuth is denied", async ({ page }) => {
     await page.goto("/login?error=AccessDenied");
-    await expect(page.getByRole("alert")).toBeVisible({ timeout: 10000 });
-    await expect(page.getByText(/נדחתה/)).toBeVisible();
+    await expect(page.getByRole("alert").filter({ hasText: /נדחתה/ })).toBeVisible({
+      timeout: 10000,
+    });
   });
 
   test("login with invalid credentials shows error", async ({ page }) => {
@@ -45,8 +48,9 @@ test.describe("Auth Flow", () => {
     await page.getByPlaceholder("הזן את הסיסמה שלך").fill("wrongpassword");
     await page.getByRole("button", { name: "התחבר" }).click();
 
-    await expect(page.getByRole("alert")).toBeVisible({ timeout: 10000 });
-    await expect(page.getByText(/שגוי/)).toBeVisible();
+    await expect(page.getByRole("alert").filter({ hasText: /שגוי/ })).toBeVisible({
+      timeout: 10000,
+    });
   });
 
   test("login with valid credentials redirects to home", async ({ page }) => {

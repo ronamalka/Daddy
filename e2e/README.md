@@ -4,7 +4,7 @@ These tests run a real browser against the running app.
 
 | File | What it covers |
 | --- | --- |
-| `auth.spec.ts` | Login and related screens |
+| `auth.spec.ts` | Login, Google consent, and OAuth Hebrew errors (form `role="alert"`, not the Next.js route announcer) |
 | `gigs.spec.ts` | Gig listing and detail |
 | `job-loop.spec.ts` | Real marketplace loop in Hebrew: login, post a request (street/floor/preferred window), seller sees photos/floor but not street until accept, seller quote, buyer accept → local job, seller start → deliver with completion photos, buyer sees those photos then complete → 1–10 review; plus instant-book a slot from the seller price list (the catalog-unification path; `/gigs/:id` checkout is not the public catalog anymore) |
 | `quotes-compare.spec.ts` | Buyer compare of two seeded quotes: price/rating sort, area overlap, accept buttons |
