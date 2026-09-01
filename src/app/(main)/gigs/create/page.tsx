@@ -234,45 +234,45 @@ export default function CreateGigPage() {
 
       {showPreview && (
         <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/50 p-4 pt-12 pb-12">
-          <div className="w-full max-w-3xl rounded-[16px] bg-white shadow-2xl">
-            <div className="sticky top-0 z-10 flex items-center justify-between rounded-t-[16px] border-b border-[#E8ECF1] bg-white px-6 py-4">
-              <h2 className="text-[18px] font-bold text-[#2D3436]">תצוגה מקדימה</h2>
-              <button onClick={() => setShowPreview(false)} className="rounded-[8px] border border-[#E8ECF1] px-4 py-2 text-[13px] font-medium text-[#636E72] hover:bg-[#FAFBFF]">
+          <div className="w-full max-w-3xl rounded-2xl bg-[rgb(var(--color-surface))] shadow-2xl">
+            <div className="sticky top-0 z-10 flex items-center justify-between rounded-t-2xl border-b border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] px-6 py-4">
+              <h2 className="text-[18px] font-bold text-[rgb(var(--color-text))]">תצוגה מקדימה</h2>
+              <button onClick={() => setShowPreview(false)} className="rounded-lg border border-[rgb(var(--color-border))] px-4 py-2 text-[13px] font-medium text-[rgb(var(--color-text-secondary))] hover:bg-[rgb(var(--color-bg))]">
                 חזור לעריכה
               </button>
             </div>
 
             <div className="p-6 space-y-6">
               {image && (
-                <img src={image} alt={title} className="w-full h-56 rounded-[12px] object-cover" />
+                <img src={image} alt={title} className="w-full h-56 rounded-xl object-cover" />
               )}
 
               <div>
-                <h1 className="text-[24px] font-bold text-[#2D3436]">{title}</h1>
+                <h1 className="text-[24px] font-bold text-[rgb(var(--color-text))]">{title}</h1>
                 {categoryId && (
-                  <span className="mt-2 inline-block rounded-[9999px] bg-[#6C5CE7]/10 px-3 py-1 text-[12px] font-medium text-[#6C5CE7]">
+                  <span className="mt-2 inline-block rounded-full bg-[rgba(var(--color-primary),0.1)] px-3 py-1 text-[12px] font-medium text-[rgb(var(--color-primary))]">
                     {catalogCategories.find((c) => c.slug === categoryId)?.nameHe}
                   </span>
                 )}
-                <p className="mt-3 text-[14px] leading-relaxed text-[#636E72] whitespace-pre-wrap">{description}</p>
+                <p className="mt-3 text-[14px] leading-relaxed text-[rgb(var(--color-text-secondary))] whitespace-pre-wrap">{description}</p>
               </div>
 
               <div>
-                <h3 className="mb-3 text-[16px] font-bold text-[#2D3436]">חבילות מחיר</h3>
+                <h3 className="mb-3 text-[16px] font-bold text-[rgb(var(--color-text))]">חבילות מחיר</h3>
                 <div className="grid gap-4 sm:grid-cols-3">
                   {getValidTiers().map((t) => {
                     const colors = TIER_COLORS[t.tier];
                     return (
-                      <div key={t.tier} className="relative overflow-hidden rounded-[12px] border border-[#E8ECF1] p-4">
+                      <div key={t.tier} className="relative overflow-hidden rounded-xl border border-[rgb(var(--color-border))] p-4">
                         <div className={`absolute top-0 left-0 right-0 h-1 bg-gradient-to-r ${colors.gradient}`} />
-                        <p className="text-[12px] font-semibold text-[#B2BEC3]">{colors.label}</p>
-                        <p className="text-[14px] font-bold text-[#2D3436]">{t.title}</p>
-                        <p className="mt-2 text-[20px] font-bold text-[#6C5CE7]">₪{t.price}</p>
-                        <div className="mt-2 space-y-1 text-[12px] text-[#636E72]">
+                        <p className="text-[12px] font-semibold text-[rgb(var(--color-text-muted))]">{colors.label}</p>
+                        <p className="text-[14px] font-bold text-[rgb(var(--color-text))]">{t.title}</p>
+                        <p className="mt-2 text-[20px] font-bold text-[rgb(var(--color-primary))]">₪{t.price}</p>
+                        <div className="mt-2 space-y-1 text-[12px] text-[rgb(var(--color-text-secondary))]">
                           <p>אספקה: {t.deliveryDays} ימים</p>
                           <p>תיקונים: {t.revisions}</p>
                         </div>
-                        {t.description && <p className="mt-2 text-[12px] text-[#636E72]">{t.description}</p>}
+                        {t.description && <p className="mt-2 text-[12px] text-[rgb(var(--color-text-secondary))]">{t.description}</p>}
                       </div>
                     );
                   })}
@@ -281,12 +281,12 @@ export default function CreateGigPage() {
 
               {faqs.filter((f) => f.question && f.answer).length > 0 && (
                 <div>
-                  <h3 className="mb-3 text-[16px] font-bold text-[#2D3436]">שאלות נפוצות</h3>
+                  <h3 className="mb-3 text-[16px] font-bold text-[rgb(var(--color-text))]">שאלות נפוצות</h3>
                   <div className="space-y-3">
                     {faqs.filter((f) => f.question && f.answer).map((faq, i) => (
-                      <div key={i} className="rounded-[12px] bg-[#FAFBFF] p-4">
-                        <p className="text-[14px] font-semibold text-[#2D3436]">{faq.question}</p>
-                        <p className="mt-1 text-[13px] text-[#636E72]">{faq.answer}</p>
+                      <div key={i} className="rounded-xl bg-[rgb(var(--color-bg))] p-4">
+                        <p className="text-[14px] font-semibold text-[rgb(var(--color-text))]">{faq.question}</p>
+                        <p className="mt-1 text-[13px] text-[rgb(var(--color-text-secondary))]">{faq.answer}</p>
                       </div>
                     ))}
                   </div>
@@ -295,13 +295,13 @@ export default function CreateGigPage() {
 
               {requirements.filter((r) => r.question).length > 0 && (
                 <div>
-                  <h3 className="mb-3 text-[16px] font-bold text-[#2D3436]">דרישות מהקונה</h3>
+                  <h3 className="mb-3 text-[16px] font-bold text-[rgb(var(--color-text))]">דרישות מהקונה</h3>
                   <div className="space-y-2">
                     {requirements.filter((r) => r.question).map((req, i) => (
-                      <div key={i} className="flex items-center gap-2 text-[14px] text-[#636E72]">
-                        <span className="text-[#6C5CE7]">•</span>
+                      <div key={i} className="flex items-center gap-2 text-[14px] text-[rgb(var(--color-text-secondary))]">
+                        <span className="text-[rgb(var(--color-primary))]">•</span>
                         {req.question}
-                        {req.required && <span className="text-[11px] text-[#E17055]">(חובה)</span>}
+                        {req.required && <span className="text-[11px] text-[rgb(var(--color-accent-warm))]">(חובה)</span>}
                       </div>
                     ))}
                   </div>
@@ -309,7 +309,7 @@ export default function CreateGigPage() {
               )}
             </div>
 
-            <div className="sticky bottom-0 flex flex-col gap-3 rounded-b-[16px] border-t border-[#E8ECF1] bg-white px-6 py-4">
+            <div className="sticky bottom-0 flex flex-col gap-3 rounded-b-2xl border-t border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] px-6 py-4">
               {error && (
                 <p className="text-[13px] font-medium text-[rgb(var(--color-error))]">{error}</p>
               )}
@@ -317,7 +317,7 @@ export default function CreateGigPage() {
               <button
                 type="button"
                 onClick={() => setShowPreview(false)}
-                className="flex-1 rounded-[12px] border border-[#E8ECF1] py-3 text-[14px] font-semibold text-[#636E72] hover:bg-[#FAFBFF] transition-all"
+                className="flex-1 rounded-xl border border-[rgb(var(--color-border))] py-3 text-[14px] font-semibold text-[rgb(var(--color-text-secondary))] hover:bg-[rgb(var(--color-bg))] transition-all"
               >
                 חזור לעריכה
               </button>
@@ -325,7 +325,7 @@ export default function CreateGigPage() {
                 type="button"
                 onClick={handlePublish}
                 disabled={loading}
-                className="flex-1 rounded-[12px] bg-[#6C5CE7] py-3 text-[14px] font-semibold text-white shadow-[0_4px_16px_rgba(108,92,231,0.3)] transition-all hover:bg-[#5A4BD1] disabled:opacity-40 disabled:cursor-not-allowed"
+                className="flex-1 rounded-xl bg-[rgb(var(--color-primary))] py-3 text-[14px] font-semibold text-white shadow-[0_4px_16px_rgba(var(--color-primary),0.3)] transition-all hover:bg-[rgb(var(--color-primary-hover))] disabled:opacity-40 disabled:cursor-not-allowed"
               >
                 {loading ? (
                   <span className="flex items-center justify-center gap-2">

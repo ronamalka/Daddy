@@ -372,7 +372,7 @@ export default function GigDetailPage() {
                         {flaggingReviewId !== review.id ? (
                           <button
                             onClick={() => setFlaggingReviewId(review.id)}
-                            className="text-[11px] text-[#B2BEC3] hover:text-[#E17055] transition-colors"
+                            className="text-[11px] text-[rgb(var(--color-text-muted))] hover:text-[rgb(var(--color-accent-warm))] transition-colors"
                           >
                             🚩 דווח
                           </button>
@@ -383,18 +383,18 @@ export default function GigDetailPage() {
                               onChange={(e) => setFlagReason(e.target.value)}
                               placeholder="סיבת הדיווח..."
                               aria-label="סיבת הדיווח על ביקורת"
-                              className="flex-1 rounded-[8px] border border-[#E8ECF1] bg-white px-3 py-1.5 text-[12px] focus:border-[#E17055] focus:outline-none"
+                              className="flex-1 rounded-[8px] border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] px-3 py-1.5 text-[12px] focus:border-[rgb(var(--color-accent-warm))] focus:outline-none"
                             />
                             <button
                               onClick={() => flagReview(review.id)}
                               disabled={!flagReason.trim()}
-                              className="rounded-[8px] bg-[#E17055] px-3 py-1.5 text-[12px] font-semibold text-white hover:bg-[#D63031] disabled:opacity-40"
+                              className="rounded-[8px] bg-[rgb(var(--color-accent-warm))] px-3 py-1.5 text-[12px] font-semibold text-white hover:bg-[rgb(var(--color-error))] disabled:opacity-40"
                             >
                               דווח
                             </button>
                             <button
                               onClick={() => { setFlaggingReviewId(null); setFlagReason(""); }}
-                              className="rounded-[8px] border border-[#E8ECF1] px-2 py-1.5 text-[12px] text-[#636E72] hover:bg-[#F8F9FA]"
+                              className="rounded-[8px] border border-[rgb(var(--color-border))] px-2 py-1.5 text-[12px] text-[rgb(var(--color-text-secondary))] hover:bg-[rgb(var(--color-surface-elevated))]"
                             >
                               ביטול
                             </button>
@@ -403,7 +403,7 @@ export default function GigDetailPage() {
                       </div>
                     )}
                     {flaggedReviews.has(review.id) && (
-                      <p className="mt-2 text-[11px] text-[#00B894]">✓ תודה! הדיווח נשלח. אנחנו בודקים.</p>
+                      <p className="mt-2 text-[11px] text-[rgb(var(--color-success))]">✓ תודה! הדיווח נשלח. אנחנו בודקים.</p>
                     )}
                   </div>
                 ))}

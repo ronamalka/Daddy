@@ -10,6 +10,8 @@ const profileUpdateSchema = z.object({
   bio: z.string().max(1000).optional().nullable(),
   avatar: z.string().max(500).optional().nullable(),
   city: z.string().max(100).optional().nullable(),
+  cityCode: z.number().int().optional().nullable(),
+  districtCode: z.number().int().optional().nullable(),
   location: z.string().max(100).optional(),
 });
 
@@ -36,10 +38,10 @@ export async function PUT(request: Request) {
   const result = await validateBody(request, profileUpdateSchema);
   if ("error" in result) return result.error;
 
-  const { location, city, ...rest } = result.data;
+  const { location, city, cityCode, districtCode, ...rest } = result.data;
   const { data, status } = await proxyRequest(USERS_SERVICE, "/profile", {
     method: "PUT",
-    body: { ...rest, city: city ?? location },
+    body: { ...rest, city: city ?? location, cityCode, districtCode },
     user: session.user as { id: string; email: string; name: string; role: string },
   });
   return NextResponse.json(data, { status });

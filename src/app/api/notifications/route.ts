@@ -36,18 +36,6 @@ export async function GET() {
       });
     }
 
-    if (asSeller && order.status === "REVISION") {
-      notifications.push({
-        id: `revision-${order.id}`,
-        type: "REVISION_REQUESTED",
-        title: "בקשת תיקון",
-        message: "הקונה ביקש תיקון להזמנה",
-        href: `/orders/${order.id}`,
-        createdAt: order.updatedAt || order.createdAt,
-        read: false,
-      });
-    }
-
     if (asBuyer && order.status === "DELIVERED") {
       notifications.push({
         id: `delivered-${order.id}`,
