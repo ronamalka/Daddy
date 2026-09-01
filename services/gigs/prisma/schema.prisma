@@ -104,6 +104,16 @@ model Favorite {
   @@index([userId])
 }
 
+model FavoriteSeller {
+  id        String   @id @default(cuid())
+  userId    String
+  sellerId  String
+  createdAt DateTime @default(now())
+
+  @@unique([userId, sellerId])
+  @@index([userId])
+}
+
 model Review {
   id                  String       @id @default(cuid())
   rating              Int

@@ -2,10 +2,10 @@
 
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { ReviewForm } from "@/components/review-form";
-import { Star, Handshake, Clock, Coins, Tag, ClipboardText, ChatCircle, PaperPlaneTilt, ArrowsClockwise, Warning, Scales } from "@phosphor-icons/react";
+import { Star, Handshake, Clock, Coins, Tag, ClipboardText, ChatCircle, PaperPlaneTilt, ArrowsClockwise, Warning, Scales, ArrowClockwise, Receipt, FilePdf } from "@phosphor-icons/react";
 import { Dialog } from "@/components/ui/dialog";
 import { formatVisitWindow } from "@/lib/availability";
 import { DisputeDialog } from "@/components/orders/dispute-dialog";
@@ -86,6 +86,12 @@ interface OrderDetail {
     streetVisible: boolean;
     hasStreet: boolean;
   } | null;
+  invoice?: {
+    id: string;
+    invoiceNumber: number;
+    issuedAt: string;
+  } | null;
+  sellerHasTaxProfile?: boolean;
 }
 
 const STATUS_STYLE: Record<string, { bg: string; text: string; label: string }> = {
@@ -100,6 +106,7 @@ const STATUS_STYLE: Record<string, { bg: string; text: string; label: string }> 
 /** Shows one order's status, messages, and review form. */
 export default function OrderDetailPage() {
   const params = useParams();
+  const router = useRouter();
   const { data: session } = useSession();
   const [order, setOrder] = useState<OrderDetail | null>(null);
   const [message, setMessage] = useState("");
@@ -131,16 +138,41 @@ export default function OrderDetailPage() {
   const [materialsError, setMaterialsError] = useState("");
   const [onMyWayBusy, setOnMyWayBusy] = useState(false);
   const [onMyWayEtaInput, setOnMyWayEtaInput] = useState("");
+  const [invoiceBusy, setInvoiceBusy] = useState(false);
+  const [invoiceError, setInvoiceError] = useState("");
 
   useEffect(() => {
     fetch(`/api/orders/${params.id}`)
       .then((r) => r.json())
-      .then((data) => {
+      .then(async (data) => {
         if (!data?.id || !data?.buyer || !data?.seller) {
           setLoadError(true);
           return;
         }
         setLoadError(false);
+
+        // Check if invoice exists
+        try {
+          const invRes = await fetch(`/api/orders/${params.id}/invoice`);
+          if (invRes.ok) {
+            const inv = await invRes.json();
+            if (inv?.id) {
+              data.invoice = { id: inv.id, invoiceNumber: inv.invoiceNumber, issuedAt: inv.issuedAt };
+            }
+          }
+        } catch {}
+
+        // Check if seller has tax profile (for seller viewing their own completed orders)
+        if (session?.user?.id === data.seller?.id && data.status === "COMPLETED" && !data.invoice) {
+          try {
+            const profileRes = await fetch("/api/profile");
+            if (profileRes.ok) {
+              const profile = await profileRes.json();
+              data.sellerHasTaxProfile = Boolean(profile?.osekType && profile?.legalName);
+            }
+          } catch {}
+        }
+
         setOrder(data);
         if (data.requirements?.length > 0) {
           setReqsSubmitted(true);
@@ -155,7 +187,7 @@ export default function OrderDetailPage() {
         }).catch(() => {});
       })
       .catch(() => setLoadError(true));
-  }, [params.id]);
+  }, [params.id, session?.user?.id]);
 
   useEffect(() => {
     if (!order) return;
@@ -277,6 +309,28 @@ export default function OrderDetailPage() {
       setStatusError("לא הצלחנו לעדכן סטטוס");
     }
     setOnMyWayBusy(false);
+  }
+
+  /** Generates a tax invoice for this completed order. */
+  async function generateInvoice() {
+    setInvoiceBusy(true);
+    setInvoiceError("");
+    try {
+      const res = await fetch(`/api/orders/${params.id}/invoice`, { method: "POST" });
+      const data = await res.json().catch(() => ({}));
+      if (res.ok && data?.id) {
+        setOrder((prev) =>
+          prev
+            ? { ...prev, invoice: { id: data.id, invoiceNumber: data.invoiceNumber, issuedAt: data.issuedAt } }
+            : prev
+        );
+      } else {
+        setInvoiceError((data as { error?: string }).error || "לא הצלחנו להנפיק חשבונית");
+      }
+    } catch {
+      setInvoiceError("לא הצלחנו להנפיק חשבונית");
+    }
+    setInvoiceBusy(false);
   }
 
   /** Posts the seller's reply to the buyer's review. */
@@ -642,6 +696,21 @@ export default function OrderDetailPage() {
           {isBuyer && order.status === "COMPLETED" && !order.review && (
             <button onClick={() => setReviewOpen(true)} className="flex items-center gap-2 rounded-xl bg-[rgb(var(--color-accent-yellow))] px-5 py-2.5 text-[14px] font-semibold text-[rgb(var(--color-text))] transition-all hover:opacity-80">כתוב חוות דעת</button>
           )}
+          {isBuyer && order.status === "COMPLETED" && (
+            <button
+              onClick={() => {
+                if (order.gig.id) {
+                  router.push(`/gigs/${order.gig.id}`);
+                } else {
+                  router.push(`/sellers/${order.seller.id}`);
+                }
+              }}
+              className="flex items-center gap-2 rounded-xl border-2 border-[rgba(var(--color-primary),0.2)] bg-[rgba(var(--color-primary),0.05)] px-5 py-2.5 text-[14px] font-semibold text-[rgb(var(--color-primary))] transition-all hover:bg-[rgba(var(--color-primary),0.1)]"
+            >
+              <ArrowClockwise className="h-4 w-4" />
+              הזמן שוב
+            </button>
+          )}
           {(isBuyer || isSeller) && isDisputableStatus(order.status) && !hasOpenDispute && !showBuyerDisputeInsteadOfCancel && (
             <button
               onClick={() => setDisputeOpen(true)}
@@ -651,7 +720,40 @@ export default function OrderDetailPage() {
               פתיחת מחלוקת
             </button>
           )}
+          {isSeller && order.status === "COMPLETED" && !order.invoice && order.sellerHasTaxProfile && (
+            <button
+              disabled={invoiceBusy}
+              onClick={generateInvoice}
+              className="flex items-center gap-2 rounded-xl bg-[rgb(var(--color-accent))] px-5 py-2.5 text-[14px] font-semibold text-white transition-all hover:opacity-90 disabled:opacity-50"
+            >
+              <Receipt className="h-4 w-4" />
+              {invoiceBusy ? "מנפיק..." : "הנפק חשבונית"}
+            </button>
+          )}
+          {isSeller && order.status === "COMPLETED" && !order.invoice && !order.sellerHasTaxProfile && (
+            <a
+              href="/profile/tax"
+              className="flex items-center gap-2 rounded-xl border-2 border-[rgba(var(--color-accent),0.3)] bg-[rgba(var(--color-accent),0.08)] px-5 py-2.5 text-[14px] font-semibold text-[rgb(var(--color-accent))] transition-all hover:bg-[rgba(var(--color-accent),0.15)]"
+            >
+              <Receipt className="h-4 w-4" />
+              הגדר פרופיל עסקי להנפקת חשבונית
+            </a>
+          )}
+          {order.invoice && (
+            <a
+              href={`/api/orders/${order.id}/invoice/pdf`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-2 rounded-xl bg-[rgb(var(--color-primary))] px-5 py-2.5 text-[14px] font-semibold text-white transition-all hover:bg-[rgb(var(--color-primary-hover))]"
+            >
+              <FilePdf className="h-4 w-4" />
+              הורד חשבונית #{order.invoice.invoiceNumber}
+            </a>
+          )}
         </div>
+        {invoiceError && (
+          <p role="alert" className="mt-3 text-[13px] font-medium text-[rgb(var(--color-error))]">{invoiceError}</p>
+        )}
         {statusError && (
           <p role="alert" className="mt-3 text-[13px] font-medium text-[rgb(var(--color-error))]">{statusError}</p>
         )}
