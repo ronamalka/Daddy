@@ -2,8 +2,10 @@ import { Router, Request, Response } from "express";
 import { compare } from "bcryptjs";
 import { prisma } from "../index";
 
+/** Routes for email-and-password login. */
 export const loginRoutes = Router();
 
+/** Check email and password and return the user if they match. */
 loginRoutes.post("/", async (req: Request, res: Response) => {
   const { email, password } = req.body;
 
@@ -18,8 +20,13 @@ loginRoutes.post("/", async (req: Request, res: Response) => {
     return;
   }
 
+  if (user.suspendedAt) {
+    res.status(403).json({ error: "החשבון הושעה" });
+    return;
+  }
+
   if (!user.passwordHash) {
-    res.status(401).json({ error: "This account uses Google sign-in" });
+    res.status(401).json({ error: "This account uses Google sign-in", code: "GOOGLE_ACCOUNT" });
     return;
   }
 

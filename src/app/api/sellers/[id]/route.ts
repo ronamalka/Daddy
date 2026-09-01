@@ -1,8 +1,9 @@
 import { NextResponse } from "next/server";
 import { proxyRequest, USERS_SERVICE, GIGS_SERVICE, ORDERS_SERVICE } from "@/lib/gateway";
 
-interface GigReview {
+interface SellerReview {
   rating: number;
+  userId?: string;
   ratingAttitude?: number | null;
   ratingTimeliness?: number | null;
   ratingPrice?: number | null;
@@ -10,27 +11,50 @@ interface GigReview {
   [key: string]: unknown;
 }
 
-interface GigWithReviews {
-  reviews?: GigReview[];
-  [key: string]: unknown;
-}
-
+/** Returns a seller profile with gigs, reviews, ratings, and completed-order count. */
 export async function GET(_request: Request, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
 
-  const [sellerRes, gigsRes, ordersRes] = await Promise.all([
-    proxyRequest(USERS_SERVICE, `/sellers/${id}`),
-    proxyRequest(GIGS_SERVICE, `/gigs/by-seller/${id}`),
-    proxyRequest(ORDERS_SERVICE, `/orders/count-by-seller/${id}`),
-  ]);
+  const sellerRes = await proxyRequest(USERS_SERVICE, `/sellers/${id}`);
 
-  if (sellerRes.status === 404) {
+  if (sellerRes.status === 404 || !sellerRes.data || sellerRes.data.error) {
     return NextResponse.json({ error: "Seller not found" }, { status: 404 });
   }
 
+  const [gigsRes, reviewsRes, ordersRes] = await Promise.all([
+    proxyRequest(GIGS_SERVICE, `/gigs/by-seller/${id}`).catch(() => ({ data: null, status: 502 })),
+    proxyRequest(GIGS_SERVICE, `/reviews/by-seller/${id}`).catch(() => ({ data: null, status: 502 })),
+    proxyRequest(ORDERS_SERVICE, `/orders/count-by-seller/${id}`).catch(() => ({ data: null, status: 502 })),
+  ]);
+
   const seller = sellerRes.data;
-  const gigs: GigWithReviews[] = Array.isArray(gigsRes.data) ? gigsRes.data : [];
-  const allReviews: GigReview[] = gigs.flatMap((g) => g.reviews || []);
+  const gigs = Array.isArray(gigsRes.data) ? gigsRes.data : [];
+  const listed = reviewsRes.data;
+  const rawReviews: SellerReview[] = Array.isArray(listed?.reviews)
+    ? listed.reviews
+    : gigs.flatMap((g: { reviews?: SellerReview[] }) => g.reviews || []);
+
+  const reviewerIds = [...new Set(
+    rawReviews.map((r) => r.userId).filter((id): id is string => typeof id === "string" && id.length > 0)
+  )];
+  const reviewerMap: Record<string, { id: string; name: string; city: string | null }> = {};
+  await Promise.all(
+    reviewerIds.map(async (userId) => {
+      const { data: u } = await proxyRequest(USERS_SERVICE, `/sellers/${userId}`);
+      if (u?.id && typeof u.name === "string") {
+        reviewerMap[userId] = { id: u.id, name: u.name, city: u.city ?? null };
+      }
+    })
+  );
+
+  const allReviews = rawReviews.map((r) => ({
+    ...r,
+    user: reviewerMap[r.userId as string] || {
+      id: r.userId || "unknown",
+      name: "משתמש",
+      city: null,
+    },
+  }));
 
   const avgRating = allReviews.length > 0
     ? allReviews.reduce((sum, r) => sum + r.rating, 0) / allReviews.length

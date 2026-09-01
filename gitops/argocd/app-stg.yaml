@@ -9,14 +9,21 @@ spec:
   project: daddy
   source:
     repoURL: https://github.com/ronamalka/Daddy.git
-    targetRevision: main
+    targetRevision: stg
     path: gitops/overlays/stg
   destination:
     server: https://kubernetes.default.svc
     namespace: daddy-stg
+  ignoreDifferences:
+    - group: ""
+      kind: Secret
+      jsonPointers:
+        - /data
+        - /stringData
   syncPolicy:
     automated:
       prune: true
       selfHeal: true
     syncOptions:
       - CreateNamespace=true
+      - RespectIgnoreDifferences=true

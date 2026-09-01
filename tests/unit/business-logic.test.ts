@@ -11,24 +11,24 @@ describe("Average Rating Calculation", () => {
   });
 
   it("calculates average correctly", () => {
-    const reviews = [{ rating: 5 }, { rating: 3 }, { rating: 4 }];
-    expect(calcAvgRating(reviews)).toBe(4);
+    const reviews = [{ rating: 10 }, { rating: 8 }, { rating: 9 }];
+    expect(calcAvgRating(reviews)).toBe(9);
   });
 
   it("handles single review", () => {
-    expect(calcAvgRating([{ rating: 5 }])).toBe(5);
+    expect(calcAvgRating([{ rating: 10 }])).toBe(10);
   });
 
   it("handles decimal averages", () => {
-    const reviews = [{ rating: 4 }, { rating: 5 }];
-    expect(calcAvgRating(reviews)).toBe(4.5);
+    const reviews = [{ rating: 9 }, { rating: 10 }];
+    expect(calcAvgRating(reviews)).toBe(9.5);
   });
 });
 
 describe("Order Status Transitions", () => {
   const VALID_TRANSITIONS: Record<string, string[]> = {
     PENDING: ["IN_PROGRESS", "CANCELLED"],
-    IN_PROGRESS: ["DELIVERED", "CANCELLED"],
+    IN_PROGRESS: ["DELIVERED"],
     DELIVERED: ["COMPLETED", "IN_PROGRESS"],
     COMPLETED: [],
     CANCELLED: [],
@@ -52,6 +52,10 @@ describe("Order Status Transitions", () => {
 
   it("IN_PROGRESS -> DELIVERED is valid", () => {
     expect(canTransition("IN_PROGRESS", "DELIVERED")).toBe(true);
+  });
+
+  it("IN_PROGRESS -> CANCELLED is invalid — open a dispute instead", () => {
+    expect(canTransition("IN_PROGRESS", "CANCELLED")).toBe(false);
   });
 
   it("COMPLETED -> anything is invalid", () => {
@@ -91,15 +95,13 @@ describe("Price Tier Sorting", () => {
 });
 
 describe("Role-Based Filtering", () => {
-  function buildOrderFilter(userId: string, role: string) {
-    return role === "SELLER" ? { sellerId: userId } : { buyerId: userId };
+  function buildOrderFilter(userId: string) {
+    return { OR: [{ sellerId: userId }, { buyerId: userId }] };
   }
 
-  it("seller sees orders where they are seller", () => {
-    expect(buildOrderFilter("seller-1", "SELLER")).toEqual({ sellerId: "seller-1" });
-  });
-
-  it("buyer sees orders where they are buyer", () => {
-    expect(buildOrderFilter("buyer-1", "BUYER")).toEqual({ buyerId: "buyer-1" });
+  it("returns orders the user sells or buys", () => {
+    expect(buildOrderFilter("seller-1")).toEqual({
+      OR: [{ sellerId: "seller-1" }, { buyerId: "seller-1" }],
+    });
   });
 });

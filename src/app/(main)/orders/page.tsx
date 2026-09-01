@@ -1,122 +1,153 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useSession } from "next-auth/react";
-import Link from "next/link";
+import { Bag, CalendarBlank, Lock } from "@phosphor-icons/react";
+import { OrderCards } from "@/components/orders/order-cards";
+import { SellerCalendar } from "@/components/orders/seller-calendar";
+import type { OrderListItem } from "@/components/orders/types";
+import { splitOrdersForUser } from "@/lib/order-views";
 
-interface Order {
-  id: string;
-  tier: string;
-  price: number;
-  status: string;
-  createdAt: string;
-  gig: { id: string; title: string; image: string | null };
-  buyer: { id: string; name: string };
-  seller: { id: string; name: string };
-}
+type Tab = "calendar" | "selling" | "buying";
 
-const STATUS_COLORS: Record<string, { bg: string; text: string; dot: string }> = {
-  PENDING: { bg: "bg-[#FDCB6E]/15", text: "text-[#E67E22]", dot: "bg-[#FDCB6E]" },
-  IN_PROGRESS: { bg: "bg-[#6C5CE7]/10", text: "text-[#6C5CE7]", dot: "bg-[#6C5CE7]" },
-  DELIVERED: { bg: "bg-[#A29BFE]/15", text: "text-[#5A4BD1]", dot: "bg-[#A29BFE]" },
-  COMPLETED: { bg: "bg-[#00B894]/15", text: "text-[#00B894]", dot: "bg-[#00B894]" },
-  CANCELLED: { bg: "bg-[#E17055]/10", text: "text-[#E17055]", dot: "bg-[#E17055]" },
-};
-
+/** Shows the user's orders as a calendar and buying or selling lists. */
 export default function OrdersPage() {
   const { data: session } = useSession();
-  const [orders, setOrders] = useState<Order[]>([]);
+  const [orders, setOrders] = useState<OrderListItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [tab, setTab] = useState<Tab | null>(null);
+
+  const userId = session?.user?.id ?? "";
+  const role = session?.user?.role;
+  const isProvider = role === "SELLER" || role === "ADMIN";
+
+  const { selling, buying } = useMemo(
+    () => (userId ? splitOrdersForUser(orders, userId) : { selling: [], buying: [] }),
+    [orders, userId]
+  );
+
+  const sellingByVisit = useMemo(() => {
+    return [...selling].sort((a, b) => {
+      if (a.slotStart && b.slotStart) return new Date(a.slotStart).getTime() - new Date(b.slotStart).getTime();
+      if (a.slotStart) return -1;
+      if (b.slotStart) return 1;
+      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+    });
+  }, [selling]);
 
   useEffect(() => {
     fetch("/api/orders")
       .then((r) => r.json())
       .then((data) => {
-        setOrders(data);
+        setOrders(Array.isArray(data) ? data : []);
+      })
+      .catch(() => {
+        setOrders([]);
+      })
+      .finally(() => {
         setLoading(false);
       });
   }, []);
 
+  useEffect(() => {
+    if (tab) return;
+    if (!session) return;
+    setTab(isProvider ? "calendar" : "buying");
+  }, [session, isProvider, tab]);
+
   if (!session) {
     return (
       <div className="flex flex-col items-center justify-center py-20">
-        <div className="rounded-full bg-[#F0EEFF] p-4 mb-4">
-          <svg className="h-8 w-8 text-[#6C5CE7]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
-          </svg>
+        <div className="mb-4 rounded-full bg-[rgba(var(--color-primary),0.1)] p-4">
+          <Lock className="h-8 w-8 text-[rgb(var(--color-primary))]" />
         </div>
-        <p className="text-[16px] text-[#636E72]">התחבר כדי לצפות בהזמנות.</p>
+        <p className="text-[16px] text-[rgb(var(--color-text-secondary))]">התחבר כדי לצפות בהזמנות.</p>
       </div>
     );
   }
 
-  if (loading) {
+  if (loading || !tab) {
     return (
       <div className="flex items-center justify-center py-20">
-        <div className="h-10 w-10 animate-spin rounded-full border-4 border-[#F0EEFF] border-t-[#6C5CE7]" />
+        <div className="h-10 w-10 animate-spin rounded-full border-4 border-[rgba(var(--color-primary),0.1)] border-t-[rgb(var(--color-primary))]" />
       </div>
     );
   }
+
+  const title = isProvider ? "העבודות שלי" : "ההזמנות שלי";
+  const subtitle = isProvider
+    ? `${selling.length} עבודות לספק${buying.length ? ` · ${buying.length} הזמנות שביצעתי` : ""}`
+    : `${buying.length} ${buying.length !== 1 ? "הזמנות" : "הזמנה"} סה״כ`;
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-8">
-      <div className="mb-8 flex items-center justify-between">
+      <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <h1 className="text-[32px] font-bold tracking-[-0.01em] text-[#2D3436]">ההזמנות שלי</h1>
-          <p className="mt-1 text-[14px] text-[#636E72]">{orders.length} {orders.length !== 1 ? "הזמנות" : "הזמנה"} סה״כ</p>
+          <h1 className="text-[32px] font-bold tracking-[-0.01em] text-[rgb(var(--color-text))]">{title}</h1>
+          <p className="mt-1 text-[14px] text-[rgb(var(--color-text-secondary))]">{subtitle}</p>
         </div>
+        {isProvider && (
+          <div className="flex flex-wrap gap-2">
+            <TabButton active={tab === "calendar"} onClick={() => setTab("calendar")} icon={<CalendarBlank className="h-4 w-4" />}>
+              יומן
+            </TabButton>
+            <TabButton active={tab === "selling"} onClick={() => setTab("selling")} icon={<Bag className="h-4 w-4" />}>
+              עבודות לספק
+            </TabButton>
+            <TabButton active={tab === "buying"} onClick={() => setTab("buying")}>
+              הזמנות שביצעתי
+            </TabButton>
+          </div>
+        )}
       </div>
 
-      {orders.length === 0 ? (
-        <div className="flex flex-col items-center justify-center rounded-[16px] border border-[#E8ECF1] bg-[#FFFFFF] py-16">
-          <div className="rounded-full bg-[#F0EEFF] p-5 mb-4">
-            <svg className="h-10 w-10 text-[#A29BFE]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z" />
-            </svg>
-          </div>
-          <p className="text-[16px] font-medium text-[#2D3436]">אין הזמנות עדיין</p>
-          <p className="mt-1 text-[14px] text-[#B2BEC3]">ההזמנות שלך יופיעו כאן</p>
-        </div>
-      ) : (
-        <div className="space-y-3">
-          {orders.map((order) => {
-            const colors = STATUS_COLORS[order.status] || STATUS_COLORS.PENDING;
-            return (
-              <Link
-                key={order.id}
-                href={`/orders/${order.id}`}
-                className="group flex items-center gap-4 rounded-[16px] border border-[#E8ECF1] bg-[#FFFFFF] p-5 transition-all hover:shadow-[0_4px_16px_rgba(108,92,231,0.08)] hover:border-[#A29BFE]/30"
-              >
-                <div className="h-16 w-16 flex-shrink-0 overflow-hidden rounded-[12px] bg-[#F0EEFF]">
-                  {order.gig.image ? (
-                    <img src={order.gig.image} alt="" className="h-full w-full object-cover" />
-                  ) : (
-                    <div className="flex h-full w-full items-center justify-center text-[20px] font-bold text-[#6C5CE7]">
-                      D
-                    </div>
-                  )}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <h3 className="font-semibold text-[#2D3436] truncate group-hover:text-[#6C5CE7] transition-colors">
-                    {order.gig.title}
-                  </h3>
-                  <p className="mt-1 text-[14px] text-[#636E72]">
-                    {session.user.role === "SELLER" ? `קונה: ${order.buyer.name}` : `מוכר: ${order.seller.name}`}
-                    <span className="mx-2 text-[#E8ECF1]">|</span>
-                    {order.tier}
-                    <span className="mx-2 text-[#E8ECF1]">|</span>
-                    <span className="font-semibold text-[#2D3436]">₪{order.price}</span>
-                  </p>
-                </div>
-                <span className={`flex items-center gap-1.5 rounded-[9999px] px-3.5 py-1.5 text-[12px] font-semibold ${colors.bg} ${colors.text}`}>
-                  <span className={`h-1.5 w-1.5 rounded-full ${colors.dot}`} />
-                  {order.status.replace("_", " ")}
-                </span>
-              </Link>
-            );
-          })}
-        </div>
+      {tab === "calendar" && isProvider && <SellerCalendar orders={selling} />}
+
+      {tab === "selling" && (
+        <OrderCards
+          orders={sellingByVisit}
+          counterpart="buyer"
+          emptyTitle="עדיין אין עבודות סגורות"
+          emptyHint="כשייסגרו איתך ג׳ובים — הם יופיעו כאן עם חלון הביקור"
+        />
+      )}
+
+      {tab === "buying" && (
+        <OrderCards
+          orders={buying}
+          counterpart="seller"
+          emptyTitle="שקט פה. בטח כולם כבר סידרו הכל."
+          emptyHint="כשתזמין אבאל׳ה — ההזמנה תופיע כאן"
+        />
       )}
     </div>
+  );
+}
+
+/** Renders a tab chip used to switch order views. */
+function TabButton({
+  active,
+  onClick,
+  children,
+  icon,
+}: {
+  active: boolean;
+  onClick: () => void;
+  children: React.ReactNode;
+  icon?: React.ReactNode;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-[13px] font-semibold transition-colors ${
+        active
+          ? "bg-[rgb(var(--color-primary))] text-white"
+          : "border border-[rgb(var(--color-border))] text-[rgb(var(--color-text-secondary))] hover:border-[rgb(var(--color-primary))] hover:text-[rgb(var(--color-primary))]"
+      }`}
+    >
+      {icon}
+      {children}
+    </button>
   );
 }

@@ -2,15 +2,38 @@ name: CI
 
 on:
   push:
-    branches: [main, develop]
+    branches: [main, dev, stg, develop, feature/*]
   pull_request:
-    branches: [main, develop]
+    branches: [main, dev, stg, develop]
+  workflow_dispatch:
 
 env:
   REGISTRY: quay.io
   IMAGE_NAME: ${{ secrets.QUAY_USER }}/daddy
 
 jobs:
+  security-audit:
+    name: Dependency Security Audit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Audit BFF dependencies
+        run: npm audit --audit-level=high
+        continue-on-error: true
+      - name: Audit service dependencies
+        run: |
+          for svc in users gigs orders requests chat; do
+            echo "=== Auditing $svc ==="
+            cd services/$svc && npm install && npm audit --audit-level=high || true
+            cd ../..
+          done
+        continue-on-error: true
+
   typecheck-gateway:
     name: Type Check Gateway
     runs-on: ubuntu-latest
@@ -25,13 +48,15 @@ jobs:
         env:
           DATABASE_URL: "postgresql://dummy:dummy@localhost:5432/dummy"
       - run: npx tsc --noEmit
+      - run: npm run lint -- --max-warnings=0
+        continue-on-error: true
 
   typecheck-services:
     name: Type Check Services
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        service: [users, gigs, orders, requests]
+        service: [users, gigs, orders, requests, chat]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -50,11 +75,195 @@ jobs:
       - name: Type check
         run: cd services/${{ matrix.service }} && npx tsc --noEmit
 
+  unit-tests:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npx prisma generate
+        env:
+          DATABASE_URL: "postgresql://dummy:dummy@localhost:5432/dummy"
+      - run: npm run test:unit
+
+  integration-tests:
+    name: System & E2E Tests
+    runs-on: ubuntu-latest
+    needs: [typecheck-gateway, unit-tests]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Generate Prisma client
+        run: npx prisma generate
+        env:
+          DATABASE_URL: "postgresql://dummy:dummy@localhost:5432/dummy"
+
+      - name: Start services with docker-compose
+        run: docker compose -f docker-compose.yml -f docker-compose.ci.yml up -d --build
+        timeout-minutes: 10
+
+      - name: Wait for services to be healthy
+        run: |
+          echo "Waiting for services to be ready..."
+          for port in 4001 4002 4003 4004 4005; do
+            ready=false
+            for i in $(seq 1 30); do
+              if curl -sf http://localhost:$port/health > /dev/null 2>&1; then
+                echo "Service on port $port is ready"
+                ready=true
+                break
+              fi
+              echo "Waiting for port $port... ($i/30)"
+              sleep 2
+            done
+            if [ "$ready" = false ]; then
+              echo "ERROR: Service on port $port did not start in time"
+              docker compose -f docker-compose.yml -f docker-compose.ci.yml logs
+              exit 1
+            fi
+          done
+          echo "Waiting for Redis on port 6379..."
+          redis_ready=false
+          for i in $(seq 1 30); do
+            if docker compose -f docker-compose.yml -f docker-compose.ci.yml exec -T redis redis-cli ping | grep -q PONG; then
+              echo "Redis is ready"
+              redis_ready=true
+              break
+            fi
+            echo "Waiting for Redis... ($i/30)"
+            sleep 2
+          done
+          if [ "$redis_ready" = false ]; then
+            echo "ERROR: Redis did not start in time"
+            docker compose -f docker-compose.yml -f docker-compose.ci.yml logs redis
+            exit 1
+          fi
+
+      - name: Install service dependencies for migrations
+        run: |
+          cd services/shared && npm install && cd ../..
+          for svc in users gigs orders requests chat; do
+            echo "=== Installing deps for $svc ==="
+            cd services/$svc && npm install && cd ../..
+          done
+
+      - name: Run database migrations
+        run: |
+          for svc in users gigs orders requests chat; do
+            DB_MAP=("users:daddy_users" "gigs:daddy_gigs" "orders:daddy_orders" "requests:daddy_requests" "chat:daddy_chat")
+            for pair in "${DB_MAP[@]}"; do
+              key="${pair%%:*}"
+              db="${pair#*:}"
+              if [ "$key" = "$svc" ]; then
+                cd services/$svc
+                echo "=== Pushing schema for $svc ($db) ==="
+                DATABASE_URL="postgresql://daddy:daddypass123@localhost:5432/$db" npx prisma db push --accept-data-loss
+                cd ../..
+              fi
+            done
+          done
+
+      - name: Generate Prisma clients and seed databases
+        run: |
+          for svc in users gigs orders requests chat; do
+            DB_MAP=("users:daddy_users" "gigs:daddy_gigs" "orders:daddy_orders" "requests:daddy_requests" "chat:daddy_chat")
+            for pair in "${DB_MAP[@]}"; do
+              key="${pair%%:*}"
+              db="${pair#*:}"
+              if [ "$key" = "$svc" ]; then
+                cd services/$svc
+                echo "=== Generating Prisma client for $svc ==="
+                DATABASE_URL="postgresql://daddy:daddypass123@localhost:5432/$db" npx prisma generate
+                cd ../..
+                echo "=== Seeding $svc ($db) ==="
+                DATABASE_URL="postgresql://daddy:daddypass123@localhost:5432/$db" npx tsx services/$svc/src/seed.ts || true
+              fi
+            done
+          done
+
+      - name: Verify services respond after migrations
+        run: |
+          echo "=== Smoke-testing services ==="
+          for port in 4001 4002 4003 4004 4005; do
+            status=$(curl -s -o /dev/null -w '%{http_code}' http://localhost:$port/health)
+            echo "Port $port health: $status"
+          done
+
+      - name: Build and start Next.js app
+        run: |
+          npm run build
+          npm start &
+          echo "Waiting for Next.js on port 3000..."
+          for i in $(seq 1 30); do
+            if curl -sf http://localhost:3000 > /dev/null 2>&1; then
+              echo "Next.js is ready"
+              break
+            fi
+            sleep 2
+          done
+        env:
+          DATABASE_URL: "postgresql://daddy:daddypass123@localhost:5432/daddy_users"
+          AUTH_SECRET: "ci-test-secret-at-least-32-characters-long"
+          AUTH_URL: "http://localhost:3000"
+          NEXT_PUBLIC_BASE_URL: "http://localhost:3000"
+          AUTH_TRUST_HOST: "true"
+          REDIS_URL: "redis://localhost:6379"
+          RATE_LIMIT_AUTH: "200"
+          RATE_LIMIT_POST: "200"
+          RATE_LIMIT_DEFAULT: "2000"
+          GOOGLE_CLIENT_ID: "test-google-client-id"
+          GOOGLE_CLIENT_SECRET: "test-google-client-secret"
+          USERS_SERVICE_URL: "http://localhost:4001"
+          GIGS_SERVICE_URL: "http://localhost:4002"
+          ORDERS_SERVICE_URL: "http://localhost:4003"
+          REQUESTS_SERVICE_URL: "http://localhost:4004"
+          CHAT_SERVICE_URL: "http://localhost:4005"
+
+      - name: Run system tests
+        run: npm run test:system
+        env:
+          TEST_BASE_URL: "http://localhost:3000"
+
+      - name: Install Playwright browsers
+        run: npx playwright install chromium
+
+      - name: Run E2E tests
+        run: npm run test:e2e
+        env:
+          E2E_BASE_URL: "http://localhost:3000"
+
+      - name: Show docker logs on failure
+        if: failure()
+        run: docker compose -f docker-compose.yml -f docker-compose.ci.yml logs --tail=100
+
+      - name: Stop services
+        if: always()
+        run: docker compose -f docker-compose.yml -f docker-compose.ci.yml down
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-results
+          path: |
+            test-results/
+          retention-days: 7
+
   build-and-push:
     name: Build & Push Images
     runs-on: ubuntu-latest
-    needs: [typecheck-gateway, typecheck-services]
-    if: github.event_name == 'push'
+    needs: [typecheck-gateway, typecheck-services, unit-tests, integration-tests]
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/stg' || github.ref == 'refs/heads/main')
     permissions:
       contents: read
     strategy:
@@ -74,6 +283,9 @@ jobs:
             context: .
           - service: requests-service
             dockerfile: services/requests/Dockerfile
+            context: .
+          - service: chat-service
+            dockerfile: services/chat/Dockerfile
             context: .
     steps:
       - uses: actions/checkout@v4
@@ -99,8 +311,8 @@ jobs:
           file: ${{ matrix.dockerfile }}
           push: true
           tags: |
-            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-${{ matrix.service }}:latest
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-${{ matrix.service }}:${{ steps.tag.outputs.sha }}
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-${{ matrix.service }}:${{ github.ref_name }}
           cache-from: type=gha,scope=${{ matrix.service }}
           cache-to: type=gha,mode=max,scope=${{ matrix.service }}
 
@@ -108,12 +320,13 @@ jobs:
     name: Update GitOps Manifests
     runs-on: ubuntu-latest
     needs: [build-and-push]
-    if: github.event_name == 'push'
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/stg' || github.ref == 'refs/heads/main')
     permissions:
       contents: write
     steps:
       - uses: actions/checkout@v4
         with:
+          ref: ${{ github.ref_name }}
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Update image tags
@@ -125,7 +338,7 @@ jobs:
           sed -i "s|image: .*daddy-app:.*|image: ${BASE}-app:${SHORT_SHA}|g" gitops/base/app-deployment.yaml
 
           # Update service deployments
-          for svc in users gigs orders requests; do
+          for svc in users gigs orders requests chat; do
             sed -i "s|image: .*daddy-${svc}-service:.*|image: ${BASE}-${svc}-service:${SHORT_SHA}|g" gitops/base/${svc}-deployment.yaml
           done
 
@@ -134,5 +347,15 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add gitops/
-          git diff --cached --quiet || git commit -m "chore: update images to ${GITHUB_SHA::8}"
-          git push
+          if git diff --cached --quiet; then
+            echo "No gitops changes to commit"
+            exit 0
+          fi
+          git commit -m "chore: update images to ${GITHUB_SHA::8}"
+          for i in 1 2 3; do
+            git pull --rebase origin ${{ github.ref_name }} && git push && exit 0
+            echo "Push attempt $i failed, retrying..."
+            sleep 2
+          done
+          echo "Failed to push after 3 attempts"
+          exit 1

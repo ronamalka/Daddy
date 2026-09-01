@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: requests-service
-          image: quay.io/rh_ee_rmalka/daddy-requests-service:d577865b
+          image: quay.io/rh_ee_rmalka/daddy-requests-service:de499632
           ports:
             - containerPort: 4004
           env:
@@ -28,6 +28,11 @@ spec:
                 secretKeyRef:
                   name: postgres-secret
                   key: REQUESTS_DATABASE_URL
+            - name: INTER_SERVICE_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: daddy-app-secret
+                  key: INTER_SERVICE_SECRET
           resources:
             requests:
               memory: "64Mi"

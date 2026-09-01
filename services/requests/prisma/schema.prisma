@@ -13,6 +13,12 @@ enum RequestStatus {
   CLOSED
 }
 
+enum PreferredWindow {
+  MORNING
+  AFTERNOON
+  WEEKEND
+}
+
 model ServiceRequest {
   id           String        @id @default(cuid())
   title        String
@@ -23,24 +29,38 @@ model ServiceRequest {
   districtName String?
   cityCode     Int?
   cityName     String?
-  status       RequestStatus @default(OPEN)
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
+  street             String?
+  floor              String?
+  preferredWindow    PreferredWindow?
+  photos             String[]        @default([])
+  status             RequestStatus @default(OPEN)
+  unlisted           Boolean       @default(false)
+  slotStart          DateTime?
+  slotEnd            DateTime?
+  selectedResponseId String?
+  orderId            String?
+  createdAt          DateTime      @default(now())
+  updatedAt          DateTime      @updatedAt
 
   responses RequestResponse[]
 
   @@index([buyerId])
   @@index([status])
   @@index([districtCode])
+  @@index([status, unlisted, createdAt])
 }
 
 model RequestResponse {
-  id            String   @id @default(cuid())
-  requestId     String
-  sellerId      String   // cross-service ref to users-service
-  message       String
-  proposedPrice Float?
-  createdAt     DateTime @default(now())
+  id                     String   @id @default(cuid())
+  requestId              String
+  sellerId               String   // cross-service ref to users-service
+  message                String
+  proposedPrice          Float?
+  laborPrice             Float?
+  materialsEstimate      Float?
+  buyerSuppliesMaterials Boolean  @default(true)
+  selected               Boolean  @default(false)
+  createdAt              DateTime @default(now())
 
   request ServiceRequest @relation(fields: [requestId], references: [id], onDelete: Cascade)
 

@@ -17,6 +17,8 @@ RUN npx prisma generate
 
 ENV DATABASE_URL="postgresql://build:build@localhost:5432/build"
 ENV AUTH_SECRET="build-time-placeholder-at-least-32-chars-long"
+ENV NEXT_TELEMETRY_DISABLED=1
+ENV NODE_OPTIONS="--max-old-space-size=2048"
 RUN npm run build
 
 # --- Runner ---
@@ -41,7 +43,13 @@ COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
 COPY --from=deps --chown=nextjs:nodejs /app/node_modules ./node_modules
 
-USER nextjs
+# OpenShift assigns a random UID in group 0. The image optimizer writes
+# .next/cache at runtime, so the tree must be group-writable.
+RUN mkdir -p /app/.next/cache \
+  && chgrp -R 0 /app \
+  && chmod -R g+rwX /app
+
+USER 1001
 
 EXPOSE 3000
 ENV PORT=3000

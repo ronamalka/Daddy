@@ -1,9 +1,9 @@
 import express from "express";
-import cors from "cors";
 import pg from "pg";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "./generated/prisma/client";
 import { extractUser } from "../../shared/middleware";
+import { applySecurity, generalRateLimit } from "../../shared/security";
 import { gigsRoutes } from "./routes/gigs";
 import { gigDetailRoutes } from "./routes/gig-detail";
 import { favoritesRoutes } from "./routes/favorites";
@@ -16,10 +16,12 @@ export const prisma = new PrismaClient({ adapter });
 const app = express();
 const PORT = Number(process.env.PORT) || 4002;
 
-app.use(cors());
-app.use(express.json());
+applySecurity(app);
+app.use(express.json({ limit: "1mb" }));
 app.use(extractUser);
+app.use(generalRateLimit);
 
+/** Return a simple OK so other systems know the gigs service is running. */
 app.get("/health", (_req, res) => {
   res.json({ status: "ok", service: "gigs" });
 });
@@ -30,6 +32,7 @@ app.use("/favorites", favoritesRoutes);
 app.use("/reviews", reviewsRoutes);
 app.use("/recent-reviews", recentReviewsRoutes);
 
+/** Start the gigs HTTP server. */
 app.listen(PORT, "0.0.0.0", () => {
   console.log(`Gigs service running on port ${PORT}`);
 });

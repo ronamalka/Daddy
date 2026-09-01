@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { proxyRequest, USERS_SERVICE, GIGS_SERVICE, ORDERS_SERVICE } from "@/lib/gateway";
 
+/** Returns site-wide user, gig, order, and revenue counts. Admins only. */
 export async function GET() {
   const session = await auth();
   if (!session?.user || (session.user as { role: string }).role !== "ADMIN") {
@@ -17,9 +18,9 @@ export async function GET() {
   ]);
 
   return NextResponse.json({
-    users: usersRes.data.users || 0,
-    gigs: gigsRes.data.gigs || 0,
-    orders: ordersRes.data.orders || 0,
-    revenue: ordersRes.data.revenue || 0,
+    users: usersRes.data?.users || 0,
+    gigs: gigsRes.data?.gigs || 0,
+    orders: ordersRes.data?.orders || 0,
+    revenue: ordersRes.data?.revenue || 0,
   });
 }

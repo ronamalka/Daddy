@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ip-blocklist
+  namespace: daddy
+  labels:
+    app.kubernetes.io/part-of: daddy
+data:
+  blocklist.conf: |
+    # IP Blocklist for known bad actors
+    # Add IPs or CIDR ranges one per line
+    # Reload: oc rollout restart deployment/ingress-nginx-controller -n ingress-nginx
+    #
+    # deny 1.2.3.4;
+    # deny 10.0.0.0/8;

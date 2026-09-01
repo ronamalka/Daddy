@@ -1,8 +1,11 @@
 import "next-auth";
+import "next-auth/jwt";
 
 declare module "next-auth" {
   interface User {
     role?: string;
+    weakPassword?: boolean;
+    hasPassword?: boolean;
   }
   interface Session {
     user: {
@@ -10,6 +13,18 @@ declare module "next-auth" {
       name: string;
       email: string;
       role: string;
+      weakPassword?: boolean;
+      hasPassword?: boolean;
     };
+  }
+}
+
+declare module "next-auth/jwt" {
+  interface JWT {
+    id?: string;
+    role?: string;
+    weakPassword?: boolean;
+    hasPassword?: boolean;
+    jti?: string;
   }
 }

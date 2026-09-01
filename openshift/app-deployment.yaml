@@ -16,9 +16,18 @@ spec:
       labels:
         app: daddy-app
     spec:
+      serviceAccountName: daddy-app
+      automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true
       containers:
         - name: daddy-app
           image: IMAGE_REGISTRY/daddy:latest
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: ["ALL"]
           ports:
             - containerPort: 3000
           env:
@@ -37,6 +46,33 @@ spec:
                 secretKeyRef:
                   name: daddy-app-secret
                   key: AUTH_URL
+            - name: AUTH_TRUST_HOST
+              value: "true"
+            - name: GOOGLE_CLIENT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: daddy-app-secret
+                  key: GOOGLE_CLIENT_ID
+            - name: GOOGLE_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: daddy-app-secret
+                  key: GOOGLE_CLIENT_SECRET
+            - name: REDIS_URL
+              valueFrom:
+                secretKeyRef:
+                  name: daddy-app-secret
+                  key: REDIS_URL
+            - name: INTER_SERVICE_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: daddy-app-secret
+                  key: INTER_SERVICE_SECRET
+          volumeMounts:
+            - name: tmp
+              mountPath: /tmp
+            - name: next-cache
+              mountPath: /app/.next/cache
           resources:
             requests:
               memory: "256Mi"
@@ -58,3 +94,8 @@ spec:
             initialDelaySeconds: 5
             periodSeconds: 5
             timeoutSeconds: 3
+      volumes:
+        - name: tmp
+          emptyDir: {}
+        - name: next-cache
+          emptyDir: {}

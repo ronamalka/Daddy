@@ -1,8 +1,12 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { proxyRequest, GIGS_SERVICE, ORDERS_SERVICE } from "@/lib/gateway";
+import { verifyTurnstileToken } from "@/lib/turnstile";
+import { detectBot } from "@/lib/bot-detection";
+import { areTenPointCriteria, overallFromCriteria } from "@/lib/review-ratings";
 
-export async function POST(request: Request, { params }: { params: Promise<{ id: string }> }) {
+/** Submits a buyer review for a completed order after bot and CAPTCHA checks. */
+export async function POST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id: orderId } = await params;
   const session = await auth();
   if (!session?.user) {
@@ -25,10 +29,46 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
     return NextResponse.json({ error: "Order must be completed" }, { status: 400 });
   }
 
-  const { comment, ratingAttitude, ratingTimeliness, ratingPrice, ratingQuality } = await request.json();
+  const body = await request.json();
+
+  const botCheck = detectBot({
+    honeypot: body._hp_field,
+    formLoadedAt: body._formLoadedAt,
+    headers: request.headers,
+  });
+
+  if (botCheck.isBot) {
+    console.warn(`[bot-detection] Review blocked: ${botCheck.reason}`);
+    return NextResponse.json(
+      { error: "הבקשה נחסמה. נסה שוב." },
+      { status: 400 }
+    );
+  }
+
+  if (body.turnstileToken) {
+    const ip = request.headers.get("x-forwarded-for")?.split(",")[0].trim();
+    const valid = await verifyTurnstileToken(body.turnstileToken, ip);
+    if (!valid) {
+      return NextResponse.json(
+        { error: "אימות CAPTCHA נכשל. נסה שוב." },
+        { status: 400 }
+      );
+    }
+  } else if (process.env.TURNSTILE_SECRET_KEY) {
+    return NextResponse.json(
+      { error: "אימות CAPTCHA חסר." },
+      { status: 400 }
+    );
+  }
+
+  const { comment, ratingAttitude, ratingTimeliness, ratingPrice, ratingQuality } = body;
 
   if (!comment?.trim()) {
     return NextResponse.json({ error: "Comment is required" }, { status: 400 });
+  }
+
+  if (!order.sellerId) {
+    return NextResponse.json({ error: "Order is missing a seller" }, { status: 400 });
   }
 
   const attitude = Number(ratingAttitude);
@@ -36,17 +76,18 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
   const price = Number(ratingPrice);
   const quality = Number(ratingQuality);
 
-  if ([attitude, timeliness, price, quality].some((v) => !v || v < 1 || v > 10)) {
+  if (!areTenPointCriteria(attitude, timeliness, price, quality)) {
     return NextResponse.json({ error: "All ratings must be between 1 and 10" }, { status: 400 });
   }
 
-  const overall = Math.round((attitude + timeliness + price + quality) / 4);
+  const overall = overallFromCriteria(attitude, timeliness, price, quality);
 
   const { data, status } = await proxyRequest(GIGS_SERVICE, "/reviews", {
     method: "POST",
     body: {
       orderId,
-      gigId: order.gigId,
+      gigId: order.gigId || null,
+      sellerId: order.sellerId,
       rating: overall,
       comment,
       ratingAttitude: attitude,

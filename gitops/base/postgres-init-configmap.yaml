@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: postgres-init
+  labels:
+    app: postgres
+    app.kubernetes.io/part-of: daddy
+data:
+  01-init-databases.sql: |
+    CREATE DATABASE daddy_users;
+    CREATE DATABASE daddy_gigs;
+    CREATE DATABASE daddy_orders;
+    CREATE DATABASE daddy_requests;
+    CREATE DATABASE daddy_chat;

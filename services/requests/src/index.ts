@@ -1,9 +1,9 @@
 import express from "express";
-import cors from "cors";
 import pg from "pg";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "./generated/prisma/client";
 import { extractUser } from "../../shared/middleware";
+import { applySecurity, generalRateLimit } from "../../shared/security";
 import { serviceRequestsRoutes } from "./routes/service-requests";
 
 const pool = new pg.Pool({ connectionString: process.env.DATABASE_URL });
@@ -12,16 +12,19 @@ export const prisma = new PrismaClient({ adapter });
 const app = express();
 const PORT = Number(process.env.PORT) || 4004;
 
-app.use(cors());
-app.use(express.json());
+applySecurity(app);
+app.use(express.json({ limit: "1mb" }));
 app.use(extractUser);
+app.use(generalRateLimit);
 
+/** Return a simple OK so other systems know the requests service is running. */
 app.get("/health", (_req, res) => {
   res.json({ status: "ok", service: "requests" });
 });
 
 app.use("/service-requests", serviceRequestsRoutes);
 
+/** Start the requests HTTP server. */
 app.listen(PORT, "0.0.0.0", () => {
   console.log(`Requests service running on port ${PORT}`);
 });

@@ -1,31 +1,17 @@
 import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "../src/generated/prisma/client";
 import { hash } from "bcryptjs";
+import { syncLocalGigCategories } from "../services/shared/gig-categories";
 
 const directUrl = process.env.SEED_DATABASE_URL || process.env.DATABASE_URL || "postgres://daddy:daddypass123@localhost:51214/daddy?sslmode=disable";
 const adapter = new PrismaPg({ connectionString: directUrl });
 const prisma = new PrismaClient({ adapter });
 
+/** Loads demo categories, users, gigs, and related rows into the BFF database. */
 async function main() {
-  const categories = [
-    { name: "תיקונים ותחזוקת הבית", slug: "home-maintenance" },
-    { name: "רכב ותחבורה", slug: "car-transport" },
-    { name: "מיקוח ובירוקרטיה", slug: "negotiation-bureaucracy" },
-    { name: "גינון, חצר וארגון", slug: "garden-yard" },
-    { name: "ייעוץ, הדרכה וסיוע אישי", slug: "consulting-training" },
-    { name: "הובלות ושינוע", slug: "moving-lifting" },
-    { name: "טכנולוגיה ומחשבים", slug: "tech-support" },
-  ];
+  await syncLocalGigCategories(prisma);
 
-  for (const cat of categories) {
-    await prisma.category.upsert({
-      where: { slug: cat.slug },
-      update: { name: cat.name },
-      create: cat,
-    });
-  }
-
-  // Clean up old categories from previous seed
+  // Clean up leftover Fiverr-era digital categories from previous seed
   const oldSlugs = ["graphics-design", "programming-tech", "digital-marketing", "video-animation", "writing-translation", "music-audio", "business"];
   for (const slug of oldSlugs) {
     const old = await prisma.category.findUnique({ where: { slug } });
@@ -47,38 +33,38 @@ async function main() {
 
   const seller = await prisma.user.upsert({
     where: { email: "seller@daddy.com" },
-    update: { bio: "אבא של 3, מתקן הכל מגיל 15. אם זה שבור – אני מסדר.", city: "תל אביב", districtCode: 5, cityCode: 5000 },
-    create: { name: "יוסי הגולדן", email: "seller@daddy.com", passwordHash, role: "SELLER", bio: "אבא של 3, מתקן הכל מגיל 15. אם זה שבור – אני מסדר.", city: "תל אביב", districtCode: 5, cityCode: 5000 },
+    update: { bio: "אבא של 3, מתקן הכל מגיל 15. אם זה שבור – אני מסדר.", city: "תל אביב", districtCode: 5, cityCode: 5000, phone: "050-1111111", avatar: "https://ui-avatars.com/api/?name=Yossi&background=0F766E&color=fff&size=128" },
+    create: { name: "יוסי הגולדן", email: "seller@daddy.com", passwordHash, role: "SELLER", bio: "אבא של 3, מתקן הכל מגיל 15. אם זה שבור – אני מסדר.", city: "תל אביב", districtCode: 5, cityCode: 5000, phone: "050-1111111", avatar: "https://ui-avatars.com/api/?name=Yossi&background=0F766E&color=fff&size=128" },
   });
 
   const seller2 = await prisma.user.upsert({
     where: { email: "seller2@daddy.com" },
-    update: { bio: "טכנאי רכב לשעבר, היום אבא במשרה מלאה שעוזר לכולם.", city: "חיפה", districtCode: 3, cityCode: 4000 },
-    create: { name: "אבי המתקן", email: "seller2@daddy.com", passwordHash, role: "SELLER", bio: "טכנאי רכב לשעבר, היום אבא במשרה מלאה שעוזר לכולם.", city: "חיפה", districtCode: 3, cityCode: 4000 },
+    update: { bio: "טכנאי רכב לשעבר, היום אבא במשרה מלאה שעוזר לכולם.", city: "חיפה", districtCode: 3, cityCode: 4000, phone: "050-2222222", avatar: "https://ui-avatars.com/api/?name=Avi&background=0F766E&color=fff&size=128" },
+    create: { name: "אבי המתקן", email: "seller2@daddy.com", passwordHash, role: "SELLER", bio: "טכנאי רכב לשעבר, היום אבא במשרה מלאה שעוזר לכולם.", city: "חיפה", districtCode: 3, cityCode: 4000, phone: "050-2222222", avatar: "https://ui-avatars.com/api/?name=Avi&background=0F766E&color=fff&size=128" },
   });
 
   const seller3 = await prisma.user.upsert({
     where: { email: "seller3@daddy.com" },
-    update: { bio: "מהנדס תוכנה ביום, אבאל׳ה בערב. מתמחה בטכנולוגיה, רשתות וסמארט הום.", city: "ראשון לציון", districtCode: 4, cityCode: 8300 },
-    create: { name: "דן הטכנולוג", email: "seller3@daddy.com", passwordHash, role: "SELLER", bio: "מהנדס תוכנה ביום, אבאל׳ה בערב. מתמחה בטכנולוגיה, רשתות וסמארט הום.", city: "ראשון לציון", districtCode: 4, cityCode: 8300 },
+    update: { bio: "מהנדס תוכנה ביום, אבאל׳ה בערב. מתמחה בטכנולוגיה, רשתות וסמארט הום.", city: "ראשון לציון", districtCode: 4, cityCode: 8300, phone: "050-3333333", avatar: "https://ui-avatars.com/api/?name=Dan&background=0F766E&color=fff&size=128" },
+    create: { name: "דן הטכנולוג", email: "seller3@daddy.com", passwordHash, role: "SELLER", bio: "מהנדס תוכנה ביום, אבאל׳ה בערב. מתמחה בטכנולוגיה, רשתות וסמארט הום.", city: "ראשון לציון", districtCode: 4, cityCode: 8300, phone: "050-3333333", avatar: "https://ui-avatars.com/api/?name=Dan&background=0F766E&color=fff&size=128" },
   });
 
   const seller4 = await prisma.user.upsert({
     where: { email: "seller4@daddy.com" },
-    update: { bio: "אבא של 4, יד ימין לכל שכן. הרכבות, תיקונים, הובלות – הכל בחיוך.", city: "באר שבע", districtCode: 6, cityCode: 9000 },
-    create: { name: "משה הכל-יכול", email: "seller4@daddy.com", passwordHash, role: "SELLER", bio: "אבא של 4, יד ימין לכל שכן. הרכבות, תיקונים, הובלות – הכל בחיוך.", city: "באר שבע", districtCode: 6, cityCode: 9000 },
+    update: { bio: "אבא של 4, יד ימין לכל שכן. הרכבות, תיקונים, הובלות – הכל בחיוך.", city: "באר שבע", districtCode: 6, cityCode: 9000, phone: "050-4444444", avatar: "https://ui-avatars.com/api/?name=Moshe&background=0F766E&color=fff&size=128" },
+    create: { name: "משה הכל-יכול", email: "seller4@daddy.com", passwordHash, role: "SELLER", bio: "אבא של 4, יד ימין לכל שכן. הרכבות, תיקונים, הובלות – הכל בחיוך.", city: "באר שבע", districtCode: 6, cityCode: 9000, phone: "050-4444444", avatar: "https://ui-avatars.com/api/?name=Moshe&background=0F766E&color=fff&size=128" },
   });
 
   const seller5 = await prisma.user.upsert({
     where: { email: "seller5@daddy.com" },
-    update: { bio: "גנן חובב שהפך למקצוען. מטפל בגינות, מרפסות וחצרות ברחבי השרון.", city: "נתניה", districtCode: 4, cityCode: 7400 },
-    create: { name: "ערן הגנן", email: "seller5@daddy.com", passwordHash, role: "SELLER", bio: "גנן חובב שהפך למקצוען. מטפל בגינות, מרפסות וחצרות ברחבי השרון.", city: "נתניה", districtCode: 4, cityCode: 7400 },
+    update: { bio: "גנן חובב שהפך למקצוען. מטפל בגינות, מרפסות וחצרות ברחבי השרון.", city: "נתניה", districtCode: 4, cityCode: 7400, phone: "050-5555555", avatar: "https://ui-avatars.com/api/?name=Eran&background=0F766E&color=fff&size=128" },
+    create: { name: "ערן הגנן", email: "seller5@daddy.com", passwordHash, role: "SELLER", bio: "גנן חובב שהפך למקצוען. מטפל בגינות, מרפסות וחצרות ברחבי השרון.", city: "נתניה", districtCode: 4, cityCode: 7400, phone: "050-5555555", avatar: "https://ui-avatars.com/api/?name=Eran&background=0F766E&color=fff&size=128" },
   });
 
   const seller6 = await prisma.user.upsert({
     where: { email: "seller6@daddy.com" },
-    update: { bio: "20 שנה בתחום הביטוח והתקשורת. חוסך לאנשים אלפי שקלים בשנה.", city: "ירושלים", districtCode: 1, cityCode: 3000 },
-    create: { name: "רועי החוסך", email: "seller6@daddy.com", passwordHash, role: "SELLER", bio: "20 שנה בתחום הביטוח והתקשורת. חוסך לאנשים אלפי שקלים בשנה.", city: "ירושלים", districtCode: 1, cityCode: 3000 },
+    update: { bio: "20 שנה בתחום הביטוח והתקשורת. חוסך לאנשים אלפי שקלים בשנה.", city: "ירושלים", districtCode: 1, cityCode: 3000, phone: "050-6666666", avatar: "https://ui-avatars.com/api/?name=Roy&background=0F766E&color=fff&size=128" },
+    create: { name: "רועי החוסך", email: "seller6@daddy.com", passwordHash, role: "SELLER", bio: "20 שנה בתחום הביטוח והתקשורת. חוסך לאנשים אלפי שקלים בשנה.", city: "ירושלים", districtCode: 1, cityCode: 3000, phone: "050-6666666", avatar: "https://ui-avatars.com/api/?name=Roy&background=0F766E&color=fff&size=128" },
   });
 
   const buyer = await prisma.user.upsert({
@@ -186,24 +172,24 @@ async function main() {
 
   // ── Gigs ───────────────────────────────────────────────
 
+  const assemblyCat = await prisma.category.findUnique({ where: { slug: "assembly-and-installation" } });
   const homeCat = await prisma.category.findUnique({ where: { slug: "home-maintenance" } });
-  const carCat = await prisma.category.findUnique({ where: { slug: "car-transport" } });
-  const negoCat = await prisma.category.findUnique({ where: { slug: "negotiation-bureaucracy" } });
-  const gardenCat = await prisma.category.findUnique({ where: { slug: "garden-yard" } });
+  const carCat = await prisma.category.findUnique({ where: { slug: "car-and-errands" } });
+  const negoCat = await prisma.category.findUnique({ where: { slug: "admin-and-bureaucracy" } });
+  const gardenCat = await prisma.category.findUnique({ where: { slug: "garden-and-outdoor" } });
   const techCat = await prisma.category.findUnique({ where: { slug: "tech-support" } });
-  const moveCat = await prisma.category.findUnique({ where: { slug: "moving-lifting" } });
-  const consultCat = await prisma.category.findUnique({ where: { slug: "consulting-training" } });
+  const moveCat = await prisma.category.findUnique({ where: { slug: "moving-and-organization" } });
 
   await prisma.gig.deleteMany({ where: { id: { in: ["seed-gig-1", "seed-gig-2"] } } });
 
-  if (homeCat) {
+  if (assemblyCat) {
     await prisma.gig.upsert({
       where: { id: "seed-gig-ikea" },
       update: {},
       create: {
         id: "seed-gig-ikea", title: "הרכבת רהיטי איקאה – מהקופסה לסלון",
         description: "מרכיב כל רהיט מאיקאה – ארונות, מיטות, שידות, מטבחים. מגיע עם כלים, מרכיב במקום, מפנה את הקרטונים.",
-        categoryId: homeCat.id, sellerId: seller.id,
+        categoryId: assemblyCat.id, sellerId: seller.id,
         tiers: { create: [
           { tier: "BASIC", title: "רהיט קטן", description: "שידה, כוננית או שולחן קטן", price: 150, deliveryDays: 1, revisions: 1 },
           { tier: "STANDARD", title: "רהיט בינוני", description: "ארון בגדים, מיטה זוגית", price: 300, deliveryDays: 1, revisions: 1 },
@@ -218,7 +204,7 @@ async function main() {
       create: {
         id: "seed-gig-handyman", title: "תליית מדפים, תמונות, וילונות וזרועות טלוויזיה",
         description: "תולה הכל ישר ובטוח – מדפים, מראות, תמונות, וילונות, זרועות לטלוויזיה. קידוח מקצועי בכל סוג קיר.",
-        categoryId: homeCat.id, sellerId: seller.id,
+        categoryId: assemblyCat.id, sellerId: seller.id,
         tiers: { create: [
           { tier: "BASIC", title: "פריט בודד", description: "תליית תמונה, מדף או מראה", price: 100, deliveryDays: 1, revisions: 1 },
           { tier: "STANDARD", title: "עד 5 פריטים", description: "תליית מספר פריטים באותו ביקור", price: 250, deliveryDays: 1, revisions: 1 },
@@ -234,7 +220,7 @@ async function main() {
       create: {
         id: "seed-gig-moshe-assembly", title: "הרכבת רהיטים ומדפים – באר שבע והסביבה",
         description: "מרכיב כל דבר: ארונות, מיטות, מדפים, פרגולות. מגיע עם כלים ומניסיון של 15 שנה.",
-        categoryId: homeCat.id, sellerId: seller4.id,
+        categoryId: assemblyCat.id, sellerId: seller4.id,
         tiers: { create: [
           { tier: "BASIC", title: "רהיט קטן", description: "שידה, כוננית, שולחן", price: 130, deliveryDays: 1, revisions: 1 },
           { tier: "STANDARD", title: "2-3 רהיטים", description: "ארון + מיטה + שידות", price: 350, deliveryDays: 1, revisions: 1 },
@@ -390,14 +376,14 @@ async function main() {
     });
   }
 
-  if (consultCat) {
+  if (homeCat) {
     await prisma.gig.upsert({
       where: { id: "seed-gig-diy" },
       update: {},
       create: {
         id: "seed-gig-diy", title: "שיעור DIY פרטי – לקדוח, לתקן, לבדוק נזילות",
         description: "שעה של הדרכה אישית בבית. לומדים לקדוח, לתלות, להשתמש בכלי עבודה בסיסיים.",
-        categoryId: consultCat.id, sellerId: seller.id,
+        categoryId: homeCat.id, sellerId: seller.id,
         tiers: { create: [
           { tier: "BASIC", title: "שיעור שעה", description: "הדרכה של שעה בנושא אחד", price: 150, deliveryDays: 1, revisions: 1 },
           { tier: "STANDARD", title: "שיעור + תרגול", description: "שעתיים – הסבר + תרגול", price: 280, deliveryDays: 1, revisions: 1 },
@@ -412,7 +398,7 @@ async function main() {
       create: {
         id: "seed-gig-apartment", title: "בדיקת דירה לפני מעבר – לא חותמים לפני שאני בודק",
         description: "מגיע לדירה שכורה או חדשה ובודק הכל: שקעים, לחץ מים, רטיבות, צירים, חלונות.",
-        categoryId: consultCat.id, sellerId: seller2.id,
+        categoryId: homeCat.id, sellerId: seller2.id,
         tiers: { create: [
           { tier: "BASIC", title: "בדיקה בסיסית", description: "בדיקת מים, חשמל וצירים", price: 200, deliveryDays: 1, revisions: 1 },
           { tier: "STANDARD", title: "בדיקה מקיפה", description: "בדיקה מלאה + דו״ח עם תמונות", price: 350, deliveryDays: 1, revisions: 1 },
@@ -438,6 +424,8 @@ async function main() {
       },
     });
   }
+
+  await syncLocalGigCategories(prisma);
 
   // ── Orders + Reviews (with 4-dimension ratings) ────────
 
@@ -508,6 +496,7 @@ async function main() {
           id: rev.id,
           orderId: rev.orderId,
           gigId: rev.gigId,
+          sellerId: rev.sellerId,
           userId: rev.buyerId,
           rating: overall,
           comment: rev.comment,
@@ -523,7 +512,7 @@ async function main() {
   // ── Service Requests ───────────────────────────────────
 
   const requests = [
-    { id: "sreq-1", title: "צריך עזרה בהרכבת ארון גדול", description: "קניתי ארון PAX 3 דלתות מאיקאה ואין לי כלים או ידע להרכיב. גר בתל אביב, צריך מישהו שיגיע השבוע.", serviceSlug: "furniture-assembly", buyerId: buyer.id, districtCode: 5, districtName: "תל אביב" },
+    { id: "sreq-1", title: "צריך עזרה בהרכבת ארון גדול", description: "קניתי ארון PAX 3 דלתות מאיקאה ואין לי כלים או ידע להרכיב. גר בתל אביב, צריך מישהו שיגיע השבוע.", serviceSlug: "furniture-assembly", buyerId: buyer.id, districtCode: 5, districtName: "תל אביב", street: "הרצל 12", floor: "3", preferredWindow: "MORNING" as const },
     { id: "sreq-2", title: "WiFi חלש בחדרים – צריך פתרון", description: "הראוטר בסלון ובחדרי השינה כמעט אין אינטרנט. צריך מישהו שיגדיר mesh או מאריך טווח.", serviceSlug: "wifi-setup", buyerId: buyer2.id, districtCode: 3, districtName: "חיפה" },
     { id: "sreq-3", title: "גיזום עצים ושיחים – חצר גדולה", description: "חצר של 200 מ״ר עם 3 עצי זית ושיחים שצריך לגזום. צריך מישהו עם ניסיון וכלים.", serviceSlug: "tree-pruning", buyerId: buyer3.id, districtCode: 1, districtName: "ירושלים" },
   ];

@@ -1,13 +1,19 @@
 "use client";
 
+import { Check } from "@phosphor-icons/react";
 import { SERVICE_CATEGORIES } from "@/lib/services";
+import { CategoryIcon } from "@/components/ui/category-icon";
+import { cn } from "@/lib/utils";
+import { REGULATED_SERVICE_SLUGS, REGULATED_SERVICE_WARNING } from "@/lib/legal";
 
 interface ServicePickerProps {
   selected: string[];
   onChange: (services: string[]) => void;
 }
 
+/** Lets a seller pick the service types they offer, by category. */
 export function ServicePicker({ selected, onChange }: ServicePickerProps) {
+  /** Adds or removes one service from the selection. */
   function toggle(slug: string) {
     if (selected.includes(slug)) {
       onChange(selected.filter((s) => s !== slug));
@@ -16,6 +22,7 @@ export function ServicePicker({ selected, onChange }: ServicePickerProps) {
     }
   }
 
+  /** Selects or clears every service in a category. */
   function toggleCategory(categorySlug: string) {
     const cat = SERVICE_CATEGORIES.find((c) => c.slug === categorySlug);
     if (!cat) return;
@@ -37,39 +44,36 @@ export function ServicePicker({ selected, onChange }: ServicePickerProps) {
         const allInCat = selectedInCat === catSlugs.length;
 
         return (
-          <div key={cat.slug} className="rounded-[12px] border border-[#E8ECF1] bg-white overflow-hidden">
+          <div key={cat.slug} className="rounded-xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] overflow-hidden">
             <button
               type="button"
               onClick={() => toggleCategory(cat.slug)}
-              className="flex w-full items-center justify-between px-4 py-3 text-right hover:bg-[#FAFBFF] transition-colors"
+              className="flex w-full items-center justify-between px-4 py-3 text-right hover:bg-[rgb(var(--color-surface-elevated))] transition-colors"
             >
               <div className="flex items-center gap-2.5">
-                <span className="text-[18px]">{cat.icon}</span>
-                <span className="text-[14px] font-semibold text-[#2D3436]">{cat.nameHe}</span>
+                <CategoryIcon slug={cat.slug} className="h-5 w-5 text-[rgb(var(--color-primary))]" />
+                <span className="text-[14px] font-semibold text-[rgb(var(--color-text))]">{cat.nameHe}</span>
                 {selectedInCat > 0 && (
-                  <span className="rounded-[9999px] bg-[#6C5CE7]/10 px-2 py-0.5 text-[11px] font-bold text-[#6C5CE7]">
+                  <span className="rounded-full bg-[rgba(var(--color-primary),0.1)] px-2 py-0.5 text-[11px] font-bold text-[rgb(var(--color-primary))]">
                     {selectedInCat}
                   </span>
                 )}
               </div>
-              <div className={`flex h-5 w-5 items-center justify-center rounded border-2 transition-all ${
+              <div className={cn(
+                "flex h-5 w-5 items-center justify-center rounded border-2 transition-all",
                 allInCat
-                  ? "border-[#6C5CE7] bg-[#6C5CE7]"
+                  ? "border-[rgb(var(--color-primary))] bg-[rgb(var(--color-primary))]"
                   : selectedInCat > 0
-                  ? "border-[#6C5CE7] bg-[#F0EEFF]"
-                  : "border-[#D1D5DB]"
-              }`}>
-                {allInCat && (
-                  <svg className="h-3 w-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={3}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
-                  </svg>
-                )}
+                  ? "border-[rgb(var(--color-primary))] bg-[rgba(var(--color-primary),0.1)]"
+                  : "border-[rgb(var(--color-border))]"
+              )}>
+                {allInCat && <Check className="h-3 w-3 text-white" />}
                 {!allInCat && selectedInCat > 0 && (
-                  <div className="h-2 w-2 rounded-sm bg-[#6C5CE7]" />
+                  <div className="h-2 w-2 rounded-sm bg-[rgb(var(--color-primary))]" />
                 )}
               </div>
             </button>
-            <div className="border-t border-[#F1F3F8] px-4 py-2">
+            <div className="border-t border-[rgb(var(--color-border-light))] px-4 py-2">
               {cat.services.map((svc) => {
                 const isSelected = selected.includes(svc.slug);
                 return (
@@ -77,22 +81,27 @@ export function ServicePicker({ selected, onChange }: ServicePickerProps) {
                     key={svc.slug}
                     type="button"
                     onClick={() => toggle(svc.slug)}
-                    className="flex w-full items-center justify-between rounded-[8px] px-3 py-2.5 text-right hover:bg-[#FAFBFF] transition-colors"
+                    className="flex w-full items-center justify-between rounded-lg px-3 py-2.5 text-right hover:bg-[rgb(var(--color-surface-elevated))] transition-colors"
                   >
                     <div className="min-w-0 flex-1">
-                      <p className={`text-[13px] font-medium ${isSelected ? "text-[#6C5CE7]" : "text-[#2D3436]"}`}>
+                      <p className={cn(
+                        "text-[13px] font-medium",
+                        isSelected ? "text-[rgb(var(--color-primary))]" : "text-[rgb(var(--color-text))]"
+                      )}>
                         {svc.nameHe}
                       </p>
-                      <p className="text-[11px] text-[#B2BEC3] truncate">{svc.description}</p>
-                    </div>
-                    <div className={`ms-3 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded border-2 transition-all ${
-                      isSelected ? "border-[#6C5CE7] bg-[#6C5CE7]" : "border-[#D1D5DB]"
-                    }`}>
-                      {isSelected && (
-                        <svg className="h-3 w-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={3}>
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
-                        </svg>
+                      <p className="text-[11px] text-[rgb(var(--color-text-muted))] truncate">{svc.description}</p>
+                      {REGULATED_SERVICE_SLUGS.has(svc.slug) && (
+                        <p className="mt-0.5 text-[11px] leading-snug text-[rgb(var(--color-warning))]">
+                          {REGULATED_SERVICE_WARNING[svc.slug]}
+                        </p>
                       )}
+                    </div>
+                    <div className={cn(
+                      "ms-3 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded border-2 transition-all",
+                      isSelected ? "border-[rgb(var(--color-primary))] bg-[rgb(var(--color-primary))]" : "border-[rgb(var(--color-border))]"
+                    )}>
+                      {isSelected && <Check className="h-3 w-3 text-white" />}
                     </div>
                   </button>
                 );

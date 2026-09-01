@@ -3,14 +3,28 @@
 import { signIn } from "next-auth/react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { googleAuthErrorMessage } from "@/lib/oauth-errors";
+import { safeInAppPath } from "@/lib/seller-ready";
 
+/** Shows the login form so users can sign in. */
 export default function LoginPage() {
   const router = useRouter();
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
+  const [nextPath, setNextPath] = useState("/");
 
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    setNextPath(safeInAppPath(params.get("next")) ?? "/");
+    const oauthError = params.get("error");
+    if (oauthError) {
+      setError(googleAuthErrorMessage(oauthError, params.get("code")));
+    }
+  }, []);
+
+  /** Signs the user in with email and password. */
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setLoading(true);
@@ -24,18 +38,24 @@ export default function LoginPage() {
     });
 
     if (result?.error) {
-      setError("אימייל או סיסמה שגויים");
+      const code = "code" in result ? String(result.code ?? "") : "";
+      setError(
+        code === "google_account"
+          ? googleAuthErrorMessage(result.error, "google_account")
+          : "אימייל או סיסמה שגויים"
+      );
       setLoading(false);
     } else {
-      router.push("/");
+      router.push(nextPath);
       router.refresh();
     }
   }
 
+  /** Signs the user in with Google. */
   async function handleGoogleSignIn() {
     setGoogleLoading(true);
     setError("");
-    await signIn("google", { callbackUrl: "/" });
+    await signIn("google", { callbackUrl: nextPath });
   }
 
   const isLoading = loading || googleLoading;
@@ -45,22 +65,22 @@ export default function LoginPage() {
       <div className="mb-8 text-center lg:hidden">
         <h2
           className="text-3xl font-extrabold tracking-[-0.02em] bg-clip-text text-transparent"
-          style={{ backgroundImage: "linear-gradient(135deg, #6C5CE7 0%, #A29BFE 50%, #00D2D3 100%)" }}
+          style={{ backgroundImage: "linear-gradient(135deg, rgb(var(--color-primary)) 0%, rgb(var(--color-primary-light)) 50%, rgb(var(--color-accent)) 100%)" }}
         >
           אבאל׳ה
         </h2>
       </div>
 
-      <div className="rounded-[16px] bg-[#FFFFFF] p-8 shadow-[0_4px_16px_rgba(108,92,231,0.08)]">
-        <h1 className="mb-2 text-center text-[24px] font-bold tracking-[-0.01em] text-[#2D3436]">
-          ברוך הבא חזרה
+      <div className="rounded-2xl bg-[rgb(var(--color-surface))] p-8 shadow-[0_4px_16px_rgba(var(--color-primary),0.08)]">
+        <h1 className="mb-2 text-center text-[24px] font-bold tracking-[-0.01em] text-[rgb(var(--color-text))]">
+          שוב פה? יופי, חיכינו לך
         </h1>
-        <p className="mb-6 text-center text-[14px] text-[#636E72]">
-          התחבר כדי להמשיך לחשבון שלך
+        <p className="mb-6 text-center text-[14px] text-[rgb(var(--color-text-secondary))]">
+          התחבר וחזור לסדר דברים
         </p>
 
         {error && (
-          <div className="mb-4 flex items-center gap-2 rounded-[12px] bg-[#E17055]/10 px-4 py-3 text-[14px] text-[#E17055]">
+          <div role="alert" className="mb-4 flex items-center gap-2 rounded-xl bg-[rgba(var(--color-error),0.1)] px-4 py-3 text-[14px] text-[rgb(var(--color-error))]">
             <svg className="h-4 w-4 flex-shrink-0" viewBox="0 0 20 20" fill="currentColor">
               <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
             </svg>
@@ -72,7 +92,7 @@ export default function LoginPage() {
           type="button"
           onClick={handleGoogleSignIn}
           disabled={isLoading}
-          className="mb-5 flex w-full items-center justify-center gap-3 rounded-[12px] border border-[#E8ECF1] bg-[#FAFBFF] py-3.5 text-[16px] font-medium text-[#2D3436] transition-all hover:bg-[#F0F0F5] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
+          className="mb-5 flex w-full items-center justify-center gap-3 rounded-xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface-elevated))] py-3.5 text-[16px] font-medium text-[rgb(var(--color-text))] transition-all hover:bg-[rgb(var(--color-bg))] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {googleLoading ? (
             <svg className="h-5 w-5 animate-spin" viewBox="0 0 24 24" fill="none">
@@ -91,14 +111,14 @@ export default function LoginPage() {
         </button>
 
         <div className="mb-5 flex items-center gap-3">
-          <div className="h-px flex-1 bg-[#E8ECF1]" />
-          <span className="text-[13px] text-[#B2BEC3]">או</span>
-          <div className="h-px flex-1 bg-[#E8ECF1]" />
+          <div className="h-px flex-1 bg-[rgb(var(--color-border))]" />
+          <span className="text-[13px] text-[rgb(var(--color-text-muted))]">או</span>
+          <div className="h-px flex-1 bg-[rgb(var(--color-border))]" />
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-5">
           <div>
-            <label htmlFor="email" className="mb-1.5 block text-[14px] font-medium text-[#2D3436]">
+            <label htmlFor="email" className="mb-1.5 block text-[14px] font-medium text-[rgb(var(--color-text))]">
               אימייל
             </label>
             <input
@@ -108,11 +128,11 @@ export default function LoginPage() {
               required
               placeholder="you@example.com"
               dir="ltr"
-              className="w-full rounded-[12px] border border-[#E8ECF1] bg-[#FAFBFF] px-4 py-3 text-[16px] text-[#2D3436] placeholder-[#B2BEC3] transition-all focus:border-[#6C5CE7] focus:outline-none focus:ring-2 focus:ring-[#6C5CE7]/20"
+              className="w-full rounded-xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface-elevated))] px-4 py-3 text-[16px] text-[rgb(var(--color-text))] placeholder-[rgb(var(--color-text-muted))] transition-all focus:border-[rgb(var(--color-primary))] focus:outline-none focus:ring-2 focus:ring-[rgba(var(--color-primary),0.2)]"
             />
           </div>
           <div>
-            <label htmlFor="password" className="mb-1.5 block text-[14px] font-medium text-[#2D3436]">
+            <label htmlFor="password" className="mb-1.5 block text-[14px] font-medium text-[rgb(var(--color-text))]">
               סיסמה
             </label>
             <input
@@ -121,21 +141,21 @@ export default function LoginPage() {
               type="password"
               required
               placeholder="הזן את הסיסמה שלך"
-              className="w-full rounded-[12px] border border-[#E8ECF1] bg-[#FAFBFF] px-4 py-3 text-[16px] text-[#2D3436] placeholder-[#B2BEC3] transition-all focus:border-[#6C5CE7] focus:outline-none focus:ring-2 focus:ring-[#6C5CE7]/20"
+              className="w-full rounded-xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface-elevated))] px-4 py-3 text-[16px] text-[rgb(var(--color-text))] placeholder-[rgb(var(--color-text-muted))] transition-all focus:border-[rgb(var(--color-primary))] focus:outline-none focus:ring-2 focus:ring-[rgba(var(--color-primary),0.2)]"
             />
           </div>
           <div className="flex justify-end">
             <Link
               href="/forgot-password"
-              className="text-[13px] text-[#6C5CE7] transition-colors hover:text-[#5A4BD1]"
+              className="text-[13px] text-[rgb(var(--color-primary))] transition-colors hover:text-[rgb(var(--color-primary-hover))]"
             >
-              שכחת סיסמה?
+              אבא לא שוכח. אבל אם כן...
             </Link>
           </div>
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full rounded-[12px] bg-[#6C5CE7] py-3.5 text-[16px] font-semibold text-white shadow-[0_4px_16px_rgba(108,92,231,0.08)] transition-all hover:bg-[#5A4BD1] hover:shadow-[0_8px_32px_rgba(108,92,231,0.12)] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full rounded-xl bg-[rgb(var(--color-primary))] py-3.5 text-[16px] font-semibold text-white shadow-[0_4px_16px_rgba(var(--color-primary),0.08)] transition-all hover:bg-[rgb(var(--color-primary-hover))] hover:shadow-[0_8px_32px_rgba(var(--color-primary),0.12)] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {loading ? (
               <span className="flex items-center justify-center gap-2">
@@ -152,11 +172,11 @@ export default function LoginPage() {
         </form>
 
         <div className="mt-6 text-center">
-          <p className="text-[14px] text-[#636E72]">
-            עדיין לא חבר?{" "}
+          <p className="text-[14px] text-[rgb(var(--color-text-secondary))]">
+            עדיין לא במשפחה?{" "}
             <Link
-              href="/register"
-              className="font-semibold text-[#6C5CE7] transition-colors hover:text-[#5A4BD1]"
+              href={nextPath !== "/" ? `/register?next=${encodeURIComponent(nextPath)}` : "/register"}
+              className="font-semibold text-[rgb(var(--color-primary))] transition-colors hover:text-[rgb(var(--color-primary-hover))]"
             >
               הצטרף עכשיו
             </Link>

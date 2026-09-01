@@ -2,8 +2,10 @@ import { Router, Request, Response } from "express";
 import { requireAuth } from "../../../shared/middleware";
 import { prisma } from "../index";
 
+/** Routes for a seller's prices per service. */
 export const servicePricesRoutes = Router();
 
+/** List the current user's service prices. */
 servicePricesRoutes.get("/", requireAuth, async (req: Request, res: Response) => {
   const prices = await prisma.servicePrice.findMany({
     where: { userId: req.user!.id },
@@ -13,6 +15,7 @@ servicePricesRoutes.get("/", requireAuth, async (req: Request, res: Response) =>
   res.json(prices);
 });
 
+/** Replace the current user's service prices. */
 servicePricesRoutes.post("/", requireAuth, async (req: Request, res: Response) => {
   const userId = req.user!.id;
   const { prices } = req.body;
@@ -28,11 +31,22 @@ servicePricesRoutes.post("/", requireAuth, async (req: Request, res: Response) =
     await prisma.servicePrice.createMany({
       data: prices
         .filter((p: { serviceSlug: string; price: number }) => p.serviceSlug && p.price > 0)
-        .map((p: { serviceSlug: string; price: number; description?: string }) => ({
+        .map((p: {
+          serviceSlug: string;
+          price: number;
+          description?: string;
+          materialsEstimate?: number | null;
+          buyerSuppliesMaterials?: boolean;
+        }) => ({
           userId,
           serviceSlug: p.serviceSlug,
           price: Number(p.price),
           description: p.description || null,
+          materialsEstimate:
+            p.materialsEstimate != null && Number(p.materialsEstimate) > 0
+              ? Number(p.materialsEstimate)
+              : null,
+          buyerSuppliesMaterials: p.buyerSuppliesMaterials !== false,
         })),
     });
   }

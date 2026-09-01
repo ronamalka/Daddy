@@ -1,7 +1,9 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { proxyRequest, REQUESTS_SERVICE } from "@/lib/gateway";
+import { enrichRequestWithQuoteSellers } from "@/lib/enrich-request-quotes";
 
+/** Lets a seller send a quote on a service request. */
 export async function POST(request: Request, { params }: { params: Promise<{ id: string }> }) {
   const session = await auth();
   if (!session?.user) {
@@ -19,8 +21,18 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
   return NextResponse.json(data, { status });
 }
 
-export async function GET(_request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+/** Returns one service request with buyer names, ratings, and area overlap on each quote. */
+export async function GET(_request: Request, { params }: { params: Promise<{ id: string }> }) {
+  const session = await auth();
+  if (!session?.user) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   const { id } = await params;
-  const { data, status } = await proxyRequest(REQUESTS_SERVICE, `/service-requests/${id}`);
-  return NextResponse.json(data, { status });
+  const user = session.user as { id: string; email: string; name: string; role: string };
+  const { data, status } = await proxyRequest(REQUESTS_SERVICE, `/service-requests/${id}`, { user });
+  if (status !== 200 || !data?.request) {
+    return NextResponse.json(data ?? { error: "Request not found" }, { status });
+  }
+  return NextResponse.json({ request: await enrichRequestWithQuoteSellers(data.request) }, { status });
 }

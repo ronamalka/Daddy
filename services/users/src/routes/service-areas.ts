@@ -2,8 +2,10 @@ import { Router, Request, Response } from "express";
 import { requireAuth } from "../../../shared/middleware";
 import { prisma } from "../index";
 
+/** Routes for the areas a seller works in. */
 export const serviceAreasRoutes = Router();
 
+/** List the current user's service areas. */
 serviceAreasRoutes.get("/", requireAuth, async (req: Request, res: Response) => {
   const areas = await prisma.serviceArea.findMany({
     where: { userId: req.user!.id },
@@ -13,6 +15,7 @@ serviceAreasRoutes.get("/", requireAuth, async (req: Request, res: Response) => 
   res.json(areas);
 });
 
+/** Replace the current user's service areas. */
 serviceAreasRoutes.post("/", requireAuth, async (req: Request, res: Response) => {
   const userId = req.user!.id;
   const { areas } = req.body;

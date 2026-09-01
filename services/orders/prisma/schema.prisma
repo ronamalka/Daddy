@@ -21,24 +21,77 @@ enum GigTier {
   PREMIUM
 }
 
+enum JobType {
+  GIG
+  LOCAL_REQUEST
+}
+
+enum DisputeReason {
+  NO_SHOW
+  DAMAGE
+  DIFFERENT_PRICE
+  QUALITY
+}
+
+enum DisputeStatus {
+  OPEN
+  UNDER_REVIEW
+  RESOLVED_RELEASE
+  RESOLVED_REFUND
+  RESOLVED_SPLIT
+  CLOSED
+}
+
+enum PaymentAction {
+  RELEASE
+  REFUND
+  SPLIT
+}
+
+enum CancellationFeeStatus {
+  NONE
+  OWED
+  COLLECTED
+  WAIVED
+}
+
 model Order {
   id        String      @id @default(cuid())
-  gigId     String      // cross-service ref to gigs-service
+  jobType   JobType     @default(GIG)
+  gigId     String?     // null for local jobs
+  requestId String?
+  title     String?
   buyerId   String      // cross-service ref to users-service
   sellerId  String      // cross-service ref to users-service
-  tier      GigTier
-  price     Float
-  status    OrderStatus @default(PENDING)
+  tier                     GigTier?
+  price                    Float
+  laborPrice               Float?
+  materialsEstimate        Float?
+  buyerSuppliesMaterials   Boolean      @default(true)
+  pendingMaterialsEstimate Float?
+  materialsUpdatedAt       DateTime?
+  materialsAcknowledgedAt  DateTime?
+  status                   OrderStatus  @default(PENDING)
   dueDate   DateTime?
+  slotStart DateTime?
+  slotEnd   DateTime?
+  cancelledAt           DateTime?
+  cancelledById         String?
+  cancellationFee       Float                 @default(0)
+  cancellationFeeStatus CancellationFeeStatus @default(NONE)
+  deliveryPhotos        String[]              @default([])
+  deliveryNote          String?
   createdAt DateTime    @default(now())
   updatedAt DateTime    @updatedAt
 
-  messages     Message[]
   requirements OrderRequirement[]
+  disputes     Dispute[]
 
   @@index([buyerId])
   @@index([sellerId])
   @@index([gigId])
+  @@index([requestId])
+  @@index([sellerId, slotStart])
 }
 
 model OrderRequirement {
@@ -52,17 +105,26 @@ model OrderRequirement {
   @@unique([orderId, requirementId])
 }
 
-model Message {
-  id         String   @id @default(cuid())
-  content    String
-  orderId    String?
-  senderId   String   // cross-service ref to users-service
-  receiverId String   // cross-service ref to users-service
-  createdAt  DateTime @default(now())
+model Dispute {
+  id               String         @id @default(cuid())
+  orderId          String
+  openerId         String
+  reason           DisputeReason
+  description      String
+  photos           String[]
+  status           DisputeStatus  @default(OPEN)
+  resolution       String?
+  paymentAction    PaymentAction?
+  splitBuyerAmount Float?
+  resolvedAt       DateTime?
+  resolvedBy       String?
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
 
-  order Order? @relation(fields: [orderId], references: [id])
+  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
 
   @@index([orderId])
-  @@index([senderId])
-  @@index([receiverId])
+  @@index([openerId])
+  @@index([status])
 }
+

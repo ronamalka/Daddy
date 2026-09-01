@@ -2,8 +2,10 @@ import { Router, Request, Response } from "express";
 import { requireAuth } from "../../../shared/middleware";
 import { prisma } from "../index";
 
+/** Routes for the current user's favorite gigs. */
 export const favoritesRoutes = Router();
 
+/** List the current user's favorite gigs. */
 favoritesRoutes.get("/", requireAuth, async (req: Request, res: Response) => {
   const favorites = await prisma.favorite.findMany({
     where: { userId: req.user!.id },
@@ -12,7 +14,7 @@ favoritesRoutes.get("/", requireAuth, async (req: Request, res: Response) => {
         include: {
           category: true,
           tiers: { orderBy: { price: "asc" }, take: 1 },
-          reviews: { select: { rating: true } },
+          reviews: { where: { hiddenAt: null }, select: { rating: true } },
         },
       },
     },
@@ -31,6 +33,7 @@ favoritesRoutes.get("/", requireAuth, async (req: Request, res: Response) => {
   res.json(gigs);
 });
 
+/** Add or remove a favorite for this gig. */
 favoritesRoutes.post("/", requireAuth, async (req: Request, res: Response) => {
   const { gigId } = req.body;
   if (!gigId) {

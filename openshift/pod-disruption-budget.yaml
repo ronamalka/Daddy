@@ -1,0 +1,10 @@
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: daddy-app-pdb
+  namespace: daddy
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: daddy-app

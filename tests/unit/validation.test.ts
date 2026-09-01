@@ -57,8 +57,8 @@ function validateOrderCreation(data: {
 function validateReview(data: { rating?: number; comment?: string }) {
   const errors: string[] = [];
   if (data.rating === undefined) errors.push("rating is required");
-  if (data.rating !== undefined && (data.rating < 1 || data.rating > 5))
-    errors.push("rating must be between 1 and 5");
+  if (data.rating !== undefined && (data.rating < 1 || data.rating > 10))
+    errors.push("rating must be between 1 and 10");
   if (!data.comment?.trim()) errors.push("comment is required");
   return errors;
 }
@@ -212,22 +212,22 @@ describe("Order Validation", () => {
 
 describe("Review Validation", () => {
   it("passes with valid data", () => {
-    const errors = validateReview({ rating: 5, comment: "Great work!" });
+    const errors = validateReview({ rating: 9, comment: "Great work!" });
     expect(errors).toEqual([]);
   });
 
   it("fails with rating out of range", () => {
-    const errors = validateReview({ rating: 6, comment: "Great!" });
-    expect(errors).toContain("rating must be between 1 and 5");
+    const errors = validateReview({ rating: 11, comment: "Great!" });
+    expect(errors).toContain("rating must be between 1 and 10");
   });
 
   it("fails with rating of 0", () => {
     const errors = validateReview({ rating: 0, comment: "Bad" });
-    expect(errors).toContain("rating must be between 1 and 5");
+    expect(errors).toContain("rating must be between 1 and 10");
   });
 
   it("fails with empty comment", () => {
-    const errors = validateReview({ rating: 4, comment: "" });
+    const errors = validateReview({ rating: 8, comment: "" });
     expect(errors).toContain("comment is required");
   });
 });

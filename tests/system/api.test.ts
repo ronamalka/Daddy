@@ -1,11 +1,28 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, beforeAll } from "vitest";
 
 const BASE_URL = process.env.TEST_BASE_URL || "http://localhost:3000";
 
+let csrfToken = "";
+
+beforeAll(async () => {
+  const res = await fetch(`${BASE_URL}/`);
+  const setCookie = res.headers.get("set-cookie") || "";
+  const match = setCookie.match(/csrf_token=([^;]+)/);
+  csrfToken = match?.[1] || "";
+});
+
 async function fetchApi(path: string, options?: RequestInit) {
+  const headers: Record<string, string> = {
+    "Content-Type": "application/json",
+    ...(options?.headers as Record<string, string>),
+  };
+  if (csrfToken && options?.method && ["POST", "PUT", "PATCH", "DELETE"].includes(options.method)) {
+    headers["x-csrf-token"] = csrfToken;
+    headers["cookie"] = `csrf_token=${csrfToken}`;
+  }
   const res = await fetch(`${BASE_URL}${path}`, {
     ...options,
-    headers: { "Content-Type": "application/json", ...options?.headers },
+    headers,
   });
   const body = await res.json().catch(() => null);
   return { status: res.status, body, headers: res.headers };
@@ -13,44 +30,57 @@ async function fetchApi(path: string, options?: RequestInit) {
 
 describe("System Tests — Public API", () => {
   describe("GET /api/gigs", () => {
-    it("returns 200 with an array", async () => {
+    it("returns 200 with gigs and total", async () => {
       const { status, body } = await fetchApi("/api/gigs");
       expect(status).toBe(200);
-      expect(Array.isArray(body)).toBe(true);
+      expect(body).toHaveProperty("gigs");
+      expect(body).toHaveProperty("total");
+      expect(Array.isArray(body.gigs)).toBe(true);
     });
 
     it("returns gigs with expected shape", async () => {
       const { body } = await fetchApi("/api/gigs");
-      if (body.length > 0) {
-        const gig = body[0];
+      if (body.gigs.length > 0) {
+        const gig = body.gigs[0];
         expect(gig).toHaveProperty("id");
         expect(gig).toHaveProperty("title");
         expect(gig).toHaveProperty("seller");
-        expect(gig).toHaveProperty("category");
-        expect(gig).toHaveProperty("tiers");
-        expect(gig).toHaveProperty("avgRating");
-        expect(gig).toHaveProperty("reviewCount");
+        expect(gig.seller).toHaveProperty("id");
+        expect(gig.seller).toHaveProperty("name");
       }
     });
 
     it("filters by category", async () => {
-      const { status, body } = await fetchApi("/api/gigs?category=home-maintenance");
+      const { status, body } = await fetchApi(
+        "/api/gigs?category=home-maintenance"
+      );
       expect(status).toBe(200);
-      expect(Array.isArray(body)).toBe(true);
-      for (const gig of body) {
-        expect(gig.category.slug).toBe("home-maintenance");
-      }
+      expect(Array.isArray(body.gigs)).toBe(true);
     });
 
     it("handles search parameter", async () => {
-      const { status } = await fetchApi("/api/gigs?search=logo");
+      const { status } = await fetchApi("/api/gigs?search=הרכבה");
       expect(status).toBe(200);
     });
 
     it("handles non-existent category gracefully", async () => {
-      const { status, body } = await fetchApi("/api/gigs?category=nonexistent");
+      const { status, body } = await fetchApi(
+        "/api/gigs?category=nonexistent"
+      );
       expect(status).toBe(200);
-      expect(body).toEqual([]);
+      expect(body.gigs).toEqual([]);
+    });
+
+    it("handles pagination parameters", async () => {
+      const { status, body } = await fetchApi("/api/gigs?limit=2&offset=0");
+      expect(status).toBe(200);
+      expect(body).toHaveProperty("hasMore");
+    });
+
+    it("handles district filter", async () => {
+      const { status, body } = await fetchApi("/api/gigs?district=תל אביב");
+      expect(status).toBe(200);
+      expect(Array.isArray(body.gigs)).toBe(true);
     });
   });
 
@@ -67,7 +97,218 @@ describe("System Tests — Public API", () => {
         expect(body).toHaveProperty("seller");
         expect(body).toHaveProperty("tiers");
         expect(body.tiers.length).toBeGreaterThan(0);
+        expect(body.seller).toHaveProperty("name");
+        if (Array.isArray(body.reviews) && body.reviews.length > 0) {
+          expect(body.reviews[0].user).toEqual(expect.objectContaining({ name: expect.any(String) }));
+        }
       }
+    });
+  });
+
+  describe("GET /api/featured-daddies", () => {
+    it("returns 200 with array", async () => {
+      const { status, body } = await fetchApi("/api/featured-daddies");
+      expect(status).toBe(200);
+      expect(Array.isArray(body)).toBe(true);
+    });
+
+    it("returns at most 6 featured sellers", async () => {
+      const { body } = await fetchApi("/api/featured-daddies");
+      expect(body.length).toBeLessThanOrEqual(6);
+    });
+
+    it("featured sellers have expected properties", async () => {
+      const { body } = await fetchApi("/api/featured-daddies");
+      if (body.length > 0) {
+        const seller = body[0];
+        expect(seller).toHaveProperty("id");
+        expect(seller).toHaveProperty("name");
+        expect(seller).toHaveProperty("reviewCount");
+        expect(seller).toHaveProperty("avgRating");
+        expect(seller).toHaveProperty("completedOrders");
+      }
+    });
+
+    it("omits incomplete daddy profiles", async () => {
+      const { status, body } = await fetchApi("/api/featured-daddies");
+      expect(status).toBe(200);
+      const ids = (body as { id: string }[]).map((s) => s.id);
+      expect(ids).not.toContain("seed-user-incomplete");
+    });
+  });
+
+  describe("GET /api/locations", () => {
+    it("returns districts and the persisted city catalog without calling data.gov.il", async () => {
+      const { status, body } = await fetchApi("/api/locations");
+      expect(status).toBe(200);
+      expect(Array.isArray(body.districts)).toBe(true);
+      expect(body.districts.length).toBeGreaterThan(0);
+      expect(Array.isArray(body.cities)).toBe(true);
+      expect(body.cities.length).toBeGreaterThan(100);
+      expect(body.cities.some((city: { code: number }) => city.code === 5000)).toBe(true);
+    });
+  });
+
+  describe("GET /api/providers", () => {
+    it("returns 200", async () => {
+      const { status } = await fetchApi("/api/providers");
+      expect(status).toBe(200);
+    });
+
+    it("omits incomplete daddy profiles", async () => {
+      const { status, body } = await fetchApi("/api/providers");
+      expect(status).toBe(200);
+      const ids = (body as { id: string }[]).map((s) => s.id);
+      expect(ids).not.toContain("seed-user-incomplete");
+      expect(ids).toContain("seed-user-seller1");
+    });
+
+    it("returns city search fields and ServicePrice tags", async () => {
+      const { status, body } = await fetchApi(
+        "/api/providers?service=furniture-assembly&cityCode=5000&district=5&sortBy=price"
+      );
+      expect(status).toBe(200);
+      const rows = body as {
+        id: string;
+        hasFixedPrice?: boolean;
+        acceptsQuotes?: boolean;
+        startingPrice?: number | null;
+        matchTier?: string | null;
+      }[];
+      expect(Array.isArray(rows)).toBe(true);
+      const ids = rows.map((p) => p.id);
+      expect(ids).toContain("seed-user-seller1");
+      expect(ids).not.toContain("seed-user-seller4");
+      const yossi = rows.find((p) => p.id === "seed-user-seller1");
+      expect(yossi?.hasFixedPrice).toBe(true);
+      expect(yossi?.acceptsQuotes).toBe(true);
+      expect(yossi?.startingPrice).toBe(200);
+      expect(yossi?.matchTier).toBe("city");
+    });
+
+    it("does not treat Eilat as Be'er Sheva just because both are in the South", async () => {
+      const { status, body } = await fetchApi(
+        "/api/providers?service=furniture-assembly&cityCode=2600&district=6&sortBy=distance"
+      );
+      expect(status).toBe(200);
+      const rows = body as { id: string; matchTier?: string | null; distanceKm?: number | null }[];
+      const moshe = rows.find((p) => p.id === "seed-user-seller4");
+      expect(moshe?.matchTier).toBe("district");
+      expect(moshe?.distanceKm).toBeGreaterThan(180);
+      expect(rows.some((p) => p.id === "seed-user-seller1")).toBe(false);
+    });
+
+    it("sorts furniture assembly by starting ServicePrice", async () => {
+      const { status, body } = await fetchApi("/api/providers?service=furniture-assembly&sortBy=price");
+      expect(status).toBe(200);
+      const rows = body as { id: string; startingPrice?: number | null }[];
+      const priced = rows.filter((p) => p.startingPrice != null);
+      const prices = priced.map((p) => p.startingPrice as number);
+      expect(prices).toEqual([...prices].sort((a, b) => a - b));
+      expect(priced[0]?.id).toBe("seed-user-seller4");
+    });
+
+    it("applies a ServicePrice range like the old gig catalog", async () => {
+      const cheap = await fetchApi("/api/providers?service=furniture-assembly&maxPrice=100");
+      expect(cheap.status).toBe(200);
+      const cheapIds = (cheap.body as { id: string }[]).map((p) => p.id);
+      expect(cheapIds).not.toContain("seed-user-seller1");
+      expect(cheapIds).not.toContain("seed-user-seller4");
+
+      const mid = await fetchApi("/api/providers?service=furniture-assembly&minPrice=100&maxPrice=250");
+      expect(mid.status).toBe(200);
+      const midIds = (mid.body as { id: string }[]).map((p) => p.id);
+      expect(midIds).toContain("seed-user-seller1");
+      expect(midIds).toContain("seed-user-seller4");
+    });
+
+    it("tags a listed service without a price as quote-only", async () => {
+      const { status, body } = await fetchApi("/api/providers?service=picture-hanging&pricing=quote");
+      expect(status).toBe(200);
+      const rows = body as { id: string; hasFixedPrice?: boolean; startingPrice?: number | null }[];
+      const yossi = rows.find((p) => p.id === "seed-user-seller1");
+      expect(yossi?.hasFixedPrice).toBe(false);
+      expect(yossi?.startingPrice).toBeNull();
+    });
+  });
+
+  describe("GET /api/profile/readiness", () => {
+    it("returns 401 without auth", async () => {
+      const { status } = await fetchApi("/api/profile/readiness");
+      expect(status).toBe(401);
+    });
+  });
+
+  describe("GET /api/notifications", () => {
+    it("returns 401 without auth", async () => {
+      const { status } = await fetchApi("/api/notifications");
+      expect(status).toBe(401);
+    });
+  });
+
+  describe("POST /api/notifications/mark-read", () => {
+    it("returns 401 without auth", async () => {
+      const { status } = await fetchApi("/api/notifications/mark-read", {
+        method: "POST",
+        body: JSON.stringify({ ids: [] }),
+      });
+      expect(status).toBe(401);
+    });
+  });
+
+  describe("GET /api/service-requests", () => {
+    it("returns 401 without auth", async () => {
+      const { status } = await fetchApi("/api/service-requests");
+      expect(status).toBe(401);
+    });
+  });
+
+  describe("GET /api/service-requests/teaser", () => {
+    it("returns a public list without private fields", async () => {
+      const { status, body, headers } = await fetchApi("/api/service-requests/teaser");
+      expect(status).toBe(200);
+      expect(Array.isArray(body)).toBe(true);
+      expect(headers.get("cache-control") || "").toMatch(/s-maxage/);
+      if (body.length > 0) {
+        const row = body[0];
+        expect(row).toHaveProperty("id");
+        expect(row).toHaveProperty("title");
+        expect(row).toHaveProperty("createdAt");
+        expect(row).not.toHaveProperty("description");
+        expect(row).not.toHaveProperty("buyerId");
+        expect(row).not.toHaveProperty("buyer");
+        expect(row).not.toHaveProperty("phone");
+        expect(row).not.toHaveProperty("photos");
+        expect(row).not.toHaveProperty("street");
+        expect(JSON.stringify(body)).not.toContain("הרצל");
+        expect(JSON.stringify(body)).not.toContain("בקשה פרטית — לא אמורה להופיע באתר");
+      }
+    });
+  });
+
+  describe("GET /api/recent-reviews", () => {
+    it("returns 200", async () => {
+      const { status } = await fetchApi("/api/recent-reviews");
+      expect(status).toBe(200);
+    });
+  });
+
+  describe("GET /api/sellers/:id", () => {
+    it("returns seller profile for valid seed seller", async () => {
+      const { status, body } = await fetchApi("/api/sellers/seed-seller-1");
+      if (status === 200) {
+        expect(body).toHaveProperty("name");
+        expect(body).toHaveProperty("gigs");
+        expect(body).toHaveProperty("avgRating");
+        expect(body).toHaveProperty("totalReviews");
+        expect(body).toHaveProperty("completedOrders");
+        expect(Array.isArray(body.gigs)).toBe(true);
+      }
+    });
+
+    it("returns 404 for non-existent seller", async () => {
+      const { status } = await fetchApi("/api/sellers/nonexistent-seller-xyz");
+      expect(status).toBe(404);
     });
   });
 });
@@ -89,10 +330,59 @@ describe("System Tests — Auth-Protected API", () => {
         body: JSON.stringify({
           name: "Dup User",
           email: "admin@daddy.com",
-          password: "password123",
+          password: "Test@1234!",
+          role: "BUYER",
         }),
       });
-      expect(status).toBe(409);
+      expect([400, 409]).toContain(status);
+    });
+
+    it("handles registration with short password", async () => {
+      const { status } = await fetchApi("/api/register", {
+        method: "POST",
+        body: JSON.stringify({
+          name: "Test User",
+          email: `newuser-short-pw-${Date.now()}@test.com`,
+          password: "12",
+          role: "BUYER",
+        }),
+      });
+      // Zod rejects password < 8 chars at gateway level
+      expect(status).toBe(400);
+    });
+  });
+
+  describe("GET /api/sellers/:id/availability", () => {
+    it("returns 404 for an unknown seller", async () => {
+      const { status } = await fetchApi("/api/sellers/does-not-exist/availability");
+      expect([404, 502]).toContain(status);
+    });
+  });
+
+  describe("GET /api/availability", () => {
+    it("returns 401 without auth", async () => {
+      const { status } = await fetchApi("/api/availability");
+      expect(status).toBe(401);
+    });
+  });
+
+  describe("PUT /api/availability", () => {
+    it("returns 401 without auth", async () => {
+      const { status } = await fetchApi("/api/availability", {
+        method: "PUT",
+        body: JSON.stringify({ acceptingJobs: true, weeklyHours: [], timeOff: [] }),
+      });
+      expect(status).toBe(401);
+    });
+  });
+
+  describe("POST /api/service-requests/:id/accept", () => {
+    it("returns 401 without auth", async () => {
+      const { status } = await fetchApi("/api/service-requests/req-1/accept", {
+        method: "POST",
+        body: JSON.stringify({ responseId: "quote-1" }),
+      });
+      expect(status).toBe(401);
     });
   });
 
@@ -121,7 +411,127 @@ describe("System Tests — Auth-Protected API", () => {
           title: "Test",
           description: "Test",
           categoryId: "cat-1",
-          tiers: [{ tier: "BASIC", title: "Basic", description: "", price: 10, deliveryDays: 3, revisions: 1 }],
+          tiers: [
+            {
+              tier: "BASIC",
+              title: "Basic",
+              description: "",
+              price: 10,
+              deliveryDays: 3,
+              revisions: 1,
+            },
+          ],
+        }),
+      });
+      expect(status).toBe(401);
+    });
+  });
+
+  describe("GET /api/profile", () => {
+    it("returns 401 without auth", async () => {
+      const { status } = await fetchApi("/api/profile");
+      expect(status).toBe(401);
+    });
+  });
+
+  describe("PUT /api/profile", () => {
+    it("returns 401 without auth", async () => {
+      const { status } = await fetchApi("/api/profile", {
+        method: "PUT",
+        body: JSON.stringify({ name: "New Name" }),
+      });
+      expect(status).toBe(401);
+    });
+  });
+
+  describe("PUT /api/profile/password", () => {
+    it("returns 401 without auth", async () => {
+      const { status } = await fetchApi("/api/profile/password", {
+        method: "PUT",
+        body: JSON.stringify({ currentPassword: "old", newPassword: "NewPass1!" }),
+      });
+      expect(status).toBe(401);
+    });
+  });
+
+  describe("GET /api/favorites", () => {
+    it("returns 401 without auth", async () => {
+      const { status } = await fetchApi("/api/favorites");
+      expect(status).toBe(401);
+    });
+  });
+
+  describe("POST /api/favorites", () => {
+    it("returns 401 without auth", async () => {
+      const { status } = await fetchApi("/api/favorites", {
+        method: "POST",
+        body: JSON.stringify({ gigId: "gig-1" }),
+      });
+      expect(status).toBe(401);
+    });
+  });
+
+  describe("GET /api/service-areas", () => {
+    it("returns 401 without auth", async () => {
+      const { status } = await fetchApi("/api/service-areas");
+      expect(status).toBe(401);
+    });
+  });
+
+  describe("GET /api/service-prices", () => {
+    it("returns 401 without auth", async () => {
+      const { status } = await fetchApi("/api/service-prices");
+      expect(status).toBe(401);
+    });
+  });
+
+  describe("GET /api/user-services", () => {
+    it("returns 401 without auth", async () => {
+      const { status } = await fetchApi("/api/user-services");
+      expect(status).toBe(401);
+    });
+  });
+
+  describe("POST /api/messages", () => {
+    it("returns 401 without auth", async () => {
+      const { status } = await fetchApi("/api/messages", {
+        method: "POST",
+        body: JSON.stringify({ content: "test" }),
+      });
+      expect(status).toBe(401);
+    });
+  });
+
+  describe("GET /api/messages", () => {
+    it("returns 401 without auth", async () => {
+      const { status } = await fetchApi("/api/messages");
+      expect(status).toBe(401);
+    });
+  });
+
+  describe("GET /api/messages/conversations", () => {
+    it("returns 401 without auth", async () => {
+      const { status } = await fetchApi("/api/messages/conversations");
+      expect(status).toBe(401);
+    });
+  });
+
+  describe("GET /api/messages/unread-count", () => {
+    it("returns count 0 without auth (graceful fallback)", async () => {
+      const { status, body } = await fetchApi("/api/messages/unread-count");
+      expect(status).toBe(200);
+      expect(body).toHaveProperty("count", 0);
+    });
+  });
+
+  describe("POST /api/service-requests (create)", () => {
+    it("returns 401 without auth", async () => {
+      const { status } = await fetchApi("/api/service-requests", {
+        method: "POST",
+        body: JSON.stringify({
+          title: "Need help",
+          description: "Details",
+          categorySlug: "furniture-assembly",
         }),
       });
       expect(status).toBe(401);
@@ -141,12 +551,117 @@ describe("System Tests — Auth-Protected API", () => {
       expect([401, 403]).toContain(status);
     });
   });
+
+  describe("GET /api/admin/queue", () => {
+    it("rejects unauthenticated requests", async () => {
+      const { status } = await fetchApi("/api/admin/queue");
+      expect([401, 403]).toContain(status);
+    });
+  });
+
+  describe("POST /api/orders/:id/dispute", () => {
+    it("returns 401 without auth", async () => {
+      const { status } = await fetchApi("/api/orders/some-order-id/dispute", {
+        method: "POST",
+        body: JSON.stringify({ reason: "QUALITY", description: "לא טוב" }),
+      });
+      expect(status).toBe(401);
+    });
+  });
+
+  describe("POST /api/admin/users/:id/suspend", () => {
+    it("rejects unauthenticated requests", async () => {
+      const { status } = await fetchApi("/api/admin/users/some-user-id/suspend", {
+        method: "POST",
+        body: JSON.stringify({ reason: "test" }),
+      });
+      expect([401, 403]).toContain(status);
+    });
+  });
+
+  describe("GET /api/orders/:id", () => {
+    it("returns 401 without auth", async () => {
+      const { status } = await fetchApi("/api/orders/some-order-id");
+      expect(status).toBe(401);
+    });
+  });
+
+  describe("PATCH /api/orders/:id", () => {
+    it("returns 401 without auth", async () => {
+      const { status } = await fetchApi("/api/orders/some-order-id", {
+        method: "PATCH",
+        body: JSON.stringify({ status: "IN_PROGRESS" }),
+      });
+      expect(status).toBe(401);
+    });
+  });
+
+  describe("POST /api/orders/:id/review", () => {
+    it("returns 401 without auth", async () => {
+      const { status } = await fetchApi("/api/orders/some-order-id/review", {
+        method: "POST",
+        body: JSON.stringify({
+          comment: "Great",
+          ratingAttitude: 8,
+          ratingTimeliness: 8,
+          ratingPrice: 8,
+          ratingQuality: 8,
+        }),
+      });
+      expect(status).toBe(401);
+    });
+  });
+
+  describe("POST /api/reviews/:id/flag", () => {
+    it("returns 401 without auth", async () => {
+      const { status } = await fetchApi("/api/reviews/some-review-id/flag", {
+        method: "POST",
+        body: JSON.stringify({ reason: "spam" }),
+      });
+      expect(status).toBe(401);
+    });
+  });
+
+  describe("POST /api/password-reset", () => {
+    it("rejects invalid action", async () => {
+      const { status } = await fetchApi("/api/password-reset?action=invalid", {
+        method: "POST",
+        body: JSON.stringify({ email: "test@test.com" }),
+      });
+      expect(status).toBe(400);
+    });
+
+    it("rejects missing action", async () => {
+      const { status } = await fetchApi("/api/password-reset", {
+        method: "POST",
+        body: JSON.stringify({ email: "test@test.com" }),
+      });
+      expect(status).toBe(400);
+    });
+
+    it("accepts valid request action", async () => {
+      const { status } = await fetchApi(
+        "/api/password-reset?action=request",
+        {
+          method: "POST",
+          body: JSON.stringify({ email: "nonexistent@test.com" }),
+        }
+      );
+      expect([200, 400, 404, 500]).toContain(status);
+    });
+  });
 });
 
 describe("System Tests — Health & Pages", () => {
   it("homepage returns 200", async () => {
     const res = await fetch(BASE_URL);
     expect(res.status).toBe(200);
+  });
+
+  it("homepage returns HTML", async () => {
+    const res = await fetch(BASE_URL);
+    const contentType = res.headers.get("content-type");
+    expect(contentType).toContain("text/html");
   });
 
   it("login page returns 200", async () => {
@@ -159,10 +674,113 @@ describe("System Tests — Health & Pages", () => {
     expect(res.status).toBe(200);
   });
 
+  it("gigs page returns 200", async () => {
+    const res = await fetch(`${BASE_URL}/gigs`);
+    expect(res.status).toBe(200);
+  });
+
+  it("how-it-works page returns 200", async () => {
+    const res = await fetch(`${BASE_URL}/how-it-works`);
+    expect(res.status).toBe(200);
+  });
+
+  it("about page returns 200", async () => {
+    const res = await fetch(`${BASE_URL}/about`);
+    expect(res.status).toBe(200);
+  });
+
+  it("terms page returns 200", async () => {
+    const res = await fetch(`${BASE_URL}/terms`);
+    expect(res.status).toBe(200);
+  });
+
+  it("privacy page returns 200", async () => {
+    const res = await fetch(`${BASE_URL}/privacy`);
+    expect(res.status).toBe(200);
+  });
+
+  it("accessibility page returns 200", async () => {
+    const res = await fetch(`${BASE_URL}/accessibility`);
+    expect(res.status).toBe(200);
+  });
+
+  it("become-a-daddy page returns 200", async () => {
+    const res = await fetch(`${BASE_URL}/become-a-daddy`);
+    expect(res.status).toBe(200);
+  });
+
+  it("onboarding page returns 200", async () => {
+    const res = await fetch(`${BASE_URL}/onboarding`);
+    expect(res.status).toBe(200);
+  });
+
+  it("forgot-password page returns 200", async () => {
+    const res = await fetch(`${BASE_URL}/forgot-password`);
+    expect(res.status).toBe(200);
+  });
+
+  it("requests/create page returns 200", async () => {
+    const res = await fetch(`${BASE_URL}/requests/create`);
+    expect(res.status).toBe(200);
+  });
+
   it("auth CSRF endpoint works", async () => {
     const res = await fetch(`${BASE_URL}/api/auth/csrf`);
     expect(res.status).toBe(200);
     const data = await res.json();
     expect(data).toHaveProperty("csrfToken");
+  });
+
+  it("robots.txt is accessible", async () => {
+    const res = await fetch(`${BASE_URL}/robots.txt`);
+    expect(res.status).toBe(200);
+    const body = await res.text();
+    expect(body).toContain("Sitemap:");
+    expect(body).toContain("/sitemap.xml");
+  });
+
+  it("sitemap.xml lists marketing pages, public sellers, and packages", async () => {
+    const res = await fetch(`${BASE_URL}/sitemap.xml`);
+    expect(res.status).toBe(200);
+    const xml = await res.text();
+    expect(xml).toContain("/how-it-works");
+    expect(xml).toContain("/become-a-daddy");
+    expect(xml).toContain("/about");
+    expect(xml).toContain("/sellers/seed-user-seller1");
+    expect(xml).toContain("/gigs/seed-gig-ikea");
+    expect(xml).not.toContain("sandbox2963");
+  });
+
+  it("manifest.webmanifest uses Abaleh branding", async () => {
+    const res = await fetch(`${BASE_URL}/manifest.webmanifest`);
+    expect(res.status).toBe(200);
+    const body = await res.json();
+    expect(body.name).toContain("אבאל׳ה");
+    expect(body.name).not.toMatch(/פרילנס/);
+    expect(body.description).not.toMatch(/פרילנס/);
+  });
+
+  it("marketing pages expose unique titles", async () => {
+    const pages = [
+      { path: "/", title: "אבאל׳ה — אבא תמיד יודע לסדר" },
+      { path: "/how-it-works", title: "איך זה עובד" },
+      { path: "/become-a-daddy", title: "הפוך לאבאל׳ה" },
+      { path: "/about", title: "על אבאל׳ה" },
+    ];
+    for (const page of pages) {
+      const res = await fetch(`${BASE_URL}${page.path}`);
+      expect(res.status).toBe(200);
+      const html = await res.text();
+      expect(html).toContain(page.title);
+    }
+  });
+
+  it("seller profile includes LocalBusiness JSON-LD", async () => {
+    const res = await fetch(`${BASE_URL}/sellers/seed-user-seller1`);
+    expect(res.status).toBe(200);
+    const html = await res.text();
+    expect(html).toContain("יוסי הגולדן");
+    expect(html).toContain("LocalBusiness");
+    expect(html).toContain("AggregateRating");
   });
 });

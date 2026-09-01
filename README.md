@@ -30,7 +30,15 @@ Each service has its own PostgreSQL database. The Next.js app signs every intern
 
 You need **Node.js 22**, **Docker**, and **npm**.
 
-1. Copy environment values your team uses (`DATABASE_URL`, `REDIS_URL`, `NEXTAUTH_SECRET`, `INTER_SERVICE_SECRET`, service URLs). There is no committed `.env` file.
+1. Copy environment values your team uses (`DATABASE_URL`, `REDIS_URL`, `AUTH_SECRET`, `AUTH_URL`, `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `INTER_SERVICE_SECRET`, service URLs). There is no committed `.env` file.
+
+   Google sign-in uses the [OAuth 2.0 web-server flow](https://developers.google.com/identity/protocols/oauth2/web-server). Create a **Web application** client, then set `AUTH_URL` to this app's public origin (locally `http://localhost:3000`). The redirect URI Google must allow is `{AUTH_URL}/api/auth/callback/google`.
+
+   Console pages:
+
+   - [OAuth consent screen](https://console.cloud.google.com/auth/overview)
+   - [Create an OAuth client](https://console.cloud.google.com/auth/clients)
+   - [Credentials list](https://console.cloud.google.com/apis/credentials)
 
 2. Start Postgres, Redis, and the five services:
 
@@ -96,7 +104,7 @@ Every source folder has its own `README.md` with a short explanation.
 
 Code goes **feature branch → `dev` → `stg` → tagged production**. Do not open a normal feature PR against `main`.
 
-CI builds container images, pushes them to Quay, and updates tags in `gitops/`. Argo CD (`daddy-dev` and the other apps) syncs those manifests. Do not change a Deployment image by hand with `oc set image`.
+CI builds container images, pushes them to Quay, and writes the SHA into `gitops/base` on that branch. Argo CD (`daddy-dev`, `daddy-stg`, `daddy-prod`) syncs the matching overlay. `daddy-prod` is manual after a `v*` tag. Do not change a Deployment image by hand with `oc set image`.
 
 Details: [`gitops/README.md`](gitops/README.md) and [`.github/workflows/README.md`](.github/workflows/README.md).
 

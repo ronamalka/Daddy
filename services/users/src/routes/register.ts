@@ -2,13 +2,31 @@ import { Router, Request, Response } from "express";
 import { hash } from "bcryptjs";
 import { prisma } from "../index";
 
+/** Routes for creating a new account. */
 export const registerRoutes = Router();
 
+/** Create a buyer or seller account with email and password. */
 registerRoutes.post("/", async (req: Request, res: Response) => {
   const { name, email, password, role, cityCode, cityName, districtCode, serviceAreas, services } = req.body;
 
   if (!name || !email || !password) {
     res.status(400).json({ error: "Missing fields" });
+    return;
+  }
+
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email)) {
+    res.status(400).json({ error: "Invalid email format" });
+    return;
+  }
+
+  if (password.length < 6) {
+    res.status(400).json({ error: "Password must be at least 6 characters" });
+    return;
+  }
+
+  if (name.length > 100 || email.length > 255) {
+    res.status(400).json({ error: "Input too long" });
     return;
   }
 

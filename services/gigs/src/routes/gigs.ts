@@ -1,9 +1,12 @@
 import { Router, Request, Response } from "express";
 import { requireSeller } from "../../../shared/middleware";
+import { canonicalizeCategorySlug } from "../../../shared/services";
 import { prisma } from "../index";
 
+/** Routes for listing gigs and creating a new gig. */
 export const gigsRoutes = Router();
 
+/** Search and page gigs with filters, sort, and ratings. */
 gigsRoutes.get("/", async (req: Request, res: Response) => {
   const search = (req.query.search as string) || "";
   const category = (req.query.category as string) || "";
@@ -30,7 +33,8 @@ gigsRoutes.get("/", async (req: Request, res: Response) => {
     ];
   }
   if (category) {
-    where.category = { slug: category };
+    const slug = canonicalizeCategorySlug(category) || category;
+    where.category = { slug };
   }
   if (sellerId) {
     where.sellerId = sellerId;
@@ -39,7 +43,7 @@ gigsRoutes.get("/", async (req: Request, res: Response) => {
   const includeFields = {
     category: true,
     tiers: { orderBy: { price: "asc" as const }, take: 1 },
-    reviews: { select: { rating: true } },
+    reviews: { where: { hiddenAt: null }, select: { rating: true } },
     _count: { select: { favorites: true } },
   };
 
@@ -79,6 +83,7 @@ gigsRoutes.get("/", async (req: Request, res: Response) => {
   res.json({ gigs: gigsWithRating, total, hasMore: skip + take < total });
 });
 
+/** Create a new gig with tiers, and optional FAQs and requirements. */
 gigsRoutes.post("/", requireSeller, async (req: Request, res: Response) => {
   const { title, description, image, categoryId, tiers, faqs, requirements } = req.body;
 
@@ -87,44 +92,57 @@ gigsRoutes.post("/", requireSeller, async (req: Request, res: Response) => {
     return;
   }
 
-  const gig = await prisma.gig.create({
-    data: {
-      title,
-      description,
-      image,
-      categoryId,
-      sellerId: req.user!.id,
-      tiers: {
-        create: tiers.map((t: { tier: string; title: string; description: string; price: number; deliveryDays: number; revisions: number }) => ({
-          tier: t.tier,
-          title: t.title,
-          description: t.description,
-          price: t.price,
-          deliveryDays: t.deliveryDays,
-          revisions: t.revisions,
-        })),
-      },
-      ...(faqs?.length && {
-        faqs: {
-          create: faqs.map((f: { question: string; answer: string }, i: number) => ({
-            question: f.question,
-            answer: f.answer,
-            order: i,
-          })),
-        },
-      }),
-      ...(requirements?.length && {
-        requirements: {
-          create: requirements.map((r: { question: string; required: boolean }, i: number) => ({
-            question: r.question,
-            required: r.required ?? true,
-            order: i,
-          })),
-        },
-      }),
-    },
-    include: { tiers: true, category: true, faqs: true, requirements: true },
+  const category = await prisma.category.findFirst({
+    where: { OR: [{ id: categoryId }, { slug: categoryId }] },
+    select: { id: true },
   });
+  if (!category) {
+    res.status(400).json({ error: "קטגוריה לא נמצאה" });
+    return;
+  }
 
-  res.status(201).json(gig);
+  try {
+    const gig = await prisma.gig.create({
+      data: {
+        title,
+        description,
+        image: image || null,
+        categoryId: category.id,
+        sellerId: req.user!.id,
+        tiers: {
+          create: tiers.map((t: { tier: string; title: string; description: string; price: number; deliveryDays: number; revisions: number }) => ({
+            tier: t.tier,
+            title: t.title || t.tier,
+            description: t.description || "",
+            price: t.price,
+            deliveryDays: t.deliveryDays,
+            revisions: t.revisions ?? 1,
+          })),
+        },
+        ...(faqs?.length && {
+          faqs: {
+            create: faqs.map((f: { question: string; answer: string }, i: number) => ({
+              question: f.question,
+              answer: f.answer,
+              order: i,
+            })),
+          },
+        }),
+        ...(requirements?.length && {
+          requirements: {
+            create: requirements.map((r: { question: string; required: boolean }, i: number) => ({
+              question: r.question,
+              required: r.required ?? true,
+              order: i,
+            })),
+          },
+        }),
+      },
+      include: { tiers: true, category: true, faqs: true, requirements: true },
+    });
+
+    res.status(201).json(gig);
+  } catch {
+    res.status(500).json({ error: "יצירת השירות נכשלה" });
+  }
 });

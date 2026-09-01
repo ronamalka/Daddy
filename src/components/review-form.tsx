@@ -1,12 +1,15 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useCallback } from "react";
+import { Star, Handshake, Clock, Coins } from "@phosphor-icons/react";
+import { cn } from "@/lib/utils";
+import { TurnstileWidget } from "@/components/turnstile-widget";
 
 const CRITERIA = [
-  { key: "ratingQuality", label: "איכות", icon: "⭐", desc: "איכות העבודה והתוצאה הסופית" },
-  { key: "ratingAttitude", label: "יחס", icon: "🤝", desc: "גישה, אדיבות ותקשורת" },
-  { key: "ratingTimeliness", label: "זמנים", icon: "⏰", desc: "עמידה בזמנים ודייקנות" },
-  { key: "ratingPrice", label: "מחיר", icon: "💰", desc: "תמורה הוגנת למחיר ששולם" },
+  { key: "ratingQuality", label: "איכות", icon: <Star className="h-4 w-4" />, desc: "איכות העבודה והתוצאה הסופית" },
+  { key: "ratingAttitude", label: "יחס", icon: <Handshake className="h-4 w-4" />, desc: "גישה, אדיבות ותקשורת" },
+  { key: "ratingTimeliness", label: "זמנים", icon: <Clock className="h-4 w-4" />, desc: "עמידה בזמנים ודייקנות" },
+  { key: "ratingPrice", label: "מחיר", icon: <Coins className="h-4 w-4" />, desc: "תמורה הוגנת למחיר ששולם" },
 ] as const;
 
 interface ReviewFormProps {
@@ -15,6 +18,7 @@ interface ReviewFormProps {
   onSubmitted: () => void;
 }
 
+/** Form for a buyer to rate a completed job on four scores and leave a comment. */
 export function ReviewForm({ orderId, sellerName, onSubmitted }: ReviewFormProps) {
   const [ratings, setRatings] = useState<Record<string, number>>({
     ratingQuality: 0,
@@ -25,12 +29,17 @@ export function ReviewForm({ orderId, sellerName, onSubmitted }: ReviewFormProps
   const [comment, setComment] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
+  const [turnstileToken, setTurnstileToken] = useState("");
+  const formLoadedAtRef = useRef(Date.now());
+  const handleTurnstileVerify = useCallback((token: string) => setTurnstileToken(token), []);
+  const handleTurnstileExpire = useCallback(() => setTurnstileToken(""), []);
 
   const allRated = Object.values(ratings).every((v) => v > 0);
   const avg = allRated
     ? (Object.values(ratings).reduce((s, v) => s + v, 0) / 4).toFixed(1)
     : null;
 
+  /** Sends the ratings and comment to the order review API. */
   async function handleSubmit() {
     if (!allRated || !comment.trim()) return;
     setSubmitting(true);
@@ -39,7 +48,7 @@ export function ReviewForm({ orderId, sellerName, onSubmitted }: ReviewFormProps
       const res = await fetch(`/api/orders/${orderId}/review`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ comment, ...ratings }),
+        body: JSON.stringify({ comment, ...ratings, turnstileToken, _hp_field: "", _formLoadedAt: formLoadedAtRef.current }),
       });
       if (res.ok) {
         onSubmitted();
@@ -54,71 +63,89 @@ export function ReviewForm({ orderId, sellerName, onSubmitted }: ReviewFormProps
   }
 
   return (
-    <div className="rounded-[16px] border border-[#E8ECF1] bg-white p-6">
-      <h3 className="text-[18px] font-bold text-[#2D3436] mb-1">דרג את {sellerName}</h3>
-      <p className="text-[13px] text-[#B2BEC3] mb-5">לחץ על הציון המתאים בכל קריטריון (1-10)</p>
+    <div className="rounded-xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] p-6">
+      <h3 className="text-[18px] font-bold text-[rgb(var(--color-text))] mb-1">דרג את {sellerName}</h3>
+      <p className="text-[13px] text-[rgb(var(--color-text-muted))] mb-5">לחץ על הציון המתאים בכל קריטריון (1-10)</p>
 
       <div className="space-y-5">
         {CRITERIA.map((c) => (
-          <div key={c.key}>
-            <div className="flex items-center gap-2 mb-2">
-              <span className="text-[16px]">{c.icon}</span>
-              <span className="text-[14px] font-semibold text-[#2D3436]">{c.label}</span>
-              <span className="text-[12px] text-[#B2BEC3]">— {c.desc}</span>
-            </div>
-            <div className="flex gap-1.5">
+          <fieldset key={c.key}>
+            <legend className="flex items-center gap-2 mb-2">
+              <span className="text-[rgb(var(--color-primary))]" aria-hidden="true">{c.icon}</span>
+              <span className="text-[14px] font-semibold text-[rgb(var(--color-text))]">{c.label}</span>
+              <span className="text-[12px] text-[rgb(var(--color-text-muted))]">— {c.desc}</span>
+            </legend>
+            <div className="flex gap-1.5" role="radiogroup" aria-label={`דירוג ${c.label}`}>
               {Array.from({ length: 10 }, (_, i) => i + 1).map((n) => (
                 <button
                   key={n}
                   onClick={() => setRatings((prev) => ({ ...prev, [c.key]: n }))}
-                  className={`h-9 w-9 rounded-[8px] text-[13px] font-semibold transition-all ${
+                  role="radio"
+                  aria-checked={ratings[c.key] === n}
+                  aria-label={`${c.label}: ${n} מתוך 10`}
+                  className={cn(
+                    "h-9 w-9 rounded-lg text-[13px] font-semibold transition-all",
                     ratings[c.key] === n
-                      ? "bg-[#6C5CE7] text-white shadow-[0_2px_8px_rgba(108,92,231,0.3)]"
+                      ? "bg-[rgb(var(--color-primary))] text-white shadow-[0_2px_8px_rgba(var(--color-primary),0.3)]"
                       : ratings[c.key] > 0 && n <= ratings[c.key]
-                      ? "bg-[#F0EEFF] text-[#6C5CE7]"
-                      : "bg-[#FAFBFF] text-[#B2BEC3] hover:bg-[#F0EEFF] hover:text-[#6C5CE7]"
-                  }`}
+                      ? "bg-[rgba(var(--color-primary),0.1)] text-[rgb(var(--color-primary))]"
+                      : "bg-[rgb(var(--color-surface-elevated))] text-[rgb(var(--color-text-muted))] hover:bg-[rgba(var(--color-primary),0.1)] hover:text-[rgb(var(--color-primary))]"
+                  )}
                 >
                   {n}
                 </button>
               ))}
               {ratings[c.key] > 0 && (
-                <span className="flex items-center px-2 text-[14px] font-bold text-[#6C5CE7]">{ratings[c.key]}/10</span>
+                <span className="flex items-center px-2 text-[14px] font-bold text-[rgb(var(--color-primary))]" aria-live="polite">{ratings[c.key]}/10</span>
               )}
             </div>
-          </div>
+          </fieldset>
         ))}
       </div>
 
       {avg && (
-        <div className="mt-5 flex items-center gap-3 rounded-[12px] bg-gradient-to-r from-[#6C5CE7]/10 to-[#00D2D3]/10 p-4">
-          <div className="text-[28px] font-bold text-[#6C5CE7]">{avg}</div>
+        <div className="mt-5 flex items-center gap-3 rounded-xl bg-gradient-to-r from-[rgba(var(--color-primary),0.1)] to-[rgba(var(--color-accent),0.1)] p-4">
+          <div className="text-[28px] font-bold text-[rgb(var(--color-primary))]" aria-label={`ציון כללי: ${avg} מתוך 10`}>{avg}</div>
           <div>
-            <p className="text-[13px] font-semibold text-[#2D3436]">ציון כללי</p>
-            <p className="text-[11px] text-[#B2BEC3]">ממוצע של כל הקריטריונים</p>
+            <p className="text-[13px] font-semibold text-[rgb(var(--color-text))]">ציון כללי</p>
+            <p className="text-[11px] text-[rgb(var(--color-text-muted))]">ממוצע של כל הקריטריונים</p>
           </div>
         </div>
       )}
 
-      <textarea
-        value={comment}
-        onChange={(e) => setComment(e.target.value)}
-        placeholder="ספר על החוויה שלך — מה היה טוב, מה אפשר לשפר..."
-        rows={4}
-        className="mt-5 w-full rounded-[12px] border border-[#E8ECF1] bg-[#FAFBFF] px-4 py-3 text-[14px] text-[#2D3436] placeholder-[#B2BEC3] focus:border-[#6C5CE7] focus:outline-none resize-none"
-      />
+      <div className="mt-5">
+        <label htmlFor="review-comment" className="mb-1.5 block text-[14px] font-medium text-[rgb(var(--color-text))]">
+          חוות דעת
+        </label>
+        <textarea
+          id="review-comment"
+          value={comment}
+          onChange={(e) => setComment(e.target.value)}
+          placeholder="ספר על החוויה שלך — מה היה טוב, מה אפשר לשפר..."
+          rows={4}
+          aria-required="true"
+          className="w-full rounded-xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface-elevated))] px-4 py-3 text-[14px] text-[rgb(var(--color-text))] placeholder-[rgb(var(--color-text-muted))] focus:border-[rgb(var(--color-primary))] focus:outline-none resize-none"
+        />
+      </div>
 
-      {error && <p className="mt-2 text-[13px] text-[#FF6B6B]">{error}</p>}
+      {error && <p role="alert" className="mt-2 text-[13px] text-[rgb(var(--color-error))]">{error}</p>}
+
+      <div aria-hidden="true" className="absolute -left-[9999px] -top-[9999px]">
+        <label htmlFor="hp-review">Leave empty</label>
+        <input id="hp-review" type="text" name="_hp_field" tabIndex={-1} autoComplete="off" />
+      </div>
+
+      <TurnstileWidget onVerify={handleTurnstileVerify} onExpire={handleTurnstileExpire} />
 
       <div className="mt-4 flex items-center gap-3">
         <button
           onClick={handleSubmit}
           disabled={submitting || !allRated || !comment.trim()}
-          className="rounded-[12px] bg-[#6C5CE7] px-6 py-3 text-[14px] font-semibold text-white transition-all hover:bg-[#5A4BD1] disabled:opacity-40"
+          className="rounded-xl bg-[rgb(var(--color-primary))] px-6 py-3 text-[14px] font-semibold text-white transition-all hover:bg-[rgb(var(--color-primary-hover))] disabled:opacity-40"
         >
           {submitting ? "שולח..." : "שלח חוות דעת"}
         </button>
-        {!allRated && <span className="text-[12px] text-[#B2BEC3]">דרג את כל הקריטריונים</span>}
+        {!allRated && <span className="text-[12px] text-[rgb(var(--color-text-muted))]">דרג את כל הקריטריונים</span>}
       </div>
     </div>
   );

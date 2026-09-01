@@ -1,9 +1,122 @@
 import { Router, Request, Response } from "express";
-import { requireAuth } from "../../../shared/middleware";
+import { requireAuth, requireAdmin } from "../../../shared/middleware";
 import { prisma } from "../index";
+import { FlagStatus } from "../generated/prisma/client";
+import {
+  areTenPointCriteria,
+  isTenPointRating,
+  overallFromCriteria,
+} from "../lib/review-ratings";
 
+/** Routes for creating reviews, looking them up, flagging, and seller replies. */
 export const reviewsRoutes = Router();
 
+/** Get the review for one order, if it exists. */
+reviewsRoutes.get("/by-order/:orderId", async (req: Request, res: Response) => {
+  const orderId = req.params.orderId as string;
+
+  const review = await prisma.review.findUnique({
+    where: { orderId },
+    select: {
+      id: true,
+      rating: true,
+      comment: true,
+      ratingAttitude: true,
+      ratingTimeliness: true,
+      ratingPrice: true,
+      ratingQuality: true,
+      sellerResponse: true,
+      sellerResponseAt: true,
+      userId: true,
+      createdAt: true,
+    },
+  });
+
+  if (!review) {
+    res.status(404).json({ error: "Review not found" });
+    return;
+  }
+
+  res.json(review);
+});
+
+/** List visible reviews for one daddy, including local jobs with no gig. */
+reviewsRoutes.get("/by-seller/:sellerId", async (req: Request, res: Response) => {
+  const sellerId = req.params.sellerId as string;
+
+  const reviews = await prisma.review.findMany({
+    where: { sellerId, hiddenAt: null },
+    select: {
+      id: true,
+      rating: true,
+      comment: true,
+      ratingAttitude: true,
+      ratingTimeliness: true,
+      ratingPrice: true,
+      ratingQuality: true,
+      sellerResponse: true,
+      sellerResponseAt: true,
+      userId: true,
+      gigId: true,
+      sellerId: true,
+      createdAt: true,
+    },
+    orderBy: { createdAt: "desc" },
+  });
+
+  const avgRating =
+    reviews.length > 0
+      ? reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length
+      : 0;
+
+  res.json({
+    reviews,
+    reviewCount: reviews.length,
+    avgRating: Math.round(avgRating * 10) / 10,
+  });
+});
+
+/** Flag a review as a problem, unless it is the user's own review. */
+reviewsRoutes.post("/:id/flag", requireAuth, async (req: Request, res: Response) => {
+  const id = req.params.id as string;
+  const { reason } = req.body;
+
+  if (!reason?.trim()) {
+    res.status(400).json({ error: "Reason is required" });
+    return;
+  }
+
+  const review = await prisma.review.findUnique({ where: { id } });
+  if (!review) {
+    res.status(404).json({ error: "Review not found" });
+    return;
+  }
+
+  if (review.userId === req.user!.id) {
+    res.status(400).json({ error: "Cannot flag your own review" });
+    return;
+  }
+
+  const existing = await prisma.reviewFlag.findUnique({
+    where: { reviewId_userId: { reviewId: id, userId: req.user!.id } },
+  });
+  if (existing) {
+    res.status(409).json({ error: "Already flagged" });
+    return;
+  }
+
+  const flag = await prisma.reviewFlag.create({
+    data: {
+      reviewId: id,
+      userId: req.user!.id,
+      reason,
+    },
+  });
+
+  res.status(201).json(flag);
+});
+
+/** Let the job's seller reply to a review once (gig or local job). */
 reviewsRoutes.post("/:id/respond", requireAuth, async (req: Request, res: Response) => {
   const id = req.params.id as string;
 
@@ -17,7 +130,8 @@ reviewsRoutes.post("/:id/respond", requireAuth, async (req: Request, res: Respon
     return;
   }
 
-  if (review.gig.sellerId !== req.user!.id) {
+  const sellerId = review.sellerId || review.gig?.sellerId;
+  if (sellerId !== req.user!.id) {
     res.status(403).json({ error: "Only the seller can respond" });
     return;
   }
@@ -41,12 +155,45 @@ reviewsRoutes.post("/:id/respond", requireAuth, async (req: Request, res: Respon
   res.json(updated);
 });
 
+/** Create a review for a completed order (package or local job). */
 reviewsRoutes.post("/", requireAuth, async (req: Request, res: Response) => {
-  const { orderId, gigId, rating, comment, ratingAttitude, ratingTimeliness, ratingPrice, ratingQuality } = req.body;
+  const { orderId, gigId, sellerId, rating, comment, ratingAttitude, ratingTimeliness, ratingPrice, ratingQuality } = req.body;
 
-  if (!orderId || !gigId || !rating || !comment) {
+  if (!orderId || !sellerId || !comment) {
     res.status(400).json({ error: "Missing fields" });
     return;
+  }
+
+  if (!areTenPointCriteria(ratingAttitude, ratingTimeliness, ratingPrice, ratingQuality)) {
+    res.status(400).json({ error: "All ratings must be between 1 and 10" });
+    return;
+  }
+
+  const overall = isTenPointRating(rating)
+    ? rating
+    : overallFromCriteria(ratingAttitude, ratingTimeliness, ratingPrice, ratingQuality);
+
+  if (!isTenPointRating(overall)) {
+    res.status(400).json({ error: "Rating must be between 1 and 10" });
+    return;
+  }
+
+  if (typeof comment !== "string" || comment.trim().length === 0 || comment.length > 2000) {
+    res.status(400).json({ error: "Comment must be between 1 and 2000 characters" });
+    return;
+  }
+
+  const linkedGigId = typeof gigId === "string" && gigId.trim() ? gigId.trim() : null;
+  if (linkedGigId) {
+    const gig = await prisma.gig.findUnique({ where: { id: linkedGigId }, select: { sellerId: true } });
+    if (!gig) {
+      res.status(400).json({ error: "Gig not found" });
+      return;
+    }
+    if (gig.sellerId !== sellerId) {
+      res.status(400).json({ error: "Seller does not match gig" });
+      return;
+    }
   }
 
   const existing = await prisma.review.findUnique({ where: { orderId } });
@@ -58,16 +205,95 @@ reviewsRoutes.post("/", requireAuth, async (req: Request, res: Response) => {
   const review = await prisma.review.create({
     data: {
       orderId,
-      gigId,
+      gigId: linkedGigId,
+      sellerId,
       userId: req.user!.id,
-      rating,
-      comment,
-      ratingAttitude: ratingAttitude ?? null,
-      ratingTimeliness: ratingTimeliness ?? null,
-      ratingPrice: ratingPrice ?? null,
-      ratingQuality: ratingQuality ?? null,
+      rating: overall,
+      comment: comment.trim(),
+      ratingAttitude,
+      ratingTimeliness,
+      ratingPrice,
+      ratingQuality,
     },
   });
 
   res.status(201).json(review);
 });
+
+/** List review flags for the admin moderation queue. */
+reviewsRoutes.get("/admin/flags", requireAdmin, async (_req: Request, res: Response) => {
+  const flags = await prisma.reviewFlag.findMany({
+    include: {
+      review: {
+        select: {
+          id: true,
+          comment: true,
+          userId: true,
+          hiddenAt: true,
+          gig: { select: { title: true, sellerId: true } },
+        },
+      },
+    },
+    orderBy: { createdAt: "desc" },
+  });
+  res.json(flags);
+});
+
+/** Review, dismiss, or hide a flagged review. */
+reviewsRoutes.patch("/admin/flags/:id", requireAdmin, async (req: Request, res: Response) => {
+  const id = req.params.id as string;
+  const action = req.body?.action as string;
+  const hideReview = action === "hide";
+  const nextStatus =
+    action === "review" ? "UNDER_REVIEW" :
+    action === "dismiss" ? "DISMISSED" :
+    action === "hide" ? "RESOLVED" :
+    null;
+
+  if (!nextStatus) {
+    res.status(400).json({ error: "פעולה לא חוקית" });
+    return;
+  }
+
+  const flag = await prisma.reviewFlag.findUnique({ where: { id } });
+  if (!flag) {
+    res.status(404).json({ error: "הדיווח לא נמצא" });
+    return;
+  }
+
+  const note = typeof req.body?.note === "string" ? req.body.note.trim() : "";
+  const isFinal = nextStatus !== "UNDER_REVIEW";
+
+  const updated = await prisma.$transaction(async (tx) => {
+    const next = await tx.reviewFlag.update({
+      where: { id },
+      data: {
+        status: nextStatus as FlagStatus,
+        resolution: note || flag.resolution,
+        resolvedAt: isFinal ? new Date() : flag.resolvedAt,
+        resolvedBy: isFinal ? req.user!.id : flag.resolvedBy,
+      },
+      include: {
+        review: {
+          select: {
+            id: true,
+            comment: true,
+            userId: true,
+            hiddenAt: true,
+            gig: { select: { title: true, sellerId: true } },
+          },
+        },
+      },
+    });
+    if (hideReview) {
+      await tx.review.update({
+        where: { id: flag.reviewId },
+        data: { hiddenAt: new Date() },
+      });
+    }
+    return next;
+  });
+
+  res.json(updated);
+});
+

@@ -1,23 +1,29 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
-import { proxyRequest, ORDERS_SERVICE } from "@/lib/gateway";
+import { proxyRequest, CHAT_SERVICE } from "@/lib/gateway";
+import { validateBody } from "@/lib/validate";
+import { directMessageSchema } from "@/lib/message-validation";
 
+/** Sends a direct message from the signed-in user. */
 export async function POST(request: Request) {
   const session = await auth();
   if (!session?.user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const body = await request.json();
+  const result = await validateBody(request, directMessageSchema);
+  if ("error" in result) return result.error;
+
   const user = session.user as { id: string; email: string; name: string; role: string };
-  const { data, status } = await proxyRequest(ORDERS_SERVICE, "/messages", {
+  const { data, status } = await proxyRequest(CHAT_SERVICE, "/messages", {
     method: "POST",
-    body,
+    body: result.data,
     user,
   });
-  return NextResponse.json(data, { status });
+  return NextResponse.json(data ?? { error: "Failed to send message" }, { status });
 }
 
+/** Returns messages for the signed-in user. Query params are passed through to chat. */
 export async function GET(request: Request) {
   const session = await auth();
   if (!session?.user) {
@@ -29,6 +35,6 @@ export async function GET(request: Request) {
   const path = params ? `/messages?${params}` : "/messages";
 
   const user = session.user as { id: string; email: string; name: string; role: string };
-  const { data, status } = await proxyRequest(ORDERS_SERVICE, path, { user });
-  return NextResponse.json(data, { status });
+  const { data, status } = await proxyRequest(CHAT_SERVICE, path, { user });
+  return NextResponse.json(data ?? { error: "Failed to load messages" }, { status });
 }

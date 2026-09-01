@@ -1,3 +1,3 @@
 # `src/` — orders service source
 
-`index.ts` mounts `/orders`. Helpers sit in `lib/`.
+`index.ts` mounts `/orders` (list, detail, disputes, cancellation fee recording) and `/admin` (dispute queue). Helpers sit in `lib/`.

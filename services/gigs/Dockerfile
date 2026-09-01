@@ -6,6 +6,7 @@ COPY services/gigs/package.json services/gigs/package-lock.json* ./
 RUN npm install
 
 COPY services/shared/ /app/services/shared/
+RUN cd /app/services/shared && npm install
 COPY services/tsconfig.base.json /app/services/tsconfig.base.json
 COPY services/gigs/ ./
 

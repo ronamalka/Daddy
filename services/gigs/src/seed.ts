@@ -1,6 +1,8 @@
 import pg from "pg";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "./generated/prisma/client";
+import { syncLocalGigCategories } from "../../shared/gig-categories";
+import { migrateReviewScaleAndSeller } from "./lib/review-ratings";
 
 const pool = new pg.Pool({ connectionString: process.env.DATABASE_URL || "postgresql://rmalka@localhost:5432/daddy_gigs" });
 const adapter = new PrismaPg(pool);
@@ -18,40 +20,24 @@ const S = {
   buyer3: "seed-user-buyer3",
 };
 
+/** Loads demo categories, gigs, and reviews into daddy_gigs. */
 async function main() {
-  // Categories
-  const categories = [
-    { name: "תיקונים ותחזוקת הבית", slug: "home-maintenance" },
-    { name: "רכב ותחבורה", slug: "car-transport" },
-    { name: "מיקוח ובירוקרטיה", slug: "negotiation-bureaucracy" },
-    { name: "גינון, חצר וארגון", slug: "garden-yard" },
-    { name: "ייעוץ, הדרכה וסיוע אישי", slug: "consulting-training" },
-    { name: "הובלות ושינוע", slug: "moving-lifting" },
-    { name: "טכנולוגיה ומחשבים", slug: "tech-support" },
-  ];
+  await syncLocalGigCategories(prisma);
 
-  for (const cat of categories) {
-    await prisma.category.upsert({
-      where: { slug: cat.slug },
-      update: { name: cat.name },
-      create: cat,
-    });
-  }
-
+  const assemblyCat = (await prisma.category.findUnique({ where: { slug: "assembly-and-installation" } }))!;
   const homeCat = (await prisma.category.findUnique({ where: { slug: "home-maintenance" } }))!;
-  const carCat = (await prisma.category.findUnique({ where: { slug: "car-transport" } }))!;
-  const negoCat = (await prisma.category.findUnique({ where: { slug: "negotiation-bureaucracy" } }))!;
-  const gardenCat = (await prisma.category.findUnique({ where: { slug: "garden-yard" } }))!;
+  const carCat = (await prisma.category.findUnique({ where: { slug: "car-and-errands" } }))!;
+  const negoCat = (await prisma.category.findUnique({ where: { slug: "admin-and-bureaucracy" } }))!;
+  const gardenCat = (await prisma.category.findUnique({ where: { slug: "garden-and-outdoor" } }))!;
   const techCat = (await prisma.category.findUnique({ where: { slug: "tech-support" } }))!;
-  const moveCat = (await prisma.category.findUnique({ where: { slug: "moving-lifting" } }))!;
-  const consultCat = (await prisma.category.findUnique({ where: { slug: "consulting-training" } }))!;
+  const moveCat = (await prisma.category.findUnique({ where: { slug: "moving-and-organization" } }))!;
 
   // Gigs with tiers
   const gigs = [
     {
       id: "seed-gig-ikea", title: "הרכבת רהיטי איקאה – מהקופסה לסלון",
       description: "מרכיב כל רהיט מאיקאה – ארונות, מיטות, שידות, מטבחים. מגיע עם כלים, מרכיב במקום, מפנה את הקרטונים.",
-      categoryId: homeCat.id, sellerId: S.seller,
+      categoryId: assemblyCat.id, sellerId: S.seller,
       tiers: [
         { tier: "BASIC" as const, title: "רהיט קטן", description: "שידה, כוננית או שולחן קטן", price: 150, deliveryDays: 1, revisions: 1 },
         { tier: "STANDARD" as const, title: "רהיט בינוני", description: "ארון בגדים, מיטה זוגית", price: 300, deliveryDays: 1, revisions: 1 },
@@ -61,7 +47,7 @@ async function main() {
     {
       id: "seed-gig-handyman", title: "תליית מדפים, תמונות, וילונות וזרועות טלוויזיה",
       description: "תולה הכל ישר ובטוח – מדפים, מראות, תמונות, וילונות, זרועות לטלוויזיה. קידוח מקצועי בכל סוג קיר.",
-      categoryId: homeCat.id, sellerId: S.seller,
+      categoryId: assemblyCat.id, sellerId: S.seller,
       tiers: [
         { tier: "BASIC" as const, title: "פריט בודד", description: "תליית תמונה, מדף או מראה", price: 100, deliveryDays: 1, revisions: 1 },
         { tier: "STANDARD" as const, title: "עד 5 פריטים", description: "תליית מספר פריטים באותו ביקור", price: 250, deliveryDays: 1, revisions: 1 },
@@ -71,7 +57,7 @@ async function main() {
     {
       id: "seed-gig-moshe-assembly", title: "הרכבת רהיטים ומדפים – באר שבע והסביבה",
       description: "מרכיב כל דבר: ארונות, מיטות, מדפים, פרגולות. מגיע עם כלים ומניסיון של 15 שנה.",
-      categoryId: homeCat.id, sellerId: S.seller4,
+      categoryId: assemblyCat.id, sellerId: S.seller4,
       tiers: [
         { tier: "BASIC" as const, title: "רהיט קטן", description: "שידה, כוננית, שולחן", price: 130, deliveryDays: 1, revisions: 1 },
         { tier: "STANDARD" as const, title: "2-3 רהיטים", description: "ארון + מיטה + שידות", price: 350, deliveryDays: 1, revisions: 1 },
@@ -171,7 +157,7 @@ async function main() {
     {
       id: "seed-gig-diy", title: "שיעור DIY פרטי – לקדוח, לתקן, לבדוק נזילות",
       description: "שעה של הדרכה אישית בבית. לומדים לקדוח, לתלות, להשתמש בכלי עבודה בסיסיים.",
-      categoryId: consultCat.id, sellerId: S.seller,
+      categoryId: homeCat.id, sellerId: S.seller,
       tiers: [
         { tier: "BASIC" as const, title: "שיעור שעה", description: "הדרכה של שעה בנושא אחד", price: 150, deliveryDays: 1, revisions: 1 },
         { tier: "STANDARD" as const, title: "שיעור + תרגול", description: "שעתיים – הסבר + תרגול", price: 280, deliveryDays: 1, revisions: 1 },
@@ -181,7 +167,7 @@ async function main() {
     {
       id: "seed-gig-apartment", title: "בדיקת דירה לפני מעבר – לא חותמים לפני שאני בודק",
       description: "מגיע לדירה שכורה או חדשה ובודק הכל: שקעים, לחץ מים, רטיבות, צירים, חלונות.",
-      categoryId: consultCat.id, sellerId: S.seller2,
+      categoryId: homeCat.id, sellerId: S.seller2,
       tiers: [
         { tier: "BASIC" as const, title: "בדיקה בסיסית", description: "בדיקת מים, חשמל וצירים", price: 200, deliveryDays: 1, revisions: 1 },
         { tier: "STANDARD" as const, title: "בדיקה מקיפה", description: "בדיקה מלאה + דו״ח עם תמונות", price: 350, deliveryDays: 1, revisions: 1 },
@@ -207,28 +193,35 @@ async function main() {
       await prisma.gig.create({
         data: { ...gigData, tiers: { create: tiers } },
       });
+    } else if (existing.categoryId !== gigData.categoryId) {
+      await prisma.gig.update({
+        where: { id: gig.id },
+        data: { categoryId: gigData.categoryId },
+      });
     }
   }
 
+  await syncLocalGigCategories(prisma);
+
   // Reviews (orderId references orders-service, userId references users-service)
   const reviewSeed = [
-    { id: "rev-1", orderId: "ord-1", gigId: "seed-gig-ikea", userId: S.buyer, comment: "הרכיב ארון PAX תוך שעה וחצי. מקצוען אמיתי, הגיע בזמן ועם כלים. מומלץ בחום!", ratingAttitude: 10, ratingTimeliness: 9, ratingPrice: 8, ratingQuality: 10 },
-    { id: "rev-2", orderId: "ord-2", gigId: "seed-gig-ikea", userId: S.buyer2, comment: "הרכיב מיטת ילדים + שידה. סבלני, נקי, ופינה את כל הקרטונים. אבא אמיתי.", ratingAttitude: 10, ratingTimeliness: 10, ratingPrice: 9, ratingQuality: 10 },
-    { id: "rev-3", orderId: "ord-3", gigId: "seed-gig-handyman", userId: S.buyer3, comment: "תלה 4 מדפים ותמונות. עבודה נקייה, מדויקת. קצת יקר אבל שווה כל שקל.", ratingAttitude: 9, ratingTimeliness: 9, ratingPrice: 7, ratingQuality: 10 },
-    { id: "rev-4", orderId: "ord-4", gigId: "seed-gig-haggle", userId: S.buyer, comment: "הוריד לי את חשבון הסלולר ב-50 שקל בחודש! תוך שיחה אחת. גאוני.", ratingAttitude: 10, ratingTimeliness: 10, ratingPrice: 10, ratingQuality: 9 },
-    { id: "rev-5", orderId: "ord-5", gigId: "seed-gig-garden", userId: S.buyer2, comment: "הגינה נראית מדהים. גיזום מקצועי ודשא ירוק. ממליצה!", ratingAttitude: 9, ratingTimeliness: 8, ratingPrice: 8, ratingQuality: 9 },
-    { id: "rev-6", orderId: "ord-6", gigId: "seed-gig-tech", userId: S.buyer, comment: "הגדיר לי WiFi mesh בכל הבית. סוף סוף יש אינטרנט בכל חדר. סופר מקצועי.", ratingAttitude: 9, ratingTimeliness: 10, ratingPrice: 8, ratingQuality: 10 },
-    { id: "rev-7", orderId: "ord-7", gigId: "seed-gig-tech", userId: S.buyer3, comment: "הגדיר סטרימר + WiFi להורים שלי. בסבלנות אינסופית. תודה רבה.", ratingAttitude: 10, ratingTimeliness: 9, ratingPrice: 9, ratingQuality: 9 },
-    { id: "rev-8", orderId: "ord-8", gigId: "seed-gig-dan-tech", userId: S.buyer, comment: "התקין לי מערכת בית חכם מלאה. הכל עובד מהטלפון. חוויה!", ratingAttitude: 10, ratingTimeliness: 10, ratingPrice: 7, ratingQuality: 10 },
-    { id: "rev-9", orderId: "ord-9", gigId: "seed-gig-dan-tech", userId: S.buyer2, comment: "ייעוץ מעולה, המליץ בדיוק על מה שצריך בלי לדחוף מוצרים מיותרים.", ratingAttitude: 10, ratingTimeliness: 10, ratingPrice: 9, ratingQuality: 10 },
-    { id: "rev-10", orderId: "ord-10", gigId: "seed-gig-dan-tech", userId: S.buyer3, comment: "הגדיר לי 15 מכשירים חכמים ביום אחד. מקצועי ברמה אחרת.", ratingAttitude: 9, ratingTimeliness: 8, ratingPrice: 7, ratingQuality: 10 },
-    { id: "rev-11", orderId: "ord-11", gigId: "seed-gig-moshe-assembly", userId: S.buyer, comment: "הרכיב 3 ארונות ביום אחד. עבודה קשה, גישה מעולה. ממליץ!", ratingAttitude: 10, ratingTimeliness: 9, ratingPrice: 10, ratingQuality: 9 },
-    { id: "rev-12", orderId: "ord-12", gigId: "seed-gig-moshe-assembly", userId: S.buyer3, comment: "הגיע בזמן, עבד מהר, והכל ישר ומסודר. מחיר הוגן מאוד.", ratingAttitude: 9, ratingTimeliness: 10, ratingPrice: 10, ratingQuality: 9 },
-    { id: "rev-13", orderId: "ord-13", gigId: "seed-gig-eran-garden", userId: S.buyer2, comment: "הגינה עברה מהפך! גיזום, שתילה, והכל נראה כמו גן עדן. ערן מקצוען.", ratingAttitude: 10, ratingTimeliness: 9, ratingPrice: 8, ratingQuality: 10 },
-    { id: "rev-14", orderId: "ord-14", gigId: "seed-gig-eran-garden", userId: S.buyer, comment: "טיפול חודשי קבוע. הגינה תמיד נראית מושלמת. שווה כל שקל.", ratingAttitude: 10, ratingTimeliness: 10, ratingPrice: 9, ratingQuality: 10 },
-    { id: "rev-15", orderId: "ord-15", gigId: "seed-gig-roei-save", userId: S.buyer, comment: "חסך לי 300 ש״ח בחודש על תקשורת וביטוח. תוך שבוע. גאון.", ratingAttitude: 10, ratingTimeliness: 10, ratingPrice: 10, ratingQuality: 10 },
-    { id: "rev-16", orderId: "ord-16", gigId: "seed-gig-roei-save", userId: S.buyer2, comment: "ירד על המחירים של 4 חברות. חסך לנו הרבה כסף. מומלץ!", ratingAttitude: 9, ratingTimeliness: 9, ratingPrice: 10, ratingQuality: 9 },
-    { id: "rev-17", orderId: "ord-17", gigId: "seed-gig-roei-save", userId: S.buyer3, comment: "סקירה מלאה ומקצועית. הסביר הכל בסבלנות ובאמת חסך לי.", ratingAttitude: 10, ratingTimeliness: 8, ratingPrice: 10, ratingQuality: 10 },
+    { id: "rev-1", orderId: "ord-1", gigId: "seed-gig-ikea", sellerId: S.seller, userId: S.buyer, comment: "הרכיב ארון PAX תוך שעה וחצי. מקצוען אמיתי, הגיע בזמן ועם כלים. מומלץ בחום!", ratingAttitude: 10, ratingTimeliness: 9, ratingPrice: 8, ratingQuality: 10 },
+    { id: "rev-2", orderId: "ord-2", gigId: "seed-gig-ikea", sellerId: S.seller, userId: S.buyer2, comment: "הרכיב מיטת ילדים + שידה. סבלני, נקי, ופינה את כל הקרטונים. אבא אמיתי.", ratingAttitude: 10, ratingTimeliness: 10, ratingPrice: 9, ratingQuality: 10 },
+    { id: "rev-3", orderId: "ord-3", gigId: "seed-gig-handyman", sellerId: S.seller, userId: S.buyer3, comment: "תלה 4 מדפים ותמונות. עבודה נקייה, מדויקת. קצת יקר אבל שווה כל שקל.", ratingAttitude: 9, ratingTimeliness: 9, ratingPrice: 7, ratingQuality: 10 },
+    { id: "rev-4", orderId: "ord-4", gigId: "seed-gig-haggle", sellerId: S.seller, userId: S.buyer, comment: "הוריד לי את חשבון הסלולר ב-50 שקל בחודש! תוך שיחה אחת. גאוני.", ratingAttitude: 10, ratingTimeliness: 10, ratingPrice: 10, ratingQuality: 9 },
+    { id: "rev-5", orderId: "ord-5", gigId: "seed-gig-garden", sellerId: S.seller, userId: S.buyer2, comment: "הגינה נראית מדהים. גיזום מקצועי ודשא ירוק. ממליצה!", ratingAttitude: 9, ratingTimeliness: 8, ratingPrice: 8, ratingQuality: 9 },
+    { id: "rev-6", orderId: "ord-6", gigId: "seed-gig-tech", sellerId: S.seller2, userId: S.buyer, comment: "הגדיר לי WiFi mesh בכל הבית. סוף סוף יש אינטרנט בכל חדר. סופר מקצועי.", ratingAttitude: 9, ratingTimeliness: 10, ratingPrice: 8, ratingQuality: 10 },
+    { id: "rev-7", orderId: "ord-7", gigId: "seed-gig-tech", sellerId: S.seller2, userId: S.buyer3, comment: "הגדיר סטרימר + WiFi להורים שלי. בסבלנות אינסופית. תודה רבה.", ratingAttitude: 10, ratingTimeliness: 9, ratingPrice: 9, ratingQuality: 9 },
+    { id: "rev-8", orderId: "ord-8", gigId: "seed-gig-dan-tech", sellerId: S.seller3, userId: S.buyer, comment: "התקין לי מערכת בית חכם מלאה. הכל עובד מהטלפון. חוויה!", ratingAttitude: 10, ratingTimeliness: 10, ratingPrice: 7, ratingQuality: 10 },
+    { id: "rev-9", orderId: "ord-9", gigId: "seed-gig-dan-tech", sellerId: S.seller3, userId: S.buyer2, comment: "ייעוץ מעולה, המליץ בדיוק על מה שצריך בלי לדחוף מוצרים מיותרים.", ratingAttitude: 10, ratingTimeliness: 10, ratingPrice: 9, ratingQuality: 10 },
+    { id: "rev-10", orderId: "ord-10", gigId: "seed-gig-dan-tech", sellerId: S.seller3, userId: S.buyer3, comment: "הגדיר לי 15 מכשירים חכמים ביום אחד. מקצועי ברמה אחרת.", ratingAttitude: 9, ratingTimeliness: 8, ratingPrice: 7, ratingQuality: 10 },
+    { id: "rev-11", orderId: "ord-11", gigId: "seed-gig-moshe-assembly", sellerId: S.seller4, userId: S.buyer, comment: "הרכיב 3 ארונות ביום אחד. עבודה קשה, גישה מעולה. ממליץ!", ratingAttitude: 10, ratingTimeliness: 9, ratingPrice: 10, ratingQuality: 9 },
+    { id: "rev-12", orderId: "ord-12", gigId: "seed-gig-moshe-assembly", sellerId: S.seller4, userId: S.buyer3, comment: "הגיע בזמן, עבד מהר, והכל ישר ומסודר. מחיר הוגן מאוד.", ratingAttitude: 9, ratingTimeliness: 10, ratingPrice: 10, ratingQuality: 9 },
+    { id: "rev-13", orderId: "ord-13", gigId: "seed-gig-eran-garden", sellerId: S.seller5, userId: S.buyer2, comment: "הגינה עברה מהפך! גיזום, שתילה, והכל נראה כמו גן עדן. ערן מקצוען.", ratingAttitude: 10, ratingTimeliness: 9, ratingPrice: 8, ratingQuality: 10 },
+    { id: "rev-14", orderId: "ord-14", gigId: "seed-gig-eran-garden", sellerId: S.seller5, userId: S.buyer, comment: "טיפול חודשי קבוע. הגינה תמיד נראית מושלמת. שווה כל שקל.", ratingAttitude: 10, ratingTimeliness: 10, ratingPrice: 9, ratingQuality: 10 },
+    { id: "rev-15", orderId: "ord-15", gigId: "seed-gig-roei-save", sellerId: S.seller6, userId: S.buyer, comment: "חסך לי 300 ש״ח בחודש על תקשורת וביטוח. תוך שבוע. גאון.", ratingAttitude: 10, ratingTimeliness: 10, ratingPrice: 10, ratingQuality: 10 },
+    { id: "rev-16", orderId: "ord-16", gigId: "seed-gig-roei-save", sellerId: S.seller6, userId: S.buyer2, comment: "ירד על המחירים של 4 חברות. חסך לנו הרבה כסף. מומלץ!", ratingAttitude: 9, ratingTimeliness: 9, ratingPrice: 10, ratingQuality: 9 },
+    { id: "rev-17", orderId: "ord-17", gigId: "seed-gig-roei-save", sellerId: S.seller6, userId: S.buyer3, comment: "סקירה מלאה ומקצועית. הסביר הכל בסבלנות ובאמת חסך לי.", ratingAttitude: 10, ratingTimeliness: 8, ratingPrice: 10, ratingQuality: 10 },
   ];
 
   for (const rev of reviewSeed) {
@@ -240,6 +233,7 @@ async function main() {
           id: rev.id,
           orderId: rev.orderId,
           gigId: rev.gigId,
+          sellerId: rev.sellerId,
           userId: rev.userId,
           rating: overall,
           comment: rev.comment,
@@ -251,6 +245,23 @@ async function main() {
       });
     }
   }
+
+  const existingFlag = await prisma.reviewFlag.findUnique({
+    where: { reviewId_userId: { reviewId: "rev-1", userId: S.buyer2 } },
+  });
+  if (!existingFlag) {
+    await prisma.reviewFlag.create({
+      data: {
+        id: "flag-seed-1",
+        reviewId: "rev-1",
+        userId: S.buyer2,
+        reason: "נראה כמו ביקורת מזויפת — ניסוח זהה לביקורות אחרות",
+        status: "OPEN",
+      },
+    });
+  }
+
+  await migrateReviewScaleAndSeller(prisma);
 
   console.log("Gigs seed complete.");
 }

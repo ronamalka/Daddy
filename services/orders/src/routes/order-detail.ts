@@ -2,19 +2,23 @@ import { Router, Request, Response } from "express";
 import { requireAuth } from "../../../shared/middleware";
 import { prisma } from "../index";
 import { OrderStatus } from "../generated/prisma/client";
+import { isOpenDisputeStatus } from "../lib/disputes";
+import { buyerCancelPatch, sellerDeclinePatch } from "../lib/cancellation";
+import { canStartWork } from "../lib/materials";
+import { parseDeliveryEvidence } from "../../../shared/delivery-photos";
 
+/** Routes for one order: details, status changes, and buyer requirements. */
 export const orderDetailRoutes = Router();
 
+/** Get one order if the user is the buyer, the seller, or an admin. */
 orderDetailRoutes.get("/:id", requireAuth, async (req: Request, res: Response) => {
   const id = req.params.id as string;
 
   const order = await prisma.order.findUnique({
     where: { id },
     include: {
-      messages: {
-        orderBy: { createdAt: "asc" },
-      },
       requirements: true,
+      disputes: { orderBy: { createdAt: "desc" } },
     },
   });
 
@@ -31,13 +35,25 @@ orderDetailRoutes.get("/:id", requireAuth, async (req: Request, res: Response) =
   res.json(order);
 });
 
+/** Update an order's status using the allowed buyer and seller steps. */
 orderDetailRoutes.patch("/:id", requireAuth, async (req: Request, res: Response) => {
   const id = req.params.id as string;
   const { status } = req.body;
 
-  const order = await prisma.order.findUnique({ where: { id } });
+  const order = await prisma.order.findUnique({
+    where: { id },
+    include: { disputes: { select: { status: true } } },
+  });
   if (!order) {
     res.status(404).json({ error: "Order not found" });
+    return;
+  }
+
+  if (
+    req.user!.role !== "ADMIN" &&
+    order.disputes.some((d) => isOpenDisputeStatus(d.status))
+  ) {
+    res.status(409).json({ error: "לא ניתן לשנות סטטוס בזמן שמחלוקת פתוחה" });
     return;
   }
 
@@ -45,8 +61,6 @@ orderDetailRoutes.patch("/:id", requireAuth, async (req: Request, res: Response)
     IN_PROGRESS: { by: ["seller"], from: ["PENDING"] },
     DELIVERED: { by: ["seller"], from: ["IN_PROGRESS"] },
     COMPLETED: { by: ["buyer"], from: ["DELIVERED"] },
-    CANCELLED: { by: ["buyer", "seller"], from: ["PENDING"] },
-    REVISION: { by: ["buyer"], from: ["DELIVERED"] },
   };
 
   if (status === "REVISION") {
@@ -61,6 +75,40 @@ orderDetailRoutes.patch("/:id", requireAuth, async (req: Request, res: Response)
     const updated = await prisma.order.update({
       where: { id },
       data: { status: "IN_PROGRESS" },
+    });
+    res.json(updated);
+    return;
+  }
+
+  if (status === "CANCELLED") {
+    const isBuyer = order.buyerId === req.user!.id;
+    const isSeller = order.sellerId === req.user!.id;
+    if (!isBuyer && !isSeller && req.user!.role !== "ADMIN") {
+      res.status(403).json({ error: "Forbidden" });
+      return;
+    }
+
+    const result = isBuyer
+      ? buyerCancelPatch({
+          status: order.status,
+          price: order.price,
+          slotStart: order.slotStart,
+          slotEnd: order.slotEnd,
+          actorId: req.user!.id,
+        })
+      : sellerDeclinePatch({
+          status: order.status,
+          actorId: req.user!.id,
+        });
+
+    if (!result.ok) {
+      res.status(result.status).json({ error: result.error });
+      return;
+    }
+
+    const updated = await prisma.order.update({
+      where: { id },
+      data: result.data,
     });
     res.json(updated);
     return;
@@ -83,6 +131,29 @@ orderDetailRoutes.patch("/:id", requireAuth, async (req: Request, res: Response)
     return;
   }
 
+  if (status === "IN_PROGRESS" && !canStartWork(order)) {
+    res.status(409).json({ error: "הלקוח צריך לאשר את עדכון החומרים לפני תחילת העבודה" });
+    return;
+  }
+
+  if (status === "DELIVERED") {
+    const evidence = parseDeliveryEvidence(req.body);
+    if (!evidence.ok) {
+      res.status(400).json({ error: evidence.error });
+      return;
+    }
+    const updated = await prisma.order.update({
+      where: { id },
+      data: {
+        status,
+        deliveryPhotos: evidence.value.photos,
+        deliveryNote: evidence.value.note,
+      },
+    });
+    res.json(updated);
+    return;
+  }
+
   const updated = await prisma.order.update({
     where: { id },
     data: { status },
@@ -91,6 +162,7 @@ orderDetailRoutes.patch("/:id", requireAuth, async (req: Request, res: Response)
   res.json(updated);
 });
 
+/** Save the buyer's answers to the gig's requirement questions. */
 orderDetailRoutes.post("/:id/requirements", requireAuth, async (req: Request, res: Response) => {
   const orderId = req.params.id as string;
 
@@ -125,38 +197,4 @@ orderDetailRoutes.post("/:id/requirements", requireAuth, async (req: Request, re
   });
 
   res.status(201).json({ count: created.count });
-});
-
-orderDetailRoutes.post("/:id/messages", requireAuth, async (req: Request, res: Response) => {
-  const orderId = req.params.id as string;
-
-  const order = await prisma.order.findUnique({ where: { id: orderId } });
-  if (!order) {
-    res.status(404).json({ error: "Order not found" });
-    return;
-  }
-
-  if (order.buyerId !== req.user!.id && order.sellerId !== req.user!.id) {
-    res.status(403).json({ error: "Forbidden" });
-    return;
-  }
-
-  const { content } = req.body;
-  if (!content?.trim()) {
-    res.status(400).json({ error: "Message cannot be empty" });
-    return;
-  }
-
-  const receiverId = req.user!.id === order.buyerId ? order.sellerId : order.buyerId;
-
-  const message = await prisma.message.create({
-    data: {
-      content,
-      orderId,
-      senderId: req.user!.id,
-      receiverId,
-    },
-  });
-
-  res.status(201).json(message);
 });

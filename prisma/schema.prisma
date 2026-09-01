@@ -27,10 +27,57 @@ enum RequestStatus {
   CLOSED
 }
 
+enum PreferredWindow {
+  MORNING
+  AFTERNOON
+  WEEKEND
+}
+
 enum GigTier {
   BASIC
   STANDARD
   PREMIUM
+}
+
+enum JobType {
+  GIG
+  LOCAL_REQUEST
+}
+
+enum DisputeReason {
+  NO_SHOW
+  DAMAGE
+  DIFFERENT_PRICE
+  QUALITY
+}
+
+enum DisputeStatus {
+  OPEN
+  UNDER_REVIEW
+  RESOLVED_RELEASE
+  RESOLVED_REFUND
+  RESOLVED_SPLIT
+  CLOSED
+}
+
+enum FlagStatus {
+  OPEN
+  UNDER_REVIEW
+  DISMISSED
+  RESOLVED
+}
+
+enum PaymentAction {
+  RELEASE
+  REFUND
+  SPLIT
+}
+
+enum CancellationFeeStatus {
+  NONE
+  OWED
+  COLLECTED
+  WAIVED
 }
 
 model User {
@@ -43,10 +90,13 @@ model User {
   bio          String?
   phone        String?
   city         String?
-  cityCode     Int?
-  districtCode Int?
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  cityCode      Int?
+  districtCode  Int?
+  acceptingJobs Boolean  @default(true)
+  suspendedAt   DateTime?
+  suspendReason String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 
   gigs             Gig[]
   ordersAsBuyer    Order[]       @relation("BuyerOrders")
@@ -61,6 +111,36 @@ model User {
   serviceRequests  ServiceRequest[]  @relation("BuyerRequests")
   requestResponses RequestResponse[] @relation("SellerResponses")
   passwordResets   PasswordReset[]
+  reviewFlags      ReviewFlag[]
+  weeklyHours      WeeklyHours[]
+  timeOff          TimeOff[]
+  disputesOpened   Dispute[]
+  notifications    Notification[]
+}
+
+model WeeklyHours {
+  id        String @id @default(cuid())
+  userId    String
+  dayOfWeek Int
+  startMin  Int
+  endMin    Int
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, dayOfWeek])
+  @@index([userId])
+}
+
+model TimeOff {
+  id     String  @id @default(cuid())
+  userId String
+  date   String
+  note   String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, date])
+  @@index([userId])
 }
 
 model PasswordReset {
@@ -101,15 +181,35 @@ model ServiceArea {
 }
 
 model UserService {
-  id          String @id @default(cuid())
+  id          String  @id @default(cuid())
   userId      String
   serviceSlug String
+  alertsMuted Boolean @default(false)
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, serviceSlug])
   @@index([userId])
   @@index([serviceSlug])
+}
+
+/// In-app alerts. `type` is `NEW_NEARBY_REQUEST` for matched jobs; WhatsApp send is issue #52.
+model Notification {
+  id        String    @id @default(cuid())
+  userId    String
+  type      String
+  title     String
+  message   String
+  href      String
+  entityId  String
+  payload   Json?
+  readAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, type, entityId])
+  @@index([userId, createdAt])
 }
 
 model ServiceRequest {
@@ -122,9 +222,18 @@ model ServiceRequest {
   districtName String?
   cityCode     Int?
   cityName     String?
-  status       RequestStatus @default(OPEN)
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
+  street             String?
+  floor              String?
+  preferredWindow    PreferredWindow?
+  photos             String[]        @default([])
+  status             RequestStatus @default(OPEN)
+  unlisted           Boolean       @default(false)
+  slotStart          DateTime?
+  slotEnd            DateTime?
+  selectedResponseId String?
+  orderId            String?
+  createdAt          DateTime      @default(now())
+  updatedAt          DateTime      @updatedAt
 
   buyer     User              @relation("BuyerRequests", fields: [buyerId], references: [id])
   responses RequestResponse[]
@@ -132,15 +241,20 @@ model ServiceRequest {
   @@index([buyerId])
   @@index([status])
   @@index([districtCode])
+  @@index([status, unlisted, createdAt])
 }
 
 model RequestResponse {
-  id            String   @id @default(cuid())
-  requestId     String
-  sellerId      String
-  message       String
-  proposedPrice Float?
-  createdAt     DateTime @default(now())
+  id                     String   @id @default(cuid())
+  requestId              String
+  sellerId               String
+  message                String
+  proposedPrice          Float?
+  laborPrice             Float?
+  materialsEstimate      Float?
+  buyerSuppliesMaterials Boolean  @default(true)
+  selected               Boolean  @default(false)
+  createdAt              DateTime @default(now())
 
   request ServiceRequest @relation(fields: [requestId], references: [id], onDelete: Cascade)
   seller  User           @relation("SellerResponses", fields: [sellerId], references: [id])
@@ -240,25 +354,46 @@ model Favorite {
 
 model Order {
   id        String      @id @default(cuid())
-  gigId     String
+  jobType   JobType     @default(GIG)
+  gigId     String?
+  requestId String?
+  title     String?
   buyerId   String
   sellerId  String
-  tier      GigTier
-  price     Float
-  status    OrderStatus @default(PENDING)
+  tier                       GigTier?
+  price                      Float
+  laborPrice                 Float?
+  materialsEstimate          Float?
+  buyerSuppliesMaterials     Boolean      @default(true)
+  pendingMaterialsEstimate   Float?
+  materialsUpdatedAt         DateTime?
+  materialsAcknowledgedAt    DateTime?
+  status                     OrderStatus  @default(PENDING)
   dueDate   DateTime?
+  slotStart DateTime?
+  slotEnd   DateTime?
+  cancelledAt           DateTime?
+  cancelledById         String?
+  cancellationFee       Float                 @default(0)
+  cancellationFeeStatus CancellationFeeStatus @default(NONE)
+  deliveryPhotos        String[]              @default([])
+  deliveryNote          String?
   createdAt DateTime    @default(now())
   updatedAt DateTime    @updatedAt
 
-  gig          Gig                @relation(fields: [gigId], references: [id])
+  gig          Gig?               @relation(fields: [gigId], references: [id])
   buyer        User               @relation("BuyerOrders", fields: [buyerId], references: [id])
   seller       User               @relation("SellerOrders", fields: [sellerId], references: [id])
   messages     Message[]
   review       Review?
   requirements OrderRequirement[]
+  disputes     Dispute[]
 
   @@index([buyerId])
   @@index([sellerId])
+  @@index([gigId])
+  @@index([requestId])
+  @@index([sellerId, slotStart])
 }
 
 model OrderRequirement {
@@ -286,22 +421,73 @@ model Review {
   timelinessRating    Int?
   sellerResponse      String?
   sellerResponseAt    DateTime?
+  hiddenAt            DateTime?
   orderId             String    @unique
-  gigId               String
+  gigId               String?   // null for local jobs (LOCAL_REQUEST)
+  sellerId            String    @default("")
   userId              String
   createdAt           DateTime  @default(now())
 
-  order Order @relation(fields: [orderId], references: [id])
-  gig   Gig   @relation(fields: [gigId], references: [id])
-  user  User  @relation(fields: [userId], references: [id])
+  order Order        @relation(fields: [orderId], references: [id])
+  gig   Gig?         @relation(fields: [gigId], references: [id])
+  user  User         @relation(fields: [userId], references: [id])
+  flags ReviewFlag[]
+
+  @@index([gigId])
+  @@index([sellerId])
+}
+
+model ReviewFlag {
+  id         String     @id @default(cuid())
+  reviewId   String
+  userId     String
+  reason     String
+  status     FlagStatus @default(OPEN)
+  resolution String?
+  resolvedAt DateTime?
+  resolvedBy String?
+  createdAt  DateTime   @default(now())
+
+  review Review @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+  user   User   @relation(fields: [userId], references: [id])
+
+  @@unique([reviewId, userId])
+  @@index([reviewId])
+  @@index([status])
+}
+
+model Dispute {
+  id               String         @id @default(cuid())
+  orderId          String
+  openerId         String
+  reason           DisputeReason
+  description      String
+  photos           String[]
+  status           DisputeStatus  @default(OPEN)
+  resolution       String?
+  paymentAction    PaymentAction?
+  splitBuyerAmount Float?
+  resolvedAt       DateTime?
+  resolvedBy       String?
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+
+  order  Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  opener User  @relation(fields: [openerId], references: [id])
+
+  @@index([orderId])
+  @@index([openerId])
+  @@index([status])
 }
 
 model ServicePrice {
-  id          String @id @default(cuid())
-  userId      String
-  serviceSlug String
-  price       Float
-  description String?
+  id                     String @id @default(cuid())
+  userId                 String
+  serviceSlug            String
+  price                  Float
+  materialsEstimate      Float?
+  buyerSuppliesMaterials Boolean @default(true)
+  description            String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
@@ -314,9 +500,11 @@ model ServicePrice {
 model Message {
   id         String   @id @default(cuid())
   content    String
+  attachment String?
   orderId    String?
   senderId   String
   receiverId String
+  readAt     DateTime?
   createdAt  DateTime @default(now())
 
   order    Order? @relation(fields: [orderId], references: [id])

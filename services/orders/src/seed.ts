@@ -18,6 +18,7 @@ const S = {
   buyer3: "seed-user-buyer3",
 };
 
+/** Loads demo bookings in several statuses into daddy_orders. */
 async function main() {
   const orders = [
     { id: "ord-1", gigId: "seed-gig-ikea", buyerId: S.buyer, sellerId: S.seller, tier: "BASIC" as const, price: 150, status: "COMPLETED" as const },
@@ -37,13 +38,114 @@ async function main() {
     { id: "ord-15", gigId: "seed-gig-roei-save", buyerId: S.buyer, sellerId: S.seller6, tier: "BASIC" as const, price: 150, status: "COMPLETED" as const },
     { id: "ord-16", gigId: "seed-gig-roei-save", buyerId: S.buyer2, sellerId: S.seller6, tier: "BASIC" as const, price: 150, status: "COMPLETED" as const },
     { id: "ord-17", gigId: "seed-gig-roei-save", buyerId: S.buyer3, sellerId: S.seller6, tier: "BASIC" as const, price: 150, status: "COMPLETED" as const },
+    {
+      id: "ord-18",
+      gigId: "seed-gig-ikea",
+      buyerId: S.buyer,
+      sellerId: S.seller,
+      tier: "BASIC" as const,
+      price: 180,
+      status: "IN_PROGRESS" as const,
+      slotStart: new Date("2026-09-01T13:00:00.000Z"),
+      slotEnd: new Date("2026-09-01T15:00:00.000Z"),
+      dueDate: new Date("2026-09-01T15:00:00.000Z"),
+    },
+    {
+      id: "ord-19",
+      gigId: "seed-gig-handyman",
+      buyerId: S.buyer2,
+      sellerId: S.seller,
+      tier: "BASIC" as const,
+      price: 200,
+      status: "PENDING" as const,
+      slotStart: new Date("2026-09-02T13:00:00.000Z"),
+      slotEnd: new Date("2026-09-02T15:00:00.000Z"),
+      dueDate: new Date("2026-09-02T15:00:00.000Z"),
+    },
+    {
+      id: "ord-20",
+      gigId: "seed-gig-garden",
+      buyerId: S.buyer3,
+      sellerId: S.seller,
+      tier: "BASIC" as const,
+      price: 220,
+      status: "IN_PROGRESS" as const,
+      slotStart: new Date("2026-09-04T15:00:00.000Z"),
+      slotEnd: new Date("2026-09-04T17:00:00.000Z"),
+      dueDate: new Date("2026-09-04T17:00:00.000Z"),
+    },
+    {
+      id: "ord-21",
+      gigId: "seed-gig-tech",
+      buyerId: S.seller,
+      sellerId: S.seller2,
+      tier: "BASIC" as const,
+      price: 160,
+      status: "PENDING" as const,
+      slotStart: new Date("2026-09-03T13:00:00.000Z"),
+      slotEnd: new Date("2026-09-03T15:00:00.000Z"),
+      dueDate: new Date("2026-09-03T15:00:00.000Z"),
+    },
+    {
+      id: "ord-22",
+      gigId: "seed-gig-handyman",
+      buyerId: S.buyer,
+      sellerId: S.seller,
+      tier: "BASIC" as const,
+      price: 170,
+      status: "DELIVERED" as const,
+      slotStart: new Date("2026-09-05T13:00:00.000Z"),
+      slotEnd: new Date("2026-09-05T15:00:00.000Z"),
+      dueDate: new Date("2026-09-05T15:00:00.000Z"),
+      deliveryPhotos: ["/uploads/aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee.jpg"],
+      deliveryNote: "החלפתי את הברז, הישן בשקית",
+    },
+    {
+      id: "ord-23",
+      jobType: "LOCAL_REQUEST" as const,
+      gigId: null,
+      title: "הרכבת שידה בסלון",
+      buyerId: S.buyer,
+      sellerId: S.seller,
+      tier: null,
+      price: 220,
+      status: "DELIVERED" as const,
+      slotStart: new Date("2026-09-06T13:00:00.000Z"),
+      slotEnd: new Date("2026-09-06T15:00:00.000Z"),
+      dueDate: new Date("2026-09-06T15:00:00.000Z"),
+      deliveryPhotos: ["/uploads/11111111-2222-3333-4444-555555555555.jpg"],
+      deliveryNote: "השידה מורכבת ומפולסת",
+    },
   ];
 
   for (const order of orders) {
     const existing = await prisma.order.findUnique({ where: { id: order.id } });
     if (!existing) {
       await prisma.order.create({ data: order });
+    } else if ("deliveryPhotos" in order && Array.isArray(order.deliveryPhotos) && order.deliveryPhotos.length > 0 && existing.deliveryPhotos.length === 0) {
+      await prisma.order.update({
+        where: { id: order.id },
+        data: {
+          deliveryPhotos: order.deliveryPhotos,
+          deliveryNote: order.deliveryNote ?? null,
+        },
+      });
     }
+  }
+
+  const existingDispute = await prisma.dispute.findUnique({ where: { id: "dsp-seed-1" } });
+  if (!existingDispute) {
+    await prisma.dispute.create({
+      data: {
+        id: "dsp-seed-1",
+        orderId: "ord-18",
+        openerId: S.buyer,
+        reason: "QUALITY",
+        description: "הארון יצא עקום והדלת לא נסגרת. ביקשתי תיקון ולא חזר.",
+        photos: [],
+        status: "OPEN",
+      },
+    });
   }
 
   console.log("Orders seed complete.");

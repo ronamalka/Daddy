@@ -1,0 +1,230 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: default-deny
+  labels:
+    app.kubernetes.io/part-of: daddy
+spec:
+  podSelector: {}
+  policyTypes:
+    - Ingress
+    - Egress
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-bff-ingress
+  labels:
+    app.kubernetes.io/part-of: daddy
+spec:
+  podSelector:
+    matchLabels:
+      app: daddy-app
+  policyTypes:
+    - Ingress
+  ingress:
+    - ports:
+        - port: 3000
+          protocol: TCP
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-bff-egress
+  labels:
+    app.kubernetes.io/part-of: daddy
+spec:
+  podSelector:
+    matchLabels:
+      app: daddy-app
+  policyTypes:
+    - Egress
+  egress:
+    - to:
+        - podSelector:
+            matchLabels:
+              app: users-service
+      ports:
+        - port: 4001
+          protocol: TCP
+    - to:
+        - podSelector:
+            matchLabels:
+              app: gigs-service
+      ports:
+        - port: 4002
+          protocol: TCP
+    - to:
+        - podSelector:
+            matchLabels:
+              app: orders-service
+      ports:
+        - port: 4003
+          protocol: TCP
+    - to:
+        - podSelector:
+            matchLabels:
+              app: requests-service
+      ports:
+        - port: 4004
+          protocol: TCP
+    - to:
+        - podSelector:
+            matchLabels:
+              app: chat-service
+      ports:
+        - port: 4005
+          protocol: TCP
+    - to:
+        - podSelector:
+            matchLabels:
+              app: postgres
+      ports:
+        - port: 5432
+          protocol: TCP
+    - to:
+        - podSelector:
+            matchLabels:
+              app: redis
+      ports:
+        - port: 6379
+          protocol: TCP
+    - ports:
+        - port: 53
+          protocol: UDP
+        - port: 53
+          protocol: TCP
+    # Google OAuth token exchange and other HTTPS APIs
+    - ports:
+        - port: 443
+          protocol: TCP
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-services-to-postgres
+  labels:
+    app.kubernetes.io/part-of: daddy
+spec:
+  podSelector:
+    matchLabels:
+      app: postgres
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app: daddy-app
+        - podSelector:
+            matchLabels:
+              app: users-service
+        - podSelector:
+            matchLabels:
+              app: gigs-service
+        - podSelector:
+            matchLabels:
+              app: orders-service
+        - podSelector:
+            matchLabels:
+              app: requests-service
+        - podSelector:
+            matchLabels:
+              app: chat-service
+      ports:
+        - port: 5432
+          protocol: TCP
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-services-egress
+  labels:
+    app.kubernetes.io/part-of: daddy
+spec:
+  podSelector:
+    matchExpressions:
+      - key: app
+        operator: In
+        values:
+          - users-service
+          - gigs-service
+          - orders-service
+          - requests-service
+          - chat-service
+  policyTypes:
+    - Egress
+  egress:
+    - to:
+        - podSelector:
+            matchLabels:
+              app: postgres
+      ports:
+        - port: 5432
+          protocol: TCP
+    - ports:
+        - port: 53
+          protocol: UDP
+        - port: 53
+          protocol: TCP
+    # users-service refreshes the city catalog from data.gov.il
+    - ports:
+        - port: 443
+          protocol: TCP
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-services-ingress
+  labels:
+    app.kubernetes.io/part-of: daddy
+spec:
+  podSelector:
+    matchExpressions:
+      - key: app
+        operator: In
+        values:
+          - users-service
+          - gigs-service
+          - orders-service
+          - requests-service
+          - chat-service
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app: daddy-app
+      ports:
+        - port: 4001
+          protocol: TCP
+        - port: 4002
+          protocol: TCP
+        - port: 4003
+          protocol: TCP
+        - port: 4004
+          protocol: TCP
+        - port: 4005
+          protocol: TCP
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-redis-ingress
+  labels:
+    app.kubernetes.io/part-of: daddy
+spec:
+  podSelector:
+    matchLabels:
+      app: redis
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app: daddy-app
+      ports:
+        - port: 6379
+          protocol: TCP

@@ -25,13 +25,19 @@ model User {
   city         String?
   cityCode     Int?
   districtCode Int?
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  acceptingJobs Boolean  @default(true)
+  suspendedAt   DateTime?
+  suspendReason String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 
   serviceAreas    ServiceArea[]
   userServices    UserService[]
   servicePrices   ServicePrice[]
   passwordResets  PasswordReset[]
+  weeklyHours     WeeklyHours[]
+  timeOff         TimeOff[]
+  notifications   Notification[]
 }
 
 model PasswordReset {
@@ -65,9 +71,10 @@ model ServiceArea {
 }
 
 model UserService {
-  id          String @id @default(cuid())
+  id          String  @id @default(cuid())
   userId      String
   serviceSlug String
+  alertsMuted Boolean @default(false)
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -76,12 +83,33 @@ model UserService {
   @@index([serviceSlug])
 }
 
+/// In-app alerts. `type` is `NEW_NEARBY_REQUEST` for matched jobs; WhatsApp send is issue #52.
+model Notification {
+  id        String    @id @default(cuid())
+  userId    String
+  type      String
+  title     String
+  message   String
+  href      String
+  entityId  String
+  payload   Json?
+  readAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, type, entityId])
+  @@index([userId, createdAt])
+}
+
 model ServicePrice {
-  id          String   @id @default(cuid())
-  userId      String
-  serviceSlug String
-  price       Float
-  description String?
+  id                     String   @id @default(cuid())
+  userId                 String
+  serviceSlug            String
+  price                  Float
+  materialsEstimate      Float?
+  buyerSuppliesMaterials Boolean  @default(true)
+  description            String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
@@ -89,4 +117,48 @@ model ServicePrice {
 
   @@unique([userId, serviceSlug])
   @@index([userId])
+}
+
+model WeeklyHours {
+  id        String @id @default(cuid())
+  userId    String
+  dayOfWeek Int
+  startMin  Int
+  endMin    Int
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, dayOfWeek])
+  @@index([userId])
+}
+
+model TimeOff {
+  id     String  @id @default(cuid())
+  userId String
+  date   String
+  note   String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, date])
+  @@index([userId])
+}
+
+/// CBS localities for pickers. Request path reads this table only; data.gov.il is a daily background refresh.
+model City {
+  code         Int      @id
+  name         String
+  districtCode Int
+  districtName String
+  regionName   String   @default("")
+  updatedAt    DateTime @updatedAt
+
+  @@index([districtCode])
+}
+
+/// Singleton (id=1). fetchedAt is the last successful government pull; null means snapshot-only.
+model CityCatalog {
+  id        Int       @id @default(1)
+  source    String    @default("snapshot")
+  fetchedAt DateTime?
 }

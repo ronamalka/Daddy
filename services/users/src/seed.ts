@@ -2,6 +2,7 @@ import pg from "pg";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "./generated/prisma/client";
 import { hash } from "bcryptjs";
+import snapshot from "./data/israeli-cities.json";
 
 const pool = new pg.Pool({ connectionString: process.env.DATABASE_URL || "postgresql://rmalka@localhost:5432/daddy_users" });
 const adapter = new PrismaPg(pool);
@@ -18,28 +19,41 @@ export const SEED_IDS = {
   buyer: "seed-user-buyer1",
   buyer2: "seed-user-buyer2",
   buyer3: "seed-user-buyer3",
+  incompleteSeller: "seed-user-incomplete",
 };
 
+/** Loads demo buyers, sellers, and an admin into daddy_users. */
 async function main() {
   const passwordHash = await hash("password123", 12);
 
   const users = [
     { id: SEED_IDS.admin, name: "אבא מנהל", email: "admin@daddy.com", passwordHash, role: "ADMIN" as const },
-    { id: SEED_IDS.seller, name: "יוסי הגולדן", email: "seller@daddy.com", passwordHash, role: "SELLER" as const, bio: "אבא של 3, מתקן הכל מגיל 15. אם זה שבור – אני מסדר.", city: "תל אביב", districtCode: 5, cityCode: 5000 },
-    { id: SEED_IDS.seller2, name: "אבי המתקן", email: "seller2@daddy.com", passwordHash, role: "SELLER" as const, bio: "טכנאי רכב לשעבר, היום אבא במשרה מלאה שעוזר לכולם.", city: "חיפה", districtCode: 3, cityCode: 4000 },
-    { id: SEED_IDS.seller3, name: "דן הטכנולוג", email: "seller3@daddy.com", passwordHash, role: "SELLER" as const, bio: "מהנדס תוכנה ביום, אבאל׳ה בערב. מתמחה בטכנולוגיה, רשתות וסמארט הום.", city: "ראשון לציון", districtCode: 4, cityCode: 8300 },
-    { id: SEED_IDS.seller4, name: "משה הכל-יכול", email: "seller4@daddy.com", passwordHash, role: "SELLER" as const, bio: "אבא של 4, יד ימין לכל שכן. הרכבות, תיקונים, הובלות – הכל בחיוך.", city: "באר שבע", districtCode: 6, cityCode: 9000 },
-    { id: SEED_IDS.seller5, name: "ערן הגנן", email: "seller5@daddy.com", passwordHash, role: "SELLER" as const, bio: "גנן חובב שהפך למקצוען. מטפל בגינות, מרפסות וחצרות ברחבי השרון.", city: "נתניה", districtCode: 4, cityCode: 7400 },
-    { id: SEED_IDS.seller6, name: "רועי החוסך", email: "seller6@daddy.com", passwordHash, role: "SELLER" as const, bio: "20 שנה בתחום הביטוח והתקשורת. חוסך לאנשים אלפי שקלים בשנה.", city: "ירושלים", districtCode: 1, cityCode: 3000 },
+    { id: SEED_IDS.seller, name: "יוסי הגולדן", email: "seller@daddy.com", passwordHash, role: "SELLER" as const, bio: "אבא של 3, מתקן הכל מגיל 15. אם זה שבור – אני מסדר.", city: "תל אביב", districtCode: 5, cityCode: 5000, phone: "050-1111111", avatar: "https://ui-avatars.com/api/?name=Yossi&background=0F766E&color=fff&size=128" },
+    { id: SEED_IDS.seller2, name: "אבי המתקן", email: "seller2@daddy.com", passwordHash, role: "SELLER" as const, bio: "טכנאי רכב לשעבר, היום אבא במשרה מלאה שעוזר לכולם.", city: "חיפה", districtCode: 3, cityCode: 4000, phone: "050-2222222", avatar: "https://ui-avatars.com/api/?name=Avi&background=0F766E&color=fff&size=128" },
+    { id: SEED_IDS.seller3, name: "דן הטכנולוג", email: "seller3@daddy.com", passwordHash, role: "SELLER" as const, bio: "מהנדס תוכנה ביום, אבאל׳ה בערב. מתמחה בטכנולוגיה, רשתות וסמארט הום.", city: "ראשון לציון", districtCode: 4, cityCode: 8300, phone: "050-3333333", avatar: "https://ui-avatars.com/api/?name=Dan&background=0F766E&color=fff&size=128" },
+    { id: SEED_IDS.seller4, name: "משה הכל-יכול", email: "seller4@daddy.com", passwordHash, role: "SELLER" as const, bio: "אבא של 4, יד ימין לכל שכן. הרכבות, תיקונים, הובלות – הכל בחיוך.", city: "באר שבע", districtCode: 6, cityCode: 9000, phone: "050-4444444", avatar: "https://ui-avatars.com/api/?name=Moshe&background=0F766E&color=fff&size=128" },
+    { id: SEED_IDS.seller5, name: "ערן הגנן", email: "seller5@daddy.com", passwordHash, role: "SELLER" as const, bio: "גנן חובב שהפך למקצוען. מטפל בגינות, מרפסות וחצרות ברחבי השרון.", city: "נתניה", districtCode: 4, cityCode: 7400, phone: "050-5555555", avatar: "https://ui-avatars.com/api/?name=Eran&background=0F766E&color=fff&size=128" },
+    { id: SEED_IDS.seller6, name: "רועי החוסך", email: "seller6@daddy.com", passwordHash, role: "SELLER" as const, bio: "20 שנה בתחום הביטוח והתקשורת. חוסך לאנשים אלפי שקלים בשנה.", city: "ירושלים", districtCode: 1, cityCode: 3000, phone: "050-6666666", avatar: "https://ui-avatars.com/api/?name=Roy&background=0F766E&color=fff&size=128" },
     { id: SEED_IDS.buyer, name: "דנה לקוחה", email: "buyer@daddy.com", passwordHash, role: "BUYER" as const, city: "תל אביב", districtCode: 5, cityCode: 5000 },
     { id: SEED_IDS.buyer2, name: "מיכל הקונה", email: "buyer2@daddy.com", passwordHash, role: "BUYER" as const, city: "חיפה", districtCode: 3, cityCode: 4000 },
     { id: SEED_IDS.buyer3, name: "שי הלקוח", email: "buyer3@daddy.com", passwordHash, role: "BUYER" as const, city: "ירושלים", districtCode: 1, cityCode: 3000 },
+    {
+      id: SEED_IDS.incompleteSeller,
+      name: "אבא לא מוכן",
+      email: "incomplete@daddy.com",
+      passwordHash,
+      role: "SELLER" as const,
+      bio: "נרשם אבל עוד אין מחיר, אזור, או שעות.",
+    },
   ];
 
   for (const u of users) {
     await prisma.user.upsert({
       where: { email: u.email },
-      update: {},
+      update: {
+        ...("phone" in u && u.phone ? { phone: u.phone } : {}),
+        ...("avatar" in u && u.avatar ? { avatar: u.avatar } : {}),
+      },
       create: u,
     });
   }
@@ -90,7 +104,7 @@ async function main() {
 
   const priceData = [
     { userId: S.seller, serviceSlug: "furniture-assembly", price: 200, description: "רהיט בינוני, כולל כלים" },
-    { userId: S.seller, serviceSlug: "tv-mounting", price: 250, description: "כולל קידוח והסתרת כבלים" },
+    { userId: S.seller, serviceSlug: "tv-mounting", price: 250, description: "כולל קידוח והסתרת כבלים", materialsEstimate: 80, buyerSuppliesMaterials: false },
     { userId: S.seller, serviceSlug: "shelf-hanging", price: 100, description: "מדף בודד, כל סוג קיר" },
     { userId: S.seller, serviceSlug: "bill-negotiation", price: 80, description: "חברה אחת, תשלום רק אם חסכתי" },
     { userId: S.seller2, serviceSlug: "car-test", price: 200, description: "כולל נסיעה למכון" },
@@ -114,9 +128,50 @@ async function main() {
   for (const p of priceData) {
     await prisma.servicePrice.upsert({
       where: { userId_serviceSlug: { userId: p.userId, serviceSlug: p.serviceSlug } },
-      update: { price: p.price, description: p.description },
-      create: p,
+      update: {
+        price: p.price,
+        description: p.description,
+        materialsEstimate: "materialsEstimate" in p ? p.materialsEstimate ?? null : null,
+        buyerSuppliesMaterials: "buyerSuppliesMaterials" in p ? p.buyerSuppliesMaterials !== false : true,
+      },
+      create: {
+        userId: p.userId,
+        serviceSlug: p.serviceSlug,
+        price: p.price,
+        description: p.description,
+        materialsEstimate: "materialsEstimate" in p ? p.materialsEstimate ?? null : null,
+        buyerSuppliesMaterials: "buyerSuppliesMaterials" in p ? p.buyerSuppliesMaterials !== false : true,
+      },
     });
+  }
+
+  const DEFAULT_WEEKLY_HOURS = [
+    { dayOfWeek: 0, startMin: 16 * 60, endMin: 20 * 60 },
+    { dayOfWeek: 1, startMin: 16 * 60, endMin: 20 * 60 },
+    { dayOfWeek: 2, startMin: 16 * 60, endMin: 20 * 60 },
+    { dayOfWeek: 3, startMin: 16 * 60, endMin: 20 * 60 },
+    { dayOfWeek: 4, startMin: 16 * 60, endMin: 20 * 60 },
+    { dayOfWeek: 5, startMin: 8 * 60, endMin: 13 * 60 },
+  ];
+
+  if ((await prisma.city.count()) === 0) {
+    await prisma.city.createMany({ data: snapshot, skipDuplicates: true });
+    await prisma.cityCatalog.upsert({
+      where: { id: 1 },
+      create: { id: 1, source: "snapshot", fetchedAt: null },
+      update: {},
+    });
+  }
+
+  const sellerIds = [S.seller, S.seller2, S.seller3, S.seller4, S.seller5, S.seller6];
+  for (const userId of sellerIds) {
+    for (const hours of DEFAULT_WEEKLY_HOURS) {
+      await prisma.weeklyHours.upsert({
+        where: { userId_dayOfWeek: { userId, dayOfWeek: hours.dayOfWeek } },
+        update: { startMin: hours.startMin, endMin: hours.endMin },
+        create: { userId, ...hours },
+      });
+    }
   }
 
   console.log("Users seed complete.");

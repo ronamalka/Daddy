@@ -1,0 +1,24 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Message {
+  id         String    @id @default(cuid())
+  content    String
+  attachment String?
+  orderId    String?   // cross-service ref to orders-service
+  senderId   String    // cross-service ref to users-service
+  receiverId String    // cross-service ref to users-service
+  readAt     DateTime?
+  createdAt  DateTime  @default(now())
+
+  @@index([orderId])
+  @@index([senderId])
+  @@index([receiverId])
+  @@index([receiverId, readAt])
+}

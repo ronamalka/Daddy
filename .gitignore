@@ -12,6 +12,7 @@ node_modules
 
 # testing
 /coverage
+/test-results
 
 # next.js
 /.next/
@@ -44,6 +45,9 @@ next-env.d.ts
 services/*/src/generated/
 services/*/dist/
 
+# user uploads
+/public/uploads/
+
 # AI tool configs
 .agents/
 .planning/
@@ -52,3 +56,4 @@ services/*/dist/
 !.claude/agents/
 skills-lock.json
 AGENTS.md
+.worktrees/

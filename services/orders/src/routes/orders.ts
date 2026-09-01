@@ -1,19 +1,20 @@
 import { Router, Request, Response } from "express";
 import { requireAuth } from "../../../shared/middleware";
 import { prisma } from "../index";
+import { parseRequiredSlot } from "../lib/slots";
+import { orderListWhere } from "../lib/order-list";
+import { laborAmount, quoteTotal } from "../lib/quote-price";
 
+/** Routes for listing orders, creating them, and reading booking stats. */
 export const ordersRoutes = Router();
 
+/** List the current user's orders. */
 ordersRoutes.get("/", requireAuth, async (req: Request, res: Response) => {
-  const where =
-    req.user!.role === "SELLER"
-      ? { sellerId: req.user!.id }
-      : { buyerId: req.user!.id };
-
   const orders = await prisma.order.findMany({
-    where,
+    where: orderListWhere(req.user!.id),
     include: {
       requirements: true,
+      disputes: { select: { status: true } },
     },
     orderBy: { createdAt: "desc" },
   });
@@ -21,10 +22,44 @@ ordersRoutes.get("/", requireAuth, async (req: Request, res: Response) => {
   res.json(orders);
 });
 
+/** Create a gig order or a local-request order with a visit window. */
 ordersRoutes.post("/", requireAuth, async (req: Request, res: Response) => {
-  const { gigId, sellerId, tier, price, deliveryDays } = req.body;
+  const jobType = req.body.jobType === "LOCAL_REQUEST" ? "LOCAL_REQUEST" : "GIG";
+  const {
+    gigId,
+    sellerId,
+    tier,
+    price,
+    laborPrice,
+    materialsEstimate,
+    buyerSuppliesMaterials,
+    slotStart,
+    slotEnd,
+    title,
+    requestId,
+  } = req.body;
 
-  if (!gigId || !sellerId || !tier || !price) {
+  const labor = laborAmount({ laborPrice, price });
+  if (!sellerId || labor == null) {
+    res.status(400).json({ error: "Missing fields" });
+    return;
+  }
+
+  const buyerSupplies = buyerSuppliesMaterials !== false;
+  const materials =
+    materialsEstimate != null && Number(materialsEstimate) > 0 ? Number(materialsEstimate) : null;
+  const total = quoteTotal({
+    laborPrice: labor,
+    materialsEstimate: materials,
+    buyerSuppliesMaterials: buyerSupplies,
+  }) ?? labor;
+
+  if (jobType === "GIG" && (!gigId || !tier)) {
+    res.status(400).json({ error: "Missing fields" });
+    return;
+  }
+
+  if (jobType === "LOCAL_REQUEST" && !String(title || "").trim()) {
     res.status(400).json({ error: "Missing fields" });
     return;
   }
@@ -34,23 +69,65 @@ ordersRoutes.post("/", requireAuth, async (req: Request, res: Response) => {
     return;
   }
 
-  const dueDate = new Date();
-  dueDate.setDate(dueDate.getDate() + (deliveryDays || 7));
+  const slot = parseRequiredSlot(slotStart, slotEnd);
+  if (!slot) {
+    res.status(400).json({ error: "A 2-hour visit window is required" });
+    return;
+  }
 
-  const order = await prisma.order.create({
-    data: {
-      gigId,
-      buyerId: req.user!.id,
-      sellerId,
-      tier,
-      price,
-      dueDate,
-    },
-  });
+  if (slot.start.getTime() <= Date.now()) {
+    res.status(400).json({ error: "Visit window must be in the future" });
+    return;
+  }
 
-  res.status(201).json(order);
+  try {
+    /** Create the order only if the visit window is free. */
+    const order = await prisma.$transaction(async (tx) => {
+      const conflict = await tx.order.findFirst({
+        where: {
+          sellerId,
+          status: { not: "CANCELLED" },
+          slotStart: { lt: slot.end },
+          slotEnd: { gt: slot.start },
+        },
+        select: { id: true },
+      });
+
+      if (conflict) {
+        throw new Error("SLOT_CONFLICT");
+      }
+
+      return tx.order.create({
+        data: {
+          jobType,
+          gigId: jobType === "GIG" ? gigId : null,
+          requestId: jobType === "LOCAL_REQUEST" ? requestId || null : null,
+          title: jobType === "LOCAL_REQUEST" ? String(title).trim() : null,
+          buyerId: req.user!.id,
+          sellerId,
+          tier: jobType === "GIG" ? tier : null,
+          price: total,
+          laborPrice: jobType === "LOCAL_REQUEST" ? labor : null,
+          materialsEstimate: jobType === "LOCAL_REQUEST" ? materials : null,
+          buyerSuppliesMaterials: jobType === "LOCAL_REQUEST" ? buyerSupplies : true,
+          dueDate: slot.end,
+          slotStart: slot.start,
+          slotEnd: slot.end,
+        },
+      });
+    });
+
+    res.status(201).json(order);
+  } catch (err) {
+    if (err instanceof Error && err.message === "SLOT_CONFLICT") {
+      res.status(409).json({ error: "That visit window is already booked" });
+      return;
+    }
+    throw err;
+  }
 });
 
+/** Return how many orders this user has as buyer and as seller. */
 ordersRoutes.get("/stats", requireAuth, async (req: Request, res: Response) => {
   const userId = req.user!.id;
 
@@ -62,7 +139,8 @@ ordersRoutes.get("/stats", requireAuth, async (req: Request, res: Response) => {
   res.json({ ordersBuyer, ordersSeller, totalOrders: ordersBuyer + ordersSeller });
 });
 
-ordersRoutes.get("/stats/admin", async (_req: Request, res: Response) => {
+/** Return platform-wide order count and completed-order revenue. */
+ordersRoutes.get("/stats/admin", requireAuth, async (_req: Request, res: Response) => {
   const orderCount = await prisma.order.count();
 
   const completedOrders = await prisma.order.findMany({
@@ -75,10 +153,43 @@ ordersRoutes.get("/stats/admin", async (_req: Request, res: Response) => {
   res.json({ orders: orderCount, revenue });
 });
 
+/** Count completed orders for one seller. */
 ordersRoutes.get("/count-by-seller/:sellerId", async (req: Request, res: Response) => {
   const sellerId = req.params.sellerId as string;
   const count = await prisma.order.count({
     where: { sellerId, status: "COMPLETED" },
   });
   res.json({ completedOrders: count });
+});
+
+/** List a seller's booked visit windows in a date range. */
+ordersRoutes.get("/booked-slots/:sellerId", async (req: Request, res: Response) => {
+  const sellerId = req.params.sellerId as string;
+  const from = typeof req.query.from === "string" ? new Date(req.query.from) : new Date();
+  const to =
+    typeof req.query.to === "string"
+      ? new Date(req.query.to)
+      : new Date(Date.now() + 21 * 24 * 60 * 60 * 1000);
+
+  if (Number.isNaN(from.getTime()) || Number.isNaN(to.getTime()) || to <= from) {
+    res.status(400).json({ error: "Invalid date range" });
+    return;
+  }
+
+  const orders = await prisma.order.findMany({
+    where: {
+      sellerId,
+      status: { not: "CANCELLED" },
+      slotStart: { lt: to },
+      slotEnd: { gt: from },
+    },
+    select: { slotStart: true, slotEnd: true },
+    orderBy: { slotStart: "asc" },
+  });
+
+  res.json(
+    orders
+      .filter((row) => row.slotStart && row.slotEnd)
+      .map((row) => ({ slotStart: row.slotStart, slotEnd: row.slotEnd }))
+  );
 });

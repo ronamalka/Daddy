@@ -1,11 +1,15 @@
 import { Router, Request, Response } from "express";
 import { prisma } from "../index";
+import { searchableSellerWhere } from "../seller-ready";
+import type { Prisma } from "../generated/prisma/client";
 
+/** Routes for a short list of featured sellers. */
 export const featuredRoutes = Router();
 
+/** Return up to six sellers who currently take jobs. */
 featuredRoutes.get("/", async (_req: Request, res: Response) => {
   const sellers = await prisma.user.findMany({
-    where: { role: "SELLER" },
+    where: searchableSellerWhere() as Prisma.UserWhereInput,
     select: {
       id: true,
       name: true,

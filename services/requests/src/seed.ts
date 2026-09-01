@@ -12,6 +12,7 @@ const S = {
   buyer3: "seed-user-buyer3",
 };
 
+/** Loads demo local job posts into daddy_requests. */
 async function main() {
   const requests = [
     {
@@ -22,6 +23,12 @@ async function main() {
       buyerId: S.buyer,
       districtCode: 5,
       districtName: "תל אביב",
+      cityCode: 5000,
+      cityName: "תל אביב - יפו",
+      street: "הרצל 12",
+      floor: "3",
+      preferredWindow: "MORNING" as const,
+      unlisted: false,
     },
     {
       id: "sreq-2",
@@ -31,6 +38,12 @@ async function main() {
       buyerId: S.buyer2,
       districtCode: 3,
       districtName: "חיפה",
+      cityCode: 4000,
+      cityName: "חיפה",
+      street: null,
+      floor: null,
+      preferredWindow: null,
+      unlisted: false,
     },
     {
       id: "sreq-3",
@@ -40,14 +53,87 @@ async function main() {
       buyerId: S.buyer3,
       districtCode: 1,
       districtName: "ירושלים",
+      cityCode: 3000,
+      cityName: "ירושלים",
+      street: null,
+      floor: null,
+      preferredWindow: null,
+      unlisted: false,
+    },
+    {
+      id: "sreq-unlisted",
+      title: "בקשה פרטית — לא אמורה להופיע באתר",
+      description: "כתובת מדויקת ורגישה שלא אמורה לצאת החוצה.",
+      serviceSlug: "furniture-assembly",
+      buyerId: S.buyer,
+      districtCode: 5,
+      districtName: "תל אביב",
+      cityCode: 8600,
+      cityName: "רמת גן",
+      street: "ביאליק 4",
+      floor: "1",
+      preferredWindow: null,
+      unlisted: true,
     },
   ];
 
   for (const req of requests) {
-    const existing = await prisma.serviceRequest.findUnique({ where: { id: req.id } });
-    if (!existing) {
-      await prisma.serviceRequest.create({ data: req });
-    }
+    await prisma.serviceRequest.upsert({
+      where: { id: req.id },
+      create: req,
+      update: {
+        title: req.title,
+        description: req.description,
+        serviceSlug: req.serviceSlug,
+        districtCode: req.districtCode,
+        districtName: req.districtName,
+        cityCode: req.cityCode,
+        cityName: req.cityName,
+        street: req.street,
+        floor: req.floor,
+        preferredWindow: req.preferredWindow,
+        unlisted: req.unlisted,
+        status: "OPEN",
+      },
+    });
+  }
+
+  const quotes = [
+    {
+      id: "sreq-1-quote-yossi",
+      requestId: "sreq-1",
+      sellerId: "seed-user-seller1",
+      message: "אגיע עם מקדחה, פלס, וכל הברגים. ארון PAX זה הבית שלי.",
+      proposedPrice: 250,
+      laborPrice: 250,
+      materialsEstimate: null as number | null,
+      buyerSuppliesMaterials: true,
+    },
+    {
+      id: "sreq-1-quote-moshe",
+      requestId: "sreq-1",
+      sellerId: "seed-user-seller4",
+      message: "כל רהיט עד שעתיים. הלקוח מביא את הארון, אני מביא כלים.",
+      proposedPrice: 180,
+      laborPrice: 180,
+      materialsEstimate: null as number | null,
+      buyerSuppliesMaterials: true,
+    },
+  ];
+
+  for (const quote of quotes) {
+    await prisma.requestResponse.upsert({
+      where: { requestId_sellerId: { requestId: quote.requestId, sellerId: quote.sellerId } },
+      create: quote,
+      update: {
+        message: quote.message,
+        proposedPrice: quote.proposedPrice,
+        laborPrice: quote.laborPrice,
+        materialsEstimate: quote.materialsEstimate,
+        buyerSuppliesMaterials: quote.buyerSuppliesMaterials,
+        selected: false,
+      },
+    });
   }
 
   console.log("Requests seed complete.");

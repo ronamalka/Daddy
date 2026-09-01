@@ -1,20 +1,23 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useSession, signOut } from "next-auth/react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
-  Menu,
-  ShoppingBag,
+  List as MenuIcon,
+  Bag,
   Heart,
-  MessageSquare,
+  Chat,
   User,
-  LogOut,
+  SignOut,
   Plus,
   Shield,
   Briefcase,
-  Search,
-} from "lucide-react";
+  ClipboardText,
+  MagnifyingGlass,
+} from "@phosphor-icons/react";
+import { NotificationBell } from "@/components/notification-bell";
 import { Button } from "@/components/ui/button";
 import { Sheet } from "@/components/ui/sheet";
 import {
@@ -23,9 +26,9 @@ import {
   DropdownMenuSeparator,
   DropdownMenuLabel,
 } from "@/components/ui/dropdown-menu";
-import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { cn } from "@/lib/utils";
 
+/** Shows a round avatar with the user's first initial. */
 function UserAvatar({ name, size = "sm" }: { name: string; size?: "sm" | "md" }) {
   const initial = name.charAt(0).toUpperCase();
   const sizeClasses = size === "md" ? "h-10 w-10 text-sm" : "h-8 w-8 text-xs";
@@ -42,40 +45,77 @@ function UserAvatar({ name, size = "sm" }: { name: string; size?: "sm" | "md" })
   );
 }
 
+/** Site header with search, inbox, notifications, and account links. */
 export function Navbar() {
   const { data: session } = useSession();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
+
+  useEffect(() => {
+    if (!session?.user) return;
+    /** Loads how many unread chats the signed-in user has. */
+    function fetchUnread() {
+      fetch("/api/messages/unread-count")
+        .then((r) => r.json())
+        .then((d) => setUnreadCount(d.count ?? 0))
+        .catch(() => {});
+    }
+    fetchUnread();
+    const interval = setInterval(fetchUnread, 10000);
+    window.addEventListener("daddy:messages-changed", fetchUnread);
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener("daddy:messages-changed", fetchUnread);
+    };
+  }, [session]);
 
   return (
-    <nav className="sticky top-0 z-50 glass-strong">
+    <nav
+      className="sticky top-0 z-50 border-b border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))]"
+      aria-label="ניווט ראשי"
+    >
       <div className="mx-auto flex max-w-7xl items-center justify-between px-5 py-3 lg:px-8">
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2 select-none">
-          <span className="text-gradient-hero text-2xl font-extrabold tracking-tight">
+          <Image src="/logo.jpeg" alt="אבאל׳ה" width={40} height={40} className="rounded-full" unoptimized />
+          <span className="text-gradient-hero text-xl font-extrabold tracking-tight hidden sm:inline">
             אבאל׳ה
           </span>
         </Link>
 
         {/* Desktop nav */}
         <div className="hidden items-center gap-1 md:flex">
-          <NavLink href="/" icon={<Search className="h-4 w-4" />}>עיון</NavLink>
-          <NavLink href="/gigs" icon={<Briefcase className="h-4 w-4" />}>שירותים</NavLink>
+          <NavLink href="/" icon={<MagnifyingGlass className="h-4 w-4" />}>עיון</NavLink>
 
           {session?.user ? (
             <>
               {session.user.role === "SELLER" && (
-                <NavLink href="/gigs/create" icon={<Plus className="h-4 w-4" />}>צור שירות</NavLink>
+                <>
+                  <NavLink href="/requests" icon={<ClipboardText className="h-4 w-4" />}>בקשות</NavLink>
+                  <NavLink href="/gigs/create" icon={<Plus className="h-4 w-4" />}>צור חבילה</NavLink>
+                </>
               )}
-              <NavLink href="/orders" icon={<ShoppingBag className="h-4 w-4" />}>הזמנות</NavLink>
+              <NavLink href="/orders" icon={<Bag className="h-4 w-4" />}>
+                {session.user.role === "SELLER" ? "עבודות" : "הזמנות"}
+              </NavLink>
               <NavLink href="/favorites" icon={<Heart className="h-4 w-4" />}>מועדפים</NavLink>
-              <NavLink href="/inbox" icon={<MessageSquare className="h-4 w-4" />}>הודעות</NavLink>
+              <NavLink href="/inbox" icon={<Chat className="h-4 w-4" />}>
+                <span className="relative">
+                  הודעות
+                  {unreadCount > 0 && (
+                    <span className="absolute -top-2 -end-4 flex h-5 min-w-5 items-center justify-center rounded-full bg-[rgb(var(--color-error))] px-1 text-[10px] font-bold text-white">
+                      {unreadCount > 99 ? "99+" : unreadCount}
+                    </span>
+                  )}
+                </span>
+              </NavLink>
               {session.user.role === "ADMIN" && (
                 <NavLink href="/admin" icon={<Shield className="h-4 w-4" />}>ניהול</NavLink>
               )}
 
+              <NotificationBell />
               <div className="mx-2 h-5 w-px bg-[rgb(var(--color-border))]" />
-              <ThemeToggle />
 
               <DropdownMenu
                 open={profileOpen}
@@ -101,10 +141,18 @@ export function Navbar() {
                     הפרופיל שלי
                   </Link>
                 </DropdownMenuItem>
+                {session.user.role === "SELLER" && (
+                  <DropdownMenuItem onClick={() => setProfileOpen(false)}>
+                    <Link href="/onboarding" className="flex items-center gap-2 w-full">
+                      <Briefcase className="h-4 w-4" />
+                      מוכנות לפרופיל
+                    </Link>
+                  </DropdownMenuItem>
+                )}
                 <DropdownMenuItem onClick={() => setProfileOpen(false)}>
                   <Link href="/orders" className="flex items-center gap-2 w-full">
-                    <ShoppingBag className="h-4 w-4" />
-                    ההזמנות שלי
+                    <Bag className="h-4 w-4" />
+                    {session.user.role === "SELLER" ? "העבודות שלי" : "ההזמנות שלי"}
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
@@ -115,14 +163,13 @@ export function Navbar() {
                     signOut();
                   }}
                 >
-                  <LogOut className="h-4 w-4" />
+                  <SignOut className="h-4 w-4" />
                   התנתק
                 </DropdownMenuItem>
               </DropdownMenu>
             </>
           ) : (
             <div className="flex items-center gap-3 me-3">
-              <ThemeToggle />
               <Button variant="ghost" size="sm" asChild>
                 <Link href="/login">התחברות</Link>
               </Button>
@@ -135,13 +182,16 @@ export function Navbar() {
 
         {/* Mobile */}
         <div className="flex items-center gap-2 md:hidden">
-          <ThemeToggle />
+          {session?.user && <NotificationBell />}
           <button
+            type="button"
             className="flex h-10 w-10 items-center justify-center rounded-lg text-[rgb(var(--color-text-secondary))] hover:bg-[rgb(var(--color-surface-elevated))] transition-colors"
             onClick={() => setMobileOpen(true)}
             aria-label="פתח תפריט"
+            aria-expanded={mobileOpen}
+            aria-controls="mobile-nav-sheet"
           >
-            <Menu className="h-5 w-5" />
+            <MenuIcon className="h-5 w-5" />
           </button>
         </div>
       </div>
@@ -163,28 +213,37 @@ export function Navbar() {
             </div>
           )}
 
-          <MobileNavLink href="/" onClick={() => setMobileOpen(false)} icon={<Search className="h-4 w-4" />}>
+          <MobileNavLink href="/" onClick={() => setMobileOpen(false)} icon={<MagnifyingGlass className="h-4 w-4" />}>
             עיון
-          </MobileNavLink>
-          <MobileNavLink href="/gigs" onClick={() => setMobileOpen(false)} icon={<Briefcase className="h-4 w-4" />}>
-            שירותים
           </MobileNavLink>
 
           {session?.user ? (
             <>
               {session.user.role === "SELLER" && (
-                <MobileNavLink href="/gigs/create" onClick={() => setMobileOpen(false)} icon={<Plus className="h-4 w-4" />}>
-                  צור שירות
-                </MobileNavLink>
+                <>
+                  <MobileNavLink href="/requests" onClick={() => setMobileOpen(false)} icon={<ClipboardText className="h-4 w-4" />}>
+                    בקשות
+                  </MobileNavLink>
+                  <MobileNavLink href="/gigs/create" onClick={() => setMobileOpen(false)} icon={<Plus className="h-4 w-4" />}>
+                    צור חבילה
+                  </MobileNavLink>
+                </>
               )}
-              <MobileNavLink href="/orders" onClick={() => setMobileOpen(false)} icon={<ShoppingBag className="h-4 w-4" />}>
-                הזמנות
+              <MobileNavLink href="/orders" onClick={() => setMobileOpen(false)} icon={<Bag className="h-4 w-4" />}>
+                {session.user.role === "SELLER" ? "עבודות" : "הזמנות"}
               </MobileNavLink>
               <MobileNavLink href="/favorites" onClick={() => setMobileOpen(false)} icon={<Heart className="h-4 w-4" />}>
                 מועדפים
               </MobileNavLink>
-              <MobileNavLink href="/inbox" onClick={() => setMobileOpen(false)} icon={<MessageSquare className="h-4 w-4" />}>
-                הודעות
+              <MobileNavLink href="/inbox" onClick={() => setMobileOpen(false)} icon={<Chat className="h-4 w-4" />}>
+                <span className="flex items-center gap-2">
+                  הודעות
+                  {unreadCount > 0 && (
+                    <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-[rgb(var(--color-error))] px-1 text-[10px] font-bold text-white">
+                      {unreadCount > 99 ? "99+" : unreadCount}
+                    </span>
+                  )}
+                </span>
               </MobileNavLink>
               {session.user.role === "ADMIN" && (
                 <MobileNavLink href="/admin" onClick={() => setMobileOpen(false)} icon={<Shield className="h-4 w-4" />}>
@@ -194,6 +253,11 @@ export function Navbar() {
               <MobileNavLink href="/profile" onClick={() => setMobileOpen(false)} icon={<User className="h-4 w-4" />}>
                 פרופיל
               </MobileNavLink>
+              {session.user.role === "SELLER" && (
+                <MobileNavLink href="/onboarding" onClick={() => setMobileOpen(false)} icon={<Briefcase className="h-4 w-4" />}>
+                  מוכנות לפרופיל
+                </MobileNavLink>
+              )}
 
               <div className="my-3 border-t border-[rgb(var(--color-border-light))]" />
               <button
@@ -203,7 +267,7 @@ export function Navbar() {
                 }}
                 className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-[rgb(var(--color-error))] hover:bg-[rgba(var(--color-error),0.05)] transition-colors"
               >
-                <LogOut className="h-4 w-4" />
+                <SignOut className="h-4 w-4" />
                 התנתק
               </button>
             </>
@@ -223,6 +287,7 @@ export function Navbar() {
   );
 }
 
+/** Desktop header link with an optional icon. */
 function NavLink({
   href,
   children,
@@ -237,12 +302,13 @@ function NavLink({
       href={href}
       className="flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium text-[rgb(var(--color-text-secondary))] transition-colors duration-200 hover:bg-[rgb(var(--color-surface-elevated))] hover:text-[rgb(var(--color-text))]"
     >
-      {icon}
+      <span aria-hidden="true">{icon}</span>
       {children}
     </Link>
   );
 }
 
+/** Mobile menu link that closes the sheet after a tap. */
 function MobileNavLink({
   href,
   onClick,
@@ -260,7 +326,7 @@ function MobileNavLink({
       onClick={onClick}
       className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-[rgb(var(--color-text-secondary))] transition-colors duration-150 hover:bg-[rgb(var(--color-surface-elevated))] hover:text-[rgb(var(--color-text))]"
     >
-      {icon}
+      <span aria-hidden="true">{icon}</span>
       {children}
     </Link>
   );

@@ -1,8 +1,9 @@
 "use client";
 
 import * as React from "react";
+import { createPortal } from "react-dom";
 import { cn } from "@/lib/utils";
-import { X } from "lucide-react";
+import { X } from "@phosphor-icons/react";
 import { AnimatePresence, motion } from "framer-motion";
 
 interface SheetProps {
@@ -11,7 +12,16 @@ interface SheetProps {
   children: React.ReactNode;
 }
 
+/** Side panel that slides in from the edge, used for the mobile nav. */
 export function Sheet({ open, onOpenChange, children }: SheetProps) {
+  const [mounted, setMounted] = React.useState(false);
+  const [isRtl, setIsRtl] = React.useState(true);
+
+  React.useEffect(() => {
+    setMounted(true);
+    setIsRtl(document.documentElement.dir !== "ltr");
+  }, []);
+
   React.useEffect(() => {
     if (open) {
       document.body.style.overflow = "hidden";
@@ -32,7 +42,11 @@ export function Sheet({ open, onOpenChange, children }: SheetProps) {
     return () => document.removeEventListener("keydown", handleKeyDown);
   }, [open, onOpenChange]);
 
-  return (
+  if (!mounted) return null;
+
+  const offscreenX = isRtl ? "-100%" : "100%";
+
+  return createPortal(
     <AnimatePresence>
       {open && (
         <>
@@ -41,31 +55,41 @@ export function Sheet({ open, onOpenChange, children }: SheetProps) {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm"
+            className="fixed inset-0 z-[100] bg-black/60 backdrop-blur-sm"
             onClick={() => onOpenChange(false)}
+            aria-hidden="true"
           />
           <motion.div
-            initial={{ x: "100%" }}
+            id="mobile-nav-sheet"
+            role="dialog"
+            aria-modal="true"
+            aria-label="תפריט ניווט"
+            initial={{ x: offscreenX }}
             animate={{ x: 0 }}
-            exit={{ x: "100%" }}
+            exit={{ x: offscreenX }}
             transition={{ type: "spring", damping: 30, stiffness: 300 }}
             className={cn(
-              "fixed inset-y-0 right-0 z-50 w-[85%] max-w-sm",
+              "fixed inset-y-0 end-0 z-[100] flex w-[min(85vw,24rem)] flex-col overflow-hidden",
               "bg-[rgb(var(--color-surface))] shadow-2xl"
             )}
           >
-            <button
-              onClick={() => onOpenChange(false)}
-              className="absolute top-4 left-4 rounded-full p-2 text-[rgb(var(--color-text-muted))] hover:bg-[rgb(var(--color-surface-elevated))] hover:text-[rgb(var(--color-text))] transition-colors"
-            >
-              <X className="h-5 w-5" />
-            </button>
-            <div className="h-full overflow-y-auto px-6 py-16">
+            <div className="flex shrink-0 items-center justify-start px-3 pt-[max(0.75rem,env(safe-area-inset-top))]">
+              <button
+                type="button"
+                onClick={() => onOpenChange(false)}
+                aria-label="סגור תפריט"
+                className="rounded-full p-2 text-[rgb(var(--color-text-muted))] hover:bg-[rgb(var(--color-surface-elevated))] hover:text-[rgb(var(--color-text))] transition-colors"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+            <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-6 pb-[max(1.5rem,env(safe-area-inset-bottom))] pt-2">
               {children}
             </div>
           </motion.div>
         </>
       )}
-    </AnimatePresence>
+    </AnimatePresence>,
+    document.body
   );
 }
