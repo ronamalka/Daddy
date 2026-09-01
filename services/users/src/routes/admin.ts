@@ -117,7 +117,7 @@ adminRoutes.get("/verifications", requireAdmin, async (_req: Request, res: Respo
 
 /** Approve or reject identity/license verification for a user. */
 adminRoutes.post("/verifications/:userId/review", requireAdmin, async (req: Request, res: Response) => {
-  const { userId } = req.params;
+  const userId = String(req.params.userId);
   const { type, decision } = req.body as { type?: string; decision?: string };
 
   if (!type || !["identity", "license"].includes(type)) {
