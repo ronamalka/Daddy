@@ -17,12 +17,26 @@ test.describe("Auth Flow", () => {
     await expect(page.getByRole("heading", { name: "בוא נכיר" })).toBeVisible();
   });
 
-  test("login page loads and shows form", async ({ page }) => {
+  test("register Google requires legal consent", async ({ page }) => {
+    await page.goto("/register");
+    await page.getByRole("button", { name: "הרשמה עם Google" }).click();
+    await expect(page.getByRole("alert")).toBeVisible({ timeout: 10000 });
+    await expect(page.getByText(/תנאי השימוש|גיל 18/)).toBeVisible();
+  });
+
+  test("login page offers Google sign-in", async ({ page }) => {
     await page.goto("/login");
     await expect(page.getByRole("heading", { name: "שוב פה? יופי, חיכינו לך" })).toBeVisible({
       timeout: 10000,
     });
     await expect(page.getByPlaceholder("you@example.com")).toBeVisible();
+    await expect(page.getByRole("button", { name: "המשך עם Google" })).toBeVisible();
+  });
+
+  test("login shows Hebrew when Google OAuth is denied", async ({ page }) => {
+    await page.goto("/login?error=AccessDenied");
+    await expect(page.getByRole("alert")).toBeVisible({ timeout: 10000 });
+    await expect(page.getByText(/נדחתה/)).toBeVisible();
   });
 
   test("login with invalid credentials shows error", async ({ page }) => {

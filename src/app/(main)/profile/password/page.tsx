@@ -35,6 +35,19 @@ export default function ChangePasswordPage() {
     );
   }
 
+  if (session.user.hasPassword === false) {
+    return (
+      <div className="mx-auto max-w-md px-4 py-16 text-center">
+        <h1 className="mb-2 text-[24px] font-bold tracking-[-0.01em] text-[rgb(var(--color-text))]">
+          אין סיסמה לעדכן
+        </h1>
+        <p className="text-[14px] text-[rgb(var(--color-text-secondary))]">
+          החשבון הזה מתחבר עם Google. אין סיסמה מקומית.
+        </p>
+      </div>
+    );
+  }
+
   /** Updates the password after checking the new one. */
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
