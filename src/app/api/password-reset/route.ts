@@ -5,6 +5,7 @@ import { validateBody } from "@/lib/validate";
 import { passwordSchema, checkBreachedPassword } from "@/lib/password-policy";
 import { verifyTurnstileToken } from "@/lib/turnstile";
 import { detectBot } from "@/lib/bot-detection";
+import { enforceRateLimit } from "@/lib/rate-limit-redis";
 
 const requestResetSchema = z.object({
   email: z.string().email().max(254),
@@ -24,6 +25,10 @@ const resetPasswordSchema = z.object({
 
 /** Handles password reset: request a link, check a token, or set a new password (`action` query). */
 export async function POST(request: NextRequest) {
+  // Redis-based rate limit that works across all pods (10 attempts per 60s).
+  const limited = await enforceRateLimit(request, "password-reset", 10, 60);
+  if (limited) return limited;
+
   const url = new URL(request.url);
   const action = url.searchParams.get("action");
 

@@ -5,6 +5,7 @@ import { validateBody } from "@/lib/validate";
 import { passwordSchema, checkBreachedPassword } from "@/lib/password-policy";
 import { verifyTurnstileToken } from "@/lib/turnstile";
 import { detectBot } from "@/lib/bot-detection";
+import { enforceRateLimit } from "@/lib/rate-limit-redis";
 
 const registerSchema = z.object({
   name: z.string().min(1).max(100),
@@ -35,6 +36,10 @@ const registerSchema = z.object({
 
 /** Creates a new buyer or seller account after bot, CAPTCHA, and password checks. */
 export async function POST(request: NextRequest) {
+  // Redis-based rate limit that works across all pods (10 attempts per 60s).
+  const limited = await enforceRateLimit(request, "register", 10, 60);
+  if (limited) return limited;
+
   const result = await validateBody(request, registerSchema);
   if ("error" in result) return result.error;
 
