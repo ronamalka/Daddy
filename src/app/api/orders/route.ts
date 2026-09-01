@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { auth } from "@/lib/auth";
 import { proxyRequest, ORDERS_SERVICE, GIGS_SERVICE, USERS_SERVICE } from "@/lib/gateway";
+import { loadOrderVisits, visitVisibleToSeller } from "@/lib/order-visit";
 import { validateBody } from "@/lib/validate";
 import { parseRequiredVisitSlot, sellerAvailabilityError } from "@/lib/seller-slot";
 
@@ -30,6 +31,7 @@ const createOrderSchema = z.union([createGigOrderSchema, createLocalOrderSchema]
 
 type OrderRow = {
   gigId?: string | null;
+  requestId?: string | null;
   title?: string | null;
   buyerId: string;
   sellerId: string;
@@ -66,19 +68,25 @@ export async function GET() {
   const gigMap: Record<string, { id: string; title: string; image: string | null }> = {};
   const userMap: Record<string, { id: string; name: string; avatar: string | null }> = {};
 
-  await Promise.all([
-    ...gigIds.map(async (id) => {
+  const [visitByRequest] = await Promise.all([
+    loadOrderVisits(
+      data
+        .filter((o: OrderRow) => o.sellerId === user.id)
+        .map((o: OrderRow) => o.requestId),
+      user
+    ),
+    Promise.all(gigIds.map(async (id) => {
       const { data: gig } = await proxyRequest(GIGS_SERVICE, `/gigs/${id}`);
       if (gig?.id && typeof gig.title === "string") {
         gigMap[id] = { id: gig.id, title: gig.title, image: gig.image };
       }
-    }),
-    ...userIds.map(async (id) => {
+    })),
+    Promise.all(userIds.map(async (id) => {
       const { data: u } = await proxyRequest(USERS_SERVICE, `/sellers/${id}`);
       if (u?.id && typeof u.name === "string") {
         userMap[id] = { id: u.id, name: u.name, avatar: u.avatar ?? null };
       }
-    }),
+    })),
   ]);
 
   const enriched = data.map((order: OrderRow) => ({
@@ -87,6 +95,11 @@ export async function GET() {
     gig: (order.gigId && gigMap[order.gigId]) || gigFallback(order),
     buyer: userMap[order.buyerId] || { id: order.buyerId, name: "משתמש", avatar: null },
     seller: userMap[order.sellerId] || { id: order.sellerId, name: "משתמש", avatar: null },
+    visit: visitVisibleToSeller(
+      order.requestId ? visitByRequest[order.requestId] ?? null : null,
+      user,
+      order.sellerId
+    ),
   }));
 
   return NextResponse.json(enriched);

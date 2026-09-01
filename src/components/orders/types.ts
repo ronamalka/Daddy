@@ -12,4 +12,12 @@ export interface OrderListItem {
   buyer: { id: string; name: string };
   seller: { id: string; name: string };
   disputes?: { status: string }[];
+  visit?: {
+    street: string | null;
+    cityName: string | null;
+    districtName: string | null;
+    floor: string | null;
+    streetVisible: boolean;
+    hasStreet: boolean;
+  } | null;
 }

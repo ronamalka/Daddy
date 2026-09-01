@@ -4,7 +4,7 @@ Bookings.
 
 | Path | Methods | Purpose |
 | --- | --- | --- |
-| `/api/orders` | GET, POST | List / create (gig or local job) |
+| `/api/orders` | GET, POST | List / create (gig or local job). Seller list rows include `visit` when the job has a request address. |
 | `/api/orders/[id]` | GET, PATCH | Detail / status (buyer cancel records a late fee when inside 24h) |
 | `/api/orders/[id]/messages` | POST | Message on this order |
 | `/api/orders/[id]/requirements` | POST | Extra notes |

@@ -9,6 +9,8 @@ import { Star, Handshake, Clock, Coins, Tag, ClipboardText, ChatCircle, PaperPla
 import { Dialog } from "@/components/ui/dialog";
 import { formatVisitWindow } from "@/lib/availability";
 import { DisputeDialog } from "@/components/orders/dispute-dialog";
+import { WazeNavigate } from "@/components/orders/waze-navigate";
+import { canShowSellerWaze } from "@/lib/waze";
 import { DISPUTE_REASON_LABELS, DISPUTE_STATUS_LABELS, isDisputableStatus, orderHasOpenDispute } from "@/lib/disputes";
 import { CANCELLATION_FEE_STATUS_LABELS, evaluateBuyerCancel } from "@/lib/cancellation";
 import { AttachmentBubble } from "@/components/chat/attachment-bubble";
@@ -70,6 +72,14 @@ interface OrderDetail {
   cancellationFee?: number;
   cancellationFeeStatus?: string;
   cancelledAt?: string | null;
+  visit?: {
+    street: string | null;
+    cityName: string | null;
+    districtName: string | null;
+    floor: string | null;
+    streetVisible: boolean;
+    hasStreet: boolean;
+  } | null;
 }
 
 const STATUS_STYLE: Record<string, { bg: string; text: string; label: string }> = {
@@ -408,6 +418,20 @@ export default function OrderDetailPage() {
               ביקור: {formatVisitWindow(new Date(order.slotStart), new Date(order.slotEnd))}
             </span>
           </div>
+        )}
+
+        {canShowSellerWaze({
+          isSeller,
+          status: order.status,
+          street: order.visit?.street,
+          streetVisible: order.visit?.streetVisible,
+        }) && order.visit && (
+          <WazeNavigate
+            street={order.visit.street}
+            cityName={order.visit.cityName}
+            districtName={order.visit.districtName}
+            floor={order.visit.floor}
+          />
         )}
 
         {/* Due Date Countdown */}

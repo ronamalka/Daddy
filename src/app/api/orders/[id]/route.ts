@@ -1,10 +1,11 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { proxyRequest, ORDERS_SERVICE, GIGS_SERVICE, USERS_SERVICE, CHAT_SERVICE } from "@/lib/gateway";
+import { loadOrderVisit, visitVisibleToSeller } from "@/lib/order-visit";
 import { validateBody } from "@/lib/validate";
 import { updateOrderSchema } from "@/lib/order-update";
 
-/** Returns one order with gig, buyer, seller, messages, and review data. */
+/** Returns one order with gig, buyer, seller, messages, review, and seller-only visit address. */
 export async function GET(_request: Request, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const session = await auth();
@@ -19,12 +20,16 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
     return NextResponse.json(data ?? { error: "Order not found" }, { status });
   }
 
-  const [gigRes, buyerRes, sellerRes, reviewRes, messagesRes] = await Promise.all([
+  const [gigRes, buyerRes, sellerRes, reviewRes, messagesRes, visit] = await Promise.all([
     data.gigId ? proxyRequest(GIGS_SERVICE, `/gigs/${data.gigId}`) : Promise.resolve({ data: null, status: 404 }),
     proxyRequest(USERS_SERVICE, `/sellers/${data.buyerId}`),
     proxyRequest(USERS_SERVICE, `/sellers/${data.sellerId}`),
     proxyRequest(GIGS_SERVICE, `/reviews/by-order/${id}`),
     proxyRequest(CHAT_SERVICE, `/messages?orderId=${id}`, { user }),
+    loadOrderVisit(
+      user.id === data.sellerId || user.role === "ADMIN" ? data.requestId : null,
+      user
+    ),
   ]);
 
   const gig = gigRes.data;
@@ -49,6 +54,7 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
     seller: { id: data.sellerId, name: sellerRes.data?.name || "משתמש", avatar: sellerRes.data?.avatar || null },
     messages: enrichedMessages,
     review: reviewRes.status === 200 ? reviewRes.data : null,
+    visit: visitVisibleToSeller(visit, user, data.sellerId),
   };
 
   return NextResponse.json(enriched);
