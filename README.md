@@ -104,7 +104,7 @@ Every source folder has its own `README.md` with a short explanation.
 
 Code goes **feature branch → `dev` → `stg` → tagged production**. Do not open a normal feature PR against `main`.
 
-CI builds container images, pushes them to Quay, and updates tags in `gitops/`. Argo CD (`daddy-dev` and the other apps) syncs those manifests. Do not change a Deployment image by hand with `oc set image`.
+CI builds container images, pushes them to Quay, and writes the SHA into `gitops/base` on that branch. Argo CD (`daddy-dev`, `daddy-stg`, `daddy-prod`) syncs the matching overlay. `daddy-prod` is manual after a `v*` tag. Do not change a Deployment image by hand with `oc set image`.
 
 Details: [`gitops/README.md`](gitops/README.md) and [`.github/workflows/README.md`](.github/workflows/README.md).
 
