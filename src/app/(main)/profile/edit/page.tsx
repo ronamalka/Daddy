@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import { LocationPicker } from "@/components/location-picker";
 
 /** Shows the form to edit the user's profile. */
 export default function EditProfilePage() {
@@ -10,11 +11,16 @@ export default function EditProfilePage() {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("");
   const [name, setName] = useState("");
   const [bio, setBio] = useState("");
   const [phone, setPhone] = useState("");
   const [city, setCity] = useState("");
+  const [cityCode, setCityCode] = useState<number | undefined>(undefined);
+  const [districtCode, setDistrictCode] = useState<number | undefined>(undefined);
   const [avatar, setAvatar] = useState("");
+  const [avatarUploading, setAvatarUploading] = useState(false);
+  const [avatarError, setAvatarError] = useState("");
 
   useEffect(() => {
     fetch("/api/profile")
@@ -25,6 +31,8 @@ export default function EditProfilePage() {
           setBio(data.bio || "");
           setPhone(data.phone || "");
           setCity(data.city || "");
+          setCityCode(data.cityCode ?? undefined);
+          setDistrictCode(data.districtCode ?? undefined);
           setAvatar(data.avatar || "");
         }
         setLoading(false);
@@ -39,19 +47,59 @@ export default function EditProfilePage() {
     return <div className="flex items-center justify-center py-20"><div className="h-10 w-10 animate-spin rounded-full border-4 border-[rgba(var(--color-primary),0.1)] border-t-[rgb(var(--color-primary))]" /></div>;
   }
 
+  /** Updates city, cityCode, and districtCode when a location is picked. */
+  const handleLocationChange = useCallback((val: { cityCode: number; cityName: string; districtCode: number; districtName: string }) => {
+    setCity(val.cityName);
+    setCityCode(val.cityCode);
+    setDistrictCode(val.districtCode);
+  }, []);
+
   /** Saves the user's profile details. */
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setSaving(true);
-    const res = await fetch("/api/profile", {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name, bio: bio || null, phone: phone || null, city: city || null, avatar: avatar || null }),
-    });
-    if (res.ok) {
-      router.push("/profile");
+    setError("");
+    try {
+      const res = await fetch("/api/profile", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, bio: bio || null, phone: phone || null, city: city || null, cityCode: cityCode ?? null, districtCode: districtCode ?? null, avatar: avatar || null }),
+      });
+      if (res.ok) {
+        router.push("/profile");
+      } else {
+        const data = await res.json().catch(() => ({}));
+        setError((data as { error?: string }).error || "לא הצלחנו לשמור את השינויים");
+      }
+    } catch {
+      setError("לא הצלחנו לשמור את השינויים");
     }
     setSaving(false);
+  }
+
+  /** Uploads a file to /api/upload and sets the avatar URL. */
+  async function handleAvatarUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setAvatarError("");
+    setAvatarUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      const res = await fetch("/api/upload", { method: "POST", body: formData });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.files?.[0]?.url) {
+          setAvatar(data.files[0].url);
+        }
+      } else {
+        const data = await res.json().catch(() => ({}));
+        setAvatarError((data as { error?: string }).error || "העלאה נכשלה");
+      }
+    } catch {
+      setAvatarError("העלאה נכשלה");
+    }
+    setAvatarUploading(false);
   }
 
   const inputClass = "w-full rounded-xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface-elevated))] px-4 py-3 text-[14px] text-[rgb(var(--color-text))] placeholder-[rgb(var(--color-text-muted))] transition-all focus:border-[rgb(var(--color-primary))] focus:outline-none focus:ring-2 focus:ring-[rgba(var(--color-primary),0.2)]";
@@ -67,10 +115,12 @@ export default function EditProfilePage() {
             <label className="mb-2 block text-[13px] font-semibold text-[rgb(var(--color-text-secondary))]">שם מלא</label>
             <input value={name} onChange={(e) => setName(e.target.value)} required className={inputClass} />
           </div>
-          <div>
-            <label className="mb-2 block text-[13px] font-semibold text-[rgb(var(--color-text-secondary))]">עיר</label>
-            <input value={city} onChange={(e) => setCity(e.target.value)} placeholder="תל אביב" className={inputClass} />
-          </div>
+          <LocationPicker
+            mode="single"
+            label="עיר"
+            value={cityCode ? { cityCode, cityName: city, districtCode } : undefined}
+            onChange={handleLocationChange}
+          />
           <div>
             <label className="mb-2 block text-[13px] font-semibold text-[rgb(var(--color-text-secondary))]">טלפון</label>
             <input value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="050-0000000" className={inputClass} />
@@ -80,10 +130,41 @@ export default function EditProfilePage() {
             <textarea value={bio} onChange={(e) => setBio(e.target.value)} rows={4} placeholder="ספר על עצמך..." className={inputClass} />
           </div>
           <div>
-            <label className="mb-2 block text-[13px] font-semibold text-[rgb(var(--color-text-secondary))]">קישור לתמונת פרופיל</label>
-            <input value={avatar} onChange={(e) => setAvatar(e.target.value)} placeholder="https://..." className={inputClass} />
+            <label className="mb-2 block text-[13px] font-semibold text-[rgb(var(--color-text-secondary))]">תמונת פרופיל</label>
+            <div className="flex items-center gap-4">
+              {avatar && (
+                <img
+                  src={avatar}
+                  alt="תמונת פרופיל"
+                  className="h-16 w-16 rounded-full object-cover border-2 border-[rgb(var(--color-border))]"
+                />
+              )}
+              <div>
+                <input
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp"
+                  onChange={handleAvatarUpload}
+                  className="hidden"
+                  id="avatar-upload"
+                  disabled={avatarUploading}
+                />
+                <label
+                  htmlFor="avatar-upload"
+                  className={`inline-block cursor-pointer rounded-xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface-elevated))] px-4 py-2.5 text-[13px] font-semibold text-[rgb(var(--color-text-secondary))] transition-all hover:border-[rgb(var(--color-primary))] hover:text-[rgb(var(--color-primary))] ${avatarUploading ? "opacity-40 cursor-not-allowed" : ""}`}
+                >
+                  {avatarUploading ? "מעלה..." : "העלה תמונה"}
+                </label>
+                {avatarError && (
+                  <p className="mt-1.5 text-[12px] text-[rgb(var(--color-error))]">{avatarError}</p>
+                )}
+              </div>
+            </div>
           </div>
         </div>
+
+        {error && (
+          <p role="alert" className="text-[13px] font-medium text-[rgb(var(--color-error))]">{error}</p>
+        )}
 
         <button type="submit" disabled={saving} className="w-full rounded-xl bg-[rgb(var(--color-primary))] py-4 text-[15px] font-semibold text-white shadow-[0_4px_16px_rgba(var(--color-primary),0.3)] transition-all hover:bg-[rgb(var(--color-primary-hover))] disabled:opacity-40 disabled:cursor-not-allowed">
           {saving ? "שומר..." : "שמור שינויים"}

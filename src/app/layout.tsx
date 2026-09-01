@@ -5,7 +5,7 @@ import { AccessibilityToolbar, A11Y_BOOTSTRAP_SCRIPT } from "@/components/access
 import { CsrfProvider } from "@/components/csrf-provider";
 import { CookieConsentBanner } from "@/components/cookie-consent-banner";
 import { HOME_DESCRIPTION, HOME_TITLE, serializeJsonLd } from "@/lib/seo";
-import { getSiteUrl } from "@/lib/site-url";
+import { getSiteUrl, getRequestSiteUrl } from "@/lib/site-url";
 import "./globals.css";
 
 const heebo = Heebo({
@@ -16,7 +16,7 @@ const heebo = Heebo({
 
 /** Site-wide defaults; `metadataBase` is resolved at request time from the env host. */
 export async function generateMetadata(): Promise<Metadata> {
-  const base = getSiteUrl();
+  const base = await getRequestSiteUrl();
   return {
     title: {
       default: HOME_TITLE,

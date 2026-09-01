@@ -63,23 +63,6 @@ orderDetailRoutes.patch("/:id", requireAuth, async (req: Request, res: Response)
     COMPLETED: { by: ["buyer"], from: ["DELIVERED"] },
   };
 
-  if (status === "REVISION") {
-    if (order.buyerId !== req.user!.id && req.user!.role !== "ADMIN") {
-      res.status(403).json({ error: "Forbidden" });
-      return;
-    }
-    if (order.status !== "DELIVERED") {
-      res.status(400).json({ error: "Can only request revision on delivered orders" });
-      return;
-    }
-    const updated = await prisma.order.update({
-      where: { id },
-      data: { status: "IN_PROGRESS" },
-    });
-    res.json(updated);
-    return;
-  }
-
   if (status === "CANCELLED") {
     const isBuyer = order.buyerId === req.user!.id;
     const isSeller = order.sellerId === req.user!.id;

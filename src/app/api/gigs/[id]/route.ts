@@ -53,8 +53,15 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
     })
   );
 
-  if (data.sellerId && profiles[data.sellerId]) {
-    data.seller = profiles[data.sellerId];
+  if (data.sellerId) {
+    data.seller = profiles[data.sellerId] ?? {
+      id: data.sellerId,
+      name: "משתמש",
+      avatar: null,
+      bio: null,
+      city: null,
+      createdAt: data.createdAt ?? new Date().toISOString(),
+    };
   }
 
   data.reviews = attachReviewAuthors(reviews, profiles);

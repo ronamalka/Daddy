@@ -11,6 +11,14 @@ interface RateLimitEntry {
   resetAt: number;
 }
 
+/**
+ * WARNING: This in-memory store is per-process. In Kubernetes with multiple
+ * pods, each pod tracks its own counters, so the effective rate limit is
+ * multiplied by the replica count. This is acceptable as a first line of
+ * defence, but critical auth paths (login, register, password-reset) also
+ * enforce a Redis-backed limit at the route handler level that works across
+ * all pods. See src/lib/rate-limit-redis.ts.
+ */
 const store = new Map<string, RateLimitEntry>();
 
 /** Drops expired in-memory rate-limit entries every minute. */
