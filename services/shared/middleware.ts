@@ -15,7 +15,17 @@ declare global {
 /** Return true if the signature matches this payload. */
 function verifySignature(payload: string, signature: string): boolean {
   const expected = crypto.createHmac("sha256", INTER_SERVICE_SECRET).update(payload).digest("hex");
+  if (expected.length !== signature.length) return false;
   return crypto.timingSafeEqual(Buffer.from(expected), Buffer.from(signature));
+}
+
+/** Check that the service-to-service HMAC token is present and valid. */
+function hasValidServiceSignature(req: Request): boolean {
+  const sig = req.headers["x-service-signature"] as string | undefined;
+  if (!sig) return false;
+  const expected = crypto.createHmac("sha256", INTER_SERVICE_SECRET).update("service-call").digest("hex");
+  if (expected.length !== sig.length) return false;
+  return crypto.timingSafeEqual(Buffer.from(expected), Buffer.from(sig));
 }
 
 /** Read the signed user header and attach the user to the request. */
@@ -68,4 +78,17 @@ export function requireSeller(req: Request, res: Response, next: NextFunction) {
     return;
   }
   next();
+}
+
+/** Stop the request unless it carries a valid inter-service signature (user or service-level). */
+export function requireInternal(req: Request, res: Response, next: NextFunction) {
+  if (req.user) {
+    next();
+    return;
+  }
+  if (hasValidServiceSignature(req)) {
+    next();
+    return;
+  }
+  res.status(403).json({ error: "Internal access required" });
 }

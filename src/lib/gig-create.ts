@@ -31,3 +31,16 @@ export const createGigSchema = z.object({
 }).strict();
 
 export type CreateGigBody = z.infer<typeof createGigSchema>;
+
+/** Body shape for updating an existing gig. All fields optional. */
+export const updateGigSchema = z.object({
+  title: z.string().min(1).max(200).optional(),
+  description: z.string().min(1).max(5000).optional(),
+  categoryId: z.string().min(1).max(100).optional(),
+  image: z.string().url().max(500).optional().nullable(),
+  tiers: z.array(gigTierSchema).min(1).max(5).optional(),
+  faqs: z.array(gigFaqSchema).max(20).optional(),
+  requirements: z.array(gigRequirementSchema).max(20).optional(),
+}).strict();
+
+export type UpdateGigBody = z.infer<typeof updateGigSchema>;
