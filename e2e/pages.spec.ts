@@ -23,10 +23,19 @@ test.describe("Public Pages", () => {
     await expect(link).toHaveAttribute("href", "/orders");
   });
 
+  test("how-it-works FAQ states the 24-hour cancel window, not 14-day cooling-off", async ({ page }) => {
+    await page.goto("/how-it-works");
+    await page.getByRole("button", { name: "אפשר לבטל?" }).click();
+    await expect(page.getByText(/24 שעות לפני חלון הביקור/)).toBeVisible();
+    await expect(page.getByText(/אינו 14 ימי ביטול/)).toBeVisible();
+  });
+
   test("terms page states the platform is an intermediary", async ({ page }) => {
     await page.goto("/terms");
     await expect(page.getByRole("heading", { name: "תנאי שימוש" })).toBeVisible();
     await expect(page.getByText(/תיווך בלבד/)).toBeVisible();
+    await expect(page.getByText(/24 שעות לפני תחילת חלון הביקור/)).toBeVisible();
+    await expect(page.getByText(/ולא עסקת מכר מרחוק רגילה עם 14 ימי ביטול/)).toBeVisible();
   });
 
   test("cookie banner can be rejected", async ({ page }) => {

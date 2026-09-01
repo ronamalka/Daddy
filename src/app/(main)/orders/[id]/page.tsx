@@ -10,6 +10,7 @@ import { Dialog } from "@/components/ui/dialog";
 import { formatVisitWindow } from "@/lib/availability";
 import { DisputeDialog } from "@/components/orders/dispute-dialog";
 import { DISPUTE_REASON_LABELS, DISPUTE_STATUS_LABELS, isDisputableStatus, orderHasOpenDispute } from "@/lib/disputes";
+import { CANCELLATION_FEE_STATUS_LABELS, evaluateBuyerCancel } from "@/lib/cancellation";
 import { AttachmentBubble } from "@/components/chat/attachment-bubble";
 import { ComposerAttach } from "@/components/chat/composer-attach";
 import { QuotePriceBreakdown } from "@/components/quote-price-breakdown";
@@ -66,6 +67,9 @@ interface OrderDetail {
     photos: string[];
     createdAt: string;
   }[];
+  cancellationFee?: number;
+  cancellationFeeStatus?: string;
+  cancelledAt?: string | null;
 }
 
 const STATUS_STYLE: Record<string, { bg: string; text: string; label: string }> = {
@@ -311,19 +315,28 @@ export default function OrderDetailPage() {
     setRevisionSubmitting(false);
   }
 
-  /** Cancels the order after the user confirms. */
+  /** Cancels the order after the user confirms. Late cancels record a fee even without escrow. */
   async function confirmCancel() {
     setCancelSubmitting(true);
+    setStatusError("");
     const res = await fetch(`/api/orders/${params.id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ status: "CANCELLED" }),
     });
+    const updated = await res.json().catch(() => ({}));
     if (res.ok) {
-      const updated = await res.json();
-      setOrder((prev) => prev ? { ...prev, status: updated.status } : prev);
+      setOrder((prev) => prev ? {
+        ...prev,
+        status: updated.status,
+        cancellationFee: updated.cancellationFee,
+        cancellationFeeStatus: updated.cancellationFeeStatus,
+        cancelledAt: updated.cancelledAt,
+      } : prev);
+      setCancelOpen(false);
+    } else {
+      setStatusError((updated as { error?: string }).error || "לא הצלחנו לבטל את ההזמנה");
     }
-    setCancelOpen(false);
     setCancelSubmitting(false);
   }
 
@@ -345,6 +358,15 @@ export default function OrderDetailPage() {
   const isSeller = session?.user?.id === order.seller.id;
   const statusInfo = STATUS_STYLE[order.status] || STATUS_STYLE.PENDING;
   const daysLeft = order.dueDate ? Math.ceil((new Date(order.dueDate).getTime() - now) / (1000 * 60 * 60 * 24)) : null;
+  const buyerCancel = evaluateBuyerCancel({
+    status: order.status,
+    price: order.price,
+    slotStart: order.slotStart,
+    slotEnd: order.slotEnd,
+    now: new Date(now),
+  });
+  const hasOpenDispute = orderHasOpenDispute(order.disputes);
+  const showBuyerDisputeInsteadOfCancel = isBuyer && order.status === "IN_PROGRESS" && !hasOpenDispute;
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-8">
@@ -496,10 +518,19 @@ export default function OrderDetailPage() {
           {isBuyer && order.status === "PENDING" && (
             <button onClick={() => setCancelOpen(true)} className="flex items-center gap-2 rounded-xl border-2 border-[rgba(var(--color-error),0.2)] bg-[rgba(var(--color-error),0.05)] px-5 py-2.5 text-[14px] font-semibold text-[rgb(var(--color-error))] transition-all hover:bg-[rgba(var(--color-error),0.1)]">בטל הזמנה</button>
           )}
+          {showBuyerDisputeInsteadOfCancel && (
+            <button
+              onClick={() => setDisputeOpen(true)}
+              className="flex items-center gap-2 rounded-xl border-2 border-[rgba(var(--color-error),0.25)] bg-[rgba(var(--color-error),0.05)] px-5 py-2.5 text-[14px] font-semibold text-[rgb(var(--color-error))] transition-all hover:bg-[rgba(var(--color-error),0.1)]"
+            >
+              <Scales className="h-4 w-4" />
+              פתח מחלוקת
+            </button>
+          )}
           {isBuyer && order.status === "COMPLETED" && !order.review && (
             <button onClick={() => setReviewOpen(true)} className="flex items-center gap-2 rounded-xl bg-[rgb(var(--color-accent-yellow))] px-5 py-2.5 text-[14px] font-semibold text-[rgb(var(--color-text))] transition-all hover:opacity-80">כתוב חוות דעת</button>
           )}
-          {(isBuyer || isSeller) && isDisputableStatus(order.status) && !orderHasOpenDispute(order.disputes) && (
+          {(isBuyer || isSeller) && isDisputableStatus(order.status) && !hasOpenDispute && !showBuyerDisputeInsteadOfCancel && (
             <button
               onClick={() => setDisputeOpen(true)}
               className="flex items-center gap-2 rounded-xl border-2 border-[rgba(var(--color-error),0.25)] bg-[rgba(var(--color-error),0.05)] px-5 py-2.5 text-[14px] font-semibold text-[rgb(var(--color-error))] transition-all hover:bg-[rgba(var(--color-error),0.1)]"
@@ -511,6 +542,17 @@ export default function OrderDetailPage() {
         </div>
         {statusError && (
           <p role="alert" className="mt-3 text-[13px] font-medium text-[rgb(var(--color-error))]">{statusError}</p>
+        )}
+
+        {order.status === "CANCELLED" && (order.cancellationFee ?? 0) > 0 && (
+          <div className="mt-5 rounded-xl border border-[rgba(var(--color-warning),0.25)] bg-[rgba(var(--color-accent-yellow),0.12)] px-4 py-3">
+            <p className="text-[13px] font-semibold text-[rgb(var(--color-text))]">
+              דמי ביטול ₪{order.cancellationFee} · {CANCELLATION_FEE_STATUS_LABELS[(order.cancellationFeeStatus as keyof typeof CANCELLATION_FEE_STATUS_LABELS) || "OWED"] || "חוב רשום"}
+            </p>
+            <p className="mt-1 text-[12px] text-[rgb(var(--color-text-secondary))]">
+              החוב נרשם לטובת האבאל׳ה. הסליקה בפלטפורמה עדיין לא פעילה.
+            </p>
+          </div>
         )}
 
         {order.disputes && order.disputes.length > 0 && (
@@ -798,14 +840,14 @@ export default function OrderDetailPage() {
       </Dialog>
 
       {/* Cancellation Confirmation Modal */}
-      <Dialog open={cancelOpen} onOpenChange={setCancelOpen}>
+      <Dialog open={cancelOpen} onOpenChange={setCancelOpen} labelledBy="cancel-dialog-title">
         <div className="pt-2">
           <div className="mb-4 flex items-center gap-3">
             <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[rgba(var(--color-error),0.1)]">
               <Warning className="h-5 w-5 text-[rgb(var(--color-error))]" weight="fill" />
             </div>
             <div>
-              <h3 className="text-[16px] font-bold text-[rgb(var(--color-text))]">
+              <h3 id="cancel-dialog-title" className="text-[16px] font-bold text-[rgb(var(--color-text))]">
                 {isSeller ? "דחיית הזמנה" : "ביטול הזמנה"}
               </h3>
               <p className="text-[13px] text-[rgb(var(--color-text-secondary))]">פעולה זו אינה ניתנת לביטול</p>
@@ -821,16 +863,32 @@ export default function OrderDetailPage() {
               <span className="text-[rgb(var(--color-text-secondary))]">סכום ההזמנה</span>
               <span className="font-bold text-[rgb(var(--color-text))]">₪{order.price}</span>
             </div>
-            {isBuyer && order.status === "PENDING" && (
+            {isBuyer && order.status === "PENDING" && buyerCancel.kind === "FREE" && (
               <div className="border-t border-[rgb(var(--color-border-light))] pt-2 mt-2">
                 <div className="flex items-center justify-between text-[14px]">
-                  <span className="text-[rgb(var(--color-success))] font-semibold">החזר כספי</span>
-                  <span className="font-bold text-[rgb(var(--color-success))]">₪{order.price} (מלא)</span>
+                  <span className="text-[rgb(var(--color-success))] font-semibold">דמי ביטול</span>
+                  <span className="font-bold text-[rgb(var(--color-success))]">₪0</span>
                 </div>
                 <p className="mt-1 text-[12px] text-[rgb(var(--color-text-muted))]">
-                  ביטול לפני תחילת העבודה — החזר מלא
+                  ביטול חינם — יותר מ־24 שעות לפני חלון הביקור
                 </p>
               </div>
+            )}
+            {isBuyer && order.status === "PENDING" && buyerCancel.kind === "LATE_FEE" && (
+              <div className="border-t border-[rgb(var(--color-border-light))] pt-2 mt-2">
+                <div className="flex items-center justify-between text-[14px]">
+                  <span className="text-[rgb(var(--color-error))] font-semibold">דמי ביטול</span>
+                  <span className="font-bold text-[rgb(var(--color-error))]">₪{buyerCancel.fee}</span>
+                </div>
+                <p className="mt-1 text-[12px] text-[rgb(var(--color-text-muted))]">
+                  שעת עבודה אחת או ₪50 — הנמוך מביניהם. החוב נרשם גם בלי סליקה בפלטפורמה.
+                </p>
+              </div>
+            )}
+            {isSeller && (
+              <p className="mt-1 text-[12px] text-[rgb(var(--color-text-muted))]">
+                דחייה לפני תחילת העבודה — בלי דמי ביטול ללקוח
+              </p>
             )}
           </div>
 

@@ -17,6 +17,7 @@ import {
 import { CategoryIcon } from "@/components/ui/category-icon";
 import { DAY_LABELS_HE, minutesToTimeLabel } from "@/lib/availability";
 import { SlotPicker, type SlotOption } from "@/components/slot-picker";
+import { CancellationPolicyNote } from "@/components/cancellation-policy-note";
 import { QuotePriceBreakdown } from "@/components/quote-price-breakdown";
 import { quoteTotal } from "@/lib/quote-price";
 
@@ -709,8 +710,9 @@ function PricesTab({
         {bookError && <p className="mt-2 text-[13px] text-[rgb(var(--color-error))]">{bookError}</p>}
       </div>
       {!isOwnProfile && isLoggedIn && acceptingJobs && (
-        <div className="border-b border-[rgb(var(--color-border-light))] px-6 py-4">
+        <div className="border-b border-[rgb(var(--color-border-light))] px-6 py-4 space-y-3">
           <SlotPicker sellerId={sellerId} value={selectedSlot} onChange={setSelectedSlot} />
+          <CancellationPolicyNote compact />
         </div>
       )}
       <div className="divide-y divide-[rgb(var(--color-border-light))]">

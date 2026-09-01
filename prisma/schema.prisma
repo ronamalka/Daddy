@@ -67,6 +67,13 @@ enum PaymentAction {
   SPLIT
 }
 
+enum CancellationFeeStatus {
+  NONE
+  OWED
+  COLLECTED
+  WAIVED
+}
+
 model User {
   id           String   @id @default(cuid())
   email        String   @unique
@@ -355,6 +362,10 @@ model Order {
   dueDate   DateTime?
   slotStart DateTime?
   slotEnd   DateTime?
+  cancelledAt           DateTime?
+  cancelledById         String?
+  cancellationFee       Float                 @default(0)
+  cancellationFeeStatus CancellationFeeStatus @default(NONE)
   createdAt DateTime    @default(now())
   updatedAt DateTime    @updatedAt
 

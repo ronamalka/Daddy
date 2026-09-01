@@ -51,4 +51,19 @@ test.describe("Order Flow", () => {
     await expect(page.getByRole("heading", { name: "ההזמנות שלי" })).toBeVisible({ timeout: 10000 });
     await expect(page.getByRole("button", { name: "יומן" })).toHaveCount(0);
   });
+
+  test("in-progress job turns the buyer cancel control into open a dispute", async ({ page }) => {
+    await loginAs(page, "buyer3@daddy.com");
+    await page.goto("/orders/ord-20");
+    await expect(page.getByRole("button", { name: "בטל הזמנה" })).toHaveCount(0);
+    await expect(page.getByRole("button", { name: "פתח מחלוקת" })).toBeVisible({ timeout: 10000 });
+  });
+
+  test("pending buyer cancel dialog states the fee policy", async ({ page }) => {
+    await loginAs(page, "buyer2@daddy.com");
+    await page.goto("/orders/ord-19");
+    await page.getByRole("button", { name: "בטל הזמנה" }).click();
+    await expect(page.getByRole("heading", { name: "ביטול הזמנה" })).toBeVisible();
+    await expect(page.getByText("דמי ביטול")).toBeVisible();
+  });
 });

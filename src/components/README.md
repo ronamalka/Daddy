@@ -12,7 +12,7 @@ Reusable pieces of the interface. Subfolders group related screens.
 | `notification-bell.tsx` | Header alerts (orders, chat, nearby requests) |
 | `cookie-consent-banner.tsx` | Cookie choice (Israeli privacy practice) |
 | `accessibility-toolbar.tsx` | Font size, contrast, and related a11y controls |
-| `legal-consent-fields.tsx` / `marketplace-disclaimer.tsx` | Legal copy on forms |
+| `legal-consent-fields.tsx` / `marketplace-disclaimer.tsx` / `cancellation-policy-note.tsx` | Legal copy on forms and checkout |
 | `profile-progress.tsx` | Daddy onboarding meter and checklist |
 | `home/` | Homepage sections |
 | `inbox/` | Messenger UI |
