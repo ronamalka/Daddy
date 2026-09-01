@@ -6,6 +6,7 @@ namespace: daddy-prod
 resources:
   - ../../base
   - network-policy.yaml
+  - app-route-custom.yaml
 
 patches:
   - target:
@@ -21,10 +22,10 @@ patches:
     patch: |
       - op: replace
         path: /stringData/AUTH_URL
-        value: https://daddy-app-daddy-prod.apps.cluster-x8bxx.x8bxx.sandbox2963.opentlc.com
+        value: https://aballeh.com
       - op: replace
         path: /stringData/NEXT_PUBLIC_BASE_URL
-        value: https://daddy-app-daddy-prod.apps.cluster-x8bxx.x8bxx.sandbox2963.opentlc.com
+        value: https://aballeh.com
       - op: replace
         path: /stringData/AUTH_SECRET
         value: CHANGE_ME_PROD_AUTH_SECRET_AT_LEAST_32_CHARS

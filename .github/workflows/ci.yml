@@ -300,25 +300,9 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Determine image tags
+      - name: Determine image tag
         id: tag
-        run: |
-          SHA="${GITHUB_SHA::8}"
-          echo "sha=${SHA}" >> $GITHUB_OUTPUT
-          case "${GITHUB_REF}" in
-            refs/heads/main) ENV=main ;;
-            refs/heads/stg) ENV=stg ;;
-            *) ENV=dev ;;
-          esac
-          echo "env=${ENV}" >> $GITHUB_OUTPUT
-          TAGS="${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-${{ matrix.service }}:${SHA}"
-          if [ "$ENV" != "main" ]; then
-            TAGS="${TAGS}
-${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-${{ matrix.service }}:${ENV}"
-          fi
-          echo "tags<<EOF" >> $GITHUB_OUTPUT
-          echo "$TAGS" >> $GITHUB_OUTPUT
-          echo "EOF" >> $GITHUB_OUTPUT
+        run: echo "sha=${GITHUB_SHA::8}" >> $GITHUB_OUTPUT
 
       - name: Build and push image
         uses: docker/build-push-action@v5
@@ -326,7 +310,9 @@ ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-${{ matrix.service }}:${ENV}"
           context: ${{ matrix.context }}
           file: ${{ matrix.dockerfile }}
           push: true
-          tags: ${{ steps.tag.outputs.tags }}
+          tags: |
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-${{ matrix.service }}:${{ steps.tag.outputs.sha }}
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-${{ matrix.service }}:${{ github.ref_name }}
           cache-from: type=gha,scope=${{ matrix.service }}
           cache-to: type=gha,mode=max,scope=${{ matrix.service }}
 
