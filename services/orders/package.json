@@ -27,7 +27,7 @@
     "@types/node": "^22.0.0",
     "@types/pg": "^8.23.1",
     "tsx": "^4.19.0",
-    "typescript": "^5.7.0"
+    "typescript": "^7.0.2"
   },
   "allowScripts": {
     "prisma@7.9.1": true,
