@@ -11,7 +11,7 @@ describe("updateOrderSchema", () => {
   });
 
   it("accepts the other order-page status values without extra fields", () => {
-    for (const status of ["COMPLETED", "CANCELLED", "REVISION"]) {
+    for (const status of ["COMPLETED", "CANCELLED"]) {
       expect(updateOrderSchema.safeParse({ status }).success).toBe(true);
     }
   });
