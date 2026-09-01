@@ -1,11 +1,12 @@
-import type { Metadata } from "next";
 import Link from "next/link";
 import { BUSINESS_DISCLOSURE, LEGAL_CONTACTS, TERMS_VERSION } from "@/lib/legal";
+import { pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
+export const metadata = pageMetadata({
   title: "תנאי שימוש",
   description: "תנאי השימוש של אבאל׳ה — פלטפורמת תיווך בין לקוחות לנותני שירות עצמאיים בישראל.",
-};
+  path: "/terms",
+});
 
 const SECTIONS = [
   {

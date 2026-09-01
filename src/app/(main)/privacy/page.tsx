@@ -1,11 +1,12 @@
-import type { Metadata } from "next";
 import Link from "next/link";
 import { BUSINESS_DISCLOSURE, LEGAL_CONTACTS, TERMS_VERSION } from "@/lib/legal";
+import { pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
+export const metadata = pageMetadata({
   title: "מדיניות פרטיות",
   description: "מדיניות הפרטיות של אבאל׳ה לפי חוק הגנת הפרטיות ותיקון 13.",
-};
+  path: "/privacy",
+});
 
 const SECTIONS = [
   {

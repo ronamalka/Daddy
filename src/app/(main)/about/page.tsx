@@ -1,16 +1,13 @@
-import type { Metadata } from "next";
 import Link from "next/link";
 import { Handshake, Scales, Buildings, CheckCircle, Wrench, FolderOpen, MapPin, Star, Target, Heart, UsersFour } from "@phosphor-icons/react/dist/ssr";
 import type { Icon as PhosphorIcon } from "@phosphor-icons/react";
+import { pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
+export const metadata = pageMetadata({
   title: "על אבאל׳ה — כל אחד צריך אבא שיסדר",
   description: "כל אחד צריך אבא שיסדר. אנחנו פשוט בנינו אפליקציה בשביל זה. הסיפור, הערכים, והפילוסופיה של אבאל׳ה.",
-  openGraph: {
-    title: "על אבאל׳ה — כל אחד צריך אבא שיסדר",
-    description: "הכל התחיל כשמישהו אמר ׳אבא, הברז מטפטף׳ ואבא אמר ׳שנייה, אני בא׳.",
-  },
-};
+  path: "/about",
+});
 
 const VALUES: { title: string; desc: string; Icon: PhosphorIcon }[] = [
   { title: "אמינות", desc: "ביקורות אמיתיות, פרופילים שקופים, דירוגים שלא ניתן לעריכה. מה שאתה רואה — זה מה שאתה מקבל.", Icon: Handshake },

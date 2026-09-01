@@ -215,6 +215,8 @@ jobs:
         env:
           DATABASE_URL: "postgresql://daddy:daddypass123@localhost:5432/daddy_users"
           AUTH_SECRET: "ci-test-secret-at-least-32-characters-long"
+          AUTH_URL: "http://localhost:3000"
+          NEXT_PUBLIC_BASE_URL: "http://localhost:3000"
           AUTH_TRUST_HOST: "true"
           REDIS_URL: "redis://localhost:6379"
           RATE_LIMIT_AUTH: "60"

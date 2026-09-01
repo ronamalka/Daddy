@@ -11,6 +11,8 @@ providersRoutes.get("/", async (req: Request, res: Response) => {
   const service = req.query.service as string | undefined;
   const district = req.query.district as string | undefined;
   const cityCode = req.query.cityCode as string | undefined;
+  const skip = Math.max(parseInt(String(req.query.skip || "0"), 10) || 0, 0);
+  const take = Math.min(Math.max(parseInt(String(req.query.take || "50"), 10) || 50, 1), 200);
 
   const sellers = await prisma.user.findMany({
     where: searchableSellerWhere({ service, district, cityCode }) as Prisma.UserWhereInput,
@@ -32,7 +34,8 @@ providersRoutes.get("/", async (req: Request, res: Response) => {
         take: 1,
       },
     },
-    take: 50,
+    skip,
+    take,
   });
 
   const results = sellers.map((s) => ({
