@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import { LocationPicker } from "@/components/location-picker";
 
 /** Shows the form to edit the user's profile. */
 export default function EditProfilePage() {
@@ -14,6 +15,8 @@ export default function EditProfilePage() {
   const [bio, setBio] = useState("");
   const [phone, setPhone] = useState("");
   const [city, setCity] = useState("");
+  const [cityCode, setCityCode] = useState<number | undefined>(undefined);
+  const [districtCode, setDistrictCode] = useState<number | undefined>(undefined);
   const [avatar, setAvatar] = useState("");
 
   useEffect(() => {
@@ -25,6 +28,8 @@ export default function EditProfilePage() {
           setBio(data.bio || "");
           setPhone(data.phone || "");
           setCity(data.city || "");
+          setCityCode(data.cityCode ?? undefined);
+          setDistrictCode(data.districtCode ?? undefined);
           setAvatar(data.avatar || "");
         }
         setLoading(false);
@@ -39,6 +44,13 @@ export default function EditProfilePage() {
     return <div className="flex items-center justify-center py-20"><div className="h-10 w-10 animate-spin rounded-full border-4 border-[rgba(var(--color-primary),0.1)] border-t-[rgb(var(--color-primary))]" /></div>;
   }
 
+  /** Updates city, cityCode, and districtCode when a location is picked. */
+  const handleLocationChange = useCallback((val: { cityCode: number; cityName: string; districtCode: number; districtName: string }) => {
+    setCity(val.cityName);
+    setCityCode(val.cityCode);
+    setDistrictCode(val.districtCode);
+  }, []);
+
   /** Saves the user's profile details. */
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -46,7 +58,7 @@ export default function EditProfilePage() {
     const res = await fetch("/api/profile", {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name, bio: bio || null, phone: phone || null, city: city || null, avatar: avatar || null }),
+      body: JSON.stringify({ name, bio: bio || null, phone: phone || null, city: city || null, cityCode: cityCode ?? null, districtCode: districtCode ?? null, avatar: avatar || null }),
     });
     if (res.ok) {
       router.push("/profile");
@@ -67,10 +79,12 @@ export default function EditProfilePage() {
             <label className="mb-2 block text-[13px] font-semibold text-[rgb(var(--color-text-secondary))]">שם מלא</label>
             <input value={name} onChange={(e) => setName(e.target.value)} required className={inputClass} />
           </div>
-          <div>
-            <label className="mb-2 block text-[13px] font-semibold text-[rgb(var(--color-text-secondary))]">עיר</label>
-            <input value={city} onChange={(e) => setCity(e.target.value)} placeholder="תל אביב" className={inputClass} />
-          </div>
+          <LocationPicker
+            mode="single"
+            label="עיר"
+            value={cityCode ? { cityCode, cityName: city, districtCode } : undefined}
+            onChange={handleLocationChange}
+          />
           <div>
             <label className="mb-2 block text-[13px] font-semibold text-[rgb(var(--color-text-secondary))]">טלפון</label>
             <input value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="050-0000000" className={inputClass} />
