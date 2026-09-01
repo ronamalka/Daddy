@@ -14,6 +14,7 @@ import {
   House, SealCheck, ChatCircleDots, PaperPlaneTilt,
   CalendarBlank, ShieldCheck, CheckCircle, Heart,
 } from "@phosphor-icons/react";
+import { VerificationBadge } from "@/components/verification-badge";
 import { CategoryIcon } from "@/components/ui/category-icon";
 import { DAY_LABELS_HE, minutesToTimeLabel } from "@/lib/availability";
 import { SlotPicker, type SlotOption } from "@/components/slot-picker";
@@ -63,6 +64,10 @@ interface SellerProfile {
     buyerSuppliesMaterials?: boolean | null;
   }[];
   acceptingJobs?: boolean;
+  phoneVerified?: boolean;
+  identityStatus?: string;
+  licenseStatus?: string;
+  licenseType?: string;
   weeklyHours?: { dayOfWeek: number; startMin: number; endMin: number }[];
   allReviews: ReviewData[];
   gigs: {
@@ -398,6 +403,18 @@ export default function SellerProfilePage() {
               </span>
             )}
           </div>
+
+          {/* Verification Badges */}
+          {(seller.phoneVerified || (seller.identityStatus && seller.identityStatus !== "NONE") || (seller.licenseStatus && seller.licenseStatus !== "NONE")) && (
+            <div className="mt-3">
+              <VerificationBadge
+                phoneVerified={seller.phoneVerified}
+                identityStatus={seller.identityStatus}
+                licenseStatus={seller.licenseStatus}
+                licenseType={seller.licenseType}
+              />
+            </div>
+          )}
 
           {/* Service areas */}
           {seller.serviceAreas.length > 0 && (
