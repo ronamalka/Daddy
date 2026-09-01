@@ -1,5 +1,5 @@
 ---
-description: Feature promotion path — PRs go to dev, then stg, then tagged prod/main
+description: Feature promotion path — PRs go to dev, then stg, then tagged prod/main. GitOps via Argo CD.
 alwaysApply: true
 ---
 
@@ -9,12 +9,19 @@ Never open a feature PR against `main` unless the user explicitly overrides this
 
 Default path:
 
-1. Feature branch → **draft/PR into `dev`**
-2. After `dev` is good → merge/promote **`dev` → `stg`**
-3. Production (`main` / prod) **only after a tag** — do not merge features straight to `main`
-
-When creating PRs with `gh pr create`, default `--base dev`.
+1. Feature branch → **draft/PR into `dev`** (`gh pr create` default `--base dev`)
+2. After `dev` is good → merge/promote **`dev` → `stg`** (create `stg` from `dev` the first time)
+3. Production (`main` / Argo `daddy-prod`) **only after a tag** — do not merge features straight to `main`
 
 If a user action says "base: main" for a feature branch, still use `dev` unless they clearly mean a production release.
 
-Do not tag or merge to `main` as part of ordinary feature work. Tagging and prod promotion happen as a separate, explicit release step.
+Do not tag or merge to `main` as part of ordinary feature work.
+
+## GitOps (how code reaches the cluster)
+
+- CI on `dev` / `stg` / `main` builds Quay images and writes the short SHA into `gitops/base` **on that same branch**.
+- Argo: `daddy-dev` tracks `dev` (auto-sync), `daddy-stg` tracks `stg` (auto-sync), `daddy-prod` tracks `main` (**manual** sync after a `v*` tag).
+- Overlays do not rewrite image names. **Never** `oc set image` or enable a CI job that does.
+- After a push to `dev` or `stg`, wait for **Build & Push Images** and **Update GitOps Manifests**, then wait for Argo.
+- Argo ignores Secret data diffs. New keys (for example `INTER_SERVICE_SECRET`) must be patched in the namespace; Git placeholders will not land on a live secret.
+- Full runbook: [`gitops/README.md`](gitops/README.md). First prod secrets: [`gitops/overlays/prod/README.md`](gitops/overlays/prod/README.md).
