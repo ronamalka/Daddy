@@ -67,6 +67,12 @@ export function OrderCards({
                 ) : null}
                 <span className="mx-2 text-[rgb(var(--color-border))]">|</span>
                 <span className="font-semibold text-[rgb(var(--color-text))]">₪{order.price}</span>
+                {order.standingJobId ? (
+                  <>
+                    <span className="mx-2 text-[rgb(var(--color-border))]">|</span>
+                    <span>קבועה</span>
+                  </>
+                ) : null}
               </p>
               {order.slotStart && order.slotEnd && (
                 <p className="mt-1 text-[13px] text-[rgb(var(--color-primary))]">

@@ -5,7 +5,7 @@ import { useSession } from "next-auth/react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import { ReviewForm } from "@/components/review-form";
-import { Star, Handshake, Clock, Coins, Tag, ClipboardText, ChatCircle, PaperPlaneTilt, ArrowsClockwise, Warning, Scales } from "@phosphor-icons/react";
+import { Star, Handshake, Clock, Coins, Tag, ClipboardText, ChatCircle, PaperPlaneTilt, ArrowsClockwise, Warning, Scales, Repeat } from "@phosphor-icons/react";
 import { Dialog } from "@/components/ui/dialog";
 import { formatVisitWindow } from "@/lib/availability";
 import { DisputeDialog } from "@/components/orders/dispute-dialog";
@@ -15,6 +15,8 @@ import { AttachmentBubble } from "@/components/chat/attachment-bubble";
 import { ComposerAttach } from "@/components/chat/composer-attach";
 import { QuotePriceBreakdown } from "@/components/quote-price-breakdown";
 import { canShowMaterialsUpdateForm, hasPendingMaterialsAck } from "@/lib/materials";
+import { StandingJobDialog } from "@/components/orders/standing-job-dialog";
+import { canCreateFromCompletedJob } from "@/lib/standing-job";
 
 interface GigRequirement {
   id: string;
@@ -31,6 +33,7 @@ interface OrderRequirement {
 interface OrderDetail {
   id: string;
   jobType?: string;
+  standingJobId?: string | null;
   tier: string | null;
   price: number;
   laborPrice?: number | null;
@@ -112,6 +115,7 @@ export default function OrderDetailPage() {
   const [materialsInput, setMaterialsInput] = useState("");
   const [materialsBusy, setMaterialsBusy] = useState(false);
   const [materialsError, setMaterialsError] = useState("");
+  const [standingOpen, setStandingOpen] = useState(false);
 
   useEffect(() => {
     fetch(`/api/orders/${params.id}`)
@@ -530,6 +534,24 @@ export default function OrderDetailPage() {
           {isBuyer && order.status === "COMPLETED" && !order.review && (
             <button onClick={() => setReviewOpen(true)} className="flex items-center gap-2 rounded-xl bg-[rgb(var(--color-accent-yellow))] px-5 py-2.5 text-[14px] font-semibold text-[rgb(var(--color-text))] transition-all hover:opacity-80">כתוב חוות דעת</button>
           )}
+          {session?.user?.id && canCreateFromCompletedJob({ jobType: order.jobType, status: order.status, buyerId: order.buyer.id }, session.user.id) && !order.standingJobId && (
+            <button
+              type="button"
+              onClick={() => setStandingOpen(true)}
+              className="flex items-center gap-2 rounded-xl border-2 border-[rgba(var(--color-primary),0.25)] bg-[rgba(var(--color-primary),0.06)] px-5 py-2.5 text-[14px] font-semibold text-[rgb(var(--color-primary))]"
+            >
+              <Repeat className="h-4 w-4" />
+              עבודה קבועה
+            </button>
+          )}
+          {order.standingJobId && (
+            <Link
+              href={`/standing-jobs/${order.standingJobId}`}
+              className="flex items-center gap-2 rounded-xl border border-[rgb(var(--color-border))] px-5 py-2.5 text-[14px] font-semibold text-[rgb(var(--color-primary))]"
+            >
+              לעבודה הקבועה
+            </Link>
+          )}
           {(isBuyer || isSeller) && isDisputableStatus(order.status) && !hasOpenDispute && !showBuyerDisputeInsteadOfCancel && (
             <button
               onClick={() => setDisputeOpen(true)}
@@ -927,6 +949,25 @@ export default function OrderDetailPage() {
             }, ...(prev.disputes || [])],
           } : prev);
         }}
+      />
+
+      <StandingJobDialog
+        open={standingOpen}
+        onOpenChange={setStandingOpen}
+        sellerId={order.seller.id}
+        sourceOrderId={order.id}
+        title={order.gig?.title}
+        firstSlot={
+          order.slotStart && order.slotEnd
+            ? {
+                slotStart: order.slotStart,
+                slotEnd: order.slotEnd,
+                date: order.slotStart.slice(0, 10),
+                startMin: 0,
+                label: "",
+              }
+            : null
+        }
       />
     </div>
   );

@@ -80,6 +80,18 @@ enum CancellationFeeStatus {
   WAIVED
 }
 
+enum RecurrenceFrequency {
+  WEEKLY
+  BIWEEKLY
+  MONTHLY
+}
+
+enum StandingJobStatus {
+  ACTIVE
+  PAUSED
+  CANCELLED
+}
+
 model User {
   id           String   @id @default(cuid())
   email        String   @unique
@@ -116,6 +128,8 @@ model User {
   timeOff          TimeOff[]
   disputesOpened   Dispute[]
   notifications    Notification[]
+  standingJobsAsBuyer  StandingJob[] @relation("BuyerStandingJobs")
+  standingJobsAsSeller StandingJob[] @relation("SellerStandingJobs")
 }
 
 model WeeklyHours {
@@ -376,12 +390,14 @@ model Order {
   cancelledById         String?
   cancellationFee       Float                 @default(0)
   cancellationFeeStatus CancellationFeeStatus @default(NONE)
+  standingJobId         String?
   createdAt DateTime    @default(now())
   updatedAt DateTime    @updatedAt
 
   gig          Gig?               @relation(fields: [gigId], references: [id])
   buyer        User               @relation("BuyerOrders", fields: [buyerId], references: [id])
   seller       User               @relation("SellerOrders", fields: [sellerId], references: [id])
+  standingJob  StandingJob?       @relation(fields: [standingJobId], references: [id])
   messages     Message[]
   review       Review?
   requirements OrderRequirement[]
@@ -392,6 +408,33 @@ model Order {
   @@index([gigId])
   @@index([requestId])
   @@index([sellerId, slotStart])
+  @@index([standingJobId])
+}
+
+model StandingJob {
+  id            String               @id @default(cuid())
+  buyerId       String
+  sellerId      String
+  serviceSlug   String
+  title         String
+  frequency     RecurrenceFrequency
+  weekday       Int
+  startMin      Int
+  status        StandingJobStatus    @default(ACTIVE)
+  pausedAt      DateTime?
+  cancelledAt   DateTime?
+  cancelledById String?
+  sourceOrderId String?
+  createdAt     DateTime             @default(now())
+  updatedAt     DateTime             @updatedAt
+
+  buyer  User    @relation("BuyerStandingJobs", fields: [buyerId], references: [id])
+  seller User    @relation("SellerStandingJobs", fields: [sellerId], references: [id])
+  orders Order[]
+
+  @@index([buyerId])
+  @@index([sellerId])
+  @@index([status])
 }
 
 model OrderRequirement {

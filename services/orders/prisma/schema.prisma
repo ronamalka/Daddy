@@ -55,6 +55,18 @@ enum CancellationFeeStatus {
   WAIVED
 }
 
+enum RecurrenceFrequency {
+  WEEKLY
+  BIWEEKLY
+  MONTHLY
+}
+
+enum StandingJobStatus {
+  ACTIVE
+  PAUSED
+  CANCELLED
+}
+
 model Order {
   id        String      @id @default(cuid())
   jobType   JobType     @default(GIG)
@@ -79,9 +91,11 @@ model Order {
   cancelledById         String?
   cancellationFee       Float                 @default(0)
   cancellationFeeStatus CancellationFeeStatus @default(NONE)
+  standingJobId         String?
   createdAt DateTime    @default(now())
   updatedAt DateTime    @updatedAt
 
+  standingJob  StandingJob?       @relation(fields: [standingJobId], references: [id])
   requirements OrderRequirement[]
   disputes     Dispute[]
 
@@ -90,6 +104,31 @@ model Order {
   @@index([gigId])
   @@index([requestId])
   @@index([sellerId, slotStart])
+  @@index([standingJobId])
+}
+
+model StandingJob {
+  id            String               @id @default(cuid())
+  buyerId       String
+  sellerId      String
+  serviceSlug   String
+  title         String
+  frequency     RecurrenceFrequency
+  weekday       Int
+  startMin      Int
+  status        StandingJobStatus    @default(ACTIVE)
+  pausedAt      DateTime?
+  cancelledAt   DateTime?
+  cancelledById String?
+  sourceOrderId String?
+  createdAt     DateTime             @default(now())
+  updatedAt     DateTime             @updatedAt
+
+  orders Order[]
+
+  @@index([buyerId])
+  @@index([sellerId])
+  @@index([status])
 }
 
 model OrderRequirement {

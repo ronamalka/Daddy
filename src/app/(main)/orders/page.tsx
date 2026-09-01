@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useSession } from "next-auth/react";
+import Link from "next/link";
 import { Bag, CalendarBlank, Lock } from "@phosphor-icons/react";
 import { OrderCards } from "@/components/orders/order-cards";
 import { SellerCalendar } from "@/components/orders/seller-calendar";
@@ -85,6 +86,9 @@ export default function OrdersPage() {
         <div>
           <h1 className="text-[32px] font-bold tracking-[-0.01em] text-[rgb(var(--color-text))]">{title}</h1>
           <p className="mt-1 text-[14px] text-[rgb(var(--color-text-secondary))]">{subtitle}</p>
+          <Link href="/standing-jobs" className="mt-2 inline-block text-[13px] font-semibold text-[rgb(var(--color-primary))]">
+            עבודות קבועות
+          </Link>
         </div>
         {isProvider && (
           <div className="flex flex-wrap gap-2">

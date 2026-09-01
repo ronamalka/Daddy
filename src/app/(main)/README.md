@@ -8,6 +8,7 @@
 | `gigs/` | Browse, view, create, and edit gig listings |
 | `sellers/` | Public helper profile (1–10 reviews, including local jobs) |
 | `orders/` | Buyer and seller job list, calendar, and order detail |
+| `standing-jobs/` | Recurring visits with the same daddy |
 | `requests/` | Local job requests and quotes |
 | `inbox/` | Direct messages |
 | `profile/` | Account, hours, prices, service areas |

@@ -8,6 +8,7 @@ export interface OrderListItem {
   createdAt: string;
   slotStart: string | null;
   slotEnd: string | null;
+  standingJobId?: string | null;
   gig: { id: string; title: string; image: string | null };
   buyer: { id: string; name: string };
   seller: { id: string; name: string };

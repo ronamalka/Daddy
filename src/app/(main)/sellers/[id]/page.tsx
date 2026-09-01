@@ -20,6 +20,7 @@ import { SlotPicker, type SlotOption } from "@/components/slot-picker";
 import { CancellationPolicyNote } from "@/components/cancellation-policy-note";
 import { QuotePriceBreakdown } from "@/components/quote-price-breakdown";
 import { quoteTotal } from "@/lib/quote-price";
+import { StandingJobDialog } from "@/components/orders/standing-job-dialog";
 
 interface ReviewData {
   id: string;
@@ -656,6 +657,7 @@ function PricesTab({
   const [bookingSlug, setBookingSlug] = useState<string | null>(null);
   const [bookError, setBookError] = useState("");
   const [selectedSlot, setSelectedSlot] = useState<SlotOption | null>(null);
+  const [standingSlug, setStandingSlug] = useState<string | null>(null);
 
   /** Books a visit from the seller's price list. */
   async function bookFromPriceList(sp: SellerProfile["servicePrices"][number]) {
@@ -743,14 +745,24 @@ function PricesTab({
                   isLoggedIn ? (
                     <div className="flex items-center gap-2">
                       {acceptingJobs && (
-                        <button
-                          type="button"
-                          onClick={() => bookFromPriceList(sp)}
-                          disabled={bookingSlug !== null || !selectedSlot}
-                          className="rounded-lg bg-[rgb(var(--color-primary))] px-3 py-1.5 text-[12px] font-semibold text-white hover:bg-[rgb(var(--color-primary-hover))] disabled:opacity-40"
-                        >
-                          {bookingSlug === sp.serviceSlug ? "מזמין..." : `הזמן ב-₪${quoteTotal(sp) ?? sp.price}`}
-                        </button>
+                        <>
+                          <button
+                            type="button"
+                            onClick={() => bookFromPriceList(sp)}
+                            disabled={bookingSlug !== null || !selectedSlot}
+                            className="rounded-lg bg-[rgb(var(--color-primary))] px-3 py-1.5 text-[12px] font-semibold text-white hover:bg-[rgb(var(--color-primary-hover))] disabled:opacity-40"
+                          >
+                            {bookingSlug === sp.serviceSlug ? "מזמין..." : `הזמן ב-₪${quoteTotal(sp) ?? sp.price}`}
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setStandingSlug(sp.serviceSlug)}
+                            disabled={!selectedSlot}
+                            className="rounded-lg border border-[rgb(var(--color-border))] px-3 py-1.5 text-[12px] font-semibold text-[rgb(var(--color-text-secondary))] hover:border-[rgb(var(--color-primary))] hover:text-[rgb(var(--color-primary))] disabled:opacity-40"
+                          >
+                            עבודה קבועה
+                          </button>
+                        </>
                       )}
                       <Link
                         href={`/requests/create?service=${encodeURIComponent(sp.serviceSlug)}`}
@@ -773,6 +785,16 @@ function PricesTab({
           );
         })}
       </div>
+      <StandingJobDialog
+        open={standingSlug !== null}
+        onOpenChange={(next) => {
+          if (!next) setStandingSlug(null);
+        }}
+        sellerId={sellerId}
+        serviceSlug={standingSlug || undefined}
+        firstSlot={selectedSlot}
+        title={standingSlug ? getServiceBySlug(standingSlug)?.nameHe : undefined}
+      />
     </div>
   );
 }

@@ -39,6 +39,9 @@ Small modules used by API routes and pages. Each exported function has a short c
 | `site-url.ts` | Public origin for canonical / sitemap / Open Graph |
 | `seo.ts` | Per-page metadata, JSON-LD, and sitemap list parsers |
 | `disputes.ts` | Who can open a dispute, reasons, and admin payment actions |
+| `standing-job.ts` | Recurring cadence, hours/time-off checks, per-visit pricing |
+| `standing-job-api.ts` | Zod bodies for create/preview and pause/resume/cancel |
+| `standing-job-context.ts` | Load daddy hours, bookings, and current ServicePrice |
 | `moderation-queue.ts` | Merge disputes and review flags into one admin list |
 | `session-revoke.ts` | Delete Redis session ids for a user |
 | `services.ts` | Catalogue of home services and local category slugs |
