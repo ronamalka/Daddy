@@ -8,7 +8,7 @@ Reusable pieces of the interface. Subfolders group related screens.
 | `session-provider.tsx` / `csrf-provider.tsx` | Auth session and CSRF `fetch` patch |
 | `review-form.tsx` | Buyer 1–10 Midrag scores after a completed job |
 | `slot-picker.tsx` / `visit-window-fields.tsx` | Choose a two-hour visit |
-| `request-photos-field.tsx` | Upload up to four request photos via `/api/upload` |
+| `request-photos-field.tsx` | Upload request or delivery photos via `/api/upload` |
 | `service-picker.tsx` / `location-picker.tsx` | Services and cities |
 | `notification-bell.tsx` | Header alerts (orders, chat, nearby requests) |
 | `cookie-consent-banner.tsx` | Cookie choice (Israeli privacy practice) |

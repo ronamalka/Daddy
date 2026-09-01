@@ -4,6 +4,10 @@ import { loginAs, openAuthedPage } from "./login";
 const BOT_WAIT_MS = 3500;
 const QUOTE_PRICE = "250";
 const REVIEW_COMMENT = "המדף יושב ישר אחרי הביקור — בדיקת לולאת העבודה";
+const PNG_1X1 = Buffer.from(
+  "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==",
+  "base64"
+);
 
 test.describe("Real job loop", () => {
   test.describe.configure({ timeout: 120_000 });
@@ -90,10 +94,25 @@ test.describe("Real job loop", () => {
       await seller.page.getByRole("button", { name: "קבל הזמנה" }).click();
       await expect(seller.page.getByText("בעבודה").first()).toBeVisible({ timeout: 10000 });
       await seller.page.getByRole("button", { name: "סמן כנמסר" }).click();
+      const deliverDialog = seller.page.getByRole("dialog", { name: "סימון כנמסר" });
+      await expect(deliverDialog).toBeVisible();
+      await deliverDialog.locator('input[type="file"]').setInputFiles({
+        name: "job-done.png",
+        mimeType: "image/png",
+        buffer: PNG_1X1,
+      });
+      await expect(deliverDialog.getByAltText("תמונת המסירה 1")).toBeVisible({ timeout: 10000 });
+      await deliverDialog.getByPlaceholder("לדוגמה: החלפתי את הברז, הישן בשקית").fill("החלפתי את הברז, הישן בשקית");
+      await deliverDialog.getByRole("button", { name: "שלח מסירה" }).click();
       await expect(seller.page.getByText("נמסר").first()).toBeVisible({ timeout: 10000 });
+      await expect(seller.page.getByAltText("תמונת המסירה 1")).toBeVisible();
+      await expect(seller.page.getByText("החלפתי את הברז, הישן בשקית")).toBeVisible();
 
       await buyer.page.reload();
-      await expect(buyer.page.getByRole("button", { name: "אשר קבלה" })).toBeVisible({ timeout: 10000 });
+      await expect(buyer.page.getByAltText("תמונת המסירה 1")).toBeVisible({ timeout: 10000 });
+      await expect(buyer.page.getByText("החלפתי את הברז, הישן בשקית")).toBeVisible();
+      await expect(buyer.page.getByText("בדקו את התמונות ואשרו שהעבודה הושלמה.")).toBeVisible();
+      await expect(buyer.page.getByRole("button", { name: "אשר קבלה" })).toBeVisible();
       await buyer.page.getByRole("button", { name: "אשר קבלה" }).click();
       await expect(buyer.page.getByRole("button", { name: "כתוב חוות דעת" })).toBeVisible({ timeout: 10000 });
       await buyer.page.getByRole("button", { name: "כתוב חוות דעת" }).click();

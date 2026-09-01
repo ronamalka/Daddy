@@ -97,6 +97,8 @@ async function main() {
       slotStart: new Date("2026-09-05T13:00:00.000Z"),
       slotEnd: new Date("2026-09-05T15:00:00.000Z"),
       dueDate: new Date("2026-09-05T15:00:00.000Z"),
+      deliveryPhotos: ["/uploads/aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee.jpg"],
+      deliveryNote: "החלפתי את הברז, הישן בשקית",
     },
     {
       id: "ord-23",
@@ -111,6 +113,8 @@ async function main() {
       slotStart: new Date("2026-09-06T13:00:00.000Z"),
       slotEnd: new Date("2026-09-06T15:00:00.000Z"),
       dueDate: new Date("2026-09-06T15:00:00.000Z"),
+      deliveryPhotos: ["/uploads/11111111-2222-3333-4444-555555555555.jpg"],
+      deliveryNote: "השידה מורכבת ומפולסת",
     },
   ];
 
@@ -118,6 +122,14 @@ async function main() {
     const existing = await prisma.order.findUnique({ where: { id: order.id } });
     if (!existing) {
       await prisma.order.create({ data: order });
+    } else if ("deliveryPhotos" in order && Array.isArray(order.deliveryPhotos) && order.deliveryPhotos.length > 0 && existing.deliveryPhotos.length === 0) {
+      await prisma.order.update({
+        where: { id: order.id },
+        data: {
+          deliveryPhotos: order.deliveryPhotos,
+          deliveryNote: order.deliveryNote ?? null,
+        },
+      });
     }
   }
 
