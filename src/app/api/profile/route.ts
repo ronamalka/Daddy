@@ -13,6 +13,10 @@ const profileUpdateSchema = z.object({
   cityCode: z.number().int().optional().nullable(),
   districtCode: z.number().int().optional().nullable(),
   location: z.string().max(100).optional(),
+  osekType: z.enum(["patur", "murshe"]).optional().nullable(),
+  osekNumber: z.string().max(20).optional().nullable(),
+  legalName: z.string().max(200).optional().nullable(),
+  businessAddress: z.string().max(300).optional().nullable(),
 });
 
 /** Returns the signed-in user's profile. */

@@ -26,6 +26,10 @@ model User {
   cityCode     Int?
   districtCode Int?
   acceptingJobs Boolean  @default(true)
+  osekType       String?  // "patur" or "murshe"
+  osekNumber     String?  // business registration number
+  legalName      String?  // business legal name
+  businessAddress String? // business address for invoice
   suspendedAt   DateTime?
   suspendReason String?
   createdAt     DateTime @default(now())
