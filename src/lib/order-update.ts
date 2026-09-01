@@ -22,6 +22,13 @@ const deliveredSchema = z
   })
   .strict();
 
+const onTheWaySchema = z
+  .object({
+    status: z.literal("ON_THE_WAY"),
+    eta: z.string().max(200).optional(),
+  })
+  .strict();
+
 const otherStatusSchema = z
   .object({
     status: z.enum(["IN_PROGRESS", "COMPLETED", "CANCELLED"]),
@@ -29,4 +36,4 @@ const otherStatusSchema = z
   .strict();
 
 /** Body for PATCH /api/orders/:id. Mark-delivered requires 1–6 uploaded photos. */
-export const updateOrderSchema = z.union([deliveredSchema, otherStatusSchema]);
+export const updateOrderSchema = z.union([deliveredSchema, onTheWaySchema, otherStatusSchema]);

@@ -8,6 +8,7 @@ import {
   resolveDisputeAction,
 } from "../lib/disputes";
 import { DisputeReason, DisputeStatus, PaymentAction, OrderStatus } from "../generated/prisma/client";
+import { releasePayment, refundPayment } from "../lib/escrow";
 
 /** Open a dispute, list them for admin, and record a staff decision. */
 export const disputeRoutes = Router();
@@ -142,6 +143,21 @@ adminDisputeRoutes.patch("/disputes/:id", requireAdmin, async (req: Request, res
     }
     return next;
   });
+
+  // Handle escrow payment based on dispute resolution
+  if (resolved.paymentAction === "RELEASE") {
+    releasePayment(prisma, dispute.orderId).catch((err) => {
+      console.error(`[escrow] dispute release failed for order ${dispute.orderId}:`, err);
+    });
+  } else if (resolved.paymentAction === "REFUND") {
+    refundPayment(prisma, dispute.orderId).catch((err) => {
+      console.error(`[escrow] dispute refund failed for order ${dispute.orderId}:`, err);
+    });
+  } else if (resolved.paymentAction === "SPLIT" && resolved.splitBuyerAmount != null) {
+    refundPayment(prisma, dispute.orderId, resolved.splitBuyerAmount).catch((err) => {
+      console.error(`[escrow] dispute split refund failed for order ${dispute.orderId}:`, err);
+    });
+  }
 
   res.json(updated);
 });

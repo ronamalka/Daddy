@@ -8,6 +8,8 @@ import { ordersRoutes } from "./routes/orders";
 import { orderDetailRoutes } from "./routes/order-detail";
 import { disputeRoutes, adminDisputeRoutes } from "./routes/disputes";
 import { materialsRoutes } from "./routes/materials";
+import { paymentRoutes, paymentHistoryRoutes } from "./routes/payments";
+import { invoiceRoutes } from "./routes/invoices";
 
 const pool = new pg.Pool({ connectionString: process.env.DATABASE_URL });
 const adapter = new PrismaPg(pool);
@@ -29,6 +31,9 @@ app.use("/orders", ordersRoutes);
 app.use("/orders", disputeRoutes);
 app.use("/orders", materialsRoutes);
 app.use("/orders", orderDetailRoutes);
+app.use("/orders", paymentRoutes);
+app.use("/payments", paymentHistoryRoutes);
+app.use("/orders", invoiceRoutes);
 app.use("/admin", adminDisputeRoutes);
 
 /** Start the orders HTTP server. */
