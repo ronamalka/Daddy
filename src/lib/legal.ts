@@ -2,10 +2,11 @@
 export const TERMS_VERSION = "2026-09-01";
 
 export const LEGAL_CONTACTS = {
-  legal: "legal@abale.co.il",
-  privacy: "privacy@abale.co.il",
-  abuse: "abuse@abale.co.il",
-  accessibility: "accessibility@abale.co.il",
+  legal: "legal@aballeh.com",
+  privacy: "privacy@aballeh.com",
+  abuse: "abuse@aballeh.com",
+  accessibility: "accessibility@aballeh.com",
+  support: "support@aballeh.com",
 } as const;
 
 export const BUSINESS_DISCLOSURE = {

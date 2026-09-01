@@ -1,5 +1,22 @@
 import { describe, it, expect } from "vitest";
-import { isConsentExpired, parseCookieConsent, type CookieConsentState } from "@/lib/legal";
+import {
+  LEGAL_CONTACTS,
+  isConsentExpired,
+  parseCookieConsent,
+  type CookieConsentState,
+} from "@/lib/legal";
+
+describe("legal contacts", () => {
+  it("publishes the aballeh.com mailboxes", () => {
+    expect(LEGAL_CONTACTS).toEqual({
+      legal: "legal@aballeh.com",
+      privacy: "privacy@aballeh.com",
+      abuse: "abuse@aballeh.com",
+      accessibility: "accessibility@aballeh.com",
+      support: "support@aballeh.com",
+    });
+  });
+});
 
 describe("cookie consent parsing", () => {
   it("returns null for empty input", () => {
