@@ -38,6 +38,7 @@ model User {
   weeklyHours     WeeklyHours[]
   timeOff         TimeOff[]
   notifications   Notification[]
+  savedAddresses  SavedAddress[]
 }
 
 model PasswordReset {
@@ -141,6 +142,25 @@ model TimeOff {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, date])
+  @@index([userId])
+}
+
+model SavedAddress {
+  id           String   @id @default(cuid())
+  userId       String
+  label        String
+  cityCode     Int?
+  cityName     String?
+  districtCode Int?
+  districtName String?
+  street       String?
+  floor        String?
+  accessNotes  String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
   @@index([userId])
 }
 
