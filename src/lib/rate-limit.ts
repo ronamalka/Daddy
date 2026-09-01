@@ -2,6 +2,7 @@ export const RATE_LIMIT_WINDOW_MS = 60_000;
 
 export const RATE_LIMIT_AUTH = parsePositiveInt(process.env.RATE_LIMIT_AUTH, 10);
 export const RATE_LIMIT_POST = parsePositiveInt(process.env.RATE_LIMIT_POST, 30);
+export const RATE_LIMIT_PUBLIC = parsePositiveInt(process.env.RATE_LIMIT_PUBLIC, 30);
 export const RATE_LIMIT_DEFAULT = parsePositiveInt(process.env.RATE_LIMIT_DEFAULT, 120);
 
 /** Parses a positive integer from an env string, or uses the fallback. */
@@ -10,7 +11,7 @@ function parsePositiveInt(value: string | undefined, fallback: number): number {
   return Number.isFinite(parsed) && parsed > 0 ? parsed : fallback;
 }
 
-export type RateLimitTierName = "auth" | "write" | "default";
+export type RateLimitTierName = "auth" | "write" | "public" | "default";
 
 export interface RateLimitTier {
   name: RateLimitTierName;
@@ -47,7 +48,12 @@ export function isCredentialAuthPath(pathname: string, method: string): boolean 
   return true;
 }
 
-/** Picks the auth, write, or default request limit for this path and method. */
+/** Tight public GET budget for scrapeable teasers (no session required). */
+export function isPublicTeaserPath(pathname: string, method: string): boolean {
+  return method === "GET" && pathname === "/api/service-requests/teaser";
+}
+
+/** Picks the auth, write, public, or default request limit for this path and method. */
 export function resolveRateLimitTier(pathname: string, method: string): RateLimitTier {
   if (isCredentialAuthPath(pathname, method)) {
     return { name: "auth", limit: RATE_LIMIT_AUTH };
@@ -55,6 +61,10 @@ export function resolveRateLimitTier(pathname: string, method: string): RateLimi
 
   if (method === "POST" || method === "PUT" || method === "PATCH" || method === "DELETE") {
     return { name: "write", limit: RATE_LIMIT_POST };
+  }
+
+  if (isPublicTeaserPath(pathname, method)) {
+    return { name: "public", limit: RATE_LIMIT_PUBLIC };
   }
 
   return { name: "default", limit: RATE_LIMIT_DEFAULT };

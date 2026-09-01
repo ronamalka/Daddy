@@ -96,11 +96,16 @@ export interface ProfileReadinessResponse extends SellerReadiness {
   role: string;
 }
 
+/** Returns an in-app path, or null if `next` is missing or an open redirect. */
+export function safeInAppPath(next: string | null | undefined): string | null {
+  if (!next || !next.startsWith("/") || next.startsWith("//") || next.includes("\\")) {
+    return null;
+  }
+  return next;
+}
+
 /** Returns a safe in-app path after sign-up. Sellers go to onboarding. */
 export function postRegisterPath(role: string, next: string | null | undefined): string {
-  if (next && next.startsWith("/") && !next.startsWith("//")) {
-    return next;
-  }
-  return role === "SELLER" ? "/onboarding" : "/";
+  return safeInAppPath(next) ?? (role === "SELLER" ? "/onboarding" : "/");
 }
 

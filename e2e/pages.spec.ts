@@ -4,6 +4,9 @@ test.describe("Public Pages", () => {
   test("homepage loads", async ({ page }) => {
     await page.goto("/");
     await expect(page).toHaveTitle(/אבאל׳ה|daddy/i);
+    await expect(page.getByText("צריך עזרה בהרכבת ארון גדול")).toBeVisible({ timeout: 10000 });
+    await expect(page.getByText("בקשה פרטית — לא אמורה להופיע באתר")).toHaveCount(0);
+    await expect(page.getByText("קניתי ארון PAX")).toHaveCount(0);
   });
 
   test("how it works page loads", async ({ page }) => {
@@ -59,9 +62,13 @@ test.describe("Public Pages", () => {
     await expect(page.getByText(/התחבר|כניסה/i).first()).toBeVisible({ timeout: 5000 });
   });
 
-  test("open requests page requires auth", async ({ page }) => {
+  test("open requests page shows a public teaser for guests", async ({ page }) => {
     await page.goto("/requests");
-    await expect(page.getByText(/התחבר|כניסה/i).first()).toBeVisible({ timeout: 5000 });
+    await expect(page.getByRole("heading", { name: "בקשות פתוחות עכשיו" })).toBeVisible({ timeout: 10000 });
+    await expect(page.getByText("צריך עזרה בהרכבת ארון גדול")).toBeVisible();
+    await expect(page.getByRole("link", { name: /התחברו כדי להגיב/ }).first()).toBeVisible();
+    await expect(page.getByText("בקשה פרטית — לא אמורה להופיע באתר")).toHaveCount(0);
+    await expect(page.getByText("קניתי ארון PAX")).toHaveCount(0);
   });
 
   test("profile page requires auth", async ({ page }) => {

@@ -103,6 +103,7 @@ export async function POST(request: NextRequest) {
 
   cleanBody.slotStart = slot.start.toISOString();
   cleanBody.slotEnd = slot.end.toISOString();
+  cleanBody.unlisted = cleanBody.unlisted === true;
 
   const user = session.user as { id: string; email: string; name: string; role: string };
   const { data, status } = await proxyRequest(REQUESTS_SERVICE, "/service-requests", {

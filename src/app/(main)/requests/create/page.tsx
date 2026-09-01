@@ -32,6 +32,7 @@ function CreateRequestPage() {
     districtName: string;
   } | null>(null);
   const [visitWindow, setVisitWindow] = useState<VisitWindowValue | null>(null);
+  const [unlisted, setUnlisted] = useState(false);
 
   useEffect(() => {
     const preset = searchParams.get("service");
@@ -98,6 +99,7 @@ function CreateRequestPage() {
         cityName: location.cityName,
         slotStart,
         slotEnd,
+        unlisted,
         turnstileToken,
         _hp_field: "",
         _formLoadedAt: formLoadedAtRef.current,
@@ -194,6 +196,23 @@ function CreateRequestPage() {
                 onChange={setLocation}
               />
             </div>
+
+            <label className="flex items-start gap-3 rounded-xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-bg))] px-4 py-3">
+              <input
+                type="checkbox"
+                checked={unlisted}
+                onChange={(e) => setUnlisted(e.target.checked)}
+                className="mt-1 h-4 w-4 rounded border-[rgb(var(--color-border))] text-[rgb(var(--color-primary))]"
+              />
+              <span>
+                <span className="block text-[13px] font-semibold text-[rgb(var(--color-text))]">
+                  אל תציגו את הבקשה בעמוד הציבורי
+                </span>
+                <span className="mt-0.5 block text-[12px] text-[rgb(var(--color-text-muted))]">
+                  אבאל׳ות מחוברים עדיין יראו אותה. לא מופיעים שם רחוב, תמונות או שם הלקוח.
+                </span>
+              </span>
+            </label>
           </div>
         </div>
 

@@ -193,6 +193,27 @@ describe("System Tests — Public API", () => {
     });
   });
 
+  describe("GET /api/service-requests/teaser", () => {
+    it("returns a public list without private fields", async () => {
+      const { status, body, headers } = await fetchApi("/api/service-requests/teaser");
+      expect(status).toBe(200);
+      expect(Array.isArray(body)).toBe(true);
+      expect(headers.get("cache-control") || "").toMatch(/s-maxage/);
+      if (body.length > 0) {
+        const row = body[0];
+        expect(row).toHaveProperty("id");
+        expect(row).toHaveProperty("title");
+        expect(row).toHaveProperty("createdAt");
+        expect(row).not.toHaveProperty("description");
+        expect(row).not.toHaveProperty("buyerId");
+        expect(row).not.toHaveProperty("buyer");
+        expect(row).not.toHaveProperty("phone");
+        expect(row).not.toHaveProperty("photos");
+        expect(JSON.stringify(body)).not.toContain("בקשה פרטית — לא אמורה להופיע באתר");
+      }
+    });
+  });
+
   describe("GET /api/recent-reviews", () => {
     it("returns 200", async () => {
       const { status } = await fetchApi("/api/recent-reviews");
