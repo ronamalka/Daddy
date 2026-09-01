@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: requests-service
-          image: quay.io/rh_ee_rmalka/daddy-requests-service:37631f80
+          image: quay.io/rh_ee_rmalka/daddy-requests-service:62ce3181
           ports:
             - containerPort: 4004
           env:
