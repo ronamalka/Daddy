@@ -6,6 +6,7 @@ import { useParams, useRouter } from "next/navigation";
 import { getServiceBySlug } from "@/lib/services";
 import { CategoryIcon } from "@/components/ui/category-icon";
 import { formatVisitWindow } from "@/lib/availability";
+import { preferredWindowLabel } from "@/lib/request-details";
 import Link from "next/link";
 import { QuotePriceBreakdown } from "@/components/quote-price-breakdown";
 import { QuoteCompareTable } from "@/components/quote-compare";
@@ -19,6 +20,12 @@ interface ServiceRequestDetail {
   serviceSlug: string | null;
   districtName: string | null;
   cityName: string | null;
+  street?: string | null;
+  floor?: string | null;
+  preferredWindow?: string | null;
+  photos?: string[];
+  streetVisible?: boolean;
+  hasStreet?: boolean;
   status: string;
   createdAt: string;
   slotStart?: string | null;
@@ -179,11 +186,39 @@ export default function RequestDetailPage() {
 
         <p className="text-[15px] leading-relaxed text-[rgb(var(--color-text-secondary))] whitespace-pre-wrap">{request.description}</p>
 
-        {request.slotStart && request.slotEnd && (
-          <p className="mt-4 rounded-xl bg-[rgba(var(--color-primary),0.08)] px-4 py-3 text-[14px] font-medium text-[rgb(var(--color-text))]">
-            חלון מבוקש: {formatVisitWindow(new Date(request.slotStart), new Date(request.slotEnd))}
-          </p>
+        {request.photos && request.photos.length > 0 && (
+          <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-4">
+            {request.photos.map((url, index) => (
+              <a key={url} href={url} target="_blank" rel="noreferrer" className="block overflow-hidden rounded-lg border border-[rgb(var(--color-border))]">
+                <img src={url} alt={`תמונה ${index + 1} של הבקשה`} className="h-28 w-full object-cover" />
+              </a>
+            ))}
+          </div>
         )}
+
+        <div className="mt-4 space-y-2">
+          {request.slotStart && request.slotEnd && (
+            <p className="rounded-xl bg-[rgba(var(--color-primary),0.08)] px-4 py-3 text-[14px] font-medium text-[rgb(var(--color-text))]">
+              חלון מבוקש: {formatVisitWindow(new Date(request.slotStart), new Date(request.slotEnd))}
+            </p>
+          )}
+          {preferredWindowLabel(request.preferredWindow) && (
+            <p className="text-[14px] text-[rgb(var(--color-text))]">
+              חלון מועדף: {preferredWindowLabel(request.preferredWindow)}
+            </p>
+          )}
+          {request.floor && (
+            <p className="text-[14px] text-[rgb(var(--color-text))]">קומה {request.floor}</p>
+          )}
+          {request.streetVisible && request.street && (
+            <p className="text-[14px] text-[rgb(var(--color-text))]">רחוב {request.street}</p>
+          )}
+          {!request.streetVisible && request.hasStreet && (
+            <p className="text-[13px] text-[rgb(var(--color-text-muted))]">
+              הרחוב ייחשף אחרי שהלקוח יקבל הצעה
+            </p>
+          )}
+        </div>
 
         {request.orderId && isBuyer && (
           <Link

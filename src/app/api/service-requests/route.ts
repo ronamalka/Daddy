@@ -5,6 +5,7 @@ import { verifyTurnstileToken } from "@/lib/turnstile";
 import { detectBot } from "@/lib/bot-detection";
 import { isTwoHourLocalWindow, parseSlotIso } from "@/lib/availability";
 import { notifyNearbySellers } from "@/lib/nearby-request";
+import { parseRequestDetails } from "@/lib/request-details";
 
 /** Loads a public display name for a user, or a Hebrew fallback. */
 async function loadBuyer(id: string): Promise<{ id: string; name: string }> {
@@ -101,9 +102,18 @@ export async function POST(request: NextRequest) {
     );
   }
 
+  const details = parseRequestDetails(cleanBody);
+  if (!details.ok) {
+    return NextResponse.json({ error: details.error }, { status: 400 });
+  }
+
   cleanBody.slotStart = slot.start.toISOString();
   cleanBody.slotEnd = slot.end.toISOString();
   cleanBody.unlisted = cleanBody.unlisted === true;
+  cleanBody.street = details.value.street;
+  cleanBody.floor = details.value.floor;
+  cleanBody.preferredWindow = details.value.preferredWindow;
+  cleanBody.photos = details.value.photos;
 
   const user = session.user as { id: string; email: string; name: string; role: string };
   const { data, status } = await proxyRequest(REQUESTS_SERVICE, "/service-requests", {

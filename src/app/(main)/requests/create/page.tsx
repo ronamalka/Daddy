@@ -8,7 +8,9 @@ import { SERVICE_CATEGORIES } from "@/lib/services";
 import { UserCircle } from "@phosphor-icons/react";
 import { TurnstileWidget } from "@/components/turnstile-widget";
 import { LocationPicker } from "@/components/location-picker";
+import { RequestPhotosField } from "@/components/request-photos-field";
 import { VisitWindowFields, visitWindowToIso, type VisitWindowValue } from "@/components/visit-window-fields";
+import { PREFERRED_WINDOWS, PREFERRED_WINDOW_LABELS, type PreferredWindow } from "@/lib/request-details";
 
 /** Shows the form to post a new service request. */
 function CreateRequestPage() {
@@ -32,6 +34,12 @@ function CreateRequestPage() {
     districtName: string;
   } | null>(null);
   const [visitWindow, setVisitWindow] = useState<VisitWindowValue | null>(null);
+  const [preferredWindow, setPreferredWindow] = useState<PreferredWindow | "">("");
+  const [street, setStreet] = useState("");
+  const [floor, setFloor] = useState("");
+  const [photos, setPhotos] = useState<string[]>([]);
+  const [photoError, setPhotoError] = useState("");
+  const [uploadingPhotos, setUploadingPhotos] = useState(false);
   const [unlisted, setUnlisted] = useState(false);
 
   useEffect(() => {
@@ -97,6 +105,10 @@ function CreateRequestPage() {
         districtName: location.districtName,
         cityCode: location.cityCode,
         cityName: location.cityName,
+        street,
+        floor,
+        preferredWindow: preferredWindow || null,
+        photos,
         slotStart,
         slotEnd,
         unlisted,
@@ -160,12 +172,51 @@ function CreateRequestPage() {
               />
             </div>
 
+            <RequestPhotosField
+              photos={photos}
+              onChange={setPhotos}
+              error={photoError}
+              onError={setPhotoError}
+              onUploading={setUploadingPhotos}
+            />
+
             <div>
               <label className="mb-2 block text-[13px] font-semibold text-[rgb(var(--color-text-secondary))]">
                 מתי לבוא? <span className="font-normal text-[rgb(var(--color-error))]">*</span>
               </label>
               <VisitWindowFields value={visitWindow} onChange={setVisitWindow} />
             </div>
+
+            <fieldset>
+              <legend className="mb-2 block text-[13px] font-semibold text-[rgb(var(--color-text-secondary))]">
+                חלון מועדף
+              </legend>
+              <p className="mb-2 text-[12px] text-[rgb(var(--color-text-muted))]">
+                עדיפות כללית בנוסף לחלון הביקור של שעתיים
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {PREFERRED_WINDOWS.map((pref) => (
+                  <label
+                    key={pref}
+                    className={`cursor-pointer rounded-full border px-4 py-2 text-[13px] font-semibold transition-colors ${
+                      preferredWindow === pref
+                        ? "border-[rgb(var(--color-primary))] bg-[rgba(var(--color-primary),0.1)] text-[rgb(var(--color-primary))]"
+                        : "border-[rgb(var(--color-border))] bg-[rgb(var(--color-bg))] text-[rgb(var(--color-text-secondary))]"
+                    }`}
+                  >
+                    <input
+                      type="radio"
+                      name="preferredWindow"
+                      value={pref}
+                      checked={preferredWindow === pref}
+                      onChange={() => setPreferredWindow(pref)}
+                      className="sr-only"
+                    />
+                    {PREFERRED_WINDOW_LABELS[pref]}
+                  </label>
+                ))}
+              </div>
+            </fieldset>
           </div>
         </div>
 
@@ -197,6 +248,36 @@ function CreateRequestPage() {
               />
             </div>
 
+            <div>
+              <label htmlFor="request-street" className="mb-2 block text-[13px] font-semibold text-[rgb(var(--color-text-secondary))]">
+                רחוב
+              </label>
+              <input
+                id="request-street"
+                value={street}
+                onChange={(e) => setStreet(e.target.value)}
+                autoComplete="street-address"
+                placeholder="לדוגמה: הרצל 12"
+                className={inputClass}
+              />
+              <p className="mt-1.5 text-[12px] text-[rgb(var(--color-text-muted))]">
+                הרחוב יוצג לאבא רק אחרי שתקבלו הצעה
+              </p>
+            </div>
+
+            <div>
+              <label htmlFor="request-floor" className="mb-2 block text-[13px] font-semibold text-[rgb(var(--color-text-secondary))]">
+                קומה
+              </label>
+              <input
+                id="request-floor"
+                value={floor}
+                onChange={(e) => setFloor(e.target.value)}
+                placeholder="לדוגמה: 3"
+                className={inputClass}
+              />
+            </div>
+
             <label className="flex items-start gap-3 rounded-xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-bg))] px-4 py-3">
               <input
                 type="checkbox"
@@ -225,7 +306,7 @@ function CreateRequestPage() {
 
         <button
           type="submit"
-          disabled={loading || !visitWindow?.date || !serviceSlug || !location}
+          disabled={loading || uploadingPhotos || !visitWindow?.date || !serviceSlug || !location}
           className="w-full rounded-xl bg-[rgb(var(--color-primary))] py-4 text-[15px] font-semibold text-white shadow-[0_4px_16px_rgba(var(--color-primary),0.3)] transition-all hover:bg-[rgb(var(--color-primary-hover))] hover:shadow-[0_6px_20px_rgba(var(--color-primary),0.4)] disabled:opacity-40 disabled:cursor-not-allowed"
         >
           {loading ? (

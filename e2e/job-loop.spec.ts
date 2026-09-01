@@ -33,6 +33,9 @@ test.describe("Real job loop", () => {
         .locator("select")
         .filter({ has: buyer.page.locator('option[value="furniture-assembly"]') })
         .selectOption("furniture-assembly");
+      await buyer.page.getByPlaceholder("לדוגמה: הרצל 12").fill("נחלת בנימין 88");
+      await buyer.page.getByPlaceholder("לדוגמה: 3").fill("4");
+      await buyer.page.getByRole("radio", { name: "בוקר" }).click();
       await pickTelAvivCity(buyer.page);
       await waitForBotWindow(openedAt);
 
@@ -45,10 +48,17 @@ test.describe("Real job loop", () => {
       );
       await expect(buyer.page.getByRole("heading", { name: title })).toBeVisible({ timeout: 10000 });
       await expect(buyer.page.getByText("פתוח").first()).toBeVisible();
+      await expect(buyer.page.getByText("נחלת בנימין 88")).toBeVisible();
+      await expect(buyer.page.getByText("קומה 4")).toBeVisible();
+      await expect(buyer.page.getByText("חלון מועדף: בוקר")).toBeVisible();
 
       const requestUrl = buyer.page.url();
       await seller.page.goto(requestUrl);
       await expect(seller.page.getByRole("heading", { name: title })).toBeVisible({ timeout: 10000 });
+      await expect(seller.page.getByText("נחלת בנימין 88")).toHaveCount(0);
+      await expect(seller.page.getByText("הרחוב ייחשף אחרי שהלקוח יקבל הצעה")).toBeVisible();
+      await expect(seller.page.getByText("קומה 4")).toBeVisible();
+      await expect(seller.page.getByText("חלון מועדף: בוקר")).toBeVisible();
       await expect(seller.page.getByRole("heading", { name: "הגש הצעה" })).toBeVisible();
       await seller.page
         .getByPlaceholder("תאר את הניסיון שלך בתחום")

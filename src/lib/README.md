@@ -27,6 +27,7 @@ Small modules used by API routes and pages. Each exported function has a short c
 | `review-users.ts` | Attach reviewer names when gigs only store `userId` |
 | `review-ratings.ts` | 1–10 scale helpers shared with gigs-service |
 | `request-teaser.ts` | Public OPEN-request teaser fields (no street, photos, or buyer) |
+| `request-details.ts` | Request photos (max 4), street/floor, morning/afternoon/weekend, street redaction |
 | `accept-quote.ts` | Rules for accepting a seller quote |
 | `validate.ts` | Parse JSON bodies with Zod |
 | `upload-security.ts` | File type checks and EXIF strip |
