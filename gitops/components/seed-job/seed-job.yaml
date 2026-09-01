@@ -1,0 +1,39 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: daddy-seed
+  annotations:
+    argocd.argoproj.io/hook: PostSync
+    argocd.argoproj.io/hook-delete-policy: BeforeHookCreation
+spec:
+  backoffLimit: 2
+  ttlSecondsAfterFinished: 300
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: seed
+          image: quay.io/rh_ee_rmalka/daddy-seed:dev
+          command: ["bash", "-c"]
+          args:
+            - |
+              cd /app/services
+              echo "=== Pushing schemas ==="
+              for svc in users gigs orders requests chat; do
+                echo "Pushing schema for $svc..."
+                (cd "$svc" && npx prisma db push --accept-data-loss 2>&1 | tail -1)
+              done
+              echo "=== Generating clients ==="
+              for svc in users gigs orders requests chat; do
+                (cd "$svc" && npx prisma generate 2>&1 | tail -1)
+              done
+              echo "=== Running seeds ==="
+              DATABASE_URL="$USERS_DATABASE_URL" npx tsx users/src/seed.ts
+              DATABASE_URL="$ORDERS_DATABASE_URL" npx tsx orders/src/seed.ts
+              DATABASE_URL="$GIGS_DATABASE_URL" npx tsx gigs/src/seed.ts
+              DATABASE_URL="$REQUESTS_DATABASE_URL" npx tsx requests/src/seed.ts
+              DATABASE_URL="$CHAT_DATABASE_URL" npx tsx chat/src/seed.ts
+              echo "=== Seeding complete ==="
+          envFrom:
+            - secretRef:
+                name: postgres-secret
