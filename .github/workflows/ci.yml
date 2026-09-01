@@ -287,6 +287,9 @@ jobs:
           - service: chat-service
             dockerfile: services/chat/Dockerfile
             context: .
+          - service: seed
+            dockerfile: Dockerfile.seed
+            context: .
     steps:
       - uses: actions/checkout@v4
 

@@ -19,6 +19,10 @@ sellerRoutes.get("/:id", async (req: Request, res: Response) => {
       createdAt: true,
       role: true,
       acceptingJobs: true,
+      osekType: true,
+      osekNumber: true,
+      legalName: true,
+      businessAddress: true,
       weeklyHours: {
         select: { dayOfWeek: true, startMin: true, endMin: true },
         orderBy: { dayOfWeek: "asc" },

@@ -2,8 +2,8 @@ import { defineConfig } from "@playwright/test";
 
 export default defineConfig({
   testDir: "./e2e",
-  timeout: process.env.CI ? 120000 : 30000,
-  retries: process.env.CI ? 2 : 1,
+  timeout: 60000,
+  retries: 1,
   // One worker so credential logins do not trip the shared in-memory auth rate limit.
   workers: 1,
   fullyParallel: false,
