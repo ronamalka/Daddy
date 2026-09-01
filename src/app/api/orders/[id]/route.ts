@@ -20,7 +20,7 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
     return NextResponse.json(data ?? { error: "Order not found" }, { status });
   }
 
-  const [gigRes, buyerRes, sellerRes, reviewRes, messagesRes, visit] = await Promise.all([
+  const [gigRes, buyerRes, sellerRes, reviewRes, messagesRes, visit, paymentRes] = await Promise.all([
     data.gigId ? proxyRequest(GIGS_SERVICE, `/gigs/${data.gigId}`) : Promise.resolve({ data: null, status: 404 }),
     proxyRequest(USERS_SERVICE, `/sellers/${data.buyerId}`),
     proxyRequest(USERS_SERVICE, `/sellers/${data.sellerId}`),
@@ -30,6 +30,7 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
       user.id === data.sellerId || user.role === "ADMIN" ? data.requestId : null,
       user
     ),
+    proxyRequest(ORDERS_SERVICE, `/orders/${id}/payment`, { user }),
   ]);
 
   const gig = gigRes.data;
@@ -55,6 +56,7 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
     messages: enrichedMessages,
     review: reviewRes.status === 200 ? reviewRes.data : null,
     visit: visitVisibleToSeller(visit, user, data.sellerId),
+    payment: paymentRes.status === 200 && paymentRes.data?.id ? paymentRes.data : null,
   };
 
   return NextResponse.json(enriched);

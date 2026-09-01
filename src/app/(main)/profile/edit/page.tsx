@@ -21,6 +21,9 @@ export default function EditProfilePage() {
   const [avatar, setAvatar] = useState("");
   const [avatarUploading, setAvatarUploading] = useState(false);
   const [avatarError, setAvatarError] = useState("");
+  const [payoutBankAccount, setPayoutBankAccount] = useState("");
+  const [payoutBankBranch, setPayoutBankBranch] = useState("");
+  const [payoutAccountNumber, setPayoutAccountNumber] = useState("");
 
   useEffect(() => {
     fetch("/api/profile")
@@ -34,6 +37,9 @@ export default function EditProfilePage() {
           setCityCode(data.cityCode ?? undefined);
           setDistrictCode(data.districtCode ?? undefined);
           setAvatar(data.avatar || "");
+          setPayoutBankAccount(data.payoutBankAccount || "");
+          setPayoutBankBranch(data.payoutBankBranch || "");
+          setPayoutAccountNumber(data.payoutAccountNumber || "");
         }
         setLoading(false);
       });
@@ -63,7 +69,18 @@ export default function EditProfilePage() {
       const res = await fetch("/api/profile", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, bio: bio || null, phone: phone || null, city: city || null, cityCode: cityCode ?? null, districtCode: districtCode ?? null, avatar: avatar || null }),
+        body: JSON.stringify({
+          name,
+          bio: bio || null,
+          phone: phone || null,
+          city: city || null,
+          cityCode: cityCode ?? null,
+          districtCode: districtCode ?? null,
+          avatar: avatar || null,
+          payoutBankAccount: payoutBankAccount || null,
+          payoutBankBranch: payoutBankBranch || null,
+          payoutAccountNumber: payoutAccountNumber || null,
+        }),
       });
       if (res.ok) {
         router.push("/profile");
@@ -161,6 +178,27 @@ export default function EditProfilePage() {
             </div>
           </div>
         </div>
+
+        {session.user.role === "SELLER" && (
+          <div className="rounded-2xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] p-6 space-y-5">
+            <div>
+              <h2 className="text-[16px] font-bold text-[rgb(var(--color-text))] mb-1">פרטי חשבון בנק</h2>
+              <p className="text-[13px] text-[rgb(var(--color-text-secondary))]">לקבלת תשלומים עתידיים. הפרטים נשמרים מוצפנים.</p>
+            </div>
+            <div>
+              <label className="mb-2 block text-[13px] font-semibold text-[rgb(var(--color-text-secondary))]">שם הבנק</label>
+              <input value={payoutBankAccount} onChange={(e) => setPayoutBankAccount(e.target.value)} placeholder="לדוגמה: לאומי, פועלים..." className={inputClass} />
+            </div>
+            <div>
+              <label className="mb-2 block text-[13px] font-semibold text-[rgb(var(--color-text-secondary))]">מספר סניף</label>
+              <input value={payoutBankBranch} onChange={(e) => setPayoutBankBranch(e.target.value)} placeholder="מספר סניף" className={inputClass} />
+            </div>
+            <div>
+              <label className="mb-2 block text-[13px] font-semibold text-[rgb(var(--color-text-secondary))]">מספר חשבון</label>
+              <input value={payoutAccountNumber} onChange={(e) => setPayoutAccountNumber(e.target.value)} placeholder="מספר חשבון" className={inputClass} />
+            </div>
+          </div>
+        )}
 
         {error && (
           <p role="alert" className="text-[13px] font-medium text-[rgb(var(--color-error))]">{error}</p>
