@@ -28,6 +28,15 @@ model User {
   acceptingJobs Boolean  @default(true)
   suspendedAt   DateTime?
   suspendReason String?
+  phoneVerified    Boolean  @default(false)
+  phoneVerifiedAt  DateTime?
+  identityStatus   String   @default("NONE") // NONE, PENDING, APPROVED, REJECTED
+  identityPhoto    String?  // URL to uploaded ID photo
+  identityReviewedAt DateTime?
+  identityReviewedBy String?
+  licenseStatus    String?  // NONE, PENDING, APPROVED, REJECTED (for regulated services)
+  licensePhoto     String?
+  licenseType      String?  // e.g., "electrician", "gas"
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
@@ -38,6 +47,7 @@ model User {
   weeklyHours     WeeklyHours[]
   timeOff         TimeOff[]
   notifications   Notification[]
+  phoneOtps       PhoneOtp[]
 }
 
 model PasswordReset {
@@ -161,4 +171,20 @@ model CityCatalog {
   id        Int       @id @default(1)
   source    String    @default("snapshot")
   fetchedAt DateTime?
+}
+
+model PhoneOtp {
+  id        String   @id @default(cuid())
+  userId    String
+  phone     String
+  code      String
+  expiresAt DateTime
+  usedAt    DateTime?
+  attempts  Int      @default(0)
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([phone, code])
 }

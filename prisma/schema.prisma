@@ -95,6 +95,15 @@ model User {
   acceptingJobs Boolean  @default(true)
   suspendedAt   DateTime?
   suspendReason String?
+  phoneVerified    Boolean  @default(false)
+  phoneVerifiedAt  DateTime?
+  identityStatus   String   @default("NONE")
+  identityPhoto    String?
+  identityReviewedAt DateTime?
+  identityReviewedBy String?
+  licenseStatus    String?
+  licensePhoto     String?
+  licenseType      String?
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
@@ -116,6 +125,7 @@ model User {
   timeOff          TimeOff[]
   disputesOpened   Dispute[]
   notifications    Notification[]
+  phoneOtps        PhoneOtp[]
 }
 
 model WeeklyHours {
@@ -514,4 +524,20 @@ model Message {
   @@index([orderId])
   @@index([senderId])
   @@index([receiverId])
+}
+
+model PhoneOtp {
+  id        String   @id @default(cuid())
+  userId    String
+  phone     String
+  code      String
+  expiresAt DateTime
+  usedAt    DateTime?
+  attempts  Int      @default(0)
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([phone, code])
 }
