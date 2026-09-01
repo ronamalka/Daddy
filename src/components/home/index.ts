@@ -6,5 +6,6 @@ export { WhyChooseSection } from "./why-choose-section";
 export { HowItWorksSection } from "./how-it-works-section";
 export { TestimonialsSection } from "./testimonials-section";
 export { CtaSection } from "./cta-section";
+export { OpenRequestsTeaser } from "./open-requests-teaser";
 export { ResultsView } from "./results-view";
 export { RequestsView } from "./requests-view";

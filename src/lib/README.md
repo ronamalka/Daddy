@@ -10,7 +10,7 @@ Small modules used by API routes and pages. Each exported function has a short c
 | `prisma.ts` | Prisma client for the Next.js process |
 | `redis.ts` | Shared Redis connection |
 | `account-lockout.ts` | Failed-login delay and lock |
-| `rate-limit.ts` | Which API paths get a tight or loose limit |
+| `rate-limit.ts` | Which API paths get a tight or loose limit (public teaser is tighter than other GETs) |
 | `csrf.ts` | Browser helper that adds the CSRF header to `fetch` |
 | `password-policy.ts` | Password rules and Have I Been Pwned check |
 | `availability.ts` | Jerusalem time, two-hour visit slots |
@@ -26,6 +26,7 @@ Small modules used by API routes and pages. Each exported function has a short c
 | `notification-feed.ts` | Merge persisted alerts with derived order/chat items |
 | `review-users.ts` | Attach reviewer names when gigs only store `userId` |
 | `review-ratings.ts` | 1–10 scale helpers shared with gigs-service |
+| `request-teaser.ts` | Public OPEN-request teaser fields (no street, photos, or buyer) |
 | `accept-quote.ts` | Rules for accepting a seller quote |
 | `validate.ts` | Parse JSON bodies with Zod |
 | `upload-security.ts` | File type checks and EXIF strip |

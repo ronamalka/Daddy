@@ -23,6 +23,9 @@ async function main() {
       buyerId: S.buyer,
       districtCode: 5,
       districtName: "תל אביב",
+      cityCode: 5000,
+      cityName: "תל אביב - יפו",
+      unlisted: false,
     },
     {
       id: "sreq-2",
@@ -32,6 +35,9 @@ async function main() {
       buyerId: S.buyer2,
       districtCode: 3,
       districtName: "חיפה",
+      cityCode: 4000,
+      cityName: "חיפה",
+      unlisted: false,
     },
     {
       id: "sreq-3",
@@ -41,14 +47,40 @@ async function main() {
       buyerId: S.buyer3,
       districtCode: 1,
       districtName: "ירושלים",
+      cityCode: 3000,
+      cityName: "ירושלים",
+      unlisted: false,
+    },
+    {
+      id: "sreq-unlisted",
+      title: "בקשה פרטית — לא אמורה להופיע באתר",
+      description: "כתובת מדויקת ורגישה שלא אמורה לצאת החוצה.",
+      serviceSlug: "furniture-assembly",
+      buyerId: S.buyer,
+      districtCode: 5,
+      districtName: "תל אביב",
+      cityCode: 8600,
+      cityName: "רמת גן",
+      unlisted: true,
     },
   ];
 
   for (const req of requests) {
-    const existing = await prisma.serviceRequest.findUnique({ where: { id: req.id } });
-    if (!existing) {
-      await prisma.serviceRequest.create({ data: req });
-    }
+    await prisma.serviceRequest.upsert({
+      where: { id: req.id },
+      create: req,
+      update: {
+        title: req.title,
+        description: req.description,
+        serviceSlug: req.serviceSlug,
+        districtCode: req.districtCode,
+        districtName: req.districtName,
+        cityCode: req.cityCode,
+        cityName: req.cityName,
+        unlisted: req.unlisted,
+        status: "OPEN",
+      },
+    });
   }
 
   console.log("Requests seed complete.");

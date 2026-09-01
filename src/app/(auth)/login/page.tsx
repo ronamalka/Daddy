@@ -3,7 +3,8 @@
 import { signIn } from "next-auth/react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { safeInAppPath } from "@/lib/seller-ready";
 
 /** Shows the login form so users can sign in. */
 export default function LoginPage() {
@@ -11,6 +12,12 @@ export default function LoginPage() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
+  const [nextPath, setNextPath] = useState("/");
+
+  useEffect(() => {
+    const next = new URLSearchParams(window.location.search).get("next");
+    setNextPath(safeInAppPath(next) ?? "/");
+  }, []);
 
   /** Signs the user in with email and password. */
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -29,7 +36,7 @@ export default function LoginPage() {
       setError("אימייל או סיסמה שגויים");
       setLoading(false);
     } else {
-      router.push("/");
+      router.push(nextPath);
       router.refresh();
     }
   }
@@ -38,7 +45,7 @@ export default function LoginPage() {
   async function handleGoogleSignIn() {
     setGoogleLoading(true);
     setError("");
-    await signIn("google", { callbackUrl: "/" });
+    await signIn("google", { callbackUrl: nextPath });
   }
 
   const isLoading = loading || googleLoading;
@@ -158,7 +165,7 @@ export default function LoginPage() {
           <p className="text-[14px] text-[rgb(var(--color-text-secondary))]">
             עדיין לא במשפחה?{" "}
             <Link
-              href="/register"
+              href={nextPath !== "/" ? `/register?next=${encodeURIComponent(nextPath)}` : "/register"}
               className="font-semibold text-[rgb(var(--color-primary))] transition-colors hover:text-[rgb(var(--color-primary-hover))]"
             >
               הצטרף עכשיו

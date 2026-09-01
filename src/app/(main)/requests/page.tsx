@@ -3,16 +3,16 @@
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
-import { UserCircle } from "@phosphor-icons/react";
+import { OpenRequestsTeaser } from "@/components/home/open-requests-teaser";
 import { RequestsView } from "@/components/home/requests-view";
-import type { ServiceRequest } from "@/components/home/types";
+import type { RequestTeaser, ServiceRequest } from "@/components/home/types";
 
-/** Lists open service requests for sellers, or the signed-in buyer's own posts. */
+/** Lists open service requests for sellers, or the signed-in buyer's own posts. Guests see a public teaser. */
 export default function RequestsPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
   const [requests, setRequests] = useState<ServiceRequest[]>([]);
+  const [teasers, setTeasers] = useState<RequestTeaser[]>([]);
   const [loadingRequests, setLoadingRequests] = useState(true);
   const [selectedDistrict, setSelectedDistrict] = useState("");
 
@@ -32,7 +32,18 @@ export default function RequestsPage() {
   }
 
   useEffect(() => {
-    if (status !== "authenticated") return;
+    if (status === "loading") return;
+    if (status !== "authenticated") {
+      setLoadingRequests(true);
+      fetch("/api/service-requests/teaser")
+        .then((res) => res.json())
+        .then((data) => {
+          setTeasers(Array.isArray(data) ? data : []);
+          setLoadingRequests(false);
+        })
+        .catch(() => setLoadingRequests(false));
+      return;
+    }
     setLoadingRequests(true);
     fetch("/api/service-requests")
       .then((res) => res.json())
@@ -53,21 +64,13 @@ export default function RequestsPage() {
 
   if (!session?.user) {
     return (
-      <div className="mx-auto max-w-lg px-4 py-20 text-center">
-        <div className="mb-4 inline-block rounded-full bg-[rgba(var(--color-primary),0.1)] p-4">
-          <UserCircle className="h-8 w-8 text-[rgb(var(--color-primary))]" />
-        </div>
-        <h2 className="text-[20px] font-bold text-[rgb(var(--color-text))]">צריך להתחבר</h2>
-        <p className="mt-2 text-[14px] text-[rgb(var(--color-text-secondary))]">
-          כדי לראות בקשות שירות פתוחות, צריך קודם להתחבר
-        </p>
-        <Link
-          href="/login"
-          className="mt-6 inline-block rounded-xl bg-[rgb(var(--color-primary))] px-6 py-3 text-[14px] font-bold text-white"
-        >
-          התחברות
-        </Link>
-      </div>
+      <OpenRequestsTeaser
+        teasers={teasers}
+        loading={loadingRequests}
+        canOpenDetail={false}
+        signedIn={false}
+        alwaysShow
+      />
     );
   }
 

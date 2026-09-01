@@ -1,5 +1,11 @@
 import { Router, Request, Response } from "express";
 import { requireAuth, requireSeller } from "../../../shared/middleware";
+import {
+  REQUEST_TEASER_SELECT,
+  REQUEST_TEASER_TAKE,
+  mapRequestTeasers,
+  requestTeaserWhere,
+} from "../../../shared/request-teaser";
 import { prisma } from "../index";
 
 /** Routes for local service requests, seller quotes, and accepting a quote. */
@@ -66,6 +72,7 @@ serviceRequestsRoutes.post("/", requireAuth, async (req: Request, res: Response)
       districtName: districtName || null,
       cityCode: cityCode ? Number(cityCode) : null,
       cityName: cityName || null,
+      unlisted: req.body.unlisted === true,
       slotStart: start,
       slotEnd: end,
     },
@@ -75,6 +82,17 @@ serviceRequestsRoutes.post("/", requireAuth, async (req: Request, res: Response)
   });
 
   res.json(created);
+});
+
+/** Public teaser of recent OPEN listed requests. No auth. Must be registered before `/:id`. */
+serviceRequestsRoutes.get("/teaser", async (_req: Request, res: Response) => {
+  const rows = await prisma.serviceRequest.findMany({
+    where: requestTeaserWhere(),
+    select: REQUEST_TEASER_SELECT,
+    orderBy: { createdAt: "desc" },
+    take: REQUEST_TEASER_TAKE,
+  });
+  res.json(mapRequestTeasers(rows));
 });
 
 /** Get one request and its quotes. Buyers can only see their own. */

@@ -9,13 +9,14 @@ import {
   StatsSection,
   CategoriesSection,
   FeaturedDaddiesSection,
+  OpenRequestsTeaser,
   WhyChooseSection,
   HowItWorksSection,
   TestimonialsSection,
   CtaSection,
   ResultsView,
 } from "@/components/home";
-import type { Provider, FeaturedDaddy, LiveReview } from "@/components/home/types";
+import type { Provider, FeaturedDaddy, LiveReview, RequestTeaser } from "@/components/home/types";
 import { visitWindowToIso, type VisitWindowValue } from "@/components/visit-window-fields";
 
 /** Shows the home page with search, featured daddies, and how the site works. */
@@ -36,6 +37,7 @@ export function HomePage() {
   const [submitted, setSubmitted] = useState(false);
   const [featuredDaddies, setFeaturedDaddies] = useState<FeaturedDaddy[]>([]);
   const [liveReviews, setLiveReviews] = useState<LiveReview[]>([]);
+  const [requestTeasers, setRequestTeasers] = useState<RequestTeaser[]>([]);
   const [fetchError, setFetchError] = useState<string | null>(null);
   const [loadingFeatured, setLoadingFeatured] = useState(true);
 
@@ -52,17 +54,18 @@ export function HomePage() {
 
   useEffect(() => {
     let cancelled = false;
-    /** Loads featured daddies and recent reviews for the homepage. */
+    /** Loads featured daddies, recent reviews, and the public request teaser. */
     async function fetchHomepageData() {
       try {
-        const [daddiesRes, reviewsRes] = await Promise.all([
-          fetch("/api/featured-daddies"),
-          fetch("/api/recent-reviews"),
+        const [daddies, reviews, teasers] = await Promise.all([
+          fetch("/api/featured-daddies").then((r) => r.json()).catch(() => []),
+          fetch("/api/recent-reviews").then((r) => r.json()).catch(() => []),
+          fetch("/api/service-requests/teaser").then((r) => r.json()).catch(() => []),
         ]);
-        const [daddies, reviews] = await Promise.all([daddiesRes.json(), reviewsRes.json()]);
         if (!cancelled) {
           setFeaturedDaddies(Array.isArray(daddies) ? daddies : []);
           setLiveReviews(Array.isArray(reviews) ? reviews : []);
+          setRequestTeasers(Array.isArray(teasers) ? teasers : []);
           setLoadingFeatured(false);
         }
       } catch {
@@ -70,6 +73,7 @@ export function HomePage() {
           setFetchError("לא הצלחנו לטעון נתונים. נסה לרענן את הדף.");
           setFeaturedDaddies([]);
           setLiveReviews([]);
+          setRequestTeasers([]);
           setLoadingFeatured(false);
         }
       }
@@ -200,6 +204,13 @@ export function HomePage() {
       />
 
       <FeaturedDaddiesSection featuredDaddies={featuredDaddies} loading={loadingFeatured} />
+
+      <OpenRequestsTeaser
+        teasers={requestTeasers}
+        loading={loadingFeatured}
+        canOpenDetail={session?.user?.role === "SELLER" || session?.user?.role === "ADMIN"}
+        signedIn={Boolean(session?.user)}
+      />
 
       <WhyChooseSection />
 

@@ -1,11 +1,13 @@
 import { describe, it, expect } from "vitest";
 import {
   isCredentialAuthPath,
+  isPublicTeaserPath,
   resolveRateLimitTier,
   clientIpFromHeaders,
   rateLimitKey,
   RATE_LIMIT_AUTH,
   RATE_LIMIT_POST,
+  RATE_LIMIT_PUBLIC,
   RATE_LIMIT_DEFAULT,
 } from "@/lib/rate-limit";
 
@@ -49,6 +51,15 @@ describe("resolveRateLimitTier", () => {
     const tier = resolveRateLimitTier("/api/orders/ord-1/messages", "POST");
     expect(tier.name).toBe("write");
     expect(tier.limit).toBe(RATE_LIMIT_POST);
+  });
+
+  it("gives the public request teaser a tighter GET budget than other reads", () => {
+    expect(isPublicTeaserPath("/api/service-requests/teaser", "GET")).toBe(true);
+    expect(isPublicTeaserPath("/api/service-requests", "GET")).toBe(false);
+    const tier = resolveRateLimitTier("/api/service-requests/teaser", "GET");
+    expect(tier.name).toBe("public");
+    expect(tier.limit).toBe(RATE_LIMIT_PUBLIC);
+    expect(tier.limit).toBeLessThan(RATE_LIMIT_DEFAULT);
   });
 });
 

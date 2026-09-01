@@ -5,6 +5,7 @@ import {
   SELLER_CHECKLIST_ITEMS,
   SELLER_READY_KEYS,
   postRegisterPath,
+  safeInAppPath,
 } from "@/lib/seller-ready";
 
 const completeInput = {
@@ -112,6 +113,9 @@ describe("postRegisterPath", () => {
   });
 
   it("honors a relative next path and rejects open redirects", () => {
+    expect(safeInAppPath("/requests/sreq-1")).toBe("/requests/sreq-1");
+    expect(safeInAppPath("https://evil.example")).toBeNull();
+    expect(safeInAppPath("//evil.example")).toBeNull();
     expect(postRegisterPath("BUYER", "/onboarding")).toBe("/onboarding");
     expect(postRegisterPath("SELLER", "https://evil.example")).toBe("/onboarding");
     expect(postRegisterPath("BUYER", "//evil.example")).toBe("/");

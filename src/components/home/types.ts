@@ -26,6 +26,15 @@ export interface ServiceRequest {
   _count?: { responses: number };
 }
 
+export interface RequestTeaser {
+  id: string;
+  title: string;
+  serviceSlug: string | null;
+  cityName: string | null;
+  districtName: string | null;
+  createdAt: string;
+}
+
 export interface FeaturedDaddy {
   id: string;
   name: string;

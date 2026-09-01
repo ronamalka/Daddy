@@ -210,6 +210,7 @@ model ServiceRequest {
   cityCode     Int?
   cityName     String?
   status             RequestStatus @default(OPEN)
+  unlisted           Boolean       @default(false)
   slotStart          DateTime?
   slotEnd            DateTime?
   selectedResponseId String?
@@ -223,6 +224,7 @@ model ServiceRequest {
   @@index([buyerId])
   @@index([status])
   @@index([districtCode])
+  @@index([status, unlisted, createdAt])
 }
 
 model RequestResponse {
