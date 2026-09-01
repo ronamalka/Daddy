@@ -641,15 +641,53 @@ describe("System Tests — Health & Pages", () => {
   it("robots.txt is accessible", async () => {
     const res = await fetch(`${BASE_URL}/robots.txt`);
     expect(res.status).toBe(200);
+    const body = await res.text();
+    expect(body).toContain("Sitemap:");
+    expect(body).toContain("/sitemap.xml");
   });
 
-  it("sitemap.xml is accessible", async () => {
+  it("sitemap.xml lists marketing pages, public sellers, and packages", async () => {
     const res = await fetch(`${BASE_URL}/sitemap.xml`);
     expect(res.status).toBe(200);
+    const xml = await res.text();
+    expect(xml).toContain("/how-it-works");
+    expect(xml).toContain("/become-a-daddy");
+    expect(xml).toContain("/about");
+    expect(xml).toContain("/sellers/seed-user-seller1");
+    expect(xml).toContain("/gigs/seed-gig-ikea");
+    expect(xml).not.toContain("sandbox2963");
   });
 
-  it("manifest.webmanifest is accessible", async () => {
+  it("manifest.webmanifest uses Abaleh branding", async () => {
     const res = await fetch(`${BASE_URL}/manifest.webmanifest`);
     expect(res.status).toBe(200);
+    const body = await res.json();
+    expect(body.name).toContain("אבאל׳ה");
+    expect(body.name).not.toMatch(/פרילנס/);
+    expect(body.description).not.toMatch(/פרילנס/);
+  });
+
+  it("marketing pages expose unique titles", async () => {
+    const pages = [
+      { path: "/", title: "אבאל׳ה — אבא תמיד יודע לסדר" },
+      { path: "/how-it-works", title: "איך זה עובד" },
+      { path: "/become-a-daddy", title: "הפוך לאבאל׳ה" },
+      { path: "/about", title: "על אבאל׳ה" },
+    ];
+    for (const page of pages) {
+      const res = await fetch(`${BASE_URL}${page.path}`);
+      expect(res.status).toBe(200);
+      const html = await res.text();
+      expect(html).toContain(page.title);
+    }
+  });
+
+  it("seller profile includes LocalBusiness JSON-LD", async () => {
+    const res = await fetch(`${BASE_URL}/sellers/seed-user-seller1`);
+    expect(res.status).toBe(200);
+    const html = await res.text();
+    expect(html).toContain("יוסי הגולדן");
+    expect(html).toContain("LocalBusiness");
+    expect(html).toContain("AggregateRating");
   });
 });

@@ -3,9 +3,9 @@ import { MetadataRoute } from "next";
 /** Returns the web app manifest used when the site is installed on a phone. */
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "אבאל׳ה — שוק פרילנסרים",
+    name: "אבאל׳ה — אבא תמיד יודע לסדר",
     short_name: "אבאל׳ה",
-    description: "מצא לך אבאל׳ה שיעזור עם מה שאתה צריך היום",
+    description: "מצא אבאל׳ה מנוסה שיעזור עם הרכבות, תיקונים, הובלות והוזלת חשבונות.",
     start_url: "/",
     display: "standalone",
     background_color: "#0a0a0a",

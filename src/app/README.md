@@ -11,7 +11,7 @@ Next.js App Router. Folders with parentheses are **route groups**: they organise
 
 Other files:
 
-- `layout.tsx` — root HTML, Hebrew font, session, cookies, accessibility toolbar
+- `layout.tsx` — root HTML, Hebrew font, session, cookies, accessibility toolbar, `generateMetadata`
 - `globals.css` — colours, RTL, and shared styles
-- `sitemap.ts` / `robots.ts` / `manifest.ts` — SEO and PWA metadata
+- `sitemap.ts` / `robots.ts` / `manifest.ts` — public URLs, crawler rules, and PWA name
 - `not-found.tsx` — 404 page

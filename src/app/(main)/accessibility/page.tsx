@@ -1,9 +1,10 @@
-import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
+export const metadata = pageMetadata({
   title: "הצהרת נגישות",
   description: "אבאל׳ה נגיש לכולם. הצהרת נגישות לפי תקן IS 5568 ותקנות שוויון זכויות לאנשים עם מוגבלות.",
-};
+  path: "/accessibility",
+});
 
 /** Shows the accessibility statement. */
 export default function AccessibilityPage() {

@@ -1,11 +1,12 @@
-import type { Metadata } from "next";
 import Link from "next/link";
 import { LEGAL_CONTACTS } from "@/lib/legal";
+import { pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
+export const metadata = pageMetadata({
   title: "כללי קהילה ועבודות אסורות",
   description: "מה מותר ומה אסור באבאל׳ה — כדי להגן על משתמשים ולהקטין חשיפה משפטית.",
-};
+  path: "/guidelines",
+});
 
 const ALLOWED = [
   "הרכבת רהיטים, תליית מדפים ותמונות, כוונון דלתות וארונות.",

@@ -1,34 +1,47 @@
-import { MetadataRoute } from "next";
+import type { MetadataRoute } from "next";
+import { GIGS_SERVICE, USERS_SERVICE } from "@/lib/gateway";
+import {
+  collectPublicGigs,
+  collectPublicSellers,
+  MARKETING_SITEMAP_ENTRIES,
+} from "@/lib/seo";
+import { siteUrl } from "@/lib/site-url";
 
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "https://daddy-app-daddy-dev.apps.cluster-x8bxx.x8bxx.sandbox2963.opentlc.com";
-
-/** Builds the public sitemap: homepage catalog plus package detail URLs. */
+/** Builds the public sitemap: marketing pages, searchable daddies, and package URLs. */
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const staticPages: MetadataRoute.Sitemap = [
-    { url: BASE_URL, lastModified: new Date(), changeFrequency: "daily", priority: 1.0 },
-    { url: `${BASE_URL}/how-it-works`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.6 },
-    { url: `${BASE_URL}/about`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.5 },
-    { url: `${BASE_URL}/become-a-daddy`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.7 },
-    { url: `${BASE_URL}/accessibility`, lastModified: new Date(), changeFrequency: "yearly", priority: 0.3 },
-    { url: `${BASE_URL}/terms`, lastModified: new Date(), changeFrequency: "yearly", priority: 0.2 },
-    { url: `${BASE_URL}/privacy`, lastModified: new Date(), changeFrequency: "yearly", priority: 0.2 },
-    { url: `${BASE_URL}/guidelines`, lastModified: new Date(), changeFrequency: "yearly", priority: 0.2 },
-  ];
+  const now = new Date();
+  const staticPages: MetadataRoute.Sitemap = MARKETING_SITEMAP_ENTRIES.map((entry) => ({
+    url: siteUrl(entry.path),
+    lastModified: now,
+    changeFrequency: entry.changeFrequency,
+    priority: entry.priority,
+  }));
+
+  let sellerPages: MetadataRoute.Sitemap = [];
+  try {
+    const sellers = await collectPublicSellers(USERS_SERVICE);
+    sellerPages = sellers.map((seller) => ({
+      url: siteUrl(`/sellers/${seller.id}`),
+      lastModified: seller.createdAt ? new Date(seller.createdAt) : now,
+      changeFrequency: "weekly" as const,
+      priority: 0.8,
+    }));
+  } catch {
+    sellerPages = [];
+  }
 
   let gigPages: MetadataRoute.Sitemap = [];
   try {
-    const res = await fetch(`${process.env.GIGS_SERVICE_URL || "http://localhost:4002"}/gigs`, { next: { revalidate: 3600 } });
-    if (res.ok) {
-      const payload = await res.json();
-      const list = Array.isArray(payload) ? payload : payload?.gigs ?? [];
-      gigPages = list.map((gig: { id: string; updatedAt?: string }) => ({
-        url: `${BASE_URL}/gigs/${gig.id}`,
-        lastModified: gig.updatedAt ? new Date(gig.updatedAt) : new Date(),
-        changeFrequency: "weekly" as const,
-        priority: 0.8,
-      }));
-    }
-  } catch {}
+    const gigs = await collectPublicGigs(GIGS_SERVICE);
+    gigPages = gigs.map((gig) => ({
+      url: siteUrl(`/gigs/${gig.id}`),
+      lastModified: gig.updatedAt ? new Date(gig.updatedAt) : now,
+      changeFrequency: "weekly" as const,
+      priority: 0.7,
+    }));
+  } catch {
+    gigPages = [];
+  }
 
-  return [...staticPages, ...gigPages];
+  return [...staticPages, ...sellerPages, ...gigPages];
 }

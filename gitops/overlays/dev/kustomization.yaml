@@ -21,6 +21,9 @@ patches:
       - op: replace
         path: /stringData/AUTH_URL
         value: https://daddy-app-daddy-dev.apps.cluster-x8bxx.x8bxx.sandbox2963.opentlc.com
+      - op: replace
+        path: /stringData/NEXT_PUBLIC_BASE_URL
+        value: https://daddy-app-daddy-dev.apps.cluster-x8bxx.x8bxx.sandbox2963.opentlc.com
 
 labels:
   - pairs:
