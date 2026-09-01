@@ -219,7 +219,9 @@ jobs:
           NEXT_PUBLIC_BASE_URL: "http://localhost:3000"
           AUTH_TRUST_HOST: "true"
           REDIS_URL: "redis://localhost:6379"
-          RATE_LIMIT_AUTH: "60"
+          RATE_LIMIT_AUTH: "200"
+          RATE_LIMIT_POST: "200"
+          RATE_LIMIT_DEFAULT: "2000"
           GOOGLE_CLIENT_ID: "test-google-client-id"
           GOOGLE_CLIENT_SECRET: "test-google-client-secret"
           USERS_SERVICE_URL: "http://localhost:4001"
@@ -240,7 +242,6 @@ jobs:
         run: npm run test:e2e
         env:
           E2E_BASE_URL: "http://localhost:3000"
-        continue-on-error: true
 
       - name: Show docker logs on failure
         if: failure()
