@@ -19,6 +19,7 @@ import { AttachmentBubble } from "@/components/chat/attachment-bubble";
 import { ComposerAttach } from "@/components/chat/composer-attach";
 import { QuotePriceBreakdown } from "@/components/quote-price-breakdown";
 import { canShowMaterialsUpdateForm, hasPendingMaterialsAck } from "@/lib/materials";
+import { PaymentSection } from "@/components/orders/payment-section";
 
 interface GigRequirement {
   id: string;
@@ -71,6 +72,17 @@ interface OrderDetail {
     photos: string[];
     createdAt: string;
   }[];
+  payment?: {
+    id: string;
+    status: string;
+    method: string;
+    amount: number;
+    currency: string;
+    heldAt: string | null;
+    releasedAt: string | null;
+    refundedAt: string | null;
+    refundAmount: number | null;
+  } | null;
   cancellationFee?: number;
   cancellationFeeStatus?: string;
   cancelledAt?: string | null;
@@ -126,6 +138,7 @@ export default function OrderDetailPage() {
   const [materialsInput, setMaterialsInput] = useState("");
   const [materialsBusy, setMaterialsBusy] = useState(false);
   const [materialsError, setMaterialsError] = useState("");
+  const [payment, setPayment] = useState<OrderDetail["payment"]>(null);
 
   useEffect(() => {
     fetch(`/api/orders/${params.id}`)
@@ -143,6 +156,7 @@ export default function OrderDetailPage() {
           data.requirements.forEach((r: OrderRequirement) => { answers[r.requirementId] = r.answer; });
           setReqAnswers(answers);
         }
+        if (data.payment) setPayment(data.payment);
         fetch("/api/messages/mark-read", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -522,6 +536,16 @@ export default function OrderDetailPage() {
         {materialsError && (
           <p role="alert" className="mb-4 text-[13px] font-medium text-[rgb(var(--color-error))]">{materialsError}</p>
         )}
+
+        <div className="mb-5">
+          <PaymentSection
+            orderId={order.id}
+            orderStatus={order.status}
+            isBuyer={isBuyer}
+            payment={payment ?? null}
+            onPaymentCreated={(p) => setPayment(p)}
+          />
+        </div>
 
         <DeliveryPhotos photos={order.deliveryPhotos ?? []} note={order.deliveryNote} />
         {isBuyer && order.status === "DELIVERED" && (order.deliveryPhotos?.length ?? 0) > 0 && (

@@ -55,6 +55,22 @@ enum CancellationFeeStatus {
   WAIVED
 }
 
+enum PaymentStatus {
+  UNPAID
+  PENDING
+  HELD
+  RELEASED
+  REFUNDED
+  PARTIALLY_REFUNDED
+  FAILED
+}
+
+enum PaymentMethod {
+  CARD
+  BIT
+  CASH
+}
+
 model Order {
   id        String      @id @default(cuid())
   jobType   JobType     @default(GIG)
@@ -86,6 +102,7 @@ model Order {
 
   requirements OrderRequirement[]
   disputes     Dispute[]
+  payments     Payment[]
 
   @@index([buyerId])
   @@index([sellerId])
@@ -125,6 +142,30 @@ model Dispute {
 
   @@index([orderId])
   @@index([openerId])
+  @@index([status])
+}
+
+model Payment {
+  id              String        @id @default(cuid())
+  orderId         String
+  amount          Float
+  currency        String        @default("ILS")
+  method          PaymentMethod
+  status          PaymentStatus @default(UNPAID)
+  gatewayId       String?
+  gatewayResponse Json?
+  heldAt          DateTime?
+  releasedAt      DateTime?
+  refundedAt      DateTime?
+  refundAmount    Float?
+  failureReason   String?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  order Order @relation(fields: [orderId], references: [id])
+
+  @@index([orderId])
+  @@index([gatewayId])
   @@index([status])
 }
 

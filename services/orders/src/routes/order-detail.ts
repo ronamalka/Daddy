@@ -6,6 +6,7 @@ import { isOpenDisputeStatus } from "../lib/disputes";
 import { buyerCancelPatch, sellerDeclinePatch } from "../lib/cancellation";
 import { canStartWork } from "../lib/materials";
 import { parseDeliveryEvidence } from "../../../shared/delivery-photos";
+import { releasePayment } from "../lib/escrow";
 
 /** Routes for one order: details, status changes, and buyer requirements. */
 export const orderDetailRoutes = Router();
@@ -141,6 +142,13 @@ orderDetailRoutes.patch("/:id", requireAuth, async (req: Request, res: Response)
     where: { id },
     data: { status },
   });
+
+  // Auto-release escrow when order is marked COMPLETED
+  if (status === "COMPLETED") {
+    releasePayment(prisma, id).catch((err) => {
+      console.error(`[escrow] auto-release failed for order ${id}:`, err);
+    });
+  }
 
   res.json(updated);
 });

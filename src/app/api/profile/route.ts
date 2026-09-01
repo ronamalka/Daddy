@@ -13,6 +13,9 @@ const profileUpdateSchema = z.object({
   cityCode: z.number().int().optional().nullable(),
   districtCode: z.number().int().optional().nullable(),
   location: z.string().max(100).optional(),
+  payoutBankAccount: z.string().max(50).optional().nullable(),
+  payoutBankBranch: z.string().max(50).optional().nullable(),
+  payoutAccountNumber: z.string().max(50).optional().nullable(),
 });
 
 /** Returns the signed-in user's profile. */

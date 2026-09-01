@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
-import { Lock, MapPin, Package, CurrencyDollar, Star, User, Envelope, Shield, CalendarBlank } from "@phosphor-icons/react";
+import { Lock, MapPin, Package, CurrencyDollar, Star, User, Envelope, Shield, CalendarBlank, CreditCard } from "@phosphor-icons/react";
 import { ProfileProgress } from "@/components/profile-progress";
 import type { ProfileReadinessResponse } from "@/lib/seller-ready";
 
@@ -105,6 +105,13 @@ export default function ProfilePage() {
               >
                 <CurrencyDollar className="h-3.5 w-3.5" />
                 מחירון
+              </Link>
+              <Link
+                href="/profile/payments"
+                className="rounded-full border border-[rgb(var(--color-border))] px-4 py-1.5 text-[13px] font-semibold text-[rgb(var(--color-text-secondary))] hover:border-[rgb(var(--color-success))] hover:text-[rgb(var(--color-success))] transition-all flex items-center gap-1.5"
+              >
+                <CreditCard className="h-3.5 w-3.5" />
+                תשלומים
               </Link>
               {session.user.role === "SELLER" && (
                 <Link

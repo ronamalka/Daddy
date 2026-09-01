@@ -26,6 +26,9 @@ model User {
   cityCode     Int?
   districtCode Int?
   acceptingJobs Boolean  @default(true)
+  payoutBankAccount  String?
+  payoutBankBranch   String?
+  payoutAccountNumber String?
   suspendedAt   DateTime?
   suspendReason String?
   createdAt     DateTime @default(now())

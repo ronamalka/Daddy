@@ -22,6 +22,9 @@ profileRoutes.get("/", requireAuth, async (req: Request, res: Response) => {
       city: true,
       cityCode: true,
       districtCode: true,
+      payoutBankAccount: true,
+      payoutBankBranch: true,
+      payoutAccountNumber: true,
       createdAt: true,
     },
   });
@@ -95,9 +98,9 @@ profileRoutes.post("/become-seller", requireAuth, async (req: Request, res: Resp
   res.json(updated);
 });
 
-/** Update the current user's name, bio, phone, city, or avatar. */
+/** Update the current user's name, bio, phone, city, avatar, or payout details. */
 profileRoutes.put("/", requireAuth, async (req: Request, res: Response) => {
-  const { name, bio, phone, city, cityCode, districtCode, avatar } = req.body;
+  const { name, bio, phone, city, cityCode, districtCode, avatar, payoutBankAccount, payoutBankBranch, payoutAccountNumber } = req.body;
 
   const updated = await prisma.user.update({
     where: { id: req.user!.id },
@@ -109,6 +112,9 @@ profileRoutes.put("/", requireAuth, async (req: Request, res: Response) => {
       ...(cityCode !== undefined && { cityCode }),
       ...(districtCode !== undefined && { districtCode }),
       ...(avatar !== undefined && { avatar }),
+      ...(payoutBankAccount !== undefined && { payoutBankAccount }),
+      ...(payoutBankBranch !== undefined && { payoutBankBranch }),
+      ...(payoutAccountNumber !== undefined && { payoutAccountNumber }),
     },
     select: {
       id: true,
@@ -121,6 +127,9 @@ profileRoutes.put("/", requireAuth, async (req: Request, res: Response) => {
       city: true,
       cityCode: true,
       districtCode: true,
+      payoutBankAccount: true,
+      payoutBankBranch: true,
+      payoutAccountNumber: true,
     },
   });
 
