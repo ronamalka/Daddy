@@ -54,7 +54,7 @@ addressesRoutes.post("/", requireAuth, async (req: Request, res: Response) => {
 /** Update a saved address. */
 addressesRoutes.put("/:id", requireAuth, async (req: Request, res: Response) => {
   const userId = req.user!.id;
-  const { id } = req.params;
+  const id = String(req.params.id);
 
   const existing = await prisma.savedAddress.findUnique({ where: { id } });
   if (!existing || existing.userId !== userId) {
@@ -89,7 +89,7 @@ addressesRoutes.put("/:id", requireAuth, async (req: Request, res: Response) => 
 /** Delete a saved address. */
 addressesRoutes.delete("/:id", requireAuth, async (req: Request, res: Response) => {
   const userId = req.user!.id;
-  const { id } = req.params;
+  const id = String(req.params.id);
 
   const existing = await prisma.savedAddress.findUnique({ where: { id } });
   if (!existing || existing.userId !== userId) {
