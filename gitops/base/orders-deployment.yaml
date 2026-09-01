@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: orders-service
-          image: quay.io/rh_ee_rmalka/daddy-orders-service:a7e7177e
+          image: quay.io/rh_ee_rmalka/daddy-orders-service:af0c0c5b
           ports:
             - containerPort: 4003
           env:
