@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { ALL_SERVICES, canonicalizeCategorySlug, getServiceBySlug } from "@/lib/services";
-import { DISTRICTS } from "@/lib/districts";
 import {
   HeroSection,
   StatsSection,
@@ -17,7 +16,10 @@ import {
   ResultsView,
 } from "@/components/home";
 import type { Provider, FeaturedDaddy, LiveReview, RequestTeaser } from "@/components/home/types";
+import { PRICE_PRESETS } from "@/components/home/data";
+import type { PricingFilter, ProviderSort } from "@/components/home/results-view";
 import { visitWindowToIso, type VisitWindowValue } from "@/components/visit-window-fields";
+import type { SelectedCity } from "@/components/city-filter";
 
 /** Shows the home page with search, featured daddies, and how the site works. */
 export function HomePage() {
@@ -25,7 +27,10 @@ export function HomePage() {
   const [view, setView] = useState<"browse" | "results">("browse");
   const [selectedCategory, setSelectedCategory] = useState("");
   const [selectedService, setSelectedService] = useState("");
-  const [selectedDistrict, setSelectedDistrict] = useState("");
+  const [selectedCity, setSelectedCity] = useState<SelectedCity | null>(null);
+  const [sortBy, setSortBy] = useState<ProviderSort>("distance");
+  const [pricing, setPricing] = useState<PricingFilter>("all");
+  const [pricePreset, setPricePreset] = useState("any");
   const [serviceSearch, setServiceSearch] = useState("");
   const [providers, setProviders] = useState<Provider[]>([]);
   const [loadingProviders, setLoadingProviders] = useState(false);
@@ -85,12 +90,20 @@ export function HomePage() {
   useEffect(() => {
     if (!selectedService) return;
     let cancelled = false;
-    /** Fetches providers that match the selected service and district. */
+    /** Fetches providers that match the selected service, city, price, and sort. */
     async function fetchProviders() {
       setLoadingProviders(true);
       const p = new URLSearchParams();
       p.set("service", selectedService);
-      if (selectedDistrict) p.set("district", selectedDistrict);
+      if (selectedCity) {
+        p.set("cityCode", String(selectedCity.cityCode));
+        p.set("district", String(selectedCity.districtCode));
+      }
+      p.set("sortBy", sortBy);
+      if (pricing !== "all") p.set("pricing", pricing);
+      const preset = PRICE_PRESETS.find((row) => row.id === pricePreset);
+      if (preset?.min != null) p.set("minPrice", String(preset.min));
+      if (preset?.max != null) p.set("maxPrice", String(preset.max));
       try {
         const r = await fetch(`/api/providers?${p}`);
         const data = await r.json();
@@ -99,13 +112,12 @@ export function HomePage() {
     }
     fetchProviders();
     return () => { cancelled = true; };
-  }, [selectedService, selectedDistrict]);
+  }, [selectedService, selectedCity, sortBy, pricing, pricePreset]);
 
   /** Sends a new service request from the homepage form. */
   async function submitRequest() {
     if (!reqTitle.trim() || !reqDesc.trim() || !reqWindow?.date) return;
     setSubmitting(true);
-    const districtName = selectedDistrict ? DISTRICTS[Number(selectedDistrict)] : null;
     const { slotStart, slotEnd } = visitWindowToIso(reqWindow);
     try {
       const res = await fetch("/api/service-requests", {
@@ -115,8 +127,10 @@ export function HomePage() {
           title: reqTitle,
           description: reqDesc,
           serviceSlug: selectedService || null,
-          districtCode: selectedDistrict ? Number(selectedDistrict) : null,
-          districtName,
+          districtCode: selectedCity?.districtCode ?? null,
+          districtName: selectedCity?.districtName ?? null,
+          cityCode: selectedCity?.cityCode ?? null,
+          cityName: selectedCity?.cityName ?? null,
           slotStart,
           slotEnd,
         }),
@@ -142,6 +156,10 @@ export function HomePage() {
     setView("browse");
     setSelectedCategory("");
     setSelectedService("");
+    setSelectedCity(null);
+    setSortBy("distance");
+    setPricing("all");
+    setPricePreset("any");
     setServiceSearch("");
     setProviders([]);
     setShowRequestForm(false);
@@ -156,8 +174,14 @@ export function HomePage() {
         providers={providers}
         loadingProviders={loadingProviders}
         selectedServiceDef={selectedServiceDef}
-        selectedDistrict={selectedDistrict}
-        setSelectedDistrict={setSelectedDistrict}
+        selectedCity={selectedCity}
+        setSelectedCity={setSelectedCity}
+        sortBy={sortBy}
+        setSortBy={setSortBy}
+        pricing={pricing}
+        setPricing={setPricing}
+        pricePreset={pricePreset}
+        setPricePreset={setPricePreset}
         resetSearch={resetSearch}
         session={session}
         showRequestForm={showRequestForm}
@@ -182,6 +206,8 @@ export function HomePage() {
         setServiceSearch={setServiceSearch}
         selectedService={selectedService}
         setSelectedService={setSelectedService}
+        selectedCity={selectedCity}
+        setSelectedCity={setSelectedCity}
         setView={setView}
         filteredServices={filteredServices}
       />

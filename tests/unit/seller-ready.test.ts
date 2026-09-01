@@ -86,14 +86,29 @@ describe("searchableSellerWhere", () => {
   });
 
   it("nests city and service filters with the completeness checks", () => {
-    const where = searchableSellerWhere({ service: "tv-mounting", cityCode: "5000" });
+    const where = searchableSellerWhere({ service: "tv-mounting", cityCode: "5000", district: "5" });
     expect(where.AND).toEqual(
       expect.arrayContaining([
-        { serviceAreas: { some: { cityCode: 5000 } } },
+        {
+          serviceAreas: {
+            some: {
+              OR: [{ cityCode: 5000 }, { districtCode: 5, cityCode: null }],
+            },
+          },
+        },
         { userServices: { some: { serviceSlug: "tv-mounting" } } },
       ])
     );
     expect(where.AND).not.toContainEqual({ serviceAreas: { some: {} } });
+  });
+
+  it("keeps a city-only filter when the district is unknown", () => {
+    const where = searchableSellerWhere({ cityCode: "5000" });
+    expect(where.AND).toEqual(
+      expect.arrayContaining([
+        { serviceAreas: { some: { OR: [{ cityCode: 5000 }] } } },
+      ])
+    );
   });
 });
 

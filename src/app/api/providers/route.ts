@@ -11,8 +11,14 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(data, { status });
   }
 
+  type ProviderRow = {
+    id: string;
+    startingPrice?: number | null;
+    [key: string]: unknown;
+  };
+
   const enriched = await Promise.all(
-    data.map(async (provider: { id: string; [key: string]: unknown }) => {
+    data.map(async (provider: ProviderRow) => {
       const { data: reviewData } = await proxyRequest(GIGS_SERVICE, `/reviews/by-seller/${provider.id}`).catch(
         () => ({ data: null, status: 502 })
       );
@@ -23,6 +29,14 @@ export async function GET(request: NextRequest) {
       };
     })
   );
+
+  if (request.nextUrl.searchParams.get("sortBy") === "rating") {
+    enriched.sort(
+      (a, b) =>
+        (b.avgRating || 0) - (a.avgRating || 0) ||
+        (a.startingPrice ?? Number.POSITIVE_INFINITY) - (b.startingPrice ?? Number.POSITIVE_INFINITY)
+    );
+  }
 
   return NextResponse.json(enriched);
 }
