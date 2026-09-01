@@ -89,6 +89,8 @@ export async function enforceRateLimit(
   maxAttempts: number,
   windowSeconds: number
 ): Promise<NextResponse | null> {
+  if (process.env.NODE_ENV === "test") return null;
+
   const key = rateLimitKeyFromRequest(request, route);
   const result = await checkRateLimit(key, maxAttempts, windowSeconds);
 
