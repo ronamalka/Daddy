@@ -18,6 +18,8 @@ export default function EditProfilePage() {
   const [cityCode, setCityCode] = useState<number | undefined>(undefined);
   const [districtCode, setDistrictCode] = useState<number | undefined>(undefined);
   const [avatar, setAvatar] = useState("");
+  const [avatarUploading, setAvatarUploading] = useState(false);
+  const [avatarError, setAvatarError] = useState("");
 
   useEffect(() => {
     fetch("/api/profile")
@@ -66,6 +68,31 @@ export default function EditProfilePage() {
     setSaving(false);
   }
 
+  /** Uploads a file to /api/upload and sets the avatar URL. */
+  async function handleAvatarUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setAvatarError("");
+    setAvatarUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      const res = await fetch("/api/upload", { method: "POST", body: formData });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.files?.[0]?.url) {
+          setAvatar(data.files[0].url);
+        }
+      } else {
+        const data = await res.json().catch(() => ({}));
+        setAvatarError((data as { error?: string }).error || "העלאה נכשלה");
+      }
+    } catch {
+      setAvatarError("העלאה נכשלה");
+    }
+    setAvatarUploading(false);
+  }
+
   const inputClass = "w-full rounded-xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface-elevated))] px-4 py-3 text-[14px] text-[rgb(var(--color-text))] placeholder-[rgb(var(--color-text-muted))] transition-all focus:border-[rgb(var(--color-primary))] focus:outline-none focus:ring-2 focus:ring-[rgba(var(--color-primary),0.2)]";
 
   return (
@@ -94,8 +121,35 @@ export default function EditProfilePage() {
             <textarea value={bio} onChange={(e) => setBio(e.target.value)} rows={4} placeholder="ספר על עצמך..." className={inputClass} />
           </div>
           <div>
-            <label className="mb-2 block text-[13px] font-semibold text-[rgb(var(--color-text-secondary))]">קישור לתמונת פרופיל</label>
-            <input value={avatar} onChange={(e) => setAvatar(e.target.value)} placeholder="https://..." className={inputClass} />
+            <label className="mb-2 block text-[13px] font-semibold text-[rgb(var(--color-text-secondary))]">תמונת פרופיל</label>
+            <div className="flex items-center gap-4">
+              {avatar && (
+                <img
+                  src={avatar}
+                  alt="תמונת פרופיל"
+                  className="h-16 w-16 rounded-full object-cover border-2 border-[rgb(var(--color-border))]"
+                />
+              )}
+              <div>
+                <input
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp"
+                  onChange={handleAvatarUpload}
+                  className="hidden"
+                  id="avatar-upload"
+                  disabled={avatarUploading}
+                />
+                <label
+                  htmlFor="avatar-upload"
+                  className={`inline-block cursor-pointer rounded-xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface-elevated))] px-4 py-2.5 text-[13px] font-semibold text-[rgb(var(--color-text-secondary))] transition-all hover:border-[rgb(var(--color-primary))] hover:text-[rgb(var(--color-primary))] ${avatarUploading ? "opacity-40 cursor-not-allowed" : ""}`}
+                >
+                  {avatarUploading ? "מעלה..." : "העלה תמונה"}
+                </label>
+                {avatarError && (
+                  <p className="mt-1.5 text-[12px] text-[rgb(var(--color-error))]">{avatarError}</p>
+                )}
+              </div>
+            </div>
           </div>
         </div>
 

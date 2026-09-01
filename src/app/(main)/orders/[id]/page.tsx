@@ -663,11 +663,11 @@ export default function OrderDetailPage() {
 
             {/* Flag Review */}
             {!isSeller && !flagSubmitted && (
-              <div className="mt-3 border-t border-[#E8ECF1] pt-3">
+              <div className="mt-3 border-t border-[rgb(var(--color-border))] pt-3">
                 {!showFlagForm ? (
                   <button
                     onClick={() => setShowFlagForm(true)}
-                    className="text-[12px] text-[#B2BEC3] hover:text-[#E17055] transition-colors"
+                    className="text-[12px] text-[rgb(var(--color-text-muted))] hover:text-[rgb(var(--color-accent-warm))] transition-colors"
                   >
                     🚩 דווח על חוות דעת זו
                   </button>
@@ -677,18 +677,18 @@ export default function OrderDetailPage() {
                       value={flagReason}
                       onChange={(e) => setFlagReason(e.target.value)}
                       placeholder="סיבת הדיווח..."
-                      className="flex-1 rounded-[8px] border border-[#E8ECF1] bg-white px-3 py-2 text-[13px] focus:border-[#E17055] focus:outline-none"
+                      className="flex-1 rounded-[8px] border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] px-3 py-2 text-[13px] focus:border-[rgb(var(--color-accent-warm))] focus:outline-none"
                     />
                     <button
                       onClick={flagReview}
                       disabled={!flagReason.trim()}
-                      className="rounded-[8px] bg-[#E17055] px-4 py-2 text-[13px] font-semibold text-white hover:bg-[#D63031] disabled:opacity-40"
+                      className="rounded-[8px] bg-[rgb(var(--color-accent-warm))] px-4 py-2 text-[13px] font-semibold text-white hover:bg-[rgb(var(--color-error))] disabled:opacity-40"
                     >
                       דווח
                     </button>
                     <button
                       onClick={() => { setShowFlagForm(false); setFlagReason(""); }}
-                      className="rounded-[8px] border border-[#E8ECF1] px-3 py-2 text-[13px] text-[#636E72] hover:bg-[#F8F9FA]"
+                      className="rounded-[8px] border border-[rgb(var(--color-border))] px-3 py-2 text-[13px] text-[rgb(var(--color-text-secondary))] hover:bg-[rgb(var(--color-surface-elevated))]"
                     >
                       ביטול
                     </button>
@@ -697,7 +697,7 @@ export default function OrderDetailPage() {
               </div>
             )}
             {flagSubmitted && (
-              <p className="mt-3 text-[12px] text-[#00B894]">✓ הדיווח נשלח בהצלחה</p>
+              <p className="mt-3 text-[12px] text-[rgb(var(--color-success))]">✓ הדיווח נשלח בהצלחה</p>
             )}
           </div>
         )}
