@@ -3,6 +3,7 @@ import snapshot from "./data/israeli-cities.json";
 import {
   CITY_REFRESH_MS,
   GOV_CITIES_URL,
+  isMissingCatalogSchema,
   mapGovRecords,
   shouldRefreshFromGov,
   type CatalogCity,
@@ -12,6 +13,7 @@ import {
 export {
   CITY_REFRESH_MS,
   GOV_CITIES_URL,
+  isMissingCatalogSchema,
   mapGovRecords,
   shouldRefreshFromGov,
 };
@@ -82,12 +84,20 @@ export async function refreshCityCatalogFromGov(fetchImpl: typeof fetch = fetch)
   return false;
 }
 
-/** Background path: snapshot if empty, then gov if the last successful pull is stale. */
+/** Background path: snapshot if empty, then gov if the last successful pull is stale. Never throws — schema may not exist yet. */
 export async function refreshCityCatalogIfStale(): Promise<void> {
-  await ensureCityCatalog();
-  const meta = await prisma.cityCatalog.findUnique({ where: { id: 1 } });
-  if (!shouldRefreshFromGov(meta?.fetchedAt ?? null)) return;
-  await refreshCityCatalogFromGov();
+  try {
+    await ensureCityCatalog();
+    const meta = await prisma.cityCatalog.findUnique({ where: { id: 1 } });
+    if (!shouldRefreshFromGov(meta?.fetchedAt ?? null)) return;
+    await refreshCityCatalogFromGov();
+  } catch (err) {
+    if (isMissingCatalogSchema(err)) {
+      console.warn("City catalog skipped until schema is applied");
+      return;
+    }
+    console.warn("City catalog refresh failed:", err instanceof Error ? err.message : err);
+  }
 }
 
 /** Fill an empty table from the snapshot, then refresh from the government once a day. */

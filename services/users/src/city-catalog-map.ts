@@ -45,3 +45,14 @@ export function shouldRefreshFromGov(fetchedAt: Date | null, now = Date.now(), t
   if (!fetchedAt) return true;
   return now - fetchedAt.getTime() > ttlMs;
 }
+
+/**
+ * Prisma P2021 / Postgres missing-relation errors.
+ * CI starts the users process before `prisma db push`, so City may not exist yet.
+ */
+export function isMissingCatalogSchema(err: unknown): boolean {
+  if (!err || typeof err !== "object") return false;
+  const rec = err as { code?: unknown; message?: unknown };
+  if (rec.code === "P2021") return true;
+  return /relation .*City(Catalog)?.* does not exist/i.test(String(rec.message ?? ""));
+}

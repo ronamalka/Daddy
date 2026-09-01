@@ -2,6 +2,7 @@ import { describe, it, expect } from "vitest";
 import {
   mapGovRecords,
   shouldRefreshFromGov,
+  isMissingCatalogSchema,
   CITY_REFRESH_MS,
 } from "../../services/users/src/city-catalog-map";
 
@@ -29,6 +30,16 @@ describe("mapGovRecords", () => {
         regionName: "תל אביב",
       },
     ]);
+  });
+});
+
+describe("isMissingCatalogSchema", () => {
+  it("treats Prisma P2021 and Postgres missing-relation errors as schema-not-ready", () => {
+    expect(isMissingCatalogSchema({ code: "P2021" })).toBe(true);
+    expect(isMissingCatalogSchema({ message: 'relation "public.City" does not exist' })).toBe(true);
+    expect(isMissingCatalogSchema({ message: "relation \"public.CityCatalog\" does not exist" })).toBe(true);
+    expect(isMissingCatalogSchema({ code: "P2002" })).toBe(false);
+    expect(isMissingCatalogSchema(new Error("connection refused"))).toBe(false);
   });
 });
 
