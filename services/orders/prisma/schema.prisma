@@ -10,6 +10,7 @@ datasource db {
 enum OrderStatus {
   PENDING
   IN_PROGRESS
+  ON_THE_WAY
   DELIVERED
   COMPLETED
   CANCELLED
@@ -79,6 +80,8 @@ model Order {
   cancelledById         String?
   cancellationFee       Float                 @default(0)
   cancellationFeeStatus CancellationFeeStatus @default(NONE)
+  onTheWayAt            DateTime?
+  onTheWayEta           String?
   deliveryPhotos        String[]              @default([])
   deliveryNote          String?
   createdAt DateTime    @default(now())
