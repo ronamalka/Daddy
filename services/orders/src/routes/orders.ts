@@ -1,5 +1,5 @@
 import { Router, Request, Response } from "express";
-import { requireAuth } from "../../../shared/middleware";
+import { requireAuth, requireAdmin, requireInternal } from "../../../shared/middleware";
 import { prisma } from "../index";
 import { parseRequiredSlot } from "../lib/slots";
 import { orderListWhere } from "../lib/order-list";
@@ -140,7 +140,7 @@ ordersRoutes.get("/stats", requireAuth, async (req: Request, res: Response) => {
 });
 
 /** Return platform-wide order count and completed-order revenue. */
-ordersRoutes.get("/stats/admin", requireAuth, async (_req: Request, res: Response) => {
+ordersRoutes.get("/stats/admin", requireAdmin, async (_req: Request, res: Response) => {
   const orderCount = await prisma.order.count();
 
   const completedOrders = await prisma.order.findMany({
@@ -154,7 +154,7 @@ ordersRoutes.get("/stats/admin", requireAuth, async (_req: Request, res: Respons
 });
 
 /** Count completed orders for one seller. */
-ordersRoutes.get("/count-by-seller/:sellerId", async (req: Request, res: Response) => {
+ordersRoutes.get("/count-by-seller/:sellerId", requireInternal, async (req: Request, res: Response) => {
   const sellerId = req.params.sellerId as string;
   const count = await prisma.order.count({
     where: { sellerId, status: "COMPLETED" },
@@ -163,7 +163,7 @@ ordersRoutes.get("/count-by-seller/:sellerId", async (req: Request, res: Respons
 });
 
 /** List a seller's booked visit windows in a date range. */
-ordersRoutes.get("/booked-slots/:sellerId", async (req: Request, res: Response) => {
+ordersRoutes.get("/booked-slots/:sellerId", requireInternal, async (req: Request, res: Response) => {
   const sellerId = req.params.sellerId as string;
   const from = typeof req.query.from === "string" ? new Date(req.query.from) : new Date();
   const to =

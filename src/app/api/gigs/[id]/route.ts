@@ -3,6 +3,8 @@ import { auth } from "@/lib/auth";
 import { proxyRequest, GIGS_SERVICE, USERS_SERVICE } from "@/lib/gateway";
 import { attachReviewAuthors, type ReviewUserLookup } from "@/lib/review-users";
 import { resolveAllowedGigCategory } from "@/lib/gig-category";
+import { updateGigSchema } from "@/lib/gig-create";
+import { validateBody } from "@/lib/validate";
 
 /** Returns one gig with seller profile and reviewer names attached. */
 export async function GET(_request: Request, { params }: { params: Promise<{ id: string }> }) {
@@ -77,15 +79,18 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const body = await request.json();
+  const result = await validateBody(request, updateGigSchema);
+  if ("error" in result) return result.error;
+
+  const body = result.data;
   const user = session.user as { id: string; email: string; name: string; role: string };
 
-  if (typeof body?.categoryId === "string" && body.categoryId) {
+  if (typeof body.categoryId === "string" && body.categoryId) {
     const allowed = await resolveAllowedGigCategory(user, body.categoryId, id);
     if ("error" in allowed) {
       return NextResponse.json({ error: allowed.error }, { status: allowed.status });
     }
-    body.categoryId = allowed.slug;
+    (body as Record<string, unknown>).categoryId = allowed.slug;
   }
 
   const { data, status } = await proxyRequest(GIGS_SERVICE, `/gigs/${id}`, {
