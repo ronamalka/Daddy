@@ -16,7 +16,7 @@ Small modules used by API routes and pages. Each exported function has a short c
 | `availability.ts` | Jerusalem time, two-hour visit slots |
 | `order-views.ts` | Split buyer/seller orders and build a month grid |
 | `order-status.ts` | Colours and Hebrew labels for order status |
-| `order-update.ts` | Zod body for PATCH order status |
+| `order-update.ts` | Zod body for PATCH order status (deliver requires 1–6 photos) |
 | `seller-slot.ts` | Validate a chosen visit window against a seller |
 | `gig-create.ts` | Zod body for creating a package from the seller form |
 | `gig-category.ts` | Package category must match the daddy's price list |
@@ -28,6 +28,7 @@ Small modules used by API routes and pages. Each exported function has a short c
 | `review-ratings.ts` | 1–10 scale helpers shared with gigs-service |
 | `request-teaser.ts` | Public OPEN-request teaser fields (no street, photos, or buyer) |
 | `request-details.ts` | Request photos (max 4), street/floor, morning/afternoon/weekend, street redaction |
+| `delivery-photos.ts` | Completion photos (1–6) and optional note when marking delivered |
 | `accept-quote.ts` | Rules for accepting a seller quote |
 | `validate.ts` | Parse JSON bodies with Zod |
 | `upload-security.ts` | File type checks and EXIF strip |

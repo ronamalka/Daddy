@@ -9,6 +9,8 @@ import { Star, Handshake, Clock, Coins, Tag, ClipboardText, ChatCircle, PaperPla
 import { Dialog } from "@/components/ui/dialog";
 import { formatVisitWindow } from "@/lib/availability";
 import { DisputeDialog } from "@/components/orders/dispute-dialog";
+import { DeliverDialog } from "@/components/orders/deliver-dialog";
+import { DeliveryPhotos } from "@/components/orders/delivery-photos";
 import { WazeNavigate } from "@/components/orders/waze-navigate";
 import { canShowSellerWaze } from "@/lib/waze";
 import { DISPUTE_REASON_LABELS, DISPUTE_STATUS_LABELS, isDisputableStatus, orderHasOpenDispute } from "@/lib/disputes";
@@ -72,6 +74,8 @@ interface OrderDetail {
   cancellationFee?: number;
   cancellationFeeStatus?: string;
   cancelledAt?: string | null;
+  deliveryPhotos?: string[];
+  deliveryNote?: string | null;
   visit?: {
     street: string | null;
     cityName: string | null;
@@ -116,6 +120,7 @@ export default function OrderDetailPage() {
   const [cancelOpen, setCancelOpen] = useState(false);
   const [cancelSubmitting, setCancelSubmitting] = useState(false);
   const [disputeOpen, setDisputeOpen] = useState(false);
+  const [deliverOpen, setDeliverOpen] = useState(false);
   const [loadError, setLoadError] = useState(false);
   const [statusBusy, setStatusBusy] = useState(false);
   const [statusError, setStatusError] = useState("");
@@ -513,6 +518,13 @@ export default function OrderDetailPage() {
           <p role="alert" className="mb-4 text-[13px] font-medium text-[rgb(var(--color-error))]">{materialsError}</p>
         )}
 
+        <DeliveryPhotos photos={order.deliveryPhotos ?? []} note={order.deliveryNote} />
+        {isBuyer && order.status === "DELIVERED" && (order.deliveryPhotos?.length ?? 0) > 0 && (
+          <p className="mb-4 text-[13px] text-[rgb(var(--color-text-secondary))]">
+            בדקו את התמונות ואשרו שהעבודה הושלמה.
+          </p>
+        )}
+
         {/* Action Buttons */}
         <div className="flex flex-wrap gap-3">
           {isSeller && order.status === "PENDING" && (
@@ -528,7 +540,7 @@ export default function OrderDetailPage() {
             </>
           )}
           {isSeller && (order.status === "IN_PROGRESS" || order.status === "REVISION") && (
-            <button disabled={statusBusy} onClick={() => updateStatus("DELIVERED")} className="flex items-center gap-2 rounded-xl bg-[rgb(var(--color-primary))] px-5 py-2.5 text-[14px] font-semibold text-white transition-all hover:bg-[rgb(var(--color-primary-hover))] disabled:opacity-50">{statusBusy ? "מעדכן..." : "סמן כנמסר"}</button>
+            <button disabled={statusBusy} onClick={() => setDeliverOpen(true)} className="flex items-center gap-2 rounded-xl bg-[rgb(var(--color-primary))] px-5 py-2.5 text-[14px] font-semibold text-white transition-all hover:bg-[rgb(var(--color-primary-hover))] disabled:opacity-50">סמן כנמסר</button>
           )}
           {isBuyer && order.status === "DELIVERED" && (
             <>
@@ -933,6 +945,20 @@ export default function OrderDetailPage() {
           </div>
         </div>
       </Dialog>
+
+      <DeliverDialog
+        open={deliverOpen}
+        onOpenChange={setDeliverOpen}
+        orderId={order.id}
+        onDelivered={(updated) => {
+          setOrder((prev) => prev ? {
+            ...prev,
+            status: updated.status,
+            deliveryPhotos: updated.deliveryPhotos ?? prev.deliveryPhotos,
+            deliveryNote: updated.deliveryNote ?? prev.deliveryNote,
+          } : prev);
+        }}
+      />
 
       <DisputeDialog
         open={disputeOpen}

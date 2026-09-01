@@ -9,14 +9,28 @@ interface RequestPhotosFieldProps {
   error?: string;
   onError: (message: string) => void;
   onUploading?: (uploading: boolean) => void;
+  max?: number;
+  label?: string;
+  hint?: string;
+  altPrefix?: string;
 }
 
-/** Uploads up to four request photos through `/api/upload`. */
-export function RequestPhotosField({ photos, onChange, error, onError, onUploading }: RequestPhotosFieldProps) {
+/** Uploads photos through `/api/upload` (request quoting by default, or a custom cap/label). */
+export function RequestPhotosField({
+  photos,
+  onChange,
+  error,
+  onError,
+  onUploading,
+  max = MAX_REQUEST_PHOTOS,
+  label,
+  hint = "תמונה של הבעיה עוזרת לאבאל׳ות לתת הצעה מדויקת. לא מופיעה בעמוד הציבורי.",
+  altPrefix = "תמונת הבקשה",
+}: RequestPhotosFieldProps) {
   /** Uploads selected images and appends their URLs, up to the photo cap. */
   async function onFiles(files: FileList | null) {
     if (!files || files.length === 0) return;
-    const remaining = MAX_REQUEST_PHOTOS - photos.length;
+    const remaining = max - photos.length;
     if (remaining <= 0) return;
     const batch = Array.from(files).slice(0, remaining);
     onError("");
@@ -31,7 +45,7 @@ export function RequestPhotosField({ photos, onChange, error, onError, onUploadi
         return;
       }
       const urls = (data.files as { url: string }[]).map((f) => f.url);
-      onChange([...photos, ...urls].slice(0, MAX_REQUEST_PHOTOS));
+      onChange([...photos, ...urls].slice(0, max));
     } catch {
       onError("העלאת התמונות נכשלה");
     } finally {
@@ -42,15 +56,13 @@ export function RequestPhotosField({ photos, onChange, error, onError, onUploadi
   return (
     <div>
       <label className="mb-2 block text-[13px] font-semibold text-[rgb(var(--color-text-secondary))]">
-        תמונות (עד {MAX_REQUEST_PHOTOS})
+        {label ?? `תמונות (עד ${max})`}
       </label>
-      <p className="mb-2 text-[12px] text-[rgb(var(--color-text-muted))]">
-        תמונה של הבעיה עוזרת לאבאל׳ות לתת הצעה מדויקת. לא מופיעה בעמוד הציבורי.
-      </p>
+      <p className="mb-2 text-[12px] text-[rgb(var(--color-text-muted))]">{hint}</p>
       <div className="flex flex-wrap gap-2">
         {photos.map((url, index) => (
           <div key={url} className="relative h-20 w-20 overflow-hidden rounded-lg border border-[rgb(var(--color-border))]">
-            <img src={url} alt={`תמונת הבקשה ${index + 1}`} className="h-full w-full object-cover" />
+            <img src={url} alt={`${altPrefix} ${index + 1}`} className="h-full w-full object-cover" />
             <button
               type="button"
               onClick={() => onChange(photos.filter((photo) => photo !== url))}
@@ -61,7 +73,7 @@ export function RequestPhotosField({ photos, onChange, error, onError, onUploadi
             </button>
           </div>
         ))}
-        {photos.length < MAX_REQUEST_PHOTOS && (
+        {photos.length < max && (
           <label className="flex h-20 w-20 cursor-pointer flex-col items-center justify-center rounded-lg border border-dashed border-[rgb(var(--color-border))] text-[rgb(var(--color-text-muted))] hover:bg-[rgb(var(--color-bg))]">
             <ImageIcon className="h-5 w-5" />
             <span className="mt-1 text-[10px]">הוסף</span>

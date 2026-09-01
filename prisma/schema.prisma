@@ -376,6 +376,8 @@ model Order {
   cancelledById         String?
   cancellationFee       Float                 @default(0)
   cancellationFeeStatus CancellationFeeStatus @default(NONE)
+  deliveryPhotos        String[]              @default([])
+  deliveryNote          String?
   createdAt DateTime    @default(now())
   updatedAt DateTime    @updatedAt
 

@@ -8,6 +8,8 @@ test.describe("Local job reviews", () => {
     await loginAs(page, "buyer@daddy.com");
     await page.goto("/orders/ord-23");
     await expect(page.getByText("הרכבת שידה בסלון")).toBeVisible({ timeout: 10000 });
+    await expect(page.getByText("תמונות מהביקור")).toBeVisible();
+    await expect(page.getByText("השידה מורכבת ומפולסת")).toBeVisible();
 
     const completeBtn = page.getByRole("button", { name: "אשר קבלה" });
     await expect(completeBtn).toBeVisible();
