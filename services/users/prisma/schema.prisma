@@ -26,10 +26,15 @@ model User {
   cityCode     Int?
   districtCode Int?
   acceptingJobs Boolean  @default(true)
-  osekType       String?  // "patur" or "murshe"
-  osekNumber     String?  // business registration number
-  legalName      String?  // business legal name
-  businessAddress String? // business address for invoice
+  notifyWhatsapp   Boolean @default(true)
+  notifySms        Boolean @default(false)
+  notifyEmail      Boolean @default(true)
+  marketingConsent Boolean @default(false)
+  marketingConsentAt DateTime?
+  osekType       String?
+  osekNumber     String?
+  legalName      String?
+  businessAddress String?
   suspendedAt   DateTime?
   suspendReason String?
   phoneVerified    Boolean  @default(false)
