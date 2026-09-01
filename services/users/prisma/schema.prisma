@@ -143,3 +143,22 @@ model TimeOff {
   @@unique([userId, date])
   @@index([userId])
 }
+
+/// CBS localities for pickers. Request path reads this table only; data.gov.il is a daily background refresh.
+model City {
+  code         Int      @id
+  name         String
+  districtCode Int
+  districtName String
+  regionName   String   @default("")
+  updatedAt    DateTime @updatedAt
+
+  @@index([districtCode])
+}
+
+/// Singleton (id=1). fetchedAt is the last successful government pull; null means snapshot-only.
+model CityCatalog {
+  id        Int       @id @default(1)
+  source    String    @default("snapshot")
+  fetchedAt DateTime?
+}

@@ -1,0 +1,9172 @@
+[
+  {
+    "code": 967,
+    "name": "אבו ג'ווייעד (שבט)",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 472,
+    "name": "אבו גוש",
+    "districtCode": 1,
+    "districtName": "ירושלים",
+    "regionName": "ירושלים"
+  },
+  {
+    "code": 473,
+    "name": "אבו סנאן",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עכו"
+  },
+  {
+    "code": 935,
+    "name": "אבו סריחאן (שבט)",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 958,
+    "name": "אבו עבדון (שבט)",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 1042,
+    "name": "אבו עמאר (שבט)",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 932,
+    "name": "אבו עמרה (שבט)",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 968,
+    "name": "אבו קורינאת (שבט)",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 1342,
+    "name": "אבו קרינאת (יישוב)",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 966,
+    "name": "אבו רובייעה (שבט)",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 961,
+    "name": "אבו רוקייק (שבט)",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 1375,
+    "name": "אבו תלול",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 652,
+    "name": "אבטין",
+    "districtCode": 3,
+    "districtName": "חיפה",
+    "regionName": "חיפה"
+  },
+  {
+    "code": 1275,
+    "name": "אבטליון",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עכו"
+  },
+  {
+    "code": 679,
+    "name": "אביאל",
+    "districtCode": 3,
+    "districtName": "חיפה",
+    "regionName": "חדרה"
+  },
+  {
+    "code": 1115,
+    "name": "אביבים",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "צפת"
+  },
+  {
+    "code": 819,
+    "name": "אביגדור",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "אשקלון"
+  },
+  {
+    "code": 3869,
+    "name": "אביגיל",
+    "districtCode": 7,
+    "districtName": "יהודה והשומרון",
+    "regionName": "חברון"
+  },
+  {
+    "code": 3905,
+    "name": "אביה",
+    "districtCode": 7,
+    "districtName": "יהודה והשומרון",
+    "regionName": "בית לחם"
+  },
+  {
+    "code": 175,
+    "name": "אביחיל",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "השרון"
+  },
+  {
+    "code": 2052,
+    "name": "אביטל",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עפולה"
+  },
+  {
+    "code": 1070,
+    "name": "אביעזר",
+    "districtCode": 1,
+    "districtName": "ירושלים",
+    "regionName": "ירושלים"
+  },
+  {
+    "code": 1220,
+    "name": "אבירים",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עכו"
+  },
+  {
+    "code": 182,
+    "name": "אבן יהודה",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "השרון"
+  },
+  {
+    "code": 1081,
+    "name": "אבן מנחם",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עכו"
+  },
+  {
+    "code": 783,
+    "name": "אבן ספיר",
+    "districtCode": 1,
+    "districtName": "ירושלים",
+    "regionName": "ירושלים"
+  },
+  {
+    "code": 400,
+    "name": "אבן שמואל",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "אשקלון"
+  },
+  {
+    "code": 4011,
+    "name": "אבני איתן",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "גולן"
+  },
+  {
+    "code": 3793,
+    "name": "אבני חפץ",
+    "districtCode": 7,
+    "districtName": "יהודה והשומרון",
+    "regionName": "טול כרם"
+  },
+  {
+    "code": 1311,
+    "name": "אבשלום",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 3759,
+    "name": "אדורה",
+    "districtCode": 7,
+    "districtName": "יהודה והשומרון",
+    "regionName": "חברון"
+  },
+  {
+    "code": 3987,
+    "name": "אדוריים",
+    "districtCode": 7,
+    "districtName": "יהודה והשומרון",
+    "regionName": "חברון"
+  },
+  {
+    "code": 113,
+    "name": "אדירים",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עפולה"
+  },
+  {
+    "code": 1068,
+    "name": "אדמית",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עכו"
+  },
+  {
+    "code": 1123,
+    "name": "אדרת",
+    "districtCode": 1,
+    "districtName": "ירושלים",
+    "regionName": "ירושלים"
+  },
+  {
+    "code": 3786,
+    "name": "אובנת",
+    "districtCode": 7,
+    "districtName": "יהודה והשומרון",
+    "regionName": "ירדן )יריחו("
+  },
+  {
+    "code": 446,
+    "name": "אודים",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "השרון"
+  },
+  {
+    "code": 4010,
+    "name": "אודם",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "גולן"
+  },
+  {
+    "code": 1046,
+    "name": "אוהד",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 2710,
+    "name": "אום אל-פחם",
+    "districtCode": 3,
+    "districtName": "חיפה",
+    "regionName": "חדרה"
+  },
+  {
+    "code": 2024,
+    "name": "אום אל-קוטוף",
+    "districtCode": 3,
+    "districtName": "חיפה",
+    "regionName": "חדרה"
+  },
+  {
+    "code": 1358,
+    "name": "אום בטין",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 1108,
+    "name": "אומן",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עפולה"
+  },
+  {
+    "code": 680,
+    "name": "אומץ",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "השרון"
+  },
+  {
+    "code": 31,
+    "name": "אופקים",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 1294,
+    "name": "אור הגנוז",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "צפת"
+  },
+  {
+    "code": 67,
+    "name": "אור הנר",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "אשקלון"
+  },
+  {
+    "code": 2400,
+    "name": "אור יהודה",
+    "districtCode": 5,
+    "districtName": "תל אביב",
+    "regionName": "רמת גן"
+  },
+  {
+    "code": 1020,
+    "name": "אור עקיבא",
+    "districtCode": 3,
+    "districtName": "חיפה",
+    "regionName": "חדרה"
+  },
+  {
+    "code": 780,
+    "name": "אורה",
+    "districtCode": 1,
+    "districtName": "ירושלים",
+    "regionName": "ירושלים"
+  },
+  {
+    "code": 2012,
+    "name": "אורות",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "אשקלון"
+  },
+  {
+    "code": 4013,
+    "name": "אורטל",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "גולן"
+  },
+  {
+    "code": 403,
+    "name": "אורים",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 882,
+    "name": "אורנים",
+    "districtCode": 3,
+    "districtName": "חיפה",
+    "regionName": "חיפה"
+  },
+  {
+    "code": 3760,
+    "name": "אורנית",
+    "districtCode": 7,
+    "districtName": "יהודה והשומרון",
+    "regionName": "טול כרם"
+  },
+  {
+    "code": 278,
+    "name": "אושה",
+    "districtCode": 3,
+    "districtName": "חיפה",
+    "regionName": "חיפה"
+  },
+  {
+    "code": 565,
+    "name": "אזור",
+    "districtCode": 5,
+    "districtName": "תל אביב",
+    "regionName": "חולון"
+  },
+  {
+    "code": 1157,
+    "name": "אחווה",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "אשקלון"
+  },
+  {
+    "code": 821,
+    "name": "אחוזם",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "אשקלון"
+  },
+  {
+    "code": 1330,
+    "name": "אחוזת ברק",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עפולה"
+  },
+  {
+    "code": 3875,
+    "name": "אחיה",
+    "districtCode": 7,
+    "districtName": "יהודה והשומרון",
+    "regionName": "ראמאללה"
+  },
+  {
+    "code": 785,
+    "name": "אחיהוד",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עכו"
+  },
+  {
+    "code": 850,
+    "name": "אחיטוב",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "השרון"
+  },
+  {
+    "code": 804,
+    "name": "אחיסמך",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "רמלה"
+  },
+  {
+    "code": 797,
+    "name": "אחיעזר",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "רמלה"
+  },
+  {
+    "code": 965,
+    "name": "אטרש (שבט)",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 3891,
+    "name": "איבי הנחל",
+    "districtCode": 7,
+    "districtName": "יהודה והשומרון",
+    "regionName": "בית לחם"
+  },
+  {
+    "code": 338,
+    "name": "איבים",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "אשקלון"
+  },
+  {
+    "code": 716,
+    "name": "אייל",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "פתח תקווה"
+  },
+  {
+    "code": 77,
+    "name": "איילת השחר",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "צפת"
+  },
+  {
+    "code": 294,
+    "name": "אילון",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עכו"
+  },
+  {
+    "code": 1126,
+    "name": "אילות",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 49,
+    "name": "אילניה",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "כנרת"
+  },
+  {
+    "code": 2600,
+    "name": "אילת",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 1336,
+    "name": "אירוס",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "רחובות"
+  },
+  {
+    "code": 3762,
+    "name": "איתמר",
+    "districtCode": 7,
+    "districtName": "יהודה והשומרון",
+    "regionName": "שכם"
+  },
+  {
+    "code": 37,
+    "name": "איתן",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "אשקלון"
+  },
+  {
+    "code": 886,
+    "name": "איתנים",
+    "districtCode": 1,
+    "districtName": "ירושלים",
+    "regionName": "ירושלים"
+  },
+  {
+    "code": 478,
+    "name": "אכסאל",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עפולה"
+  },
+  {
+    "code": 1359,
+    "name": "אל סייד",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 1339,
+    "name": "אל-עזי",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "אשקלון"
+  },
+  {
+    "code": 1316,
+    "name": "אל-עריאן",
+    "districtCode": 3,
+    "districtName": "חיפה",
+    "regionName": "חדרה"
+  },
+  {
+    "code": 4003,
+    "name": "אל-רום",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "גולן"
+  },
+  {
+    "code": 1145,
+    "name": "אלומה",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "אשקלון"
+  },
+  {
+    "code": 330,
+    "name": "אלומות",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "כנרת"
+  },
+  {
+    "code": 3898,
+    "name": "אלון",
+    "districtCode": 7,
+    "districtName": "יהודה והשומרון",
+    "regionName": "ראמאללה"
+  },
+  {
+    "code": 1182,
+    "name": "אלון הגליל",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עפולה"
+  },
+  {
+    "code": 3579,
+    "name": "אלון מורה",
+    "districtCode": 7,
+    "districtName": "יהודה והשומרון",
+    "regionName": "שכם"
+  },
+  {
+    "code": 3604,
+    "name": "אלון שבות",
+    "districtCode": 7,
+    "districtName": "יהודה והשומרון",
+    "regionName": "בית לחם"
+  },
+  {
+    "code": 429,
+    "name": "אלוני אבא",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עפולה"
+  },
+  {
+    "code": 4017,
+    "name": "אלוני הבשן",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "גולן"
+  },
+  {
+    "code": 868,
+    "name": "אלוני יצחק",
+    "districtCode": 3,
+    "districtName": "חיפה",
+    "regionName": "חדרה"
+  },
+  {
+    "code": 285,
+    "name": "אלונים",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עפולה"
+  },
+  {
+    "code": 4002,
+    "name": "אלי-עד",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "גולן"
+  },
+  {
+    "code": 1365,
+    "name": "אליאב",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "אשקלון"
+  },
+  {
+    "code": 41,
+    "name": "אליכין",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "השרון"
+  },
+  {
+    "code": 1248,
+    "name": "אליפז",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 730,
+    "name": "אליפלט",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "צפת"
+  },
+  {
+    "code": 682,
+    "name": "אליקים",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עפולה"
+  },
+  {
+    "code": 204,
+    "name": "אלישיב",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "השרון"
+  },
+  {
+    "code": 841,
+    "name": "אלישמע",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "פתח תקווה"
+  },
+  {
+    "code": 1125,
+    "name": "אלמגור",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "כנרת"
+  },
+  {
+    "code": 3556,
+    "name": "אלמוג",
+    "districtCode": 7,
+    "districtName": "יהודה והשומרון",
+    "regionName": "ירדן )יריחו("
+  },
+  {
+    "code": 1309,
+    "name": "אלעד",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "פתח תקווה"
+  },
+  {
+    "code": 3618,
+    "name": "אלעזר",
+    "districtCode": 7,
+    "districtName": "יהודה והשומרון",
+    "regionName": "בית לחם"
+  },
+  {
+    "code": 3750,
+    "name": "אלפי מנשה",
+    "districtCode": 7,
+    "districtName": "יהודה והשומרון",
+    "regionName": "טול כרם"
+  },
+  {
+    "code": 603,
+    "name": "אלקוש",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עכו"
+  },
+  {
+    "code": 3560,
+    "name": "אלקנה",
+    "districtCode": 7,
+    "districtName": "יהודה והשומרון",
+    "regionName": "טול כרם"
+  },
+  {
+    "code": 772,
+    "name": "אמונים",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "אשקלון"
+  },
+  {
+    "code": 1064,
+    "name": "אמירים",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "צפת"
+  },
+  {
+    "code": 1253,
+    "name": "אמנון",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "כנרת"
+  },
+  {
+    "code": 23,
+    "name": "אמציה",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "אשקלון"
+  },
+  {
+    "code": 4012,
+    "name": "אניעם",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "גולן"
+  },
+  {
+    "code": 960,
+    "name": "אסד (שבט)",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 3906,
+    "name": "אסיף",
+    "districtCode": 7,
+    "districtName": "יהודה והשומרון",
+    "regionName": "שכם"
+  },
+  {
+    "code": 3754,
+    "name": "אספר",
+    "districtCode": 7,
+    "districtName": "יהודה והשומרון",
+    "regionName": "חברון"
+  },
+  {
+    "code": 529,
+    "name": "אעבלין",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עכו"
+  },
+  {
+    "code": 963,
+    "name": "אעצם (שבט)",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 959,
+    "name": "אפיניש (שבט)",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 4301,
+    "name": "אפיק",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "גולן"
+  },
+  {
+    "code": 176,
+    "name": "אפיקים",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "כנרת"
+  },
+  {
+    "code": 313,
+    "name": "אפק",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עכו"
+  },
+  {
+    "code": 3650,
+    "name": "אפרת",
+    "districtCode": 7,
+    "districtName": "יהודה והשומרון",
+    "regionName": "בית לחם"
+  },
+  {
+    "code": 701,
+    "name": "ארבל",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "כנרת"
+  },
+  {
+    "code": 3598,
+    "name": "ארגמן",
+    "districtCode": 7,
+    "districtName": "יהודה והשומרון",
+    "regionName": "ירדן )יריחו("
+  },
+  {
+    "code": 714,
+    "name": "ארז",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "אשקלון"
+  },
+  {
+    "code": 3570,
+    "name": "אריאל",
+    "districtCode": 7,
+    "districtName": "יהודה והשומרון",
+    "regionName": "טול כרם"
+  },
+  {
+    "code": 1324,
+    "name": "ארסוף",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "השרון"
+  },
+  {
+    "code": 71,
+    "name": "אשבול",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 1276,
+    "name": "אשבל",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עכו"
+  },
+  {
+    "code": 70,
+    "name": "אשדוד",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "אשקלון"
+  },
+  {
+    "code": 199,
+    "name": "אשדות יעקב (איחוד)",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "כנרת"
+  },
+  {
+    "code": 188,
+    "name": "אשדות יעקב (מאוחד)",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "כנרת"
+  },
+  {
+    "code": 1188,
+    "name": "אשחר",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עכו"
+  },
+  {
+    "code": 3722,
+    "name": "אשכולות",
+    "districtCode": 7,
+    "districtName": "יהודה והשומרון",
+    "regionName": "חברון"
+  },
+  {
+    "code": 2021,
+    "name": "אשל הנשיא",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 1152,
+    "name": "אשלים",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 7100,
+    "name": "אשקלון",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "אשקלון"
+  },
+  {
+    "code": 1256,
+    "name": "אשרת",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עכו"
+  },
+  {
+    "code": 740,
+    "name": "אשתאול",
+    "districtCode": 1,
+    "districtName": "ירושלים",
+    "regionName": "ירושלים"
+  },
+  {
+    "code": 1298,
+    "name": "אתגר",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עכו"
+  },
+  {
+    "code": 6000,
+    "name": "באקה אל-גרביה",
+    "districtCode": 3,
+    "districtName": "חיפה",
+    "regionName": "חדרה"
+  },
+  {
+    "code": 21,
+    "name": "באר אורה",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 1376,
+    "name": "באר גנים",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 155,
+    "name": "באר טוביה",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "אשקלון"
+  },
+  {
+    "code": 2530,
+    "name": "באר יעקב",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "רמלה"
+  },
+  {
+    "code": 1278,
+    "name": "באר מילכה",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 9000,
+    "name": "באר שבע",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 450,
+    "name": "בארות יצחק",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "פתח תקווה"
+  },
+  {
+    "code": 697,
+    "name": "בארותיים",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "השרון"
+  },
+  {
+    "code": 399,
+    "name": "בארי",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 559,
+    "name": "בוסתן הגליל",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עכו"
+  },
+  {
+    "code": 482,
+    "name": "בועיינה-נוג'ידאת",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "נצרת"
+  },
+  {
+    "code": 4001,
+    "name": "בוקעאתא",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "גולן"
+  },
+  {
+    "code": 698,
+    "name": "בורגתה",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "השרון"
+  },
+  {
+    "code": 2043,
+    "name": "בחן",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "השרון"
+  },
+  {
+    "code": 762,
+    "name": "בטחה",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 234,
+    "name": "ביצרון",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "אשקלון"
+  },
+  {
+    "code": 998,
+    "name": "ביר אל-מכסור",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עכו"
+  },
+  {
+    "code": 1348,
+    "name": "ביר הדאג'",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 368,
+    "name": "ביריה",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "צפת"
+  },
+  {
+    "code": 317,
+    "name": "בית אורן",
+    "districtCode": 3,
+    "districtName": "חיפה",
+    "regionName": "חדרה"
+  },
+  {
+    "code": 3574,
+    "name": "בית אל",
+    "districtCode": 7,
+    "districtName": "יהודה והשומרון",
+    "regionName": "ראמאללה"
+  },
+  {
+    "code": 562,
+    "name": "בית אלעזרי",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "רחובות"
+  },
+  {
+    "code": 95,
+    "name": "בית אלפא",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עפולה"
+  },
+  {
+    "code": 3652,
+    "name": "בית אריה",
+    "districtCode": 7,
+    "districtName": "יהודה והשומרון",
+    "regionName": "ראמאללה"
+  },
+  {
+    "code": 1076,
+    "name": "בית ברל",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "פתח תקווה"
+  },
+  {
+    "code": 480,
+    "name": "בית ג'ן",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עכו"
+  },
+  {
+    "code": 619,
+    "name": "בית גוברין",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "אשקלון"
+  },
+  {
+    "code": 571,
+    "name": "בית גמליאל",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "רחובות"
+  },
+  {
+    "code": 466,
+    "name": "בית דגן",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "רמלה"
+  },
+  {
+    "code": 723,
+    "name": "בית הגדי",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 373,
+    "name": "בית הלוי",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "השרון"
+  },
+  {
+    "code": 322,
+    "name": "בית הלל",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "צפת"
+  },
+  {
+    "code": 572,
+    "name": "בית העמק",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עכו"
+  },
+  {
+    "code": 3645,
+    "name": "בית הערבה",
+    "districtCode": 7,
+    "districtName": "יהודה והשומרון",
+    "regionName": "ירדן )יריחו("
+  },
+  {
+    "code": 242,
+    "name": "בית השיטה",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עפולה"
+  },
+  {
+    "code": 353,
+    "name": "בית זיד",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עפולה"
+  },
+  {
+    "code": 710,
+    "name": "בית זית",
+    "districtCode": 1,
+    "districtName": "ירושלים",
+    "regionName": "ירושלים"
+  },
+  {
+    "code": 143,
+    "name": "בית זרע",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "כנרת"
+  },
+  {
+    "code": 3864,
+    "name": "בית חוגלה",
+    "districtCode": 7,
+    "districtName": "יהודה והשומרון",
+    "regionName": "ירדן )יריחו("
+  },
+  {
+    "code": 3575,
+    "name": "בית חורון",
+    "districtCode": 7,
+    "districtName": "יהודה והשומרון",
+    "regionName": "ראמאללה"
+  },
+  {
+    "code": 877,
+    "name": "בית חירות",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "השרון"
+  },
+  {
+    "code": 2033,
+    "name": "בית חלקיה",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "רחובות"
+  },
+  {
+    "code": 159,
+    "name": "בית חנן",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "רחובות"
+  },
+  {
+    "code": 800,
+    "name": "בית חנניה",
+    "districtCode": 3,
+    "districtName": "חיפה",
+    "regionName": "חדרה"
+  },
+  {
+    "code": 1050,
+    "name": "בית חשמונאי",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "רמלה"
+  },
+  {
+    "code": 288,
+    "name": "בית יהושע",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "השרון"
+  },
+  {
+    "code": 265,
+    "name": "בית יוסף",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עפולה"
+  },
+  {
+    "code": 200,
+    "name": "בית ינאי",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "השרון"
+  },
+  {
+    "code": 326,
+    "name": "בית יצחק-שער חפר",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "השרון"
+  },
+  {
+    "code": 3745,
+    "name": "בית יתיר",
+    "districtCode": 7,
+    "districtName": "יהודה והשומרון",
+    "regionName": "חברון"
+  },
+  {
+    "code": 430,
+    "name": "בית לחם הגלילית",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עפולה"
+  },
+  {
+    "code": 751,
+    "name": "בית מאיר",
+    "districtCode": 1,
+    "districtName": "ירושלים",
+    "regionName": "ירושלים"
+  },
+  {
+    "code": 784,
+    "name": "בית נחמיה",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "רמלה"
+  },
+  {
+    "code": 16,
+    "name": "בית ניר",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "אשקלון"
+  },
+  {
+    "code": 672,
+    "name": "בית נקופה",
+    "districtCode": 1,
+    "districtName": "ירושלים",
+    "regionName": "ירושלים"
+  },
+  {
+    "code": 202,
+    "name": "בית עובד",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "רחובות"
+  },
+  {
+    "code": 301,
+    "name": "בית עוזיאל",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "רמלה"
+  },
+  {
+    "code": 756,
+    "name": "בית עזרא",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "אשקלון"
+  },
+  {
+    "code": 604,
+    "name": "בית עריף",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "רמלה"
+  },
+  {
+    "code": 212,
+    "name": "בית צבי",
+    "districtCode": 3,
+    "districtName": "חיפה",
+    "regionName": "חדרה"
+  },
+  {
+    "code": 598,
+    "name": "בית קמה",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 365,
+    "name": "בית קשת",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "כנרת"
+  },
+  {
+    "code": 848,
+    "name": "בית רבן",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "רחובות"
+  },
+  {
+    "code": 1162,
+    "name": "בית רימון",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עפולה"
+  },
+  {
+    "code": 9200,
+    "name": "בית שאן",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עפולה"
+  },
+  {
+    "code": 2610,
+    "name": "בית שמש",
+    "districtCode": 1,
+    "districtName": "ירושלים",
+    "regionName": "ירושלים"
+  },
+  {
+    "code": 248,
+    "name": "בית שערים",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עפולה"
+  },
+  {
+    "code": 747,
+    "name": "בית שקמה",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "אשקלון"
+  },
+  {
+    "code": 252,
+    "name": "ביתן אהרן",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "השרון"
+  },
+  {
+    "code": 3780,
+    "name": "ביתר עילית",
+    "districtCode": 7,
+    "districtName": "יהודה והשומרון",
+    "regionName": "בית לחם"
+  },
+  {
+    "code": 94,
+    "name": "בלפוריה",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עפולה"
+  },
+  {
+    "code": 760,
+    "name": "בן זכאי",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "רחובות"
+  },
+  {
+    "code": 712,
+    "name": "בן עמי",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עכו"
+  },
+  {
+    "code": 1084,
+    "name": "בן שמן (כפר נוער)",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "רמלה"
+  },
+  {
+    "code": 2013,
+    "name": "בן שמן (מושב)",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "רמלה"
+  },
+  {
+    "code": 6100,
+    "name": "בני ברק",
+    "districtCode": 5,
+    "districtName": "תל אביב",
+    "regionName": "רמת גן"
+  },
+  {
+    "code": 1368,
+    "name": "בני דקלים",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "אשקלון"
+  },
+  {
+    "code": 592,
+    "name": "בני דרום",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "רחובות"
+  },
+  {
+    "code": 386,
+    "name": "בני דרור",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "השרון"
+  },
+  {
+    "code": 4015,
+    "name": "בני יהודה",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "גולן"
+  },
+  {
+    "code": 1363,
+    "name": "בני נצרים",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 448,
+    "name": "בני עטרות",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "פתח תקווה"
+  },
+  {
+    "code": 1066,
+    "name": "בני עיש",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "רחובות"
+  },
+  {
+    "code": 418,
+    "name": "בני ציון",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "השרון"
+  },
+  {
+    "code": 588,
+    "name": "בני ראם",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "רחובות"
+  },
+  {
+    "code": 685,
+    "name": "בניה",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "רחובות"
+  },
+  {
+    "code": 9800,
+    "name": "בנימינה-גבעת עדה",
+    "districtCode": 3,
+    "districtName": "חיפה",
+    "regionName": "חדרה"
+  },
+  {
+    "code": 1326,
+    "name": "בסמה",
+    "districtCode": 3,
+    "districtName": "חיפה",
+    "regionName": "חדרה"
+  },
+  {
+    "code": 944,
+    "name": "בסמת טבעון",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עפולה"
+  },
+  {
+    "code": 483,
+    "name": "בענה",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עכו"
+  },
+  {
+    "code": 389,
+    "name": "בצרה",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "השרון"
+  },
+  {
+    "code": 589,
+    "name": "בצת",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עכו"
+  },
+  {
+    "code": 864,
+    "name": "בקוע",
+    "districtCode": 1,
+    "districtName": "ירושלים",
+    "regionName": "ירושלים"
+  },
+  {
+    "code": 3612,
+    "name": "בקעות",
+    "districtCode": 7,
+    "districtName": "יהודה והשומרון",
+    "regionName": "ירדן )יריחו("
+  },
+  {
+    "code": 823,
+    "name": "בר גיורא",
+    "districtCode": 1,
+    "districtName": "ירושלים",
+    "regionName": "ירושלים"
+  },
+  {
+    "code": 1191,
+    "name": "בר יוחאי",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "צפת"
+  },
+  {
+    "code": 3499,
+    "name": "בר כוכבא",
+    "districtCode": 7,
+    "districtName": "יהודה והשומרון",
+    "regionName": "בית לחם"
+  },
+  {
+    "code": 3744,
+    "name": "ברוכין",
+    "districtCode": 7,
+    "districtName": "יהודה והשומרון",
+    "regionName": "טול כרם"
+  },
+  {
+    "code": 428,
+    "name": "ברור חיל",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "אשקלון"
+  },
+  {
+    "code": 2060,
+    "name": "ברוש",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 3757,
+    "name": "ברוש הבקעה",
+    "districtCode": 7,
+    "districtName": "יהודה והשומרון",
+    "regionName": "ירדן )יריחו("
+  },
+  {
+    "code": 3710,
+    "name": "ברכה",
+    "districtCode": 7,
+    "districtName": "יהודה והשומרון",
+    "regionName": "שכם"
+  },
+  {
+    "code": 746,
+    "name": "ברכיה",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "אשקלון"
+  },
+  {
+    "code": 667,
+    "name": "ברעם",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "צפת"
+  },
+  {
+    "code": 141,
+    "name": "ברק",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עפולה"
+  },
+  {
+    "code": 617,
+    "name": "ברקאי",
+    "districtCode": 3,
+    "districtName": "חיפה",
+    "regionName": "חדרה"
+  },
+  {
+    "code": 3654,
+    "name": "ברקן",
+    "districtCode": 7,
+    "districtName": "יהודה והשומרון",
+    "regionName": "טול כרם"
+  },
+  {
+    "code": 2038,
+    "name": "ברקת",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "פתח תקווה"
+  },
+  {
+    "code": 1323,
+    "name": "בת הדר",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "אשקלון"
+  },
+  {
+    "code": 1361,
+    "name": "בת חן",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "השרון"
+  },
+  {
+    "code": 1319,
+    "name": "בת חפר",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "השרון"
+  },
+  {
+    "code": 6200,
+    "name": "בת ים",
+    "districtCode": 5,
+    "districtName": "תל אביב",
+    "regionName": "חולון"
+  },
+  {
+    "code": 3794,
+    "name": "בת עין",
+    "districtCode": 7,
+    "districtName": "יהודה והשומרון",
+    "regionName": "בית לחם"
+  },
+  {
+    "code": 33,
+    "name": "בת שלמה",
+    "districtCode": 3,
+    "districtName": "חיפה",
+    "regionName": "חדרה"
+  },
+  {
+    "code": 3897,
+    "name": "בתרון",
+    "districtCode": 7,
+    "districtName": "יהודה והשומרון",
+    "regionName": "ירדן )יריחו("
+  },
+  {
+    "code": 1292,
+    "name": "ג'דיידה-מכר",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עכו"
+  },
+  {
+    "code": 485,
+    "name": "ג'ולס",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עכו"
+  },
+  {
+    "code": 627,
+    "name": "ג'לג'וליה",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "פתח תקווה"
+  },
+  {
+    "code": 976,
+    "name": "ג'נאביב (שבט)",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 541,
+    "name": "ג'סר א-זרקא",
+    "districtCode": 3,
+    "districtName": "חיפה",
+    "regionName": "חדרה"
+  },
+  {
+    "code": 487,
+    "name": "ג'ש (גוש חלב)",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "צפת"
+  },
+  {
+    "code": 628,
+    "name": "ג'ת",
+    "districtCode": 3,
+    "districtName": "חיפה",
+    "regionName": "חדרה"
+  },
+  {
+    "code": 872,
+    "name": "גאולי תימן",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "השרון"
+  },
+  {
+    "code": 379,
+    "name": "גאולים",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "השרון"
+  },
+  {
+    "code": 853,
+    "name": "גאליה",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "רחובות"
+  },
+  {
+    "code": 352,
+    "name": "גבולות",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 424,
+    "name": "גבים",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "אשקלון"
+  },
+  {
+    "code": 86,
+    "name": "גבע",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עפולה"
+  },
+  {
+    "code": 3763,
+    "name": "גבע בנימין",
+    "districtCode": 7,
+    "districtName": "יהודה והשומרון",
+    "regionName": "ראמאללה"
+  },
+  {
+    "code": 683,
+    "name": "גבע כרמל",
+    "districtCode": 3,
+    "districtName": "חיפה",
+    "regionName": "חדרה"
+  },
+  {
+    "code": 2014,
+    "name": "גבעולים",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 3644,
+    "name": "גבעון החדשה",
+    "districtCode": 7,
+    "districtName": "יהודה והשומרון",
+    "regionName": "ראמאללה"
+  },
+  {
+    "code": 3783,
+    "name": "גבעות",
+    "districtCode": 7,
+    "districtName": "יהודה והשומרון",
+    "regionName": "בית לחם"
+  },
+  {
+    "code": 1344,
+    "name": "גבעות בר",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 3862,
+    "name": "גבעות הרואה",
+    "districtCode": 7,
+    "districtName": "יהודה והשומרון",
+    "regionName": "ראמאללה"
+  },
+  {
+    "code": 1362,
+    "name": "גבעות עדן",
+    "districtCode": 1,
+    "districtName": "ירושלים",
+    "regionName": "ירושלים"
+  },
+  {
+    "code": 1293,
+    "name": "גבעת אבני",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "כנרת"
+  },
+  {
+    "code": 1288,
+    "name": "גבעת אלה",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עפולה"
+  },
+  {
+    "code": 147,
+    "name": "גבעת ברנר",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "רחובות"
+  },
+  {
+    "code": 870,
+    "name": "גבעת השלושה",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "פתח תקווה"
+  },
+  {
+    "code": 3730,
+    "name": "גבעת זאב",
+    "districtCode": 7,
+    "districtName": "יהודה והשומרון",
+    "regionName": "ראמאללה"
+  },
+  {
+    "code": 2018,
+    "name": "גבעת חיים (איחוד)",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "השרון"
+  },
+  {
+    "code": 173,
+    "name": "גבעת חיים (מאוחד)",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "השרון"
+  },
+  {
+    "code": 207,
+    "name": "גבעת חן",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "פתח תקווה"
+  },
+  {
+    "code": 4021,
+    "name": "גבעת יואב",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "גולן"
+  },
+  {
+    "code": 787,
+    "name": "גבעת יערים",
+    "districtCode": 1,
+    "districtName": "ירושלים",
+    "regionName": "ירושלים"
+  },
+  {
+    "code": 919,
+    "name": "גבעת ישעיהו",
+    "districtCode": 1,
+    "districtName": "ירושלים",
+    "regionName": "ירושלים"
+  },
+  {
+    "code": 802,
+    "name": "גבעת כח",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "פתח תקווה"
+  },
+  {
+    "code": 360,
+    "name": "גבעת נילי",
+    "districtCode": 3,
+    "districtName": "חיפה",
+    "regionName": "חדרה"
+  },
+  {
+    "code": 703,
+    "name": "גבעת עוז",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עפולה"
+  },
+  {
+    "code": 681,
+    "name": "גבעת שמואל",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "פתח תקווה"
+  },
+  {
+    "code": 566,
+    "name": "גבעת שמש",
+    "districtCode": 1,
+    "districtName": "ירושלים",
+    "regionName": "ירושלים"
+  },
+  {
+    "code": 1077,
+    "name": "גבעת שפירא",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "השרון"
+  },
+  {
+    "code": 793,
+    "name": "גבעתי",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "אשקלון"
+  },
+  {
+    "code": 6300,
+    "name": "גבעתיים",
+    "districtCode": 5,
+    "districtName": "תל אביב",
+    "regionName": "רמת גן"
+  },
+  {
+    "code": 342,
+    "name": "גברעם",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "אשקלון"
+  },
+  {
+    "code": 133,
+    "name": "גבת",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עפולה"
+  },
+  {
+    "code": 35,
+    "name": "גדות",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "צפת"
+  },
+  {
+    "code": 145,
+    "name": "גדיש",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עפולה"
+  },
+  {
+    "code": 442,
+    "name": "גדעונה",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עפולה"
+  },
+  {
+    "code": 2550,
+    "name": "גדרה",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "רחובות"
+  },
+  {
+    "code": 3893,
+    "name": "גודר",
+    "districtCode": 7,
+    "districtName": "יהודה והשומרון",
+    "regionName": "ירדן )יריחו("
+  },
+  {
+    "code": 852,
+    "name": "גונן",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "צפת"
+  },
+  {
+    "code": 755,
+    "name": "גורן",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עכו"
+  },
+  {
+    "code": 1219,
+    "name": "גורנות הגליל",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עכו"
+  },
+  {
+    "code": 457,
+    "name": "גזית",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עפולה"
+  },
+  {
+    "code": 370,
+    "name": "גזר",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "רמלה"
+  },
+  {
+    "code": 706,
+    "name": "גיאה",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "אשקלון"
+  },
+  {
+    "code": 196,
+    "name": "גיבתון",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "רחובות"
+  },
+  {
+    "code": 1043,
+    "name": "גיזו",
+    "districtCode": 1,
+    "districtName": "ירושלים",
+    "regionName": "ירושלים"
+  },
+  {
+    "code": 1204,
+    "name": "גילון",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עכו"
+  },
+  {
+    "code": 736,
+    "name": "גילת",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 262,
+    "name": "גינוסר",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "כנרת"
+  },
+  {
+    "code": 92,
+    "name": "גיניגר",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עפולה"
+  },
+  {
+    "code": 863,
+    "name": "גינתון",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "רמלה"
+  },
+  {
+    "code": 1206,
+    "name": "גיתה",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עכו"
+  },
+  {
+    "code": 3613,
+    "name": "גיתית",
+    "districtCode": 7,
+    "districtName": "יהודה והשומרון",
+    "regionName": "ירדן )יריחו("
+  },
+  {
+    "code": 393,
+    "name": "גלאון",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "אשקלון"
+  },
+  {
+    "code": 3606,
+    "name": "גלגל",
+    "districtCode": 7,
+    "districtName": "יהודה והשומרון",
+    "regionName": "ירדן )יריחו("
+  },
+  {
+    "code": 346,
+    "name": "גליל ים",
+    "districtCode": 5,
+    "districtName": "תל אביב",
+    "regionName": "תל אביב"
+  },
+  {
+    "code": 369,
+    "name": "גלעד (אבן יצחק)",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עפולה"
+  },
+  {
+    "code": 745,
+    "name": "גמזו",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "רמלה"
+  },
+  {
+    "code": 1072,
+    "name": "גן הדרום",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "רחובות"
+  },
+  {
+    "code": 225,
+    "name": "גן השומרון",
+    "districtCode": 3,
+    "districtName": "חיפה",
+    "regionName": "חדרה"
+  },
+  {
+    "code": 239,
+    "name": "גן חיים",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "פתח תקווה"
+  },
+  {
+    "code": 734,
+    "name": "גן יאשיה",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "השרון"
+  },
+  {
+    "code": 166,
+    "name": "גן יבנה",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "רחובות"
+  },
+  {
+    "code": 1274,
+    "name": "גן נר",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עפולה"
+  },
+  {
+    "code": 311,
+    "name": "גן שורק",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "רחובות"
+  },
+  {
+    "code": 144,
+    "name": "גן שלמה",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "רחובות"
+  },
+  {
+    "code": 72,
+    "name": "גן שמואל",
+    "districtCode": 3,
+    "districtName": "חיפה",
+    "regionName": "חדרה"
+  },
+  {
+    "code": 836,
+    "name": "גנות",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "רמלה"
+  },
+  {
+    "code": 549,
+    "name": "גנות הדר",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "השרון"
+  },
+  {
+    "code": 1103,
+    "name": "גני הדר",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "רמלה"
+  },
+  {
+    "code": 1371,
+    "name": "גני טל",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "רחובות"
+  },
+  {
+    "code": 862,
+    "name": "גני יוחנן",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "רחובות"
+  },
+  {
+    "code": 3823,
+    "name": "גני מודיעין",
+    "districtCode": 7,
+    "districtName": "יהודה והשומרון",
+    "regionName": "ראמאללה"
+  },
+  {
+    "code": 218,
+    "name": "גני עם",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "פתח תקווה"
+  },
+  {
+    "code": 229,
+    "name": "גני תקווה",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "פתח תקווה"
+  },
+  {
+    "code": 3758,
+    "name": "גנים",
+    "districtCode": 7,
+    "districtName": "יהודה והשומרון",
+    "regionName": "ג'נין"
+  },
+  {
+    "code": 842,
+    "name": "געש",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "השרון"
+  },
+  {
+    "code": 463,
+    "name": "געתון",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עכו"
+  },
+  {
+    "code": 39,
+    "name": "גפן",
+    "districtCode": 1,
+    "districtName": "ירושלים",
+    "regionName": "ירושלים"
+  },
+  {
+    "code": 1129,
+    "name": "גרופית",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 4022,
+    "name": "גשור",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "גולן"
+  },
+  {
+    "code": 305,
+    "name": "גשר",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "כנרת"
+  },
+  {
+    "code": 574,
+    "name": "גשר הזיו",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עכו"
+  },
+  {
+    "code": 340,
+    "name": "גת (קיבוץ)",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "אשקלון"
+  },
+  {
+    "code": 128,
+    "name": "גת רימון",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "פתח תקווה"
+  },
+  {
+    "code": 494,
+    "name": "דאלית אל-כרמל",
+    "districtCode": 3,
+    "districtName": "חיפה",
+    "regionName": "חיפה"
+  },
+  {
+    "code": 146,
+    "name": "דבורה",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עפולה"
+  },
+  {
+    "code": 489,
+    "name": "דבוריה",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עפולה"
+  },
+  {
+    "code": 849,
+    "name": "דביר",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 407,
+    "name": "דברת",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עפולה"
+  },
+  {
+    "code": 62,
+    "name": "דגניה א'",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "כנרת"
+  },
+  {
+    "code": 79,
+    "name": "דגניה ב'",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "כנרת"
+  },
+  {
+    "code": 1067,
+    "name": "דובב",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "צפת"
+  },
+  {
+    "code": 3747,
+    "name": "דולב",
+    "districtCode": 7,
+    "districtName": "יהודה והשומרון",
+    "regionName": "ראמאללה"
+  },
+  {
+    "code": 738,
+    "name": "דור",
+    "districtCode": 3,
+    "districtName": "חיפה",
+    "regionName": "חדרה"
+  },
+  {
+    "code": 336,
+    "name": "דורות",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "אשקלון"
+  },
+  {
+    "code": 475,
+    "name": "דחי",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עפולה"
+  },
+  {
+    "code": 490,
+    "name": "דייר אל-אסד",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עכו"
+  },
+  {
+    "code": 492,
+    "name": "דייר חנא",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עכו"
+  },
+  {
+    "code": 493,
+    "name": "דייר ראפאת",
+    "districtCode": 1,
+    "districtName": "ירושלים",
+    "regionName": "ירושלים"
+  },
+  {
+    "code": 2200,
+    "name": "דימונה",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 2063,
+    "name": "דישון",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "צפת"
+  },
+  {
+    "code": 300,
+    "name": "דליה",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עפולה"
+  },
+  {
+    "code": 431,
+    "name": "דלתון",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "צפת"
+  },
+  {
+    "code": 1317,
+    "name": "דמיידה",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עכו"
+  },
+  {
+    "code": 303,
+    "name": "דן",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "צפת"
+  },
+  {
+    "code": 302,
+    "name": "דפנה",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "צפת"
+  },
+  {
+    "code": 1241,
+    "name": "דקל",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 1349,
+    "name": "דריג'את",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 702,
+    "name": "האון",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "כנרת"
+  },
+  {
+    "code": 675,
+    "name": "הבונים",
+    "districtCode": 3,
+    "districtName": "חיפה",
+    "regionName": "חדרה"
+  },
+  {
+    "code": 356,
+    "name": "הגושרים",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "צפת"
+  },
+  {
+    "code": 191,
+    "name": "הדר עם",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "השרון"
+  },
+  {
+    "code": 9700,
+    "name": "הוד השרון",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "פתח תקווה"
+  },
+  {
+    "code": 726,
+    "name": "הודיה",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "אשקלון"
+  },
+  {
+    "code": 1322,
+    "name": "הודיות",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "כנרת"
+  },
+  {
+    "code": 1169,
+    "name": "הוואשלה (שבט)",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 956,
+    "name": "הוזייל (שבט)",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 1186,
+    "name": "הושעיה",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עפולה"
+  },
+  {
+    "code": 250,
+    "name": "הזורע",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עפולה"
+  },
+  {
+    "code": 307,
+    "name": "הזורעים",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "כנרת"
+  },
+  {
+    "code": 434,
+    "name": "החותרים",
+    "districtCode": 3,
+    "districtName": "חיפה",
+    "regionName": "חדרה"
+  },
+  {
+    "code": 684,
+    "name": "היוגב",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עפולה"
+  },
+  {
+    "code": 1208,
+    "name": "הילה",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עכו"
+  },
+  {
+    "code": 377,
+    "name": "המעפיל",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "השרון"
+  },
+  {
+    "code": 677,
+    "name": "הסוללים",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עפולה"
+  },
+  {
+    "code": 423,
+    "name": "העוגן",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "השרון"
+  },
+  {
+    "code": 3769,
+    "name": "הר אדר",
+    "districtCode": 7,
+    "districtName": "יהודה והשומרון",
+    "regionName": "ראמאללה"
+  },
+  {
+    "code": 3603,
+    "name": "הר גילה",
+    "districtCode": 7,
+    "districtName": "יהודה והשומרון",
+    "regionName": "בית לחם"
+  },
+  {
+    "code": 1261,
+    "name": "הר עמשא",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 464,
+    "name": "הראל",
+    "districtCode": 1,
+    "districtName": "ירושלים",
+    "regionName": "ירושלים"
+  },
+  {
+    "code": 1249,
+    "name": "הרדוף",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עפולה"
+  },
+  {
+    "code": 6400,
+    "name": "הרצליה",
+    "districtCode": 5,
+    "districtName": "תל אביב",
+    "regionName": "תל אביב"
+  },
+  {
+    "code": 1203,
+    "name": "הררית",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עכו"
+  },
+  {
+    "code": 3639,
+    "name": "ורד יריחו",
+    "districtCode": 7,
+    "districtName": "יהודה והשומרון",
+    "regionName": "ירדן )יריחו("
+  },
+  {
+    "code": 1133,
+    "name": "ורדון",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "אשקלון"
+  },
+  {
+    "code": 2742,
+    "name": "זבארגה (שבט)",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 815,
+    "name": "זבדיאל",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "אשקלון"
+  },
+  {
+    "code": 44,
+    "name": "זוהר",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "אשקלון"
+  },
+  {
+    "code": 584,
+    "name": "זיקים",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "אשקלון"
+  },
+  {
+    "code": 788,
+    "name": "זיתן",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "רמלה"
+  },
+  {
+    "code": 9300,
+    "name": "זכרון יעקב",
+    "districtCode": 3,
+    "districtName": "חיפה",
+    "regionName": "חדרה"
+  },
+  {
+    "code": 799,
+    "name": "זכריה",
+    "districtCode": 1,
+    "districtName": "ירושלים",
+    "regionName": "ירושלים"
+  },
+  {
+    "code": 1290,
+    "name": "זמר",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "השרון"
+  },
+  {
+    "code": 1065,
+    "name": "זמרת",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 816,
+    "name": "זנוח",
+    "districtCode": 1,
+    "districtName": "ירושלים",
+    "regionName": "ירושלים"
+  },
+  {
+    "code": 2064,
+    "name": "זרועה",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 975,
+    "name": "זרזיר",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עפולה"
+  },
+  {
+    "code": 818,
+    "name": "זרחיה",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "אשקלון"
+  },
+  {
+    "code": 1321,
+    "name": "ח'ואלד",
+    "districtCode": 3,
+    "districtName": "חיפה",
+    "regionName": "חיפה"
+  },
+  {
+    "code": 986,
+    "name": "ח'ואלד (שבט)",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "נצרת"
+  },
+  {
+    "code": 235,
+    "name": "חבצלת השרון",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "השרון"
+  },
+  {
+    "code": 1110,
+    "name": "חבר",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עפולה"
+  },
+  {
+    "code": 3400,
+    "name": "חברון",
+    "districtCode": 7,
+    "districtName": "יהודה והשומרון",
+    "regionName": "חברון"
+  },
+  {
+    "code": 717,
+    "name": "חגור",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "פתח תקווה"
+  },
+  {
+    "code": 3764,
+    "name": "חגי",
+    "districtCode": 7,
+    "districtName": "יהודה והשומרון",
+    "regionName": "חברון"
+  },
+  {
+    "code": 205,
+    "name": "חגלה",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "השרון"
+  },
+  {
+    "code": 4026,
+    "name": "חד-נס",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "גולן"
+  },
+  {
+    "code": 618,
+    "name": "חדיד",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "רמלה"
+  },
+  {
+    "code": 6500,
+    "name": "חדרה",
+    "districtCode": 3,
+    "districtName": "חיפה",
+    "regionName": "חדרה"
+  },
+  {
+    "code": 948,
+    "name": "חוג'ייראת (ד'הרה)",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עכו"
+  },
+  {
+    "code": 160,
+    "name": "חולדה",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "רמלה"
+  },
+  {
+    "code": 6600,
+    "name": "חולון",
+    "districtCode": 5,
+    "districtName": "תל אביב",
+    "regionName": "חולון"
+  },
+  {
+    "code": 1239,
+    "name": "חולית",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 253,
+    "name": "חולתה",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "צפת"
+  },
+  {
+    "code": 3642,
+    "name": "חומש",
+    "districtCode": 7,
+    "districtName": "יהודה והשומרון",
+    "regionName": "טול כרם"
+  },
+  {
+    "code": 662,
+    "name": "חוסן",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עכו"
+  },
+  {
+    "code": 1332,
+    "name": "חוסנייה",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עכו"
+  },
+  {
+    "code": 115,
+    "name": "חופית",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "השרון"
+  },
+  {
+    "code": 374,
+    "name": "חוקוק",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "כנרת"
+  },
+  {
+    "code": 1303,
+    "name": "חורה",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 496,
+    "name": "חורפיש",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עכו"
+  },
+  {
+    "code": 355,
+    "name": "חורשים",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "פתח תקווה"
+  },
+  {
+    "code": 1047,
+    "name": "חזון",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "כנרת"
+  },
+  {
+    "code": 219,
+    "name": "חיבת ציון",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "השרון"
+  },
+  {
+    "code": 3643,
+    "name": "חיננית",
+    "districtCode": 7,
+    "districtName": "יהודה והשומרון",
+    "regionName": "ג'נין"
+  },
+  {
+    "code": 4000,
+    "name": "חיפה",
+    "districtCode": 3,
+    "districtName": "חיפה",
+    "regionName": "חיפה"
+  },
+  {
+    "code": 162,
+    "name": "חירות",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "השרון"
+  },
+  {
+    "code": 1272,
+    "name": "חלוץ",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עכו"
+  },
+  {
+    "code": 820,
+    "name": "חלץ",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "אשקלון"
+  },
+  {
+    "code": 993,
+    "name": "חמאם",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "כנרת"
+  },
+  {
+    "code": 801,
+    "name": "חמד",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "רמלה"
+  },
+  {
+    "code": 343,
+    "name": "חמדיה",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עפולה"
+  },
+  {
+    "code": 3646,
+    "name": "חמדת",
+    "districtCode": 7,
+    "districtName": "יהודה והשומרון",
+    "regionName": "ירדן )יריחו("
+  },
+  {
+    "code": 3609,
+    "name": "חמרה",
+    "districtCode": 7,
+    "districtName": "יהודה והשומרון",
+    "regionName": "ירדן )יריחו("
+  },
+  {
+    "code": 807,
+    "name": "חניאל",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "השרון"
+  },
+  {
+    "code": 280,
+    "name": "חניתה",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עכו"
+  },
+  {
+    "code": 1257,
+    "name": "חנתון",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עפולה"
+  },
+  {
+    "code": 4005,
+    "name": "חספין",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "גולן"
+  },
+  {
+    "code": 363,
+    "name": "חפץ חיים",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "רחובות"
+  },
+  {
+    "code": 90,
+    "name": "חפצי-בה",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עפולה"
+  },
+  {
+    "code": 700,
+    "name": "חצב",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "אשקלון"
+  },
+  {
+    "code": 13,
+    "name": "חצבה",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 2034,
+    "name": "חצור הגלילית",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "צפת"
+  },
+  {
+    "code": 406,
+    "name": "חצור-אשדוד",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "אשקלון"
+  },
+  {
+    "code": 397,
+    "name": "חצרים",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 422,
+    "name": "חרב לאת",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "השרון"
+  },
+  {
+    "code": 1024,
+    "name": "חרוצים",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "השרון"
+  },
+  {
+    "code": 1247,
+    "name": "חריש",
+    "districtCode": 3,
+    "districtName": "חיפה",
+    "regionName": "חדרה"
+  },
+  {
+    "code": 3717,
+    "name": "חרמש",
+    "districtCode": 7,
+    "districtName": "יהודה והשומרון",
+    "regionName": "ג'נין"
+  },
+  {
+    "code": 3870,
+    "name": "חרשה",
+    "districtCode": 7,
+    "districtName": "יהודה והשומרון",
+    "regionName": "ראמאללה"
+  },
+  {
+    "code": 1209,
+    "name": "חרשים",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עכו"
+  },
+  {
+    "code": 3770,
+    "name": "חשמונאים",
+    "districtCode": 7,
+    "districtName": "יהודה והשומרון",
+    "regionName": "ראמאללה"
+  },
+  {
+    "code": 6700,
+    "name": "טבריה",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "כנרת"
+  },
+  {
+    "code": 962,
+    "name": "טובא-זנגריה",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "צפת"
+  },
+  {
+    "code": 498,
+    "name": "טורעאן",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "נצרת"
+  },
+  {
+    "code": 2730,
+    "name": "טייבה",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "השרון"
+  },
+  {
+    "code": 497,
+    "name": "טייבה (בעמק)",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עפולה"
+  },
+  {
+    "code": 2720,
+    "name": "טירה",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "השרון"
+  },
+  {
+    "code": 663,
+    "name": "טירת יהודה",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "פתח תקווה"
+  },
+  {
+    "code": 2100,
+    "name": "טירת כרמל",
+    "districtCode": 3,
+    "districtName": "חיפה",
+    "regionName": "חיפה"
+  },
+  {
+    "code": 268,
+    "name": "טירת צבי",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עפולה"
+  },
+  {
+    "code": 3873,
+    "name": "טל מנשה",
+    "districtCode": 7,
+    "districtName": "יהודה והשומרון",
+    "regionName": "ג'נין"
+  },
+  {
+    "code": 462,
+    "name": "טל שחר",
+    "districtCode": 1,
+    "districtName": "ירושלים",
+    "regionName": "ירושלים"
+  },
+  {
+    "code": 1181,
+    "name": "טל-אל",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עכו"
+  },
+  {
+    "code": 1177,
+    "name": "טללים",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 3788,
+    "name": "טלמון",
+    "districtCode": 7,
+    "districtName": "יהודה והשומרון",
+    "regionName": "ראמאללה"
+  },
+  {
+    "code": 8900,
+    "name": "טמרה",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עכו"
+  },
+  {
+    "code": 547,
+    "name": "טמרה (יזרעאל)",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עפולה"
+  },
+  {
+    "code": 3743,
+    "name": "טנא",
+    "districtCode": 7,
+    "districtName": "יהודה והשומרון",
+    "regionName": "חברון"
+  },
+  {
+    "code": 1214,
+    "name": "טפחות",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "כנרת"
+  },
+  {
+    "code": 1295,
+    "name": "יאנוח-ג'ת",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עכו"
+  },
+  {
+    "code": 1232,
+    "name": "יבול",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 46,
+    "name": "יבנאל",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "כנרת"
+  },
+  {
+    "code": 2660,
+    "name": "יבנה",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "רחובות"
+  },
+  {
+    "code": 96,
+    "name": "יגור",
+    "districtCode": 3,
+    "districtName": "חיפה",
+    "regionName": "חיפה"
+  },
+  {
+    "code": 798,
+    "name": "יגל",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "רמלה"
+  },
+  {
+    "code": 577,
+    "name": "יד בנימין",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "רחובות"
+  },
+  {
+    "code": 1134,
+    "name": "יד השמונה",
+    "districtCode": 1,
+    "districtName": "ירושלים",
+    "regionName": "ירושלים"
+  },
+  {
+    "code": 758,
+    "name": "יד חנה",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "השרון"
+  },
+  {
+    "code": 358,
+    "name": "יד מרדכי",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "אשקלון"
+  },
+  {
+    "code": 775,
+    "name": "יד נתן",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "אשקלון"
+  },
+  {
+    "code": 64,
+    "name": "יד רמבם",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "רמלה"
+  },
+  {
+    "code": 1144,
+    "name": "ידידה",
+    "districtCode": 1,
+    "districtName": "ירושלים",
+    "regionName": "ירושלים"
+  },
+  {
+    "code": 9400,
+    "name": "יהוד-מונוסון",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "פתח תקווה"
+  },
+  {
+    "code": 1158,
+    "name": "יהל",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 2009,
+    "name": "יובל",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "צפת"
+  },
+  {
+    "code": 1226,
+    "name": "יובלים",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עכו"
+  },
+  {
+    "code": 1112,
+    "name": "יודפת",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עכו"
+  },
+  {
+    "code": 3896,
+    "name": "יונדב",
+    "districtCode": 7,
+    "districtName": "יהודה והשומרון",
+    "regionName": "חברון"
+  },
+  {
+    "code": 4007,
+    "name": "יונתן",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "גולן"
+  },
+  {
+    "code": 803,
+    "name": "יושיביה",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 452,
+    "name": "יזרעאל",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עפולה"
+  },
+  {
+    "code": 409,
+    "name": "יחיעם",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עכו"
+  },
+  {
+    "code": 866,
+    "name": "יטבתה",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 3607,
+    "name": "ייטב",
+    "districtCode": 7,
+    "districtName": "יהודה והשומרון",
+    "regionName": "ירדן )יריחו("
+  },
+  {
+    "code": 811,
+    "name": "יכיני",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "אשקלון"
+  },
+  {
+    "code": 753,
+    "name": "ינוב",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "השרון"
+  },
+  {
+    "code": 2011,
+    "name": "ינון",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "אשקלון"
+  },
+  {
+    "code": 29,
+    "name": "יסוד המעלה",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "צפת"
+  },
+  {
+    "code": 440,
+    "name": "יסודות",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "רחובות"
+  },
+  {
+    "code": 575,
+    "name": "יסעור",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עכו"
+  },
+  {
+    "code": 1138,
+    "name": "יעד",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עכו"
+  },
+  {
+    "code": 1117,
+    "name": "יעל",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עפולה"
+  },
+  {
+    "code": 1044,
+    "name": "יעף",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "השרון"
+  },
+  {
+    "code": 795,
+    "name": "יערה",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עכו"
+  },
+  {
+    "code": 499,
+    "name": "יפיע",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "נצרת"
+  },
+  {
+    "code": 3566,
+    "name": "יפית",
+    "districtCode": 7,
+    "districtName": "יהודה והשומרון",
+    "regionName": "ירדן )יריחו("
+  },
+  {
+    "code": 134,
+    "name": "יפעת",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עפולה"
+  },
+  {
+    "code": 453,
+    "name": "יפתח",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "צפת"
+  },
+  {
+    "code": 3749,
+    "name": "יצהר",
+    "districtCode": 7,
+    "districtName": "יהודה והשומרון",
+    "regionName": "שכם"
+  },
+  {
+    "code": 759,
+    "name": "יציץ",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "רמלה"
+  },
+  {
+    "code": 417,
+    "name": "יקום",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "השרון"
+  },
+  {
+    "code": 3647,
+    "name": "יקיר",
+    "districtCode": 7,
+    "districtName": "יהודה והשומרון",
+    "regionName": "טול כרם"
+  },
+  {
+    "code": 241,
+    "name": "יקנעם (מושבה)",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עפולה"
+  },
+  {
+    "code": 240,
+    "name": "יקנעם עילית",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עפולה"
+  },
+  {
+    "code": 623,
+    "name": "יראון",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "צפת"
+  },
+  {
+    "code": 2026,
+    "name": "ירדנה",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עפולה"
+  },
+  {
+    "code": 831,
+    "name": "ירוחם",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 3000,
+    "name": "ירושלים",
+    "districtCode": 1,
+    "districtName": "ירושלים",
+    "regionName": "ירושלים"
+  },
+  {
+    "code": 718,
+    "name": "ירחיב",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "פתח תקווה"
+  },
+  {
+    "code": 502,
+    "name": "ירכא",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עכו"
+  },
+  {
+    "code": 183,
+    "name": "ירקונה",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "פתח תקווה"
+  },
+  {
+    "code": 916,
+    "name": "ישע",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 805,
+    "name": "ישעי",
+    "districtCode": 1,
+    "districtName": "ירושלים",
+    "regionName": "ירושלים"
+  },
+  {
+    "code": 828,
+    "name": "ישרש",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "רמלה"
+  },
+  {
+    "code": 1227,
+    "name": "יתד",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 504,
+    "name": "כאבול",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עכו"
+  },
+  {
+    "code": 505,
+    "name": "כאוכב אבו אל-היג'א",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עכו"
+  },
+  {
+    "code": 576,
+    "name": "כברי",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עכו"
+  },
+  {
+    "code": 371,
+    "name": "כדורי",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "כנרת"
+  },
+  {
+    "code": 3729,
+    "name": "כדים",
+    "districtCode": 7,
+    "districtName": "יהודה והשומרון",
+    "regionName": "ג'נין"
+  },
+  {
+    "code": 1338,
+    "name": "כדיתה",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "צפת"
+  },
+  {
+    "code": 3564,
+    "name": "כוכב השחר",
+    "districtCode": 7,
+    "districtName": "יהודה והשומרון",
+    "regionName": "ראמאללה"
+  },
+  {
+    "code": 1224,
+    "name": "כוכב יאיר-צור יגאל",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "פתח תקווה"
+  },
+  {
+    "code": 3779,
+    "name": "כוכב יעקב",
+    "districtCode": 7,
+    "districtName": "יהודה והשומרון",
+    "regionName": "ראמאללה"
+  },
+  {
+    "code": 824,
+    "name": "כוכב מיכאל",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "אשקלון"
+  },
+  {
+    "code": 1252,
+    "name": "כורזים",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "צפת"
+  },
+  {
+    "code": 1210,
+    "name": "כחל",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "צפת"
+  },
+  {
+    "code": 1367,
+    "name": "כחלה",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 840,
+    "name": "כיסופים",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 1153,
+    "name": "כישור",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עכו"
+  },
+  {
+    "code": 1183,
+    "name": "כליל",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עכו"
+  },
+  {
+    "code": 1229,
+    "name": "כלנית",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "כנרת"
+  },
+  {
+    "code": 1331,
+    "name": "כמאנה",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עכו"
+  },
+  {
+    "code": 1291,
+    "name": "כמהין",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 1201,
+    "name": "כמון",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עכו"
+  },
+  {
+    "code": 2006,
+    "name": "כנות",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "אשקלון"
+  },
+  {
+    "code": 4028,
+    "name": "כנף",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "גולן"
+  },
+  {
+    "code": 3902,
+    "name": "כנפי שחר",
+    "districtCode": 7,
+    "districtName": "יהודה והשומרון",
+    "regionName": "ראמאללה"
+  },
+  {
+    "code": 63,
+    "name": "כנרת (מושבה)",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "כנרת"
+  },
+  {
+    "code": 57,
+    "name": "כנרת (קבוצה)",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "כנרת"
+  },
+  {
+    "code": 1059,
+    "name": "כסיפה",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 859,
+    "name": "כסלון",
+    "districtCode": 1,
+    "districtName": "ירושלים",
+    "regionName": "ירושלים"
+  },
+  {
+    "code": 1296,
+    "name": "כסרא-סמיע",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עכו"
+  },
+  {
+    "code": 978,
+    "name": "כעביה-טבאש-חג'אג'רה",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "נצרת"
+  },
+  {
+    "code": 857,
+    "name": "כפר אביב",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "רחובות"
+  },
+  {
+    "code": 3638,
+    "name": "כפר אדומים",
+    "districtCode": 7,
+    "districtName": "יהודה והשומרון",
+    "regionName": "ראמאללה"
+  },
+  {
+    "code": 364,
+    "name": "כפר אוריה",
+    "districtCode": 1,
+    "districtName": "ירושלים",
+    "regionName": "ירושלים"
+  },
+  {
+    "code": 690,
+    "name": "כפר אחים",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "אשקלון"
+  },
+  {
+    "code": 220,
+    "name": "כפר ביאליק",
+    "districtCode": 3,
+    "districtName": "חיפה",
+    "regionName": "חיפה"
+  },
+  {
+    "code": 177,
+    "name": "כפר בילו",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "רחובות"
+  },
+  {
+    "code": 357,
+    "name": "כפר בלום",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "צפת"
+  },
+  {
+    "code": 2010,
+    "name": "כפר בן נון",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "רמלה"
+  },
+  {
+    "code": 633,
+    "name": "כפר ברא",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "פתח תקווה"
+  },
+  {
+    "code": 132,
+    "name": "כפר ברוך",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עפולה"
+  },
+  {
+    "code": 106,
+    "name": "כפר גדעון",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עפולה"
+  },
+  {
+    "code": 427,
+    "name": "כפר גלים",
+    "districtCode": 3,
+    "districtName": "חיפה",
+    "regionName": "חיפה"
+  },
+  {
+    "code": 310,
+    "name": "כפר גליקסון",
+    "districtCode": 3,
+    "districtName": "חיפה",
+    "regionName": "חדרה"
+  },
+  {
+    "code": 76,
+    "name": "כפר גלעדי",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "צפת"
+  },
+  {
+    "code": 707,
+    "name": "כפר דניאל",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "רמלה"
+  },
+  {
+    "code": 3796,
+    "name": "כפר האורנים",
+    "districtCode": 7,
+    "districtName": "יהודה והשומרון",
+    "regionName": "ראמאללה"
+  },
+  {
+    "code": 192,
+    "name": "כפר החורש",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עפולה"
+  },
+  {
+    "code": 254,
+    "name": "כפר המכבי",
+    "districtCode": 3,
+    "districtName": "חיפה",
+    "regionName": "חיפה"
+  },
+  {
+    "code": 582,
+    "name": "כפר הנגיד",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "רחובות"
+  },
+  {
+    "code": 890,
+    "name": "כפר הנוער הדתי",
+    "districtCode": 3,
+    "districtName": "חיפה",
+    "regionName": "חיפה"
+  },
+  {
+    "code": 443,
+    "name": "כפר הנשיא",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "צפת"
+  },
+  {
+    "code": 187,
+    "name": "כפר הס",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "השרון"
+  },
+  {
+    "code": 217,
+    "name": "כפר הראה",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "השרון"
+  },
+  {
+    "code": 888,
+    "name": "כפר הריף",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "אשקלון"
+  },
+  {
+    "code": 190,
+    "name": "כפר ויתקין",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "השרון"
+  },
+  {
+    "code": 320,
+    "name": "כפר ורבורג",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "אשקלון"
+  },
+  {
+    "code": 1263,
+    "name": "כפר ורדים",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עכו"
+  },
+  {
+    "code": 1325,
+    "name": "כפר זוהרים",
+    "districtCode": 1,
+    "districtName": "ירושלים",
+    "regionName": "ירושלים"
+  },
+  {
+    "code": 786,
+    "name": "כפר זיתים",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "כנרת"
+  },
+  {
+    "code": 696,
+    "name": "כפר חבד",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "רמלה"
+  },
+  {
+    "code": 609,
+    "name": "כפר חושן",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "צפת"
+  },
+  {
+    "code": 255,
+    "name": "כפר חיטים",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "כנרת"
+  },
+  {
+    "code": 193,
+    "name": "כפר חיים",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "השרון"
+  },
+  {
+    "code": 1297,
+    "name": "כפר חנניה",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "צפת"
+  },
+  {
+    "code": 112,
+    "name": "כפר חסידים א'",
+    "districtCode": 3,
+    "districtName": "חיפה",
+    "regionName": "חיפה"
+  },
+  {
+    "code": 889,
+    "name": "כפר חסידים ב'",
+    "districtCode": 3,
+    "districtName": "חיפה",
+    "regionName": "חיפה"
+  },
+  {
+    "code": 4004,
+    "name": "כפר חרוב",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "גולן"
+  },
+  {
+    "code": 673,
+    "name": "כפר טרומן",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "רמלה"
+  },
+  {
+    "code": 507,
+    "name": "כפר יאסיף",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עכו"
+  },
+  {
+    "code": 233,
+    "name": "כפר ידידיה",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "השרון"
+  },
+  {
+    "code": 140,
+    "name": "כפר יהושע",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עפולה"
+  },
+  {
+    "code": 168,
+    "name": "כפר יונה",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "השרון"
+  },
+  {
+    "code": 85,
+    "name": "כפר יחזקאל",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עפולה"
+  },
+  {
+    "code": 170,
+    "name": "כפר יעבץ",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "השרון"
+  },
+  {
+    "code": 508,
+    "name": "כפר כמא",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "כנרת"
+  },
+  {
+    "code": 509,
+    "name": "כפר כנא",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "נצרת"
+  },
+  {
+    "code": 387,
+    "name": "כפר מונש",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "השרון"
+  },
+  {
+    "code": 1095,
+    "name": "כפר מימון",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 98,
+    "name": "כפר מלל",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "פתח תקווה"
+  },
+  {
+    "code": 510,
+    "name": "כפר מנדא",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עכו"
+  },
+  {
+    "code": 274,
+    "name": "כפר מנחם",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "אשקלון"
+  },
+  {
+    "code": 297,
+    "name": "כפר מסריק",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עכו"
+  },
+  {
+    "code": 512,
+    "name": "כפר מצר",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "נצרת"
+  },
+  {
+    "code": 764,
+    "name": "כפר מרדכי",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "רחובות"
+  },
+  {
+    "code": 316,
+    "name": "כפר נטר",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "השרון"
+  },
+  {
+    "code": 345,
+    "name": "כפר סאלד",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "צפת"
+  },
+  {
+    "code": 6900,
+    "name": "כפר סבא",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "פתח תקווה"
+  },
+  {
+    "code": 107,
+    "name": "כפר סילבר",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "אשקלון"
+  },
+  {
+    "code": 249,
+    "name": "כפר סירקין",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "פתח תקווה"
+  },
+  {
+    "code": 875,
+    "name": "כפר עבודה",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "השרון"
+  },
+  {
+    "code": 845,
+    "name": "כפר עזה",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "אשקלון"
+  },
+  {
+    "code": 3488,
+    "name": "כפר עציון",
+    "districtCode": 7,
+    "districtName": "יהודה והשומרון",
+    "regionName": "בית לחם"
+  },
+  {
+    "code": 189,
+    "name": "כפר פינס",
+    "districtCode": 3,
+    "districtName": "חיפה",
+    "regionName": "חדרה"
+  },
+  {
+    "code": 634,
+    "name": "כפר קאסם",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "פתח תקווה"
+  },
+  {
+    "code": 388,
+    "name": "כפר קיש",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "כנרת"
+  },
+  {
+    "code": 654,
+    "name": "כפר קרע",
+    "districtCode": 3,
+    "districtName": "חיפה",
+    "regionName": "חדרה"
+  },
+  {
+    "code": 579,
+    "name": "כפר ראש הנקרה",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עכו"
+  },
+  {
+    "code": 1130,
+    "name": "כפר רוזנואלד (זרעית)",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עכו"
+  },
+  {
+    "code": 295,
+    "name": "כפר רופין",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עפולה"
+  },
+  {
+    "code": 1166,
+    "name": "כפר רות",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "רמלה"
+  },
+  {
+    "code": 605,
+    "name": "כפר שמאי",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "צפת"
+  },
+  {
+    "code": 743,
+    "name": "כפר שמואל",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "רמלה"
+  },
+  {
+    "code": 267,
+    "name": "כפר שמריהו",
+    "districtCode": 5,
+    "districtName": "תל אביב",
+    "regionName": "תל אביב"
+  },
+  {
+    "code": 47,
+    "name": "כפר תבור",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "כנרת"
+  },
+  {
+    "code": 3572,
+    "name": "כפר תפוח",
+    "districtCode": 7,
+    "districtName": "יהודה והשומרון",
+    "regionName": "טול כרם"
+  },
+  {
+    "code": 1285,
+    "name": "כרכום",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "כנרת"
+  },
+  {
+    "code": 1094,
+    "name": "כרם ביבנה (ישיבה)",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "רחובות"
+  },
+  {
+    "code": 664,
+    "name": "כרם בן זמרה",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "צפת"
+  },
+  {
+    "code": 88,
+    "name": "כרם בן שמן",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "רמלה"
+  },
+  {
+    "code": 580,
+    "name": "כרם מהרל",
+    "districtCode": 3,
+    "districtName": "חיפה",
+    "regionName": "חדרה"
+  },
+  {
+    "code": 3889,
+    "name": "כרם רעים",
+    "districtCode": 7,
+    "districtName": "יהודה והשומרון",
+    "regionName": "ראמאללה"
+  },
+  {
+    "code": 1085,
+    "name": "כרם שלום",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 1264,
+    "name": "כרמי יוסף",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "רמלה"
+  },
+  {
+    "code": 3766,
+    "name": "כרמי צור",
+    "districtCode": 7,
+    "districtName": "יהודה והשומרון",
+    "regionName": "חברון"
+  },
+  {
+    "code": 1374,
+    "name": "כרמי קטיף",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "אשקלון"
+  },
+  {
+    "code": 1139,
+    "name": "כרמיאל",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עכו"
+  },
+  {
+    "code": 768,
+    "name": "כרמיה",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "אשקלון"
+  },
+  {
+    "code": 1198,
+    "name": "כרמים",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 3656,
+    "name": "כרמל",
+    "districtCode": 7,
+    "districtName": "יהודה והשומרון",
+    "regionName": "חברון"
+  },
+  {
+    "code": 1207,
+    "name": "לבון",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עכו"
+  },
+  {
+    "code": 585,
+    "name": "לביא",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "כנרת"
+  },
+  {
+    "code": 1230,
+    "name": "לבנים",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "כנרת"
+  },
+  {
+    "code": 2023,
+    "name": "להב",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 380,
+    "name": "להבות הבשן",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "צפת"
+  },
+  {
+    "code": 715,
+    "name": "להבות חביבה",
+    "districtCode": 3,
+    "districtName": "חיפה",
+    "regionName": "חדרה"
+  },
+  {
+    "code": 1271,
+    "name": "להבים",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 7000,
+    "name": "לוד",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "רמלה"
+  },
+  {
+    "code": 52,
+    "name": "לוזית",
+    "districtCode": 1,
+    "districtName": "ירושלים",
+    "regionName": "ירושלים"
+  },
+  {
+    "code": 595,
+    "name": "לוחמי הגיטאות",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עכו"
+  },
+  {
+    "code": 1171,
+    "name": "לוטם",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עכו"
+  },
+  {
+    "code": 1255,
+    "name": "לוטן",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 3901,
+    "name": "לחי",
+    "districtCode": 7,
+    "districtName": "יהודה והשומרון",
+    "regionName": "טול כרם"
+  },
+  {
+    "code": 674,
+    "name": "לימן",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עכו"
+  },
+  {
+    "code": 24,
+    "name": "לכיש",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "אשקלון"
+  },
+  {
+    "code": 1310,
+    "name": "לפיד",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "רמלה"
+  },
+  {
+    "code": 1173,
+    "name": "לפידות",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עכו"
+  },
+  {
+    "code": 1060,
+    "name": "לקיה",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 3892,
+    "name": "לשם",
+    "districtCode": 7,
+    "districtName": "יהודה והשומרון",
+    "regionName": "טול כרם"
+  },
+  {
+    "code": 2055,
+    "name": "מאור",
+    "districtCode": 3,
+    "districtName": "חיפה",
+    "regionName": "חדרה"
+  },
+  {
+    "code": 102,
+    "name": "מאיר שפיה",
+    "districtCode": 3,
+    "districtName": "חיפה",
+    "regionName": "חדרה"
+  },
+  {
+    "code": 771,
+    "name": "מבוא ביתר",
+    "districtCode": 1,
+    "districtName": "ירושלים",
+    "regionName": "ירושלים"
+  },
+  {
+    "code": 3569,
+    "name": "מבוא דותן",
+    "districtCode": 7,
+    "districtName": "יהודה והשומרון",
+    "regionName": "ג'נין"
+  },
+  {
+    "code": 3709,
+    "name": "מבוא חורון",
+    "districtCode": 7,
+    "districtName": "יהודה והשומרון",
+    "regionName": "ראמאללה"
+  },
+  {
+    "code": 4204,
+    "name": "מבוא חמה",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "גולן"
+  },
+  {
+    "code": 1141,
+    "name": "מבוא מודיעים",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "רמלה"
+  },
+  {
+    "code": 1318,
+    "name": "מבואות ים",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "השרון"
+  },
+  {
+    "code": 3825,
+    "name": "מבואות יריחו",
+    "districtCode": 7,
+    "districtName": "יהודה והשומרון",
+    "regionName": "ירדן )יריחו("
+  },
+  {
+    "code": 1080,
+    "name": "מבועים",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 829,
+    "name": "מבטחים",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 573,
+    "name": "מבקיעים",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "אשקלון"
+  },
+  {
+    "code": 1015,
+    "name": "מבשרת ציון",
+    "districtCode": 1,
+    "districtName": "ירושלים",
+    "regionName": "ירושלים"
+  },
+  {
+    "code": 516,
+    "name": "מג'ד אל-כרום",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עכו"
+  },
+  {
+    "code": 4201,
+    "name": "מג'דל שמס",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "גולן"
+  },
+  {
+    "code": 481,
+    "name": "מגאר",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "כנרת"
+  },
+  {
+    "code": 689,
+    "name": "מגדים",
+    "districtCode": 3,
+    "districtName": "חיפה",
+    "regionName": "חדרה"
+  },
+  {
+    "code": 65,
+    "name": "מגדל",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "כנרת"
+  },
+  {
+    "code": 874,
+    "name": "מגדל העמק",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עפולה"
+  },
+  {
+    "code": 3561,
+    "name": "מגדל עוז",
+    "districtCode": 7,
+    "districtName": "יהודה והשומרון",
+    "regionName": "בית לחם"
+  },
+  {
+    "code": 3751,
+    "name": "מגדלים",
+    "districtCode": 7,
+    "districtName": "יהודה והשומרון",
+    "regionName": "שכם"
+  },
+  {
+    "code": 586,
+    "name": "מגידו",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עפולה"
+  },
+  {
+    "code": 375,
+    "name": "מגל",
+    "districtCode": 3,
+    "districtName": "חיפה",
+    "regionName": "חדרה"
+  },
+  {
+    "code": 695,
+    "name": "מגן",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 1155,
+    "name": "מגן שאול",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עפולה"
+  },
+  {
+    "code": 3871,
+    "name": "מגרון",
+    "districtCode": 7,
+    "districtName": "יהודה והשומרון",
+    "regionName": "ראמאללה"
+  },
+  {
+    "code": 722,
+    "name": "מגשימים",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "פתח תקווה"
+  },
+  {
+    "code": 2029,
+    "name": "מדרך עוז",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עפולה"
+  },
+  {
+    "code": 1140,
+    "name": "מדרשת בן גוריון",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 897,
+    "name": "מדרשת רופין",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "השרון"
+  },
+  {
+    "code": 3797,
+    "name": "מודיעין עילית",
+    "districtCode": 7,
+    "districtName": "יהודה והשומרון",
+    "regionName": "ראמאללה"
+  },
+  {
+    "code": 1200,
+    "name": "מודיעין-מכבים-רעות",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "רמלה"
+  },
+  {
+    "code": 269,
+    "name": "מולדת",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עפולה"
+  },
+  {
+    "code": 208,
+    "name": "מוצא עילית",
+    "districtCode": 1,
+    "districtName": "ירושלים",
+    "regionName": "ירושלים"
+  },
+  {
+    "code": 635,
+    "name": "מוקייבלה",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עפולה"
+  },
+  {
+    "code": 1163,
+    "name": "מורן",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עכו"
+  },
+  {
+    "code": 1178,
+    "name": "מורשת",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עכו"
+  },
+  {
+    "code": 606,
+    "name": "מזור",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "פתח תקווה"
+  },
+  {
+    "code": 28,
+    "name": "מזכרת בתיה",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "רחובות"
+  },
+  {
+    "code": 104,
+    "name": "מזרע",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עפולה"
+  },
+  {
+    "code": 517,
+    "name": "מזרעה",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עכו"
+  },
+  {
+    "code": 3599,
+    "name": "מחולה",
+    "districtCode": 7,
+    "districtName": "יהודה והשומרון",
+    "regionName": "ירדן )יריחו("
+  },
+  {
+    "code": 1411,
+    "name": "מחנה הילה",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "רחובות"
+  },
+  {
+    "code": 1418,
+    "name": "מחנה טלי",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 1413,
+    "name": "מחנה יהודית",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עפולה"
+  },
+  {
+    "code": 1416,
+    "name": "מחנה יוכבד",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 1415,
+    "name": "מחנה יפה",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 1196,
+    "name": "מחנה יתיר",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 1414,
+    "name": "מחנה מרים",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "אשקלון"
+  },
+  {
+    "code": 1412,
+    "name": "מחנה תל נוף",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "רחובות"
+  },
+  {
+    "code": 308,
+    "name": "מחניים",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "צפת"
+  },
+  {
+    "code": 776,
+    "name": "מחסיה",
+    "districtCode": 1,
+    "districtName": "ירושלים",
+    "regionName": "ירושלים"
+  },
+  {
+    "code": 43,
+    "name": "מטולה",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "צפת"
+  },
+  {
+    "code": 822,
+    "name": "מטע",
+    "districtCode": 1,
+    "districtName": "ירושלים",
+    "regionName": "ירושלים"
+  },
+  {
+    "code": 1128,
+    "name": "מי עמי",
+    "districtCode": 3,
+    "districtName": "חיפה",
+    "regionName": "חדרה"
+  },
+  {
+    "code": 2054,
+    "name": "מיטב",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עפולה"
+  },
+  {
+    "code": 1154,
+    "name": "מיטל",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עפולה"
+  },
+  {
+    "code": 649,
+    "name": "מייסר",
+    "districtCode": 3,
+    "districtName": "חיפה",
+    "regionName": "חדרה"
+  },
+  {
+    "code": 4019,
+    "name": "מיצר",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "גולן"
+  },
+  {
+    "code": 1282,
+    "name": "מירב",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עפולה"
+  },
+  {
+    "code": 607,
+    "name": "מירון",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "צפת"
+  },
+  {
+    "code": 731,
+    "name": "מישר",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "רחובות"
+  },
+  {
+    "code": 1268,
+    "name": "מיתר",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 3614,
+    "name": "מכורה",
+    "districtCode": 7,
+    "districtName": "יהודה והשומרון",
+    "regionName": "ירדן )יריחו("
+  },
+  {
+    "code": 1343,
+    "name": "מכחול",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 382,
+    "name": "מכמורת",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "השרון"
+  },
+  {
+    "code": 1202,
+    "name": "מכמנים",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עכו"
+  },
+  {
+    "code": 164,
+    "name": "מלאה",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עפולה"
+  },
+  {
+    "code": 3863,
+    "name": "מלאכי השלום",
+    "districtCode": 7,
+    "districtName": "יהודה והשומרון",
+    "regionName": "ראמאללה"
+  },
+  {
+    "code": 2044,
+    "name": "מלילות",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 596,
+    "name": "מלכיה",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "צפת"
+  },
+  {
+    "code": 2030,
+    "name": "מנוחה",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "אשקלון"
+  },
+  {
+    "code": 1174,
+    "name": "מנוף",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עכו"
+  },
+  {
+    "code": 1205,
+    "name": "מנות",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עכו"
+  },
+  {
+    "code": 48,
+    "name": "מנחמיה",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "כנרת"
+  },
+  {
+    "code": 347,
+    "name": "מנרה",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "צפת"
+  },
+  {
+    "code": 994,
+    "name": "מנשית זבדה",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "נצרת"
+  },
+  {
+    "code": 1258,
+    "name": "מסד",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "כנרת"
+  },
+  {
+    "code": 263,
+    "name": "מסדה",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "כנרת"
+  },
+  {
+    "code": 298,
+    "name": "מסילות",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עפולה"
+  },
+  {
+    "code": 742,
+    "name": "מסילת ציון",
+    "districtCode": 1,
+    "districtName": "ירושלים",
+    "regionName": "ירושלים"
+  },
+  {
+    "code": 748,
+    "name": "מסלול",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 4203,
+    "name": "מסעדה",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "גולן"
+  },
+  {
+    "code": 939,
+    "name": "מסעודין אל-עזאזמה",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 197,
+    "name": "מעברות",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "השרון"
+  },
+  {
+    "code": 1082,
+    "name": "מעגלים",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 678,
+    "name": "מעגן",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "כנרת"
+  },
+  {
+    "code": 694,
+    "name": "מעגן מיכאל",
+    "districtCode": 3,
+    "districtName": "חיפה",
+    "regionName": "חדרה"
+  },
+  {
+    "code": 3879,
+    "name": "מעוז",
+    "districtCode": 7,
+    "districtName": "יהודה והשומרון",
+    "regionName": "ג'נין"
+  },
+  {
+    "code": 272,
+    "name": "מעוז חיים",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עפולה"
+  },
+  {
+    "code": 3657,
+    "name": "מעון",
+    "districtCode": 7,
+    "districtName": "יהודה והשומרון",
+    "regionName": "חברון"
+  },
+  {
+    "code": 570,
+    "name": "מעונה",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עכו"
+  },
+  {
+    "code": 518,
+    "name": "מעיליא",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עכו"
+  },
+  {
+    "code": 416,
+    "name": "מעין ברוך",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "צפת"
+  },
+  {
+    "code": 290,
+    "name": "מעין צבי",
+    "districtCode": 3,
+    "districtName": "חיפה",
+    "regionName": "חדרה"
+  },
+  {
+    "code": 3616,
+    "name": "מעלה אדומים",
+    "districtCode": 7,
+    "districtName": "יהודה והשומרון",
+    "regionName": "בית לחם"
+  },
+  {
+    "code": 3608,
+    "name": "מעלה אפרים",
+    "districtCode": 7,
+    "districtName": "יהודה והשומרון",
+    "regionName": "ירדן )יריחו("
+  },
+  {
+    "code": 1127,
+    "name": "מעלה גלבוע",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עפולה"
+  },
+  {
+    "code": 4008,
+    "name": "מעלה גמלא",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "גולן"
+  },
+  {
+    "code": 286,
+    "name": "מעלה החמישה",
+    "districtCode": 1,
+    "districtName": "ירושלים",
+    "regionName": "ירושלים"
+  },
+  {
+    "code": 3752,
+    "name": "מעלה לבונה",
+    "districtCode": 7,
+    "districtName": "יהודה והשומרון",
+    "regionName": "ראמאללה"
+  },
+  {
+    "code": 3651,
+    "name": "מעלה מכמש",
+    "districtCode": 7,
+    "districtName": "יהודה והשומרון",
+    "regionName": "ראמאללה"
+  },
+  {
+    "code": 1327,
+    "name": "מעלה עירון",
+    "districtCode": 3,
+    "districtName": "חיפה",
+    "regionName": "חדרה"
+  },
+  {
+    "code": 3653,
+    "name": "מעלה עמוס",
+    "districtCode": 7,
+    "districtName": "יהודה והשומרון",
+    "regionName": "בית לחם"
+  },
+  {
+    "code": 1063,
+    "name": "מעלות-תרשיחא",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עכו"
+  },
+  {
+    "code": 344,
+    "name": "מענית",
+    "districtCode": 3,
+    "districtName": "חיפה",
+    "regionName": "חדרה"
+  },
+  {
+    "code": 230,
+    "name": "מעש",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "פתח תקווה"
+  },
+  {
+    "code": 668,
+    "name": "מפלסים",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "אשקלון"
+  },
+  {
+    "code": 325,
+    "name": "מצובה",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עכו"
+  },
+  {
+    "code": 3903,
+    "name": "מצוקי ארץ",
+    "districtCode": 7,
+    "districtName": "יהודה והשומרון",
+    "regionName": "ירדן )יריחו("
+  },
+  {
+    "code": 757,
+    "name": "מצליח",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "רמלה"
+  },
+  {
+    "code": 58,
+    "name": "מצפה",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "כנרת"
+  },
+  {
+    "code": 1222,
+    "name": "מצפה אביב",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עכו"
+  },
+  {
+    "code": 1370,
+    "name": "מצפה אילן",
+    "districtCode": 3,
+    "districtName": "חיפה",
+    "regionName": "חדרה"
+  },
+  {
+    "code": 3899,
+    "name": "מצפה זיף",
+    "districtCode": 7,
+    "districtName": "יהודה והשומרון",
+    "regionName": "חברון"
+  },
+  {
+    "code": 3576,
+    "name": "מצפה יריחו",
+    "districtCode": 7,
+    "districtName": "יהודה והשומרון",
+    "regionName": "ירדן )יריחו("
+  },
+  {
+    "code": 1190,
+    "name": "מצפה נטופה",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עפולה"
+  },
+  {
+    "code": 99,
+    "name": "מצפה רמון",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 3610,
+    "name": "מצפה שלם",
+    "districtCode": 7,
+    "districtName": "יהודה והשומרון",
+    "regionName": "ירדן )יריחו("
+  },
+  {
+    "code": 648,
+    "name": "מצר",
+    "districtCode": 3,
+    "districtName": "חיפה",
+    "regionName": "חדרה"
+  },
+  {
+    "code": 22,
+    "name": "מקווה ישראל",
+    "districtCode": 5,
+    "districtName": "תל אביב",
+    "regionName": "חולון"
+  },
+  {
+    "code": 843,
+    "name": "מרגליות",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "צפת"
+  },
+  {
+    "code": 4101,
+    "name": "מרום גולן",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "גולן"
+  },
+  {
+    "code": 1340,
+    "name": "מרחב עם",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 97,
+    "name": "מרחביה (מושב)",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עפולה"
+  },
+  {
+    "code": 66,
+    "name": "מרחביה (קיבוץ)",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עפולה"
+  },
+  {
+    "code": 1098,
+    "name": "מרכז שפירא",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "אשקלון"
+  },
+  {
+    "code": 421,
+    "name": "משאבי שדה",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 765,
+    "name": "משגב דב",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "רחובות"
+  },
+  {
+    "code": 378,
+    "name": "משגב עם",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "צפת"
+  },
+  {
+    "code": 520,
+    "name": "משהד",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "נצרת"
+  },
+  {
+    "code": 3605,
+    "name": "משואה",
+    "districtCode": 7,
+    "districtName": "יהודה והשומרון",
+    "regionName": "ירדן )יריחו("
+  },
+  {
+    "code": 620,
+    "name": "משואות יצחק",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "אשקלון"
+  },
+  {
+    "code": 3785,
+    "name": "משכיות",
+    "districtCode": 7,
+    "districtName": "יהודה והשומרון",
+    "regionName": "ירדן )יריחו("
+  },
+  {
+    "code": 670,
+    "name": "משמר איילון",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "רמלה"
+  },
+  {
+    "code": 563,
+    "name": "משמר דוד",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "רמלה"
+  },
+  {
+    "code": 732,
+    "name": "משמר הירדן",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "צפת"
+  },
+  {
+    "code": 395,
+    "name": "משמר הנגב",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 130,
+    "name": "משמר העמק",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עפולה"
+  },
+  {
+    "code": 729,
+    "name": "משמר השבעה",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "רמלה"
+  },
+  {
+    "code": 194,
+    "name": "משמר השרון",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "השרון"
+  },
+  {
+    "code": 3865,
+    "name": "משמר יהודה",
+    "districtCode": 7,
+    "districtName": "יהודה והשומרון",
+    "regionName": "בית לחם"
+  },
+  {
+    "code": 213,
+    "name": "משמרות",
+    "districtCode": 3,
+    "districtName": "חיפה",
+    "regionName": "חדרה"
+  },
+  {
+    "code": 425,
+    "name": "משמרת",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "השרון"
+  },
+  {
+    "code": 791,
+    "name": "משען",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "אשקלון"
+  },
+  {
+    "code": 1315,
+    "name": "מתן",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "פתח תקווה"
+  },
+  {
+    "code": 1184,
+    "name": "מתת",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עכו"
+  },
+  {
+    "code": 3648,
+    "name": "מתתיהו",
+    "districtCode": 7,
+    "districtName": "יהודה והשומרון",
+    "regionName": "ראמאללה"
+  },
+  {
+    "code": 4551,
+    "name": "נאות גולן",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "גולן"
+  },
+  {
+    "code": 1124,
+    "name": "נאות הכיכר",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 408,
+    "name": "נאות מרדכי",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "צפת"
+  },
+  {
+    "code": 1197,
+    "name": "נאות סמדר",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 524,
+    "name": "נאעורה",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עפולה"
+  },
+  {
+    "code": 396,
+    "name": "נבטים",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 315,
+    "name": "נגבה",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "אשקלון"
+  },
+  {
+    "code": 3724,
+    "name": "נגוהות",
+    "districtCode": 7,
+    "districtName": "יהודה והשומרון",
+    "regionName": "חברון"
+  },
+  {
+    "code": 309,
+    "name": "נהורה",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "אשקלון"
+  },
+  {
+    "code": 80,
+    "name": "נהלל",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עפולה"
+  },
+  {
+    "code": 9100,
+    "name": "נהריה",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עכו"
+  },
+  {
+    "code": 4304,
+    "name": "נוב",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "גולן"
+  },
+  {
+    "code": 55,
+    "name": "נוגה",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "אשקלון"
+  },
+  {
+    "code": 3573,
+    "name": "נוה צוף",
+    "districtCode": 7,
+    "districtName": "יהודה והשומרון",
+    "regionName": "ראמאללה"
+  },
+  {
+    "code": 1366,
+    "name": "נווה",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 926,
+    "name": "נווה אבות",
+    "districtCode": 3,
+    "districtName": "חיפה",
+    "regionName": "חדרה"
+  },
+  {
+    "code": 590,
+    "name": "נווה אור",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עפולה"
+  },
+  {
+    "code": 4303,
+    "name": "נווה אטיב",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "גולן"
+  },
+  {
+    "code": 405,
+    "name": "נווה אילן",
+    "districtCode": 1,
+    "districtName": "ירושלים",
+    "regionName": "ירושלים"
+  },
+  {
+    "code": 296,
+    "name": "נווה איתן",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עפולה"
+  },
+  {
+    "code": 3877,
+    "name": "נווה גדיד",
+    "districtCode": 7,
+    "districtName": "יהודה והשומרון",
+    "regionName": "ירדן )יריחו("
+  },
+  {
+    "code": 3725,
+    "name": "נווה דניאל",
+    "districtCode": 7,
+    "districtName": "יהודה והשומרון",
+    "regionName": "בית לחם"
+  },
+  {
+    "code": 1057,
+    "name": "נווה זוהר",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 1314,
+    "name": "נווה זיו",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עכו"
+  },
+  {
+    "code": 1279,
+    "name": "נווה חריף",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 312,
+    "name": "נווה ים",
+    "districtCode": 3,
+    "districtName": "חיפה",
+    "regionName": "חדרה"
+  },
+  {
+    "code": 686,
+    "name": "נווה ימין",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "פתח תקווה"
+  },
+  {
+    "code": 858,
+    "name": "נווה ירק",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "פתח תקווה"
+  },
+  {
+    "code": 827,
+    "name": "נווה מבטח",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "אשקלון"
+  },
+  {
+    "code": 1071,
+    "name": "נווה מיכאל",
+    "districtCode": 1,
+    "districtName": "ירושלים",
+    "regionName": "ירושלים"
+  },
+  {
+    "code": 1259,
+    "name": "נווה שלום",
+    "districtCode": 1,
+    "districtName": "ירושלים",
+    "regionName": "ירושלים"
+  },
+  {
+    "code": 15,
+    "name": "נועם",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "אשקלון"
+  },
+  {
+    "code": 1333,
+    "name": "נוף איילון",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "רמלה"
+  },
+  {
+    "code": 1061,
+    "name": "נוף הגליל",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "נצרת"
+  },
+  {
+    "code": 3876,
+    "name": "נופי פרת",
+    "districtCode": 7,
+    "districtName": "יהודה והשומרון",
+    "regionName": "ראמאללה"
+  },
+  {
+    "code": 3790,
+    "name": "נופים",
+    "districtCode": 7,
+    "districtName": "יהודה והשומרון",
+    "regionName": "טול כרם"
+  },
+  {
+    "code": 1284,
+    "name": "נופית",
+    "districtCode": 3,
+    "districtName": "חיפה",
+    "regionName": "חיפה"
+  },
+  {
+    "code": 257,
+    "name": "נופך",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "פתח תקווה"
+  },
+  {
+    "code": 3726,
+    "name": "נוקדים",
+    "districtCode": 7,
+    "districtName": "יהודה והשומרון",
+    "regionName": "בית לחם"
+  },
+  {
+    "code": 447,
+    "name": "נורדיה",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "השרון"
+  },
+  {
+    "code": 833,
+    "name": "נורית",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עפולה"
+  },
+  {
+    "code": 3887,
+    "name": "נזר שומרון",
+    "districtCode": 7,
+    "districtName": "יהודה והשומרון",
+    "regionName": "שכם"
+  },
+  {
+    "code": 59,
+    "name": "נחושה",
+    "districtCode": 1,
+    "districtName": "ירושלים",
+    "regionName": "ירושלים"
+  },
+  {
+    "code": 844,
+    "name": "נחל עוז",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "אשקלון"
+  },
+  {
+    "code": 2045,
+    "name": "נחלה",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "אשקלון"
+  },
+  {
+    "code": 3767,
+    "name": "נחליאל",
+    "districtCode": 7,
+    "districtName": "יהודה והשומרון",
+    "regionName": "ראמאללה"
+  },
+  {
+    "code": 449,
+    "name": "נחלים",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "פתח תקווה"
+  },
+  {
+    "code": 809,
+    "name": "נחם",
+    "districtCode": 1,
+    "districtName": "ירושלים",
+    "regionName": "ירושלים"
+  },
+  {
+    "code": 522,
+    "name": "נחף",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עכו"
+  },
+  {
+    "code": 433,
+    "name": "נחשולים",
+    "districtCode": 3,
+    "districtName": "חיפה",
+    "regionName": "חדרה"
+  },
+  {
+    "code": 777,
+    "name": "נחשון",
+    "districtCode": 1,
+    "districtName": "ירושלים",
+    "regionName": "ירושלים"
+  },
+  {
+    "code": 705,
+    "name": "נחשונים",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "פתח תקווה"
+  },
+  {
+    "code": 1147,
+    "name": "נטועה",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עכו"
+  },
+  {
+    "code": 4014,
+    "name": "נטור",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "גולן"
+  },
+  {
+    "code": 1369,
+    "name": "נטע",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "אשקלון"
+  },
+  {
+    "code": 174,
+    "name": "נטעים",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "רחובות"
+  },
+  {
+    "code": 1254,
+    "name": "נטף",
+    "districtCode": 1,
+    "districtName": "ירושלים",
+    "regionName": "ירושלים"
+  },
+  {
+    "code": 523,
+    "name": "ניין",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עפולה"
+  },
+  {
+    "code": 3655,
+    "name": "נילי",
+    "districtCode": 7,
+    "districtName": "יהודה והשומרון",
+    "regionName": "ראמאללה"
+  },
+  {
+    "code": 351,
+    "name": "ניצן",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "אשקלון"
+  },
+  {
+    "code": 1419,
+    "name": "ניצן ב'",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "אשקלון"
+  },
+  {
+    "code": 1195,
+    "name": "ניצנה (קהילת חינוך)",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 1280,
+    "name": "ניצני סיני",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 851,
+    "name": "ניצני עוז",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "השרון"
+  },
+  {
+    "code": 359,
+    "name": "ניצנים",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "אשקלון"
+  },
+  {
+    "code": 808,
+    "name": "ניר אליהו",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "פתח תקווה"
+  },
+  {
+    "code": 553,
+    "name": "ניר בנים",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "אשקלון"
+  },
+  {
+    "code": 720,
+    "name": "ניר גלים",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "רחובות"
+  },
+  {
+    "code": 256,
+    "name": "ניר דוד (תל עמל)",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עפולה"
+  },
+  {
+    "code": 11,
+    "name": "ניר חן",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "אשקלון"
+  },
+  {
+    "code": 165,
+    "name": "ניר יפה",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עפולה"
+  },
+  {
+    "code": 402,
+    "name": "ניר יצחק",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 699,
+    "name": "ניר ישראל",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "אשקלון"
+  },
+  {
+    "code": 2047,
+    "name": "ניר משה",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 69,
+    "name": "ניר עוז",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 348,
+    "name": "ניר עם",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "אשקלון"
+  },
+  {
+    "code": 769,
+    "name": "ניר עציון",
+    "districtCode": 3,
+    "districtName": "חיפה",
+    "regionName": "חדרה"
+  },
+  {
+    "code": 2048,
+    "name": "ניר עקיבא",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 331,
+    "name": "ניר צבי",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "רמלה"
+  },
+  {
+    "code": 602,
+    "name": "נירים",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 1236,
+    "name": "נירית",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "פתח תקווה"
+  },
+  {
+    "code": 4035,
+    "name": "נמרוד",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "גולן"
+  },
+  {
+    "code": 825,
+    "name": "נס הרים",
+    "districtCode": 1,
+    "districtName": "ירושלים",
+    "regionName": "ירושלים"
+  },
+  {
+    "code": 1143,
+    "name": "נס עמים",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עכו"
+  },
+  {
+    "code": 7200,
+    "name": "נס ציונה",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "רחובות"
+  },
+  {
+    "code": 186,
+    "name": "נעורים",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "השרון"
+  },
+  {
+    "code": 3787,
+    "name": "נעלה",
+    "districtCode": 7,
+    "districtName": "יהודה והשומרון",
+    "regionName": "ראמאללה"
+  },
+  {
+    "code": 3713,
+    "name": "נעמה",
+    "districtCode": 7,
+    "districtName": "יהודה והשומרון",
+    "regionName": "ירדן )יריחו("
+  },
+  {
+    "code": 158,
+    "name": "נען",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "רמלה"
+  },
+  {
+    "code": 3620,
+    "name": "נערן",
+    "districtCode": 7,
+    "districtName": "יהודה והשומרון",
+    "regionName": "ירדן )יריחו("
+  },
+  {
+    "code": 1041,
+    "name": "נצאצרה (שבט)",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 1372,
+    "name": "נצר חזני",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "רחובות"
+  },
+  {
+    "code": 435,
+    "name": "נצר סרני",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "רמלה"
+  },
+  {
+    "code": 7300,
+    "name": "נצרת",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "נצרת"
+  },
+  {
+    "code": 3890,
+    "name": "נריה",
+    "districtCode": 7,
+    "districtName": "יהודה והשומרון",
+    "regionName": "ראמאללה"
+  },
+  {
+    "code": 2500,
+    "name": "נשר",
+    "districtCode": 3,
+    "districtName": "חיפה",
+    "regionName": "חיפה"
+  },
+  {
+    "code": 3555,
+    "name": "נתיב הגדוד",
+    "districtCode": 7,
+    "districtName": "יהודה והשומרון",
+    "regionName": "ירדן )יריחו("
+  },
+  {
+    "code": 693,
+    "name": "נתיב הלה",
+    "districtCode": 1,
+    "districtName": "ירושלים",
+    "regionName": "ירושלים"
+  },
+  {
+    "code": 1242,
+    "name": "נתיב העשרה",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "אשקלון"
+  },
+  {
+    "code": 792,
+    "name": "נתיב השיירה",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עכו"
+  },
+  {
+    "code": 246,
+    "name": "נתיבות",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 7400,
+    "name": "נתניה",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "השרון"
+  },
+  {
+    "code": 525,
+    "name": "סאג'ור",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עכו"
+  },
+  {
+    "code": 578,
+    "name": "סאסא",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "צפת"
+  },
+  {
+    "code": 587,
+    "name": "סביון",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "פתח תקווה"
+  },
+  {
+    "code": 2046,
+    "name": "סגולה",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "אשקלון"
+  },
+  {
+    "code": 942,
+    "name": "סואעד (חמירה)",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עכו"
+  },
+  {
+    "code": 989,
+    "name": "סואעד (כמאנה) (שבט)",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עכו"
+  },
+  {
+    "code": 526,
+    "name": "סולם",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עפולה"
+  },
+  {
+    "code": 3756,
+    "name": "סוסיה",
+    "districtCode": 7,
+    "districtName": "יהודה והשומרון",
+    "regionName": "חברון"
+  },
+  {
+    "code": 1238,
+    "name": "סופה",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 7500,
+    "name": "סח'נין",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עכו"
+  },
+  {
+    "code": 1170,
+    "name": "סייד (שבט)",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 1245,
+    "name": "סלמה",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עכו"
+  },
+  {
+    "code": 3567,
+    "name": "סלעית",
+    "districtCode": 7,
+    "districtName": "יהודה והשומרון",
+    "regionName": "טול כרם"
+  },
+  {
+    "code": 1156,
+    "name": "סמר",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 3777,
+    "name": "סנסנה",
+    "districtCode": 7,
+    "districtName": "יהודה והשומרון",
+    "regionName": "חברון"
+  },
+  {
+    "code": 419,
+    "name": "סעד",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 1360,
+    "name": "סעוה",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 454,
+    "name": "סער",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עכו"
+  },
+  {
+    "code": 1176,
+    "name": "ספיר",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 610,
+    "name": "סתריה",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "רמלה"
+  },
+  {
+    "code": 4501,
+    "name": "ע'ג'ר",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "גולן"
+  },
+  {
+    "code": 892,
+    "name": "עבדון",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עכו"
+  },
+  {
+    "code": 376,
+    "name": "עברון",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עכו"
+  },
+  {
+    "code": 794,
+    "name": "עגור",
+    "districtCode": 1,
+    "districtName": "ירושלים",
+    "regionName": "ירושלים"
+  },
+  {
+    "code": 1199,
+    "name": "עדי",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עכו"
+  },
+  {
+    "code": 3874,
+    "name": "עדי עד",
+    "districtCode": 7,
+    "districtName": "יהודה והשומרון",
+    "regionName": "ראמאללה"
+  },
+  {
+    "code": 2035,
+    "name": "עדנים",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "פתח תקווה"
+  },
+  {
+    "code": 826,
+    "name": "עוזה",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "אשקלון"
+  },
+  {
+    "code": 528,
+    "name": "עוזייר",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "נצרת"
+  },
+  {
+    "code": 737,
+    "name": "עולש",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "השרון"
+  },
+  {
+    "code": 666,
+    "name": "עומר",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 810,
+    "name": "עופר",
+    "districtCode": 3,
+    "districtName": "חיפה",
+    "regionName": "חדרה"
+  },
+  {
+    "code": 3617,
+    "name": "עופרה",
+    "districtCode": 7,
+    "districtName": "יהודה והשומרון",
+    "regionName": "ראמאללה"
+  },
+  {
+    "code": 32,
+    "name": "עוצם",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "אשקלון"
+  },
+  {
+    "code": 957,
+    "name": "עוקבי (בנו עוקבה)",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 328,
+    "name": "עזוז",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 1149,
+    "name": "עזר",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "אשקלון"
+  },
+  {
+    "code": 837,
+    "name": "עזריאל",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "השרון"
+  },
+  {
+    "code": 711,
+    "name": "עזריה",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "רמלה"
+  },
+  {
+    "code": 817,
+    "name": "עזריקם",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "אשקלון"
+  },
+  {
+    "code": 969,
+    "name": "עטאוונה (שבט)",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 3658,
+    "name": "עטרת",
+    "districtCode": 7,
+    "districtName": "יהודה והשומרון",
+    "regionName": "ראמאללה"
+  },
+  {
+    "code": 3880,
+    "name": "עיבל",
+    "districtCode": 7,
+    "districtName": "יהודה והשומרון",
+    "regionName": "שכם"
+  },
+  {
+    "code": 1175,
+    "name": "עידן",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 530,
+    "name": "עיילבון",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "כנרת"
+  },
+  {
+    "code": 156,
+    "name": "עיינות",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "רחובות"
+  },
+  {
+    "code": 511,
+    "name": "עילוט",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "נצרת"
+  },
+  {
+    "code": 687,
+    "name": "עין איילה",
+    "districtCode": 3,
+    "districtName": "חיפה",
+    "regionName": "חדרה"
+  },
+  {
+    "code": 546,
+    "name": "עין אל-אסד",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עכו"
+  },
+  {
+    "code": 273,
+    "name": "עין גב",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "כנרת"
+  },
+  {
+    "code": 2042,
+    "name": "עין גדי",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 436,
+    "name": "עין דור",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עפולה"
+  },
+  {
+    "code": 1240,
+    "name": "עין הבשור",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 74,
+    "name": "עין הוד",
+    "districtCode": 3,
+    "districtName": "חיפה",
+    "regionName": "חדרה"
+  },
+  {
+    "code": 167,
+    "name": "עין החורש",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "השרון"
+  },
+  {
+    "code": 289,
+    "name": "עין המפרץ",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עכו"
+  },
+  {
+    "code": 383,
+    "name": "עין הנציב",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עפולה"
+  },
+  {
+    "code": 367,
+    "name": "עין העמק",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עפולה"
+  },
+  {
+    "code": 270,
+    "name": "עין השופט",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עפולה"
+  },
+  {
+    "code": 676,
+    "name": "עין השלושה",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 157,
+    "name": "עין ורד",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "השרון"
+  },
+  {
+    "code": 4503,
+    "name": "עין זיוון",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "גולן"
+  },
+  {
+    "code": 1320,
+    "name": "עין חוד",
+    "districtCode": 3,
+    "districtName": "חיפה",
+    "regionName": "חדרה"
+  },
+  {
+    "code": 1053,
+    "name": "עין חצבה",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 89,
+    "name": "עין חרוד (איחוד)",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עפולה"
+  },
+  {
+    "code": 82,
+    "name": "עין חרוד (מאוחד)",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עפולה"
+  },
+  {
+    "code": 806,
+    "name": "עין יהב",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 3904,
+    "name": "עין ייטב",
+    "districtCode": 7,
+    "districtName": "יהודה והשומרון",
+    "regionName": "ירדן )יריחו("
+  },
+  {
+    "code": 813,
+    "name": "עין יעקב",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עכו"
+  },
+  {
+    "code": 1056,
+    "name": "עין כרם-ביס חקלאי",
+    "districtCode": 1,
+    "districtName": "ירושלים",
+    "regionName": "ירושלים"
+  },
+  {
+    "code": 426,
+    "name": "עין כרמל",
+    "districtCode": 3,
+    "districtName": "חיפה",
+    "regionName": "חדרה"
+  },
+  {
+    "code": 532,
+    "name": "עין מאהל",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "נצרת"
+  },
+  {
+    "code": 521,
+    "name": "עין נקובא",
+    "districtCode": 1,
+    "districtName": "ירושלים",
+    "regionName": "ירושלים"
+  },
+  {
+    "code": 223,
+    "name": "עין עירון",
+    "districtCode": 3,
+    "districtName": "חיפה",
+    "regionName": "חדרה"
+  },
+  {
+    "code": 622,
+    "name": "עין צורים",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "אשקלון"
+  },
+  {
+    "code": 4502,
+    "name": "עין קנייא",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "גולן"
+  },
+  {
+    "code": 514,
+    "name": "עין ראפה",
+    "districtCode": 1,
+    "districtName": "ירושלים",
+    "regionName": "ירושלים"
+  },
+  {
+    "code": 139,
+    "name": "עין שמר",
+    "districtCode": 3,
+    "districtName": "חיפה",
+    "regionName": "חדרה"
+  },
+  {
+    "code": 880,
+    "name": "עין שריד",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "השרון"
+  },
+  {
+    "code": 1251,
+    "name": "עין תמר",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 871,
+    "name": "עינת",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "פתח תקווה"
+  },
+  {
+    "code": 1187,
+    "name": "עיר אובות",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 7600,
+    "name": "עכו",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עכו"
+  },
+  {
+    "code": 1146,
+    "name": "עלומים",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 3765,
+    "name": "עלי",
+    "districtCode": 7,
+    "districtName": "יהודה והשומרון",
+    "regionName": "שכם"
+  },
+  {
+    "code": 3727,
+    "name": "עלי זהב",
+    "districtCode": 7,
+    "districtName": "יהודה והשומרון",
+    "regionName": "טול כרם"
+  },
+  {
+    "code": 688,
+    "name": "עלמה",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "צפת"
+  },
+  {
+    "code": 3715,
+    "name": "עלמון",
+    "districtCode": 7,
+    "districtName": "יהודה והשומרון",
+    "regionName": "ראמאללה"
+  },
+  {
+    "code": 1212,
+    "name": "עמוקה",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "צפת"
+  },
+  {
+    "code": 3824,
+    "name": "עמיחי",
+    "districtCode": 7,
+    "districtName": "יהודה והשומרון",
+    "regionName": "ראמאללה"
+  },
+  {
+    "code": 779,
+    "name": "עמינדב",
+    "districtCode": 1,
+    "districtName": "ירושלים",
+    "regionName": "ירושלים"
+  },
+  {
+    "code": 385,
+    "name": "עמיעד",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "צפת"
+  },
+  {
+    "code": 318,
+    "name": "עמיעוז",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 773,
+    "name": "עמיקם",
+    "districtCode": 3,
+    "districtName": "חיפה",
+    "regionName": "חדרה"
+  },
+  {
+    "code": 319,
+    "name": "עמיר",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "צפת"
+  },
+  {
+    "code": 3660,
+    "name": "עמנואל",
+    "districtCode": 7,
+    "districtName": "יהודה והשומרון",
+    "regionName": "טול כרם"
+  },
+  {
+    "code": 708,
+    "name": "עמקה",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עכו"
+  },
+  {
+    "code": 3712,
+    "name": "ענב",
+    "districtCode": 7,
+    "districtName": "יהודה והשומרון",
+    "regionName": "טול כרם"
+  },
+  {
+    "code": 534,
+    "name": "עספיא",
+    "districtCode": 3,
+    "districtName": "חיפה",
+    "regionName": "חיפה"
+  },
+  {
+    "code": 7700,
+    "name": "עפולה",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עפולה"
+  },
+  {
+    "code": 917,
+    "name": "עצמון שגב",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עכו"
+  },
+  {
+    "code": 531,
+    "name": "עראבה",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עכו"
+  },
+  {
+    "code": 1246,
+    "name": "עראמשה",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עכו"
+  },
+  {
+    "code": 1335,
+    "name": "ערב אל נעים",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עכו"
+  },
+  {
+    "code": 2560,
+    "name": "ערד",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 593,
+    "name": "ערוגות",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "אשקלון"
+  },
+  {
+    "code": 637,
+    "name": "ערערה",
+    "districtCode": 3,
+    "districtName": "חיפה",
+    "regionName": "חדרה"
+  },
+  {
+    "code": 1192,
+    "name": "ערערה-בנגב",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 3861,
+    "name": "עשהאל",
+    "districtCode": 7,
+    "districtName": "יהודה והשומרון",
+    "regionName": "חברון"
+  },
+  {
+    "code": 591,
+    "name": "עשרת",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "רחובות"
+  },
+  {
+    "code": 53,
+    "name": "עתלית",
+    "districtCode": 3,
+    "districtName": "חיפה",
+    "regionName": "חדרה"
+  },
+  {
+    "code": 3748,
+    "name": "עתניאל",
+    "districtCode": 7,
+    "districtName": "יהודה והשומרון",
+    "regionName": "חברון"
+  },
+  {
+    "code": 1151,
+    "name": "פארן",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 3768,
+    "name": "פדואל",
+    "districtCode": 7,
+    "districtName": "יהודה והשומרון",
+    "regionName": "טול כרם"
+  },
+  {
+    "code": 750,
+    "name": "פדויים",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 838,
+    "name": "פדיה",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "רמלה"
+  },
+  {
+    "code": 1104,
+    "name": "פוריה - כפר עבודה",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "כנרת"
+  },
+  {
+    "code": 1105,
+    "name": "פוריה - נווה עובד",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "כנרת"
+  },
+  {
+    "code": 1313,
+    "name": "פוריה עילית",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "כנרת"
+  },
+  {
+    "code": 537,
+    "name": "פוריידיס",
+    "districtCode": 3,
+    "districtName": "חיפה",
+    "regionName": "חדרה"
+  },
+  {
+    "code": 767,
+    "name": "פורת",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "השרון"
+  },
+  {
+    "code": 749,
+    "name": "פטיש",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 1185,
+    "name": "פלך",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עכו"
+  },
+  {
+    "code": 597,
+    "name": "פלמחים",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "רחובות"
+  },
+  {
+    "code": 3723,
+    "name": "פני חבר",
+    "districtCode": 7,
+    "districtName": "יהודה והשומרון",
+    "regionName": "חברון"
+  },
+  {
+    "code": 3659,
+    "name": "פסגות",
+    "districtCode": 7,
+    "districtName": "יהודה והשומרון",
+    "regionName": "ראמאללה"
+  },
+  {
+    "code": 535,
+    "name": "פסוטה",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עכו"
+  },
+  {
+    "code": 2059,
+    "name": "פעמי תשז",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 3615,
+    "name": "פצאל",
+    "districtCode": 7,
+    "districtName": "יהודה והשומרון",
+    "regionName": "ירדן )יריחו("
+  },
+  {
+    "code": 536,
+    "name": "פקיעין (בוקייעה)",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עכו"
+  },
+  {
+    "code": 281,
+    "name": "פקיעין חדשה",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עכו"
+  },
+  {
+    "code": 7800,
+    "name": "פרדס חנה-כרכור",
+    "districtCode": 3,
+    "districtName": "חיפה",
+    "regionName": "חדרה"
+  },
+  {
+    "code": 171,
+    "name": "פרדסיה",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "השרון"
+  },
+  {
+    "code": 599,
+    "name": "פרוד",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "צפת"
+  },
+  {
+    "code": 2053,
+    "name": "פרזון",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עפולה"
+  },
+  {
+    "code": 1231,
+    "name": "פרי גן",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 3894,
+    "name": "פרשים",
+    "districtCode": 7,
+    "districtName": "יהודה והשומרון",
+    "regionName": "ג'נין"
+  },
+  {
+    "code": 7900,
+    "name": "פתח תקווה",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "פתח תקווה"
+  },
+  {
+    "code": 839,
+    "name": "פתחיה",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "רמלה"
+  },
+  {
+    "code": 413,
+    "name": "צאלים",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 1180,
+    "name": "צביה",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עכו"
+  },
+  {
+    "code": 1213,
+    "name": "צבעון",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "צפת"
+  },
+  {
+    "code": 465,
+    "name": "צובה",
+    "districtCode": 1,
+    "districtName": "ירושלים",
+    "regionName": "ירושלים"
+  },
+  {
+    "code": 1136,
+    "name": "צוחר",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 1111,
+    "name": "צופיה",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "רחובות"
+  },
+  {
+    "code": 3791,
+    "name": "צופים",
+    "districtCode": 7,
+    "districtName": "יהודה והשומרון",
+    "regionName": "טול כרם"
+  },
+  {
+    "code": 198,
+    "name": "צופית",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "פתח תקווה"
+  },
+  {
+    "code": 1150,
+    "name": "צופר",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 1102,
+    "name": "צוקי ים",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "השרון"
+  },
+  {
+    "code": 1262,
+    "name": "צוקים",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 1113,
+    "name": "צור הדסה",
+    "districtCode": 1,
+    "districtName": "ירושלים",
+    "regionName": "ירושלים"
+  },
+  {
+    "code": 1345,
+    "name": "צור יצחק",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "פתח תקווה"
+  },
+  {
+    "code": 276,
+    "name": "צור משה",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "השרון"
+  },
+  {
+    "code": 1148,
+    "name": "צור נתן",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "פתח תקווה"
+  },
+  {
+    "code": 774,
+    "name": "צוריאל",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עכו"
+  },
+  {
+    "code": 1221,
+    "name": "צורית",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עכו"
+  },
+  {
+    "code": 613,
+    "name": "ציפורי",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עפולה"
+  },
+  {
+    "code": 796,
+    "name": "צלפון",
+    "districtCode": 1,
+    "districtName": "ירושלים",
+    "regionName": "ירושלים"
+  },
+  {
+    "code": 636,
+    "name": "צנדלה",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עפולה"
+  },
+  {
+    "code": 594,
+    "name": "צפריה",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "רמלה"
+  },
+  {
+    "code": 1079,
+    "name": "צפרירים",
+    "districtCode": 1,
+    "districtName": "ירושלים",
+    "regionName": "ירושלים"
+  },
+  {
+    "code": 8000,
+    "name": "צפת",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "צפת"
+  },
+  {
+    "code": 612,
+    "name": "צרופה",
+    "districtCode": 3,
+    "districtName": "חיפה",
+    "regionName": "חדרה"
+  },
+  {
+    "code": 567,
+    "name": "צרעה",
+    "districtCode": 1,
+    "districtName": "ירושלים",
+    "regionName": "ירושלים"
+  },
+  {
+    "code": 1234,
+    "name": "קבועה (שבט)",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 334,
+    "name": "קבוצת יבנה",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "רחובות"
+  },
+  {
+    "code": 3557,
+    "name": "קדומים",
+    "districtCode": 7,
+    "districtName": "יהודה והשומרון",
+    "regionName": "טול כרם"
+  },
+  {
+    "code": 195,
+    "name": "קדימה-צורן",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "השרון"
+  },
+  {
+    "code": 3895,
+    "name": "קדם ערבה",
+    "districtCode": 7,
+    "districtName": "יהודה והשומרון",
+    "regionName": "ירדן )יריחו("
+  },
+  {
+    "code": 392,
+    "name": "קדמה",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "אשקלון"
+  },
+  {
+    "code": 4025,
+    "name": "קדמת צבי",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "גולן"
+  },
+  {
+    "code": 3781,
+    "name": "קדר",
+    "districtCode": 7,
+    "districtName": "יהודה והשומרון",
+    "regionName": "בית לחם"
+  },
+  {
+    "code": 615,
+    "name": "קדרון",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "רחובות"
+  },
+  {
+    "code": 1211,
+    "name": "קדרים",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "כנרת"
+  },
+  {
+    "code": 964,
+    "name": "קודייראת א-צאנע(שבט)",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 972,
+    "name": "קוואעין (שבט)",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 766,
+    "name": "קוממיות",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "אשקלון"
+  },
+  {
+    "code": 1179,
+    "name": "קורנית",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עכו"
+  },
+  {
+    "code": 1052,
+    "name": "קטורה",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 1167,
+    "name": "קיסריה",
+    "districtCode": 3,
+    "districtName": "חיפה",
+    "regionName": "חדרה"
+  },
+  {
+    "code": 414,
+    "name": "קלחים",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 3601,
+    "name": "קליה",
+    "districtCode": 7,
+    "districtName": "יהודה והשומרון",
+    "regionName": "ירדן )יריחו("
+  },
+  {
+    "code": 638,
+    "name": "קלנסווה",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "השרון"
+  },
+  {
+    "code": 4024,
+    "name": "קלע",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "גולן"
+  },
+  {
+    "code": 1243,
+    "name": "קציר",
+    "districtCode": 3,
+    "districtName": "חיפה",
+    "regionName": "חדרה"
+  },
+  {
+    "code": 1347,
+    "name": "קצר א-סר",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 4100,
+    "name": "קצרין",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "גולן"
+  },
+  {
+    "code": 2620,
+    "name": "קרית אונו",
+    "districtCode": 5,
+    "districtName": "תל אביב",
+    "regionName": "רמת גן"
+  },
+  {
+    "code": 3611,
+    "name": "קרית ארבע",
+    "districtCode": 7,
+    "districtName": "יהודה והשומרון",
+    "regionName": "חברון"
+  },
+  {
+    "code": 6800,
+    "name": "קרית אתא",
+    "districtCode": 3,
+    "districtName": "חיפה",
+    "regionName": "חיפה"
+  },
+  {
+    "code": 9500,
+    "name": "קרית ביאליק",
+    "districtCode": 3,
+    "districtName": "חיפה",
+    "regionName": "חיפה"
+  },
+  {
+    "code": 2630,
+    "name": "קרית גת",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "אשקלון"
+  },
+  {
+    "code": 2300,
+    "name": "קרית טבעון",
+    "districtCode": 3,
+    "districtName": "חיפה",
+    "regionName": "חיפה"
+  },
+  {
+    "code": 9600,
+    "name": "קרית ים",
+    "districtCode": 3,
+    "districtName": "חיפה",
+    "regionName": "חיפה"
+  },
+  {
+    "code": 1137,
+    "name": "קרית יערים",
+    "districtCode": 1,
+    "districtName": "ירושלים",
+    "regionName": "ירושלים"
+  },
+  {
+    "code": 2039,
+    "name": "קרית יערים(מוסד)",
+    "districtCode": 1,
+    "districtName": "ירושלים",
+    "regionName": "ירושלים"
+  },
+  {
+    "code": 8200,
+    "name": "קרית מוצקין",
+    "districtCode": 3,
+    "districtName": "חיפה",
+    "regionName": "חיפה"
+  },
+  {
+    "code": 1034,
+    "name": "קרית מלאכי",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "אשקלון"
+  },
+  {
+    "code": 3746,
+    "name": "קרית נטפים",
+    "districtCode": 7,
+    "districtName": "יהודה והשומרון",
+    "regionName": "טול כרם"
+  },
+  {
+    "code": 78,
+    "name": "קרית ענבים",
+    "districtCode": 1,
+    "districtName": "ירושלים",
+    "regionName": "ירושלים"
+  },
+  {
+    "code": 469,
+    "name": "קרית עקרון",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "רחובות"
+  },
+  {
+    "code": 412,
+    "name": "קרית שלמה",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "השרון"
+  },
+  {
+    "code": 2800,
+    "name": "קרית שמונה",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "צפת"
+  },
+  {
+    "code": 3640,
+    "name": "קרני שומרון",
+    "districtCode": 7,
+    "districtName": "יהודה והשומרון",
+    "regionName": "טול כרם"
+  },
+  {
+    "code": 4006,
+    "name": "קשת",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "גולן"
+  },
+  {
+    "code": 543,
+    "name": "ראמה",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עכו"
+  },
+  {
+    "code": 1334,
+    "name": "ראס אל-עין",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עכו"
+  },
+  {
+    "code": 990,
+    "name": "ראס עלי",
+    "districtCode": 3,
+    "districtName": "חיפה",
+    "regionName": "חיפה"
+  },
+  {
+    "code": 2640,
+    "name": "ראש העין",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "פתח תקווה"
+  },
+  {
+    "code": 26,
+    "name": "ראש פינה",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "צפת"
+  },
+  {
+    "code": 3602,
+    "name": "ראש צורים",
+    "districtCode": 7,
+    "districtName": "יהודה והשומרון",
+    "regionName": "בית לחם"
+  },
+  {
+    "code": 8300,
+    "name": "ראשון לציון",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "רחובות"
+  },
+  {
+    "code": 3795,
+    "name": "רבבה",
+    "districtCode": 7,
+    "districtName": "יהודה והשומרון",
+    "regionName": "שכם"
+  },
+  {
+    "code": 564,
+    "name": "רבדים",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "אשקלון"
+  },
+  {
+    "code": 354,
+    "name": "רביבים",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 1225,
+    "name": "רביד",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "כנרת"
+  },
+  {
+    "code": 390,
+    "name": "רגבה",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עכו"
+  },
+  {
+    "code": 444,
+    "name": "רגבים",
+    "districtCode": 3,
+    "districtName": "חיפה",
+    "regionName": "חדרה"
+  },
+  {
+    "code": 1161,
+    "name": "רהט",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 2051,
+    "name": "רווחה",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "אשקלון"
+  },
+  {
+    "code": 2016,
+    "name": "רוויה",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עפולה"
+  },
+  {
+    "code": 1341,
+    "name": "רוח מדבר",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 362,
+    "name": "רוחמה",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "אשקלון"
+  },
+  {
+    "code": 539,
+    "name": "רומאנה",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "נצרת"
+  },
+  {
+    "code": 997,
+    "name": "רומת הייב",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "נצרת"
+  },
+  {
+    "code": 3619,
+    "name": "רועי",
+    "districtCode": 7,
+    "districtName": "יהודה והשומרון",
+    "regionName": "ירדן )יריחו("
+  },
+  {
+    "code": 3782,
+    "name": "רותם",
+    "districtCode": 7,
+    "districtName": "יהודה והשומרון",
+    "regionName": "ירדן )יריחו("
+  },
+  {
+    "code": 854,
+    "name": "רחוב",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עפולה"
+  },
+  {
+    "code": 8400,
+    "name": "רחובות",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "רחובות"
+  },
+  {
+    "code": 3822,
+    "name": "רחלים",
+    "districtCode": 7,
+    "districtName": "יהודה והשומרון",
+    "regionName": "שכם"
+  },
+  {
+    "code": 540,
+    "name": "ריחאניה",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "צפת"
+  },
+  {
+    "code": 3568,
+    "name": "ריחן",
+    "districtCode": 7,
+    "districtName": "יהודה והשומרון",
+    "regionName": "ג'נין"
+  },
+  {
+    "code": 542,
+    "name": "ריינה",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "נצרת"
+  },
+  {
+    "code": 3565,
+    "name": "רימונים",
+    "districtCode": 7,
+    "districtName": "יהודה והשומרון",
+    "regionName": "ראמאללה"
+  },
+  {
+    "code": 616,
+    "name": "רינתיה",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "פתח תקווה"
+  },
+  {
+    "code": 922,
+    "name": "רכסים",
+    "districtCode": 3,
+    "districtName": "חיפה",
+    "regionName": "חיפה"
+  },
+  {
+    "code": 1069,
+    "name": "רם-און",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עפולה"
+  },
+  {
+    "code": 4702,
+    "name": "רמות",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "גולן"
+  },
+  {
+    "code": 206,
+    "name": "רמות השבים",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "פתח תקווה"
+  },
+  {
+    "code": 735,
+    "name": "רמות מאיר",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "רמלה"
+  },
+  {
+    "code": 445,
+    "name": "רמות מנשה",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עפולה"
+  },
+  {
+    "code": 372,
+    "name": "רמות נפתלי",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "צפת"
+  },
+  {
+    "code": 8500,
+    "name": "רמלה",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "רמלה"
+  },
+  {
+    "code": 8600,
+    "name": "רמת גן",
+    "districtCode": 5,
+    "districtName": "תל אביב",
+    "regionName": "רמת גן"
+  },
+  {
+    "code": 135,
+    "name": "רמת דוד",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עפולה"
+  },
+  {
+    "code": 184,
+    "name": "רמת הכובש",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "פתח תקווה"
+  },
+  {
+    "code": 4029,
+    "name": "רמת הנשיא טראמפ",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "גולן"
+  },
+  {
+    "code": 335,
+    "name": "רמת השופט",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עפולה"
+  },
+  {
+    "code": 2650,
+    "name": "רמת השרון",
+    "districtCode": 5,
+    "districtName": "תל אביב",
+    "regionName": "תל אביב"
+  },
+  {
+    "code": 178,
+    "name": "רמת יוחנן",
+    "districtCode": 3,
+    "districtName": "חיפה",
+    "regionName": "חיפה"
+  },
+  {
+    "code": 122,
+    "name": "רמת ישי",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עפולה"
+  },
+  {
+    "code": 4701,
+    "name": "רמת מגשימים",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "גולן"
+  },
+  {
+    "code": 339,
+    "name": "רמת צבי",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עפולה"
+  },
+  {
+    "code": 460,
+    "name": "רמת רזיאל",
+    "districtCode": 1,
+    "districtName": "ירושלים",
+    "regionName": "ירושלים"
+  },
+  {
+    "code": 127,
+    "name": "רמת רחל",
+    "districtCode": 1,
+    "districtName": "ירושלים",
+    "regionName": "ירושלים"
+  },
+  {
+    "code": 789,
+    "name": "רנן",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 713,
+    "name": "רעים",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 8700,
+    "name": "רעננה",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "פתח תקווה"
+  },
+  {
+    "code": 1228,
+    "name": "רקפת",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עכו"
+  },
+  {
+    "code": 247,
+    "name": "רשפון",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "השרון"
+  },
+  {
+    "code": 437,
+    "name": "רשפים",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עפולה"
+  },
+  {
+    "code": 1260,
+    "name": "רתמים",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 3711,
+    "name": "שא-נור",
+    "districtCode": 7,
+    "districtName": "יהודה והשומרון",
+    "regionName": "ג'נין"
+  },
+  {
+    "code": 324,
+    "name": "שאר ישוב",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "צפת"
+  },
+  {
+    "code": 3872,
+    "name": "שבות רחל",
+    "districtCode": 7,
+    "districtName": "יהודה והשומרון",
+    "regionName": "ראמאללה"
+  },
+  {
+    "code": 1377,
+    "name": "שבי דרום",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 282,
+    "name": "שבי ציון",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עכו"
+  },
+  {
+    "code": 3571,
+    "name": "שבי שומרון",
+    "districtCode": 7,
+    "districtName": "יהודה והשומרון",
+    "regionName": "שכם"
+  },
+  {
+    "code": 913,
+    "name": "שבלי - אום אל-גנם",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עפולה"
+  },
+  {
+    "code": 1286,
+    "name": "שגב-שלום",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 721,
+    "name": "שדה אילן",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "כנרת"
+  },
+  {
+    "code": 304,
+    "name": "שדה אליהו",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עפולה"
+  },
+  {
+    "code": 861,
+    "name": "שדה אליעזר",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "צפת"
+  },
+  {
+    "code": 885,
+    "name": "שדה בוקר",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 36,
+    "name": "שדה דוד",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "אשקלון"
+  },
+  {
+    "code": 284,
+    "name": "שדה ורבורג",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "פתח תקווה"
+  },
+  {
+    "code": 293,
+    "name": "שדה יואב",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "אשקלון"
+  },
+  {
+    "code": 142,
+    "name": "שדה יעקב",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עפולה"
+  },
+  {
+    "code": 2008,
+    "name": "שדה יצחק",
+    "districtCode": 3,
+    "districtName": "חיפה",
+    "regionName": "חדרה"
+  },
+  {
+    "code": 18,
+    "name": "שדה משה",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "אשקלון"
+  },
+  {
+    "code": 259,
+    "name": "שדה נחום",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עפולה"
+  },
+  {
+    "code": 329,
+    "name": "שדה נחמיה",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "צפת"
+  },
+  {
+    "code": 1058,
+    "name": "שדה ניצן",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 739,
+    "name": "שדה עוזיהו",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "אשקלון"
+  },
+  {
+    "code": 2049,
+    "name": "שדה צבי",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 327,
+    "name": "שדות ים",
+    "districtCode": 3,
+    "districtName": "חיפה",
+    "regionName": "חדרה"
+  },
+  {
+    "code": 27,
+    "name": "שדות מיכה",
+    "districtCode": 1,
+    "districtName": "ירושלים",
+    "regionName": "ירושלים"
+  },
+  {
+    "code": 1223,
+    "name": "שדי אברהם",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 2015,
+    "name": "שדי חמד",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "פתח תקווה"
+  },
+  {
+    "code": 2057,
+    "name": "שדי תרומות",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עפולה"
+  },
+  {
+    "code": 555,
+    "name": "שדמה",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "רחובות"
+  },
+  {
+    "code": 306,
+    "name": "שדמות דבורה",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "כנרת"
+  },
+  {
+    "code": 3578,
+    "name": "שדמות מחולה",
+    "districtCode": 7,
+    "districtName": "יהודה והשומרון",
+    "regionName": "ירדן )יריחו("
+  },
+  {
+    "code": 1031,
+    "name": "שדרות",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "אשקלון"
+  },
+  {
+    "code": 741,
+    "name": "שואבה",
+    "districtCode": 1,
+    "districtName": "ירושלים",
+    "regionName": "ירושלים"
+  },
+  {
+    "code": 761,
+    "name": "שובה",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 394,
+    "name": "שובל",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 1304,
+    "name": "שוהם",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "רמלה"
+  },
+  {
+    "code": 614,
+    "name": "שומרה",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עכו"
+  },
+  {
+    "code": 1265,
+    "name": "שומריה",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 415,
+    "name": "שוקדה",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 456,
+    "name": "שורש",
+    "districtCode": 1,
+    "districtName": "ירושלים",
+    "regionName": "ירושלים"
+  },
+  {
+    "code": 1235,
+    "name": "שורשים",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עכו"
+  },
+  {
+    "code": 224,
+    "name": "שושנת העמקים",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "השרון"
+  },
+  {
+    "code": 527,
+    "name": "שזור",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עכו"
+  },
+  {
+    "code": 7,
+    "name": "שחר",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "אשקלון"
+  },
+  {
+    "code": 1266,
+    "name": "שחרות",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 3868,
+    "name": "שחרית",
+    "districtCode": 7,
+    "districtName": "יהודה והשומרון",
+    "regionName": "טול כרם"
+  },
+  {
+    "code": 865,
+    "name": "שיבולים",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 1378,
+    "name": "שיזף",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 1267,
+    "name": "שיטים",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 658,
+    "name": "שייח' דנון",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עכו"
+  },
+  {
+    "code": 3641,
+    "name": "שילה",
+    "districtCode": 7,
+    "districtName": "יהודה והשומרון",
+    "regionName": "ראמאללה"
+  },
+  {
+    "code": 1165,
+    "name": "שילת",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "רמלה"
+  },
+  {
+    "code": 1160,
+    "name": "שכניה",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עכו"
+  },
+  {
+    "code": 873,
+    "name": "שלווה",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "אשקלון"
+  },
+  {
+    "code": 1373,
+    "name": "שלווה במדבר",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 439,
+    "name": "שלוחות",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עפולה"
+  },
+  {
+    "code": 812,
+    "name": "שלומי",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עכו"
+  },
+  {
+    "code": 1364,
+    "name": "שלומית",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 366,
+    "name": "שמיר",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "צפת"
+  },
+  {
+    "code": 3784,
+    "name": "שמעה",
+    "districtCode": 7,
+    "districtName": "יהודה והשומרון",
+    "regionName": "חברון"
+  },
+  {
+    "code": 432,
+    "name": "שמרת",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עכו"
+  },
+  {
+    "code": 1337,
+    "name": "שמשית",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עפולה"
+  },
+  {
+    "code": 1287,
+    "name": "שני",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 1132,
+    "name": "שניר",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "צפת"
+  },
+  {
+    "code": 538,
+    "name": "שעב",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עכו"
+  },
+  {
+    "code": 4009,
+    "name": "שעל",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "גולן"
+  },
+  {
+    "code": 856,
+    "name": "שעלבים",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "רמלה"
+  },
+  {
+    "code": 661,
+    "name": "שער אפרים",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "השרון"
+  },
+  {
+    "code": 264,
+    "name": "שער הגולן",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "כנרת"
+  },
+  {
+    "code": 237,
+    "name": "שער העמקים",
+    "districtCode": 3,
+    "districtName": "חיפה",
+    "regionName": "חיפה"
+  },
+  {
+    "code": 921,
+    "name": "שער מנשה",
+    "districtCode": 3,
+    "districtName": "חיפה",
+    "regionName": "חדרה"
+  },
+  {
+    "code": 3826,
+    "name": "שער שומרון",
+    "districtCode": 7,
+    "districtName": "יהודה והשומרון",
+    "regionName": "טול כרם"
+  },
+  {
+    "code": 232,
+    "name": "שפיים",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "השרון"
+  },
+  {
+    "code": 692,
+    "name": "שפיר",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "אשקלון"
+  },
+  {
+    "code": 846,
+    "name": "שפר",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "צפת"
+  },
+  {
+    "code": 8800,
+    "name": "שפרעם",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עכו"
+  },
+  {
+    "code": 3649,
+    "name": "שקד",
+    "districtCode": 7,
+    "districtName": "יהודה והשומרון",
+    "regionName": "ג'נין"
+  },
+  {
+    "code": 1233,
+    "name": "שקף",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "אשקלון"
+  },
+  {
+    "code": 292,
+    "name": "שרונה",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "כנרת"
+  },
+  {
+    "code": 1114,
+    "name": "שריגים (לי-און)",
+    "districtCode": 1,
+    "districtName": "ירושלים",
+    "regionName": "ירושלים"
+  },
+  {
+    "code": 126,
+    "name": "שריד",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עפולה"
+  },
+  {
+    "code": 398,
+    "name": "שרשרת",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 1045,
+    "name": "שתולה",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עכו"
+  },
+  {
+    "code": 763,
+    "name": "שתולים",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "אשקלון"
+  },
+  {
+    "code": 2062,
+    "name": "תאשור",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 2061,
+    "name": "תדהר",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 1172,
+    "name": "תובל",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עכו"
+  },
+  {
+    "code": 3558,
+    "name": "תומר",
+    "districtCode": 7,
+    "districtName": "יהודה והשומרון",
+    "regionName": "ירדן )יריחו("
+  },
+  {
+    "code": 1083,
+    "name": "תושיה",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 163,
+    "name": "תימורים",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "אשקלון"
+  },
+  {
+    "code": 10,
+    "name": "תירוש",
+    "districtCode": 1,
+    "districtName": "ירושלים",
+    "regionName": "ירושלים"
+  },
+  {
+    "code": 5000,
+    "name": "תל אביב - יפו",
+    "districtCode": 5,
+    "districtName": "תל אביב",
+    "regionName": "תל אביב"
+  },
+  {
+    "code": 84,
+    "name": "תל יוסף",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עפולה"
+  },
+  {
+    "code": 287,
+    "name": "תל יצחק",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "השרון"
+  },
+  {
+    "code": 154,
+    "name": "תל מונד",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "השרון"
+  },
+  {
+    "code": 103,
+    "name": "תל עדשים",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עפולה"
+  },
+  {
+    "code": 3815,
+    "name": "תל ציון",
+    "districtCode": 7,
+    "districtName": "יהודה והשומרון",
+    "regionName": "ראמאללה"
+  },
+  {
+    "code": 719,
+    "name": "תל קציר",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "כנרת"
+  },
+  {
+    "code": 1054,
+    "name": "תל שבע",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 1283,
+    "name": "תל תאומים",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עפולה"
+  },
+  {
+    "code": 3719,
+    "name": "תלם",
+    "districtCode": 7,
+    "districtName": "יהודה והשומרון",
+    "regionName": "חברון"
+  },
+  {
+    "code": 1051,
+    "name": "תלמי אליהו",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 2003,
+    "name": "תלמי אלעזר",
+    "districtCode": 3,
+    "districtName": "חיפה",
+    "regionName": "חדרה"
+  },
+  {
+    "code": 2050,
+    "name": "תלמי בילו",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 1237,
+    "name": "תלמי יוסף",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 727,
+    "name": "תלמי יחיאל",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "אשקלון"
+  },
+  {
+    "code": 744,
+    "name": "תלמי יפה",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "אשקלון"
+  },
+  {
+    "code": 814,
+    "name": "תלמים",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "אשקלון"
+  },
+  {
+    "code": 3878,
+    "name": "תמרה",
+    "districtCode": 7,
+    "districtName": "יהודה והשומרון",
+    "regionName": "ירדן )יריחו("
+  },
+  {
+    "code": 1244,
+    "name": "תמרת",
+    "districtCode": 2,
+    "districtName": "הצפון",
+    "regionName": "עפולה"
+  },
+  {
+    "code": 2002,
+    "name": "תנובות",
+    "districtCode": 4,
+    "districtName": "המרכז",
+    "regionName": "השרון"
+  },
+  {
+    "code": 752,
+    "name": "תעוז",
+    "districtCode": 1,
+    "districtName": "ירושלים",
+    "regionName": "ירושלים"
+  },
+  {
+    "code": 709,
+    "name": "תפרח",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 665,
+    "name": "תקומה",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 3563,
+    "name": "תקוע",
+    "districtCode": 7,
+    "districtName": "יהודה והשומרון",
+    "regionName": "בית לחם"
+  },
+  {
+    "code": 970,
+    "name": "תראבין א-צאנע (שבט)",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 1346,
+    "name": "תראבין א-צאנע(ישוב)",
+    "districtCode": 6,
+    "districtName": "הדרום",
+    "regionName": "באר שבע"
+  },
+  {
+    "code": 778,
+    "name": "תרום",
+    "districtCode": 1,
+    "districtName": "ירושלים",
+    "regionName": "ירושלים"
+  }
+]

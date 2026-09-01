@@ -1,8 +1,6 @@
 import express from "express";
-import pg from "pg";
-import { PrismaPg } from "@prisma/adapter-pg";
-import { PrismaClient } from "./generated/prisma/client";
 import { extractUser } from "../../shared/middleware";
+import { prisma } from "./db";
 import { applySecurity, authRateLimit, passwordResetRateLimit, generalRateLimit } from "../../shared/security";
 import { registerRoutes } from "./routes/register";
 import { profileRoutes } from "./routes/profile";
@@ -19,10 +17,9 @@ import { loginRoutes } from "./routes/login";
 import { oauthRoutes } from "./routes/oauth";
 import { passwordResetRoutes } from "./routes/password-reset";
 import { notificationsRoutes } from "./routes/notifications";
+import { startCityCatalogRefresh } from "./city-catalog";
 
-const pool = new pg.Pool({ connectionString: process.env.DATABASE_URL });
-const adapter = new PrismaPg(pool);
-export const prisma = new PrismaClient({ adapter });
+export { prisma };
 const app = express();
 const PORT = Number(process.env.PORT) || 4001;
 
@@ -55,4 +52,5 @@ app.use("/notifications", notificationsRoutes);
 /** Start the users HTTP server. */
 app.listen(PORT, "0.0.0.0", () => {
   console.log(`Users service running on port ${PORT}`);
+  startCityCatalogRefresh();
 });

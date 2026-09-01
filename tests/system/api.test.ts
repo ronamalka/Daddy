@@ -138,12 +138,14 @@ describe("System Tests — Public API", () => {
   });
 
   describe("GET /api/locations", () => {
-    it("returns 200 with districts even if the government city list is down", async () => {
+    it("returns districts and the persisted city catalog without calling data.gov.il", async () => {
       const { status, body } = await fetchApi("/api/locations");
       expect(status).toBe(200);
       expect(Array.isArray(body.districts)).toBe(true);
       expect(body.districts.length).toBeGreaterThan(0);
       expect(Array.isArray(body.cities)).toBe(true);
+      expect(body.cities.length).toBeGreaterThan(100);
+      expect(body.cities.some((city: { code: number }) => city.code === 5000)).toBe(true);
     });
   });
 

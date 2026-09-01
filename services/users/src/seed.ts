@@ -2,6 +2,7 @@ import pg from "pg";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "./generated/prisma/client";
 import { hash } from "bcryptjs";
+import snapshot from "./data/israeli-cities.json";
 
 const pool = new pg.Pool({ connectionString: process.env.DATABASE_URL || "postgresql://rmalka@localhost:5432/daddy_users" });
 const adapter = new PrismaPg(pool);
@@ -152,6 +153,15 @@ async function main() {
     { dayOfWeek: 4, startMin: 16 * 60, endMin: 20 * 60 },
     { dayOfWeek: 5, startMin: 8 * 60, endMin: 13 * 60 },
   ];
+
+  if ((await prisma.city.count()) === 0) {
+    await prisma.city.createMany({ data: snapshot, skipDuplicates: true });
+    await prisma.cityCatalog.upsert({
+      where: { id: 1 },
+      create: { id: 1, source: "snapshot", fetchedAt: null },
+      update: {},
+    });
+  }
 
   const sellerIds = [S.seller, S.seller2, S.seller3, S.seller4, S.seller5, S.seller6];
   for (const userId of sellerIds) {
