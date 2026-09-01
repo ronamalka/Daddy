@@ -25,6 +25,7 @@ model User {
   city         String?
   cityCode     Int?
   districtCode Int?
+  emailVerified  Boolean  @default(false)
   acceptingJobs Boolean  @default(true)
   notifyWhatsapp   Boolean @default(true)
   notifySms        Boolean @default(false)
@@ -39,28 +40,43 @@ model User {
   suspendReason String?
   phoneVerified    Boolean  @default(false)
   phoneVerifiedAt  DateTime?
-  identityStatus   String   @default("NONE") // NONE, PENDING, APPROVED, REJECTED
-  identityPhoto    String?  // URL to uploaded ID photo
+  identityStatus   String   @default("NONE")
+  identityPhoto    String?
   identityReviewedAt DateTime?
   identityReviewedBy String?
-  licenseStatus    String?  // NONE, PENDING, APPROVED, REJECTED (for regulated services)
+  licenseStatus    String?
   licensePhoto     String?
-  licenseType      String?  // e.g., "electrician", "gas"
+  licenseType      String?
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
-  serviceAreas    ServiceArea[]
-  userServices    UserService[]
-  servicePrices   ServicePrice[]
-  passwordResets  PasswordReset[]
-  weeklyHours     WeeklyHours[]
-  timeOff         TimeOff[]
-  notifications   Notification[]
-  phoneOtps       PhoneOtp[]
-  savedAddresses  SavedAddress[]
+  serviceAreas        ServiceArea[]
+  userServices        UserService[]
+  servicePrices       ServicePrice[]
+  passwordResets      PasswordReset[]
+  emailVerifications  EmailVerification[]
+  weeklyHours         WeeklyHours[]
+  timeOff             TimeOff[]
+  notifications       Notification[]
+  phoneOtps           PhoneOtp[]
+  savedAddresses      SavedAddress[]
 }
 
 model PasswordReset {
+  id        String   @id @default(cuid())
+  userId    String
+  token     String   @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([token])
+}
+
+model EmailVerification {
   id        String   @id @default(cuid())
   userId    String
   token     String   @unique

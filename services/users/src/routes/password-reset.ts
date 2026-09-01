@@ -1,12 +1,15 @@
 import { Router, Request, Response } from "express";
 import { randomBytes } from "crypto";
 import { hash } from "bcryptjs";
-import { prisma } from "../index";
+import { prisma } from "../db";
+import { sendEmail } from "../../../shared/email";
+import { passwordResetEmail } from "../../../shared/email-templates";
 
 /** Routes for requesting, checking, and using a password-reset token. */
 export const passwordResetRoutes = Router();
 
 const TOKEN_EXPIRY_HOURS = 1;
+const BASE_URL = process.env.BASE_URL || "http://localhost:3000";
 
 /** Create a reset token for this email, without saying if the account exists. */
 passwordResetRoutes.post("/request", async (req: Request, res: Response) => {
@@ -43,6 +46,12 @@ passwordResetRoutes.post("/request", async (req: Request, res: Response) => {
       token,
       expiresAt,
     },
+  });
+
+  // Send the reset email (non-blocking for anti-enumeration: always respond the same)
+  const link = `${BASE_URL}/reset-password?token=${token}`;
+  sendEmail(user.email, "איפוס סיסמה - אבאל׳ה", passwordResetEmail(user.name, link)).catch((err) => {
+    console.error("[password-reset] Failed to send reset email:", err);
   });
 
   res.json({ message: "If the email exists, a reset link has been sent" });
