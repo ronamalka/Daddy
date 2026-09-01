@@ -17,6 +17,8 @@ import { loginRoutes } from "./routes/login";
 import { oauthRoutes } from "./routes/oauth";
 import { passwordResetRoutes } from "./routes/password-reset";
 import { notificationsRoutes } from "./routes/notifications";
+import { verificationRoutes } from "./routes/verification";
+import { addressesRoutes } from "./routes/addresses";
 import { startCityCatalogRefresh } from "./city-catalog";
 
 export { prisma };
@@ -48,6 +50,8 @@ app.use("/locations", locationsRoutes);
 app.use("/featured-daddies", featuredRoutes);
 app.use("/availability", availabilityRoutes);
 app.use("/notifications", notificationsRoutes);
+app.use("/verify", verificationRoutes);
+app.use("/addresses", addressesRoutes);
 
 /** Start the users HTTP server. */
 app.listen(PORT, "0.0.0.0", () => {

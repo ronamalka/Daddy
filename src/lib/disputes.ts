@@ -1,7 +1,7 @@
 export const DISPUTE_REASONS = ["NO_SHOW", "DAMAGE", "DIFFERENT_PRICE", "QUALITY"] as const;
 export type DisputeReason = (typeof DISPUTE_REASONS)[number];
 
-export const DISPUTABLE_STATUSES = ["IN_PROGRESS", "DELIVERED"] as const;
+export const DISPUTABLE_STATUSES = ["IN_PROGRESS", "ON_THE_WAY", "DELIVERED"] as const;
 export type DisputableStatus = (typeof DISPUTABLE_STATUSES)[number];
 
 export const OPEN_DISPUTE_STATUSES = ["OPEN", "UNDER_REVIEW"] as const;

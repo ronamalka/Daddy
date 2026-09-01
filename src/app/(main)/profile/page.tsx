@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
-import { Lock, MapPin, Package, CurrencyDollar, Star, User, Envelope, Shield, CalendarBlank, Bell } from "@phosphor-icons/react";
+import { Lock, MapPin, Package, CurrencyDollar, Star, User, Envelope, Shield, CalendarBlank, Bell, ShieldCheck, House, Receipt } from "@phosphor-icons/react";
 import { ProfileProgress } from "@/components/profile-progress";
 import type { ProfileReadinessResponse } from "@/lib/seller-ready";
 
@@ -93,6 +93,13 @@ export default function ProfilePage() {
                 אזורי שירות
               </Link>
               <Link
+                href="/profile/addresses"
+                className="rounded-full border border-[rgb(var(--color-border))] px-4 py-1.5 text-[13px] font-semibold text-[rgb(var(--color-text-secondary))] hover:border-[rgb(var(--color-accent))] hover:text-[rgb(var(--color-accent))] transition-all flex items-center gap-1.5"
+              >
+                <House className="h-3.5 w-3.5" />
+                כתובות
+              </Link>
+              <Link
                 href="/profile/services"
                 className="rounded-full border border-[rgb(var(--color-border))] px-4 py-1.5 text-[13px] font-semibold text-[rgb(var(--color-text-secondary))] hover:border-[rgb(var(--color-primary))] hover:text-[rgb(var(--color-primary))] transition-all flex items-center gap-1.5"
               >
@@ -115,6 +122,13 @@ export default function ProfilePage() {
                   זמינות
                 </Link>
               )}
+              <Link
+                href="/profile/verification"
+                className="rounded-full border border-[rgb(var(--color-border))] px-4 py-1.5 text-[13px] font-semibold text-[rgb(var(--color-text-secondary))] hover:border-[rgb(var(--color-success))] hover:text-[rgb(var(--color-success))] transition-all flex items-center gap-1.5"
+              >
+                <ShieldCheck className="h-3.5 w-3.5" />
+                אימותים
+              </Link>
               {session.user.role === "SELLER" && (
                 <Link
                   href="/profile/gigs"
@@ -133,6 +147,15 @@ export default function ProfilePage() {
                 <Bell className="h-3.5 w-3.5" />
                 התראות
               </Link>
+              {session.user.role === "SELLER" && (
+                <Link
+                  href="/profile/tax"
+                  className="rounded-full border border-[rgb(var(--color-border))] px-4 py-1.5 text-[13px] font-semibold text-[rgb(var(--color-text-secondary))] hover:border-[rgb(var(--color-accent))] hover:text-[rgb(var(--color-accent))] transition-all flex items-center gap-1.5"
+                >
+                  <Receipt className="h-3.5 w-3.5" />
+                  פרופיל עסקי
+                </Link>
+              )}
             </div>
           </div>
 

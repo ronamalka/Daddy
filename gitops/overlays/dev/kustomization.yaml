@@ -6,6 +6,9 @@ namespace: daddy-dev
 resources:
   - ../../base
 
+components:
+  - ../../components/seed-job
+
 patches:
   - target:
       kind: Deployment
