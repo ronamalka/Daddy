@@ -13,6 +13,26 @@ function serviceSignature(): string {
   return crypto.createHmac("sha256", INTER_SERVICE_SECRET).update("service-call").digest("hex");
 }
 
+/** GET from a sibling service with the inter-service signature. */
+export async function internalGet(
+  serviceUrl: string,
+  path: string,
+): Promise<{ data: unknown; status: number }> {
+  try {
+    const res = await fetch(`${serviceUrl}${path}`, {
+      method: "GET",
+      headers: {
+        "x-service-signature": serviceSignature(),
+      },
+    });
+    const data = await res.json().catch(() => null);
+    return { data, status: res.status };
+  } catch (err) {
+    console.error(`[internal-client] GET ${serviceUrl}${path} failed:`, err);
+    return { data: null, status: 502 };
+  }
+}
+
 /** POST JSON to a sibling service with the inter-service signature. */
 export async function internalPost(
   serviceUrl: string,

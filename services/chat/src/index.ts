@@ -5,7 +5,8 @@ import { PrismaClient } from "./generated/prisma/client";
 import { extractUser } from "../../shared/middleware";
 import { applySecurity, generalRateLimit } from "../../shared/security";
 import { createMessagesRouter } from "./routes/messages";
-import { prismaMessageRepo } from "./repo";
+import { createViolationsRouter } from "./routes/violations";
+import { prismaMessageRepo, prismaViolationRepo } from "./repo";
 
 const pool = new pg.Pool({ connectionString: process.env.DATABASE_URL });
 const adapter = new PrismaPg(pool);
@@ -23,7 +24,9 @@ app.get("/health", (_req, res) => {
   res.json({ status: "ok", service: "chat" });
 });
 
-app.use("/messages", createMessagesRouter(prismaMessageRepo(prisma)));
+const violationRepo = prismaViolationRepo(prisma);
+app.use("/messages", createMessagesRouter(prismaMessageRepo(prisma), violationRepo));
+app.use("/violations", createViolationsRouter(prisma));
 
 /** Start the chat HTTP server. */
 app.listen(PORT, "0.0.0.0", () => {

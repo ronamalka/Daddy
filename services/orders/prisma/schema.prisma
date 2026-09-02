@@ -72,6 +72,21 @@ enum PaymentMethod {
   CASH
 }
 
+enum MaintenancePlanStatus {
+  ACTIVE
+  PAUSED
+  CANCELLED
+  EXPIRED
+}
+
+enum MaintenanceVisitStatus {
+  SCHEDULED
+  CONFIRMED
+  COMPLETED
+  MISSED
+  CANCELLED
+}
+
 model Order {
   id        String      @id @default(cuid())
   jobType   JobType     @default(GIG)
@@ -100,13 +115,16 @@ model Order {
   onTheWayEta           String?
   deliveryPhotos        String[]              @default([])
   deliveryNote          String?
+  commissionRate       Float?
+  commissionAmount     Float?
   createdAt DateTime    @default(now())
   updatedAt DateTime    @updatedAt
 
-  requirements OrderRequirement[]
-  disputes     Dispute[]
-  payments     Payment[]
-  invoice      Invoice?
+  requirements   OrderRequirement[]
+  disputes       Dispute[]
+  payments       Payment[]
+  invoice        Invoice?
+  warrantyClaims WarrantyClaim[]
 
   @@index([buyerId])
   @@index([sellerId])
@@ -193,6 +211,73 @@ model Payment {
 
   @@index([orderId])
   @@index([gatewayId])
+  @@index([status])
+}
+
+model MaintenancePlan {
+  id           String                @id @default(cuid())
+  buyerId      String
+  sellerId     String?
+  planType     String                @default("BASIC")
+  priceMonthly Float                 @default(99)
+  status       MaintenancePlanStatus @default(ACTIVE)
+  startedAt    DateTime              @default(now())
+  nextVisitAt  DateTime?
+  cancelledAt  DateTime?
+  createdAt    DateTime              @default(now())
+  updatedAt    DateTime              @updatedAt
+
+  visits MaintenanceVisit[]
+
+  @@index([buyerId])
+  @@index([sellerId])
+  @@index([status])
+}
+
+model MaintenanceVisit {
+  id          String                 @id @default(cuid())
+  planId      String
+  scheduledAt DateTime
+  completedAt DateTime?
+  status      MaintenanceVisitStatus @default(SCHEDULED)
+  report      String?
+  photos      String[]               @default([])
+  createdAt   DateTime               @default(now())
+  updatedAt   DateTime               @updatedAt
+
+  plan MaintenancePlan @relation(fields: [planId], references: [id])
+
+  @@index([planId])
+  @@index([scheduledAt])
+  @@index([status])
+}
+
+enum WarrantyStatus {
+  OPEN
+  UNDER_REVIEW
+  APPROVED_RESEND
+  APPROVED_REFUND
+  REJECTED
+  CLOSED
+}
+
+model WarrantyClaim {
+  id          String         @id @default(cuid())
+  orderId     String
+  buyerId     String
+  description String
+  photos      String[]       @default([])
+  status      WarrantyStatus @default(OPEN)
+  resolution  String?
+  resolvedAt  DateTime?
+  resolvedBy  String?
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  order Order @relation(fields: [orderId], references: [id])
+
+  @@index([orderId])
+  @@index([buyerId])
   @@index([status])
 }
 
