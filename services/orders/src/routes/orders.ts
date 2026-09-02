@@ -164,12 +164,26 @@ ordersRoutes.get("/stats/admin", requireAdmin, async (_req: Request, res: Respon
   res.json({ orders: orderCount, revenue });
 });
 
-/** Count completed orders for one seller. */
+/** Count completed orders for one seller. Pass ?since=ISO_DATE to filter by date. */
 ordersRoutes.get("/count-by-seller/:sellerId", requireInternal, async (req: Request, res: Response) => {
   const sellerId = req.params.sellerId as string;
-  const count = await prisma.order.count({
-    where: { sellerId, status: "COMPLETED" },
-  });
+  const since = typeof req.query.since === "string" ? req.query.since : null;
+
+  const where: { sellerId: string; status: "COMPLETED"; createdAt?: { gte: Date } } = {
+    sellerId,
+    status: "COMPLETED",
+  };
+
+  if (since) {
+    const sinceDate = new Date(since);
+    if (Number.isNaN(sinceDate.getTime())) {
+      res.status(400).json({ error: "Invalid since date" });
+      return;
+    }
+    where.createdAt = { gte: sinceDate };
+  }
+
+  const count = await prisma.order.count({ where });
   res.json({ completedOrders: count });
 });
 

@@ -1,6 +1,6 @@
 import { Router, Request, Response } from "express";
 import { requireAuth } from "../../../shared/middleware";
-import { sendNotification } from "../../../shared/internal-client";
+import { sendNotification, internalGet } from "../../../shared/internal-client";
 import { buildNotification } from "../../../shared/notification-templates";
 import { prisma } from "../index";
 import { OrderStatus } from "../generated/prisma/client";
@@ -9,6 +9,8 @@ import { buyerCancelPatch, sellerDeclinePatch } from "../lib/cancellation";
 import { canStartWork } from "../lib/materials";
 import { parseDeliveryEvidence } from "../../../shared/delivery-photos";
 import { releasePayment } from "../lib/escrow";
+
+const USERS_SERVICE_URL = process.env.USERS_SERVICE_URL || "http://localhost:4001";
 
 /** Routes for one order: details, status changes, and buyer requirements. */
 export const orderDetailRoutes = Router();
@@ -179,9 +181,29 @@ orderDetailRoutes.patch("/:id", requireAuth, async (req: Request, res: Response)
     return;
   }
 
+  const updateData: Record<string, unknown> = { status };
+
+  // Record commission when order is marked COMPLETED
+  if (status === "COMPLETED") {
+    try {
+      const { data, status: commStatus } = await internalGet(
+        USERS_SERVICE_URL,
+        `/sellers/${order.sellerId}/commission`,
+      );
+      if (commStatus === 200 && data) {
+        const commData = data as { rate: number };
+        const rate = commData.rate;
+        updateData.commissionRate = rate;
+        updateData.commissionAmount = Math.round(order.price * rate * 100) / 100;
+      }
+    } catch (err) {
+      console.error(`[commission] Failed to fetch rate for seller ${order.sellerId}:`, err);
+    }
+  }
+
   const updated = await prisma.order.update({
     where: { id },
-    data: { status },
+    data: updateData,
   });
 
   // Auto-release escrow when order is marked COMPLETED

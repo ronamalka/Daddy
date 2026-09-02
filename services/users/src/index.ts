@@ -20,6 +20,7 @@ import { emailVerifyRoutes } from "./routes/email-verify";
 import { notificationsRoutes } from "./routes/notifications";
 import { verificationRoutes } from "./routes/verification";
 import { addressesRoutes } from "./routes/addresses";
+import { commissionRoutes } from "./routes/commission";
 import { startCityCatalogRefresh } from "./city-catalog";
 
 export { prisma };
@@ -45,6 +46,7 @@ app.use("/profile", profileRoutes);
 app.use("/admin", adminRoutes);
 app.use("/providers", providersRoutes);
 app.use("/sellers", sellerRoutes);
+app.use("/sellers", commissionRoutes);
 app.use("/service-areas", serviceAreasRoutes);
 app.use("/service-prices", servicePricesRoutes);
 app.use("/user-services", userServicesRoutes);
