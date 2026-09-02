@@ -17,18 +17,18 @@ export function createRequestLogger() {
   return pinoHttp({
     logger,
     autoLogging: {
-      ignore: (req: { url?: string }) => req.url === "/health" || req.url === "/metrics",
+      ignore: (req: any) => req.url === "/health" || req.url === "/metrics",
     },
-    customProps: (req: { headers?: Record<string, string | string[] | undefined>; id?: string }) => ({
+    customProps: (req: any) => ({
       requestId: req.headers?.["x-request-id"] || req.id,
     }),
     serializers: {
-      req: (req: { method?: string; url?: string; remoteAddress?: string }) => ({
+      req: (req: any) => ({
         method: req.method,
         url: req.url,
         remoteAddress: req.remoteAddress,
       }),
-      res: (res: { statusCode?: number }) => ({
+      res: (res: any) => ({
         statusCode: res.statusCode,
       }),
     },
