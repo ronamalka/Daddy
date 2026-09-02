@@ -27,6 +27,7 @@ import { addressesRoutes } from "./routes/addresses";
 import { subscriptionRoutes } from "./routes/subscription";
 import { commissionRoutes } from "./routes/commission";
 import { whatsappRoutes } from "./routes/whatsapp";
+import { userAnalyticsRoutes } from "./routes/analytics";
 import { startCityCatalogRefresh } from "./city-catalog";
 
 export { prisma };
@@ -68,6 +69,7 @@ app.use("/notifications/whatsapp", whatsappRoutes);
 app.use("/verify", verificationRoutes);
 app.use("/addresses", addressesRoutes);
 app.use("/subscription", subscriptionRoutes);
+app.use("/api/analytics", userAnalyticsRoutes);
 
 /** Start the users HTTP server. */
 app.listen(PORT, "0.0.0.0", () => {
