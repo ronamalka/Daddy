@@ -45,6 +45,9 @@ export async function generateMetadata(): Promise<Metadata> {
       description: "מצא אבאל׳ה מנוסה שיסדר לך הכל — מהרכבת ארון ועד הוזלת חשבונות.",
     },
     robots: { index: true, follow: true },
+    verification: {
+      google: process.env.GOOGLE_SITE_VERIFICATION || "",
+    },
   };
 }
 

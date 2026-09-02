@@ -16,6 +16,7 @@ export const MARKETING_SITEMAP_ENTRIES: {
   { path: "/how-it-works", changeFrequency: "monthly", priority: 0.8 },
   { path: "/become-a-daddy", changeFrequency: "monthly", priority: 0.7 },
   { path: "/about", changeFrequency: "monthly", priority: 0.6 },
+  { path: "/services", changeFrequency: "weekly", priority: 0.8 },
   { path: "/accessibility", changeFrequency: "yearly", priority: 0.3 },
   { path: "/terms", changeFrequency: "yearly", priority: 0.2 },
   { path: "/privacy", changeFrequency: "yearly", priority: 0.2 },
