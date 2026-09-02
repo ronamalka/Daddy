@@ -22,7 +22,9 @@ Add the Google redirect URI `https://aballeh.com/api/auth/callback/google`.
 1. Confirm `daddy-stg` is healthy on the build you want.
 2. Merge `stg` → `main`. Wait for CI to write image SHAs into `gitops/base`.
 3. Tag `v1.0.0` on that GitOps-updated commit and push the tag. Create a GitHub Environment named `production` if it does not exist (the release workflow uses it).
-4. Create real secrets in `daddy-prod` (placeholders in Git are `CHANGE_ME_PROD_*`). Argo will not overwrite Secret data.
+4. Create real secrets in `daddy-prod` (base manifests use empty strings). Argo
+   uses `ServerSideApply=true` + `RespectIgnoreDifferences=true` to preserve
+   cluster-patched values across syncs.
 
 ```bash
 NS=daddy-prod
