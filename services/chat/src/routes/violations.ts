@@ -37,7 +37,7 @@ export function createViolationsRouter(prisma: PrismaClient) {
 
   /** Mark a violation as a false positive (dismissed). */
   router.post("/:id/dismiss", requireAdmin, async (req: Request, res: Response) => {
-    const { id } = req.params;
+    const id = String(req.params.id);
     try {
       const updated = await prisma.chatViolation.update({
         where: { id },
@@ -51,7 +51,7 @@ export function createViolationsRouter(prisma: PrismaClient) {
 
   /** Mark that the user has been warned about this violation. */
   router.post("/:id/warn", requireAdmin, async (req: Request, res: Response) => {
-    const { id } = req.params;
+    const id = String(req.params.id);
     try {
       const updated = await prisma.chatViolation.update({
         where: { id },
