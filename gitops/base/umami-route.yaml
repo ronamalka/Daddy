@@ -3,7 +3,7 @@ kind: Route
 metadata:
   name: umami
   annotations:
-    cert-utils-operator.redhat-cop.io/certs-from-secret: daddy-tls
+    cert-utils-operator.redhat-cop.io/certs-from-secret: aballeh-tls
 spec:
   host: analytics.aballeh.com
   to:
