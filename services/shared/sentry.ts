@@ -1,16 +1,18 @@
-import * as Sentry from "@sentry/node";
 import type { Express } from "express";
 import { logger } from "./logger";
 
-/**
- * Initialize Sentry for an Express microservice.
- * Reads SENTRY_DSN from the environment; skips init when absent so local dev
- * works without a DSN.
- */
+let Sentry: typeof import("@sentry/node") | null = null;
+
+try {
+  Sentry = require("@sentry/node");
+} catch {
+  logger.warn("@sentry/node not installed — Sentry will be disabled");
+}
+
 export function initSentry(): void {
   const dsn = process.env.SENTRY_DSN;
-  if (!dsn) {
-    logger.info("SENTRY_DSN not set — Sentry disabled");
+  if (!dsn || !Sentry) {
+    logger.info("Sentry disabled (no DSN or module not installed)");
     return;
   }
 
@@ -30,12 +32,8 @@ export function initSentry(): void {
   logger.info({ service: serviceName, environment }, "Sentry initialized");
 }
 
-/**
- * Register the Sentry error handler on an Express app.
- * Must be called AFTER all routes are mounted.
- */
 export function setupSentryErrorHandler(app: Express): void {
-  if (!process.env.SENTRY_DSN) return;
+  if (!process.env.SENTRY_DSN || !Sentry) return;
   Sentry.setupExpressErrorHandler(app);
 }
 

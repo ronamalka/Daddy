@@ -2,9 +2,9 @@ name: CI
 
 on:
   push:
-    branches: [main, dev, stg, develop, feature/*]
+    branches: [main, dev, stg]
   pull_request:
-    branches: [main, dev, stg, develop]
+    branches: [main, dev, stg]
   workflow_dispatch:
 
 env:
@@ -118,14 +118,14 @@ jobs:
           echo "Waiting for services to be ready..."
           for port in 4001 4002 4003 4004 4005; do
             ready=false
-            for i in $(seq 1 30); do
+            for i in $(seq 1 60); do
               if curl -sf http://localhost:$port/health > /dev/null 2>&1; then
                 echo "Service on port $port is ready"
                 ready=true
                 break
               fi
-              echo "Waiting for port $port... ($i/30)"
-              sleep 2
+              echo "Waiting for port $port... ($i/60)"
+              sleep 3
             done
             if [ "$ready" = false ]; then
               echo "ERROR: Service on port $port did not start in time"
