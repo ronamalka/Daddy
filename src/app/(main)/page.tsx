@@ -1,4 +1,5 @@
 import { pageMetadata, HOME_DESCRIPTION, HOME_TITLE } from "@/lib/seo";
+import { fetchFeaturedDaddies, fetchRecentReviews, fetchRequestTeasers } from "@/lib/homepage-data";
 import { HomePage } from "./home-page";
 
 export const metadata = pageMetadata({
@@ -9,6 +10,18 @@ export const metadata = pageMetadata({
 });
 
 /** Homepage catalog: search, featured daddies, and how the site works. */
-export default function Page() {
-  return <HomePage />;
+export default async function Page() {
+  const [featuredDaddies, liveReviews, requestTeasers] = await Promise.all([
+    fetchFeaturedDaddies(),
+    fetchRecentReviews(),
+    fetchRequestTeasers(),
+  ]);
+
+  return (
+    <HomePage
+      initialFeaturedDaddies={featuredDaddies}
+      initialLiveReviews={liveReviews}
+      initialRequestTeasers={requestTeasers}
+    />
+  );
 }
