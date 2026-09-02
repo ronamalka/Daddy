@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
-import { Lock, MapPin, Package, CurrencyDollar, Star, User, Envelope, Shield, CalendarBlank, CreditCard, Bell, ShieldCheck, House, Receipt } from "@phosphor-icons/react";
+import { Lock, MapPin, Package, CurrencyDollar, Star, User, Envelope, Shield, CalendarBlank, CreditCard, Bell, ShieldCheck, House, Receipt, Crown } from "@phosphor-icons/react";
 import { ProfileProgress } from "@/components/profile-progress";
 import type { ProfileReadinessResponse } from "@/lib/seller-ready";
 
@@ -161,6 +161,15 @@ export default function ProfilePage() {
                 >
                   <Receipt className="h-3.5 w-3.5" />
                   פרופיל עסקי
+                </Link>
+              )}
+              {session.user.role === "SELLER" && (
+                <Link
+                  href="/profile/subscription"
+                  className="rounded-full border border-[rgb(var(--color-border))] px-4 py-1.5 text-[13px] font-semibold text-[rgb(var(--color-text-secondary))] hover:border-[rgb(var(--color-accent-yellow))] hover:text-[rgb(var(--color-warning))] transition-all flex items-center gap-1.5"
+                >
+                  <Crown className="h-3.5 w-3.5" />
+                  מנוי פרימיום
                 </Link>
               )}
             </div>

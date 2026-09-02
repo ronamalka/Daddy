@@ -50,6 +50,10 @@ model User {
   licenseStatus    String?
   licensePhoto     String?
   licenseType      String?
+  subscriptionTier      String    @default("FREE")
+  subscriptionStartedAt DateTime?
+  subscriptionExpiresAt DateTime?
+  subscriptionPaymentId String?
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 

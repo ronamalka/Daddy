@@ -20,6 +20,7 @@ import { emailVerifyRoutes } from "./routes/email-verify";
 import { notificationsRoutes } from "./routes/notifications";
 import { verificationRoutes } from "./routes/verification";
 import { addressesRoutes } from "./routes/addresses";
+import { subscriptionRoutes } from "./routes/subscription";
 import { startCityCatalogRefresh } from "./city-catalog";
 
 export { prisma };
@@ -54,6 +55,7 @@ app.use("/availability", availabilityRoutes);
 app.use("/notifications", notificationsRoutes);
 app.use("/verify", verificationRoutes);
 app.use("/addresses", addressesRoutes);
+app.use("/subscription", subscriptionRoutes);
 
 /** Start the users HTTP server. */
 app.listen(PORT, "0.0.0.0", () => {
