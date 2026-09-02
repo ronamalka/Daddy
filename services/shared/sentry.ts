@@ -1,7 +1,8 @@
 import type { Express } from "express";
 import { logger } from "./logger";
 
-let Sentry: typeof import("@sentry/node") | null = null;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+let Sentry: any = null;
 
 try {
   Sentry = require("@sentry/node");
