@@ -12,6 +12,7 @@ import {
   CATEGORY_SLUGS,
   CITY_SLUGS,
 } from "@/lib/landing-pages";
+import { getAllPosts } from "@/lib/blog";
 
 /** Builds the public sitemap: marketing pages, searchable daddies, and package URLs. */
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
@@ -75,11 +76,30 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     gigPages = [];
   }
 
+  /* --- Blog posts --- */
+  const blogPosts = getAllPosts();
+  const blogIndex: MetadataRoute.Sitemap = [
+    {
+      url: siteUrl("/blog"),
+      lastModified: now,
+      changeFrequency: "weekly" as const,
+      priority: 0.7,
+    },
+  ];
+  const blogPostPages: MetadataRoute.Sitemap = blogPosts.map((post) => ({
+    url: siteUrl(`/blog/${post.slug}`),
+    lastModified: new Date(post.date),
+    changeFrequency: "monthly" as const,
+    priority: 0.6,
+  }));
+
   return [
     ...staticPages,
     ...servicePages,
     ...cityPages,
     ...cityServicePages,
+    ...blogIndex,
+    ...blogPostPages,
     ...sellerPages,
     ...gigPages,
   ];
