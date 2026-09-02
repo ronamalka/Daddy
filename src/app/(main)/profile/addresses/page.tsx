@@ -199,7 +199,7 @@ export default function AddressesPage() {
           {addresses.map((addr) => (
             <div
               key={addr.id}
-              className="rounded-2xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] p-5 shadow-[0_2px_8px_rgba(var(--color-primary),0.06)]"
+              className="rounded-2xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] p-5 shadow-sm"
             >
               <div className="flex items-start justify-between">
                 <div className="flex items-start gap-3">
@@ -261,7 +261,7 @@ export default function AddressesPage() {
           )}
 
           {showForm && (
-            <div className="rounded-2xl border border-[rgb(var(--color-primary))] bg-[rgb(var(--color-surface))] p-6 shadow-[0_4px_16px_rgba(var(--color-primary),0.1)]">
+            <div className="rounded-2xl border border-[rgb(var(--color-primary))] bg-[rgb(var(--color-surface))] p-6 shadow-md">
               <h2 className="mb-5 text-[16px] font-bold text-[rgb(var(--color-text))]">
                 {editingId ? "עריכת כתובת" : "הוסף כתובת"}
               </h2>

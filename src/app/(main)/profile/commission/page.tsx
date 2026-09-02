@@ -137,7 +137,7 @@ export default function CommissionPage() {
 
       {/* Current Tier Card */}
       <div
-        className="rounded-2xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] p-6 shadow-[0_4px_16px_rgba(var(--color-primary),0.08)]"
+        className="rounded-2xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] p-6 shadow-md"
       >
         <div className="flex items-center gap-4 mb-6">
           <div
@@ -218,7 +218,7 @@ export default function CommissionPage() {
       </div>
 
       {/* Tier Comparison Table */}
-      <div className="mt-6 rounded-2xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] p-6 shadow-[0_4px_16px_rgba(var(--color-primary),0.08)]">
+      <div className="mt-6 rounded-2xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] p-6 shadow-md">
         <h2 className="text-[18px] font-bold text-[rgb(var(--color-text))] mb-4">
           טבלת דרגות
         </h2>

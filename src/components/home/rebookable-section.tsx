@@ -42,7 +42,7 @@ export function RebookableSection({ sellers, loading }: { sellers: RebookableSel
         {sellers.map((item) => (
           <div
             key={item.sellerId}
-            className="group flex items-center gap-4 rounded-2xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] p-5 transition-all hover:border-[rgba(var(--color-primary-light),0.3)] hover:shadow-[0_4px_16px_rgba(var(--color-primary),0.08)]"
+            className="group flex items-center gap-4 rounded-2xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] p-5 transition-all hover:border-[rgba(var(--color-primary-light),0.3)] hover:shadow-md"
           >
             <div className="relative h-14 w-14 flex-shrink-0 overflow-hidden rounded-full bg-[rgba(var(--color-primary),0.1)]">
               {item.seller.avatar ? (

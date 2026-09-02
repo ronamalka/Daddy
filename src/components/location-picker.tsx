@@ -134,7 +134,7 @@ export function LocationPicker({ mode, value, areas = [], onChange, onAreasChang
                 className={cn(
                   "rounded-full px-4 py-2 text-[13px] font-semibold transition-all",
                   selected
-                    ? "bg-[rgb(var(--color-primary))] text-white shadow-[0_2px_8px_rgba(var(--color-primary),0.3)]"
+                    ? "bg-[rgb(var(--color-primary))] text-white shadow-md"
                     : partial
                     ? "border-2 border-[rgb(var(--color-primary))] bg-[rgba(var(--color-primary),0.1)] text-[rgb(var(--color-primary))]"
                     : "border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] text-[rgb(var(--color-text-secondary))] hover:border-[rgba(var(--color-primary-light),0.3)] hover:text-[rgb(var(--color-primary))]"

@@ -204,7 +204,7 @@ export default function EditProfilePage() {
           <p role="alert" className="text-[13px] font-medium text-[rgb(var(--color-error))]">{error}</p>
         )}
 
-        <button type="submit" disabled={saving} className="w-full rounded-xl bg-[rgb(var(--color-primary))] py-4 text-[15px] font-semibold text-white shadow-[0_4px_16px_rgba(var(--color-primary),0.3)] transition-all hover:bg-[rgb(var(--color-primary-hover))] disabled:opacity-40 disabled:cursor-not-allowed">
+        <button type="submit" disabled={saving} className="w-full rounded-xl bg-[rgb(var(--color-primary))] py-4 text-[15px] font-semibold text-white shadow-md transition-all hover:bg-[rgb(var(--color-primary-hover))] disabled:opacity-40 disabled:cursor-not-allowed">
           {saving ? "שומר..." : "שמור שינויים"}
         </button>
       </form>

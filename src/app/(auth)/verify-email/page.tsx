@@ -17,7 +17,7 @@ export default function VerifyEmailPage() {
 function VerifyEmailSkeleton() {
   return (
     <div className="w-full max-w-md">
-      <div className="rounded-2xl bg-[rgb(var(--color-surface))] p-8 shadow-[0_4px_16px_rgba(var(--color-primary),0.08)] text-center">
+      <div className="rounded-2xl bg-[rgb(var(--color-surface))] p-8 shadow-md text-center">
         <div className="h-6 w-48 mx-auto rounded bg-[rgb(var(--color-border))] animate-pulse mb-4" />
         <div className="h-4 w-64 mx-auto rounded bg-[rgb(var(--color-border))] animate-pulse" />
       </div>
@@ -65,7 +65,7 @@ function VerifyEmailContent() {
 
   return (
     <div className="w-full max-w-md">
-      <div className="rounded-2xl bg-[rgb(var(--color-surface))] p-8 shadow-[0_4px_16px_rgba(var(--color-primary),0.08)] text-center">
+      <div className="rounded-2xl bg-[rgb(var(--color-surface))] p-8 shadow-md text-center">
         {status === "loading" && (
           <>
             <div className="mb-4">

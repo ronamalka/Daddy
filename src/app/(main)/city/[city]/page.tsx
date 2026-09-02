@@ -61,7 +61,7 @@ export default async function CityPage({ params }: PageProps) {
   return (
     <div className="min-h-screen bg-[rgb(var(--color-bg))]">
       {/* Hero */}
-      <section className="bg-gradient-to-br from-slate-900 via-slate-900 to-[rgba(var(--color-primary),0.3)] py-20 text-center text-white">
+      <section className="bg-slate-900 py-20 text-center text-white">
         <div className="mx-auto max-w-4xl px-4">
           <nav className="mb-6 flex items-center justify-center gap-2 text-[13px] text-white/50">
             <Link href="/" className="hover:text-white/80 transition-colors">
@@ -95,7 +95,7 @@ export default async function CityPage({ params }: PageProps) {
             <Link
               key={slug}
               href={`/city/${citySlug}/${slug}`}
-              className="group rounded-2xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] p-6 transition-all hover:shadow-lg hover:-translate-y-1"
+              className="group rounded-2xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] p-6 transition-all hover:shadow-lg"
             >
               <h3 className="text-[20px] font-bold text-[rgb(var(--color-text))] mb-2 group-hover:text-[rgb(var(--color-primary))] transition-colors">
                 {cat.he} ב{city.he}
@@ -136,7 +136,7 @@ export default async function CityPage({ params }: PageProps) {
       </section>
 
       {/* CTA */}
-      <section className="bg-gradient-to-br from-[rgb(var(--color-primary))] to-[rgb(var(--color-primary-light))] py-16 text-center text-white">
+      <section className="bg-primary py-16 text-center text-white">
         <div className="mx-auto max-w-3xl px-4">
           <h2 className="text-[28px] font-extrabold md:text-[32px]">
             צריך עזרה ב{city.he}?
@@ -146,7 +146,7 @@ export default async function CityPage({ params }: PageProps) {
           </p>
           <Link
             href="/requests/create"
-            className="mt-8 inline-block rounded-xl bg-white px-8 py-3.5 text-[15px] font-bold text-[rgb(var(--color-primary))] shadow-[0_4px_16px_rgba(0,0,0,0.15)] transition-all hover:shadow-[0_8px_24px_rgba(0,0,0,0.2)] hover:-translate-y-0.5"
+            className="mt-8 inline-block rounded-xl bg-white px-8 py-3.5 text-[15px] font-bold text-[rgb(var(--color-primary))] shadow-md transition-all hover:shadow-lg"
           >
             פרסם בקשה
           </Link>

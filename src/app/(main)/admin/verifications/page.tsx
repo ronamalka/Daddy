@@ -127,7 +127,7 @@ export default function AdminVerificationsPage() {
               className="overflow-hidden rounded-2xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))]"
             >
               <div className="flex items-center gap-4 border-b border-[rgb(var(--color-border-light))] px-6 py-4">
-                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-[rgb(var(--color-primary))] to-[rgb(var(--color-primary-light))] text-[14px] font-bold text-white">
+                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary text-[14px] font-bold text-white">
                   {user.name[0]}
                 </div>
                 <div className="flex-1">

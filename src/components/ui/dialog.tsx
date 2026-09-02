@@ -45,21 +45,21 @@ export function Dialog({ open, onOpenChange, children, className, labelledBy, ar
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm"
+            className="fixed inset-0 z-50 bg-black/50"
             onClick={() => onOpenChange(false)}
           />
           <motion.div
-            initial={{ opacity: 0, scale: 0.95, y: 8 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.95, y: 8 }}
-            transition={{ type: "spring", damping: 25, stiffness: 300 }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.15 }}
             role="dialog"
             aria-modal="true"
             aria-labelledby={labelledBy}
             aria-label={ariaLabel}
             className={cn(
               "fixed left-1/2 top-1/2 z-50 w-[90%] max-w-md -translate-x-1/2 -translate-y-1/2",
-              "rounded-2xl bg-[rgb(var(--color-surface))] p-6 shadow-2xl border border-[rgb(var(--color-border))]",
+              "rounded-2xl bg-[rgb(var(--color-surface))] p-6 shadow-lg border border-[rgb(var(--color-border))]",
               className
             )}
           >

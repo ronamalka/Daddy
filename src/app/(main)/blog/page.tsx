@@ -16,7 +16,7 @@ export default function BlogIndexPage() {
   return (
     <div className="min-h-screen bg-[rgb(var(--color-bg))]">
       {/* Hero */}
-      <section className="bg-gradient-to-br from-slate-900 via-slate-900 to-[rgba(var(--color-primary),0.3)] py-20 text-center text-white">
+      <section className="bg-slate-900 py-20 text-center text-white">
         <div className="mx-auto max-w-4xl px-4">
           <h1 className="text-[36px] font-extrabold md:text-[48px]">
             הבלוג של אבאל׳ה
@@ -39,10 +39,10 @@ export default function BlogIndexPage() {
               <Link
                 key={post.slug}
                 href={`/blog/${post.slug}`}
-                className="group flex flex-col rounded-2xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] overflow-hidden transition-all hover:shadow-lg hover:-translate-y-1"
+                className="group flex flex-col rounded-2xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] overflow-hidden transition-shadow hover:shadow-lg"
               >
                 {/* Image placeholder */}
-                <div className="relative h-48 w-full bg-gradient-to-br from-[rgba(var(--color-primary),0.15)] to-[rgba(var(--color-primary),0.05)] flex items-center justify-center">
+                <div className="relative h-48 w-full bg-[rgba(var(--color-primary),0.08)] flex items-center justify-center">
                   <span className="text-[48px]" aria-hidden="true">
                     {post.tags.includes("טיפים")
                       ? "\u{1F4A1}"
@@ -90,7 +90,7 @@ export default function BlogIndexPage() {
       </section>
 
       {/* CTA */}
-      <section className="bg-gradient-to-br from-[rgb(var(--color-primary))] to-[rgb(var(--color-primary-light))] py-16 text-center text-white">
+      <section className="bg-primary py-16 text-center text-white">
         <div className="mx-auto max-w-3xl px-4">
           <h2 className="text-[28px] font-extrabold md:text-[32px]">
             צריכים עזרה בבית?
@@ -101,7 +101,7 @@ export default function BlogIndexPage() {
           <div className="mt-8 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
             <Link
               href="/"
-              className="rounded-xl bg-white px-8 py-3.5 text-[15px] font-bold text-[rgb(var(--color-primary))] shadow-[0_4px_16px_rgba(0,0,0,0.15)] transition-all hover:shadow-[0_8px_24px_rgba(0,0,0,0.2)] hover:-translate-y-0.5"
+              className="rounded-xl bg-white px-8 py-3.5 text-[15px] font-bold text-[rgb(var(--color-primary))] shadow-md transition-shadow hover:shadow-lg"
             >
               חפש אבאל׳ה
             </Link>

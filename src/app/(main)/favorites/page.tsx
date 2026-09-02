@@ -149,10 +149,10 @@ export default function FavoritesPage() {
                 <Link
                   key={fav.id}
                   href={`/sellers/${fav.seller.id}`}
-                  className="group rounded-2xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] p-5 transition-all hover:shadow-[0_4px_16px_rgba(var(--color-primary),0.1)] hover:border-[rgba(var(--color-primary),0.3)]"
+                  className="group rounded-2xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] p-5 transition-all hover:shadow-md hover:border-[rgba(var(--color-primary),0.3)]"
                 >
                   <div className="flex items-center gap-4">
-                    <div className="relative flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-full bg-gradient-to-br from-[rgb(var(--color-primary))] to-[rgb(var(--color-primary-light))] text-2xl font-bold text-white">
+                    <div className="relative flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-full bg-primary text-2xl font-bold text-white">
                       {fav.seller.avatar ? (
                         <Image
                           src={fav.seller.avatar}

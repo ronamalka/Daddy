@@ -231,7 +231,7 @@ export default function GigDetailPage() {
 
           {/* Seller Info */}
           <Link href={`/sellers/${gig.seller?.id ?? ""}`} className="mb-6 flex items-center gap-3 group">
-            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-[rgb(var(--color-primary))] to-[rgb(var(--color-primary-light))] text-[14px] font-bold text-white">
+            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary text-[14px] font-bold text-white">
               {sellerName[0]}
             </div>
             <div>
@@ -328,7 +328,7 @@ export default function GigDetailPage() {
                 {gig.reviews.map((review) => (
                   <div key={review.id} className="py-4 first:pt-0 last:pb-0">
                     <div className="mb-2 flex items-center gap-3">
-                      <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-[rgb(var(--color-accent))] to-[rgb(var(--color-success))] text-[12px] font-bold text-white">
+                      <div className="flex h-9 w-9 items-center justify-center rounded-full bg-accent text-[12px] font-bold text-white">
                         {(review.user?.name || "משתמש")[0]}
                       </div>
                       <div className="flex-1">
@@ -437,7 +437,7 @@ export default function GigDetailPage() {
 
         {/* Right Column — Pricing */}
         <div>
-          <div className="sticky top-4 overflow-hidden rounded-2xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] shadow-[0_4px_16px_rgba(var(--color-primary),0.08)]">
+          <div className="sticky top-4 overflow-hidden rounded-2xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] shadow-md">
             {/* Tier Tabs */}
             <div className="flex border-b border-[rgb(var(--color-border))]">
               {sortedTiers.map((tier) => {
@@ -492,7 +492,7 @@ export default function GigDetailPage() {
                 <button
                   onClick={handleOrder}
                   disabled={ordering || gig.seller?.id === session?.user?.id || !selectedSlot}
-                  className="w-full rounded-xl bg-[rgb(var(--color-primary))] py-3.5 text-[14px] font-semibold text-white shadow-[0_4px_16px_rgba(var(--color-primary),0.3)] transition-all hover:bg-[rgb(var(--color-primary-hover))] hover:shadow-[0_6px_20px_rgba(var(--color-primary),0.4)] disabled:opacity-40 disabled:cursor-not-allowed disabled:shadow-none"
+                  className="w-full rounded-xl bg-[rgb(var(--color-primary))] py-3.5 text-[14px] font-semibold text-white shadow-md transition-all hover:bg-[rgb(var(--color-primary-hover))]  disabled:opacity-40 disabled:cursor-not-allowed disabled:shadow-none"
                 >
                   {ordering ? "מבצע הזמנה..." : `המשך (₪${currentTier.price})`}
                 </button>

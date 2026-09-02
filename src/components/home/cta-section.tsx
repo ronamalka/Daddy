@@ -13,9 +13,7 @@ interface CtaSectionProps {
 export function CtaSection({ session }: CtaSectionProps) {
   return (
     <section className="mx-auto max-w-6xl px-4 py-16">
-      <div className="overflow-hidden rounded-2xl bg-gradient-to-br from-[rgb(var(--color-primary))] to-[rgb(var(--color-primary-light))] p-8 md:p-12 text-center relative">
-        <div className="absolute top-0 left-0 h-64 w-64 rounded-full bg-white/5 -translate-x-1/3 -translate-y-1/3" />
-        <div className="absolute bottom-0 right-0 h-48 w-48 rounded-full bg-[rgba(var(--color-accent),0.1)] translate-x-1/4 translate-y-1/4" />
+      <div className="overflow-hidden rounded-2xl bg-[rgb(var(--color-primary))] p-8 md:p-12 text-center relative">
         <div className="relative">
           <h2 className="text-2xl font-extrabold text-white md:text-3xl">
             {session?.user?.role === "SELLER"
@@ -24,7 +22,7 @@ export function CtaSection({ session }: CtaSectionProps) {
               ? "משהו נשבר? ספר לנו, נשלח אבאל׳ה"
               : "אבא, הארון לא מתרכב. — שנייה, אני בא."}
           </h2>
-          <p className="mt-3 text-white/70 max-w-md mx-auto">
+          <p className="mt-3 text-white/80 max-w-md mx-auto">
             {session?.user?.role === "SELLER"
               ? "לקוחות באזור שלך צריכים עזרה עכשיו. תעיף מבט, תגיב, ותרוויח — כמו פעם, רק עם יותר ׳תודה רבה׳."
               : session?.user
