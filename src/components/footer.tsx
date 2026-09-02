@@ -36,6 +36,7 @@ export function Footer() {
               <FooterLink href="/">עיון</FooterLink>
               <FooterLink href="/how-it-works">איך זה עובד</FooterLink>
               <FooterLink href="/become-a-daddy">הפוך לאבאל׳ה</FooterLink>
+              <FooterLink href="/blog">בלוג</FooterLink>
               <FooterLink href="/about">אודות</FooterLink>
             </div>
             <div className="flex flex-col gap-3">
