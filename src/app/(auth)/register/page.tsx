@@ -61,6 +61,18 @@ function RegisterForm() {
     trackEvent("signup_started", { role });
   }, []);
 
+  useEffect(() => {
+    if (acceptedTerms && confirmedAge18) {
+      trackEvent("signup_consent_given", { role });
+    }
+  }, [acceptedTerms, confirmedAge18]);
+
+  useEffect(() => {
+    if (selectedCity?.cityName) {
+      trackEvent("signup_city_selected", { city: selectedCity.cityName });
+    }
+  }, [selectedCity]);
+
   /** Creates the account and signs the user in. */
   async function handleSubmit() {
     if (!ensureLegalConsent()) {

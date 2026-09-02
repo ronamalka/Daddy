@@ -280,6 +280,9 @@ export default function OrderDetailPage() {
       if (res.ok) {
         const updated = await res.json();
         trackEvent("order_status_changed", { orderId: params.id as string, status });
+        if (status === "COMPLETED") {
+          trackEvent("order_completed", { category: order?.gig?.title || "", amount: order?.price || 0 });
+        }
         setOrder((prev) => prev ? { ...prev, status: updated.status } : prev);
       } else {
         const data = await res.json().catch(() => ({}));

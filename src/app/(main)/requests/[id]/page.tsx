@@ -80,6 +80,9 @@ export default function RequestDetailPage() {
       .then((data) => {
         if (data.request) {
           setRequest(data.request);
+          for (const resp of data.request.responses || []) {
+            trackEvent("quote_viewed", { requestId: data.request.id, sellerId: resp.seller?.id || "" });
+          }
         }
         setLoading(false);
       })

@@ -5,6 +5,7 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { Lock, Check, X, Crown, ArrowLeft } from "@phosphor-icons/react";
 import Link from "next/link";
+import { trackEvent } from "@/lib/analytics";
 
 interface SubscriptionData {
   tier: string;
@@ -42,6 +43,7 @@ export default function SubscriptionPage() {
   }, []);
 
   useEffect(() => {
+    trackEvent("subscription_page_viewed");
     if (session?.user?.role === "SELLER") {
       fetchSubscription();
     } else {
@@ -97,6 +99,11 @@ export default function SubscriptionPage() {
       const res = await fetch(`/api/subscription/${action}`, { method: "POST" });
       const data = await res.json();
       if (res.ok) {
+        if (action === "subscribe") {
+          trackEvent("subscription_started", { tier: "PREMIUM" });
+        } else if (action === "cancel") {
+          trackEvent("subscription_cancelled", { tier: "PREMIUM" });
+        }
         setMessage({ text: data.message, type: "success" });
         await fetchSubscription();
       } else {
