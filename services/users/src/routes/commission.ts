@@ -3,6 +3,7 @@ import { requireAuth, requireInternal } from "../../../shared/middleware";
 import { internalGet } from "../../../shared/internal-client";
 import { prisma } from "../db";
 import { calculateTier, nextTierInfo, COMMISSION_TIERS, CommissionTierName } from "../lib/commission";
+import { logger } from "../../../shared/logger";
 
 const ORDERS_SERVICE_URL = process.env.ORDERS_SERVICE_URL || "http://localhost:4003";
 
@@ -20,7 +21,7 @@ async function fetch90DayCount(sellerId: string): Promise<number> {
     `/orders/count-by-seller/${sellerId}?since=${since}`,
   );
   if (status !== 200 || !data) {
-    console.warn(`[commission] Failed to fetch order count for seller ${sellerId} (HTTP ${status})`);
+    logger.warn({ sellerId, status }, "Failed to fetch order count for commission tier");
     return 0;
   }
   return (data as { completedOrders: number }).completedOrders ?? 0;

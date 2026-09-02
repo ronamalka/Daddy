@@ -4,6 +4,8 @@
  * logs to console (stub mode) when WHATSAPP_PHONE_ID / WHATSAPP_API_TOKEN are not set.
  */
 
+import { logger } from "./logger";
+
 const IS_TEST = process.env.NODE_ENV === "test";
 
 const WHATSAPP_API_URL = "https://graph.facebook.com/v21.0";
@@ -42,8 +44,9 @@ export async function sendWhatsAppNotification(
   if (IS_TEST) return { success: true };
 
   if (!WHATSAPP_PHONE_ID || !WHATSAPP_API_TOKEN) {
-    console.log(
-      `[whatsapp-stub] Would send template "${notification.template}" to ${notification.to} params=${JSON.stringify(notification.params)} link=${notification.link ?? "none"}`,
+    logger.debug(
+      { template: notification.template, to: notification.to, params: notification.params, link: notification.link },
+      "WhatsApp stub: would send template",
     );
     return { success: true };
   }
@@ -93,7 +96,7 @@ export async function sendWhatsAppNotification(
 
     if (!response.ok) {
       const error = await response.text();
-      console.error("[whatsapp] Send failed:", error);
+      logger.error({ err: error }, "WhatsApp send failed");
       return { success: false, error };
     }
 
@@ -101,7 +104,7 @@ export async function sendWhatsAppNotification(
     const messageId = result.messages?.[0]?.id;
     return { success: true, messageId };
   } catch (err) {
-    console.error("[whatsapp] Send error:", err);
+    logger.error({ err }, "WhatsApp send error");
     return { success: false, error: String(err) };
   }
 }
@@ -129,11 +132,11 @@ export async function sendWhatsApp(phone: string, message: string): Promise<void
   if (IS_TEST) return;
 
   if (!WHATSAPP_API_TOKEN) {
-    console.log(`[whatsapp-stub] Would send to ${phone}: ${message}`);
+    logger.debug({ phone, message }, "WhatsApp stub: would send message");
     return;
   }
 
-  console.log(`[whatsapp] Sent to ${phone}: ${message}`);
+  logger.info({ phone, message }, "WhatsApp message sent");
 }
 
 /** Send an SMS message. Stub when SMS_API_KEY is not set. */
@@ -141,9 +144,9 @@ export async function sendSms(phone: string, message: string): Promise<void> {
   if (IS_TEST) return;
 
   if (!process.env.SMS_API_KEY) {
-    console.log(`[sms-stub] Would send to ${phone}: ${message}`);
+    logger.debug({ phone, message }, "SMS stub: would send message");
     return;
   }
 
-  console.log(`[sms] Sent to ${phone}: ${message}`);
+  logger.info({ phone, message }, "SMS message sent");
 }

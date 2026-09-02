@@ -4,6 +4,7 @@ import { proxyRequest, GIGS_SERVICE, ORDERS_SERVICE } from "@/lib/gateway";
 import { verifyTurnstileToken } from "@/lib/turnstile";
 import { detectBot } from "@/lib/bot-detection";
 import { areTenPointCriteria, overallFromCriteria } from "@/lib/review-ratings";
+import { logger } from "@/lib/logger";
 
 /** Submits a buyer review for a completed order after bot and CAPTCHA checks. */
 export async function POST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
@@ -38,7 +39,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
   });
 
   if (botCheck.isBot) {
-    console.warn(`[bot-detection] Review blocked: ${botCheck.reason}`);
+    logger.warn({ reason: botCheck.reason }, "Bot detection: review blocked");
     return NextResponse.json(
       { error: "הבקשה נחסמה. נסה שוב." },
       { status: 400 }

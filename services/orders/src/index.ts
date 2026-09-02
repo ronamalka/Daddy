@@ -1,9 +1,12 @@
+process.env.SERVICE_NAME = process.env.SERVICE_NAME || "orders";
+
 import express from "express";
 import pg from "pg";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "./generated/prisma/client";
 import { extractUser } from "../../shared/middleware";
 import { applySecurity, generalRateLimit } from "../../shared/security";
+import { logger, createRequestLogger } from "../../shared/logger";
 import { ordersRoutes } from "./routes/orders";
 import { orderDetailRoutes } from "./routes/order-detail";
 import { disputeRoutes, adminDisputeRoutes } from "./routes/disputes";
@@ -21,6 +24,7 @@ const PORT = Number(process.env.PORT) || 4003;
 
 applySecurity(app);
 app.use(express.json({ limit: "1mb" }));
+app.use(createRequestLogger());
 app.use(extractUser);
 app.use(generalRateLimit);
 
@@ -43,5 +47,5 @@ app.use("/admin", adminWarrantyRoutes);
 
 /** Start the orders HTTP server. */
 app.listen(PORT, "0.0.0.0", () => {
-  console.log(`Orders service running on port ${PORT}`);
+  logger.info({ port: PORT }, "Orders service started");
 });

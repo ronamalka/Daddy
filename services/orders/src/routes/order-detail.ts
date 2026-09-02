@@ -9,6 +9,7 @@ import { buyerCancelPatch, sellerDeclinePatch } from "../lib/cancellation";
 import { canStartWork } from "../lib/materials";
 import { parseDeliveryEvidence } from "../../../shared/delivery-photos";
 import { releasePayment } from "../lib/escrow";
+import { logger } from "../../../shared/logger";
 
 const USERS_SERVICE_URL = process.env.USERS_SERVICE_URL || "http://localhost:4001";
 
@@ -281,7 +282,7 @@ orderDetailRoutes.patch("/:id", requireAuth, async (req: Request, res: Response)
         updateData.commissionAmount = Math.round(order.price * rate * 100) / 100;
       }
     } catch (err) {
-      console.error(`[commission] Failed to fetch rate for seller ${order.sellerId}:`, err);
+      logger.error({ err, sellerId: order.sellerId }, "Failed to fetch commission rate");
     }
   }
 
@@ -293,7 +294,7 @@ orderDetailRoutes.patch("/:id", requireAuth, async (req: Request, res: Response)
   // Auto-release escrow when order is marked COMPLETED
   if (status === "COMPLETED") {
     releasePayment(prisma, id).catch((err) => {
-      console.error(`[escrow] auto-release failed for order ${id}:`, err);
+      logger.error({ err, orderId: id }, "Escrow auto-release failed");
     });
   }
 

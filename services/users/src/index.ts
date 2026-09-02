@@ -1,7 +1,10 @@
+process.env.SERVICE_NAME = process.env.SERVICE_NAME || "users";
+
 import express from "express";
 import { extractUser } from "../../shared/middleware";
 import { prisma } from "./db";
 import { applySecurity, authRateLimit, passwordResetRateLimit, generalRateLimit } from "../../shared/security";
+import { logger, createRequestLogger } from "../../shared/logger";
 import { registerRoutes } from "./routes/register";
 import { profileRoutes } from "./routes/profile";
 import { adminRoutes } from "./routes/admin";
@@ -31,6 +34,7 @@ const PORT = Number(process.env.PORT) || 4001;
 
 applySecurity(app);
 app.use(express.json({ limit: "1mb" }));
+app.use(createRequestLogger());
 app.use(extractUser);
 app.use(generalRateLimit);
 
@@ -63,6 +67,6 @@ app.use("/subscription", subscriptionRoutes);
 
 /** Start the users HTTP server. */
 app.listen(PORT, "0.0.0.0", () => {
-  console.log(`Users service running on port ${PORT}`);
+  logger.info({ port: PORT }, "Users service started");
   startCityCatalogRefresh();
 });

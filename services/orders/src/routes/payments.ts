@@ -3,6 +3,7 @@ import { requireAuth, requireAdmin } from "../../../shared/middleware";
 import { prisma } from "../index";
 import { getPaymentGateway } from "../lib/payment-gateway";
 import { releasePayment, refundPayment } from "../lib/escrow";
+import { logger } from "../../../shared/logger";
 
 const gateway = getPaymentGateway();
 
@@ -108,7 +109,7 @@ paymentRoutes.post("/:id/pay", requireAuth, async (req: Request, res: Response) 
 
     res.status(201).json(payment);
   } catch (err) {
-    console.error("[payments] createCharge error:", err);
+    logger.error({ err }, "Payment createCharge failed");
     res.status(500).json({ error: "שגיאה בעיבוד התשלום" });
   }
 });

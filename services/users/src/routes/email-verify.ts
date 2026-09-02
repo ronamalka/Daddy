@@ -3,6 +3,7 @@ import { randomBytes } from "crypto";
 import { prisma } from "../db";
 import { sendEmail } from "../../../shared/email";
 import { verificationEmail } from "../../../shared/email-templates";
+import { logger } from "../../../shared/logger";
 
 /** Routes for email verification. */
 export const emailVerifyRoutes = Router();
@@ -61,7 +62,7 @@ emailVerifyRoutes.post("/send-verification", async (req: Request, res: Response)
     await createAndSendVerification(dbUser.id, dbUser.email, dbUser.name);
     res.json({ message: "Verification email sent" });
   } catch (err) {
-    console.error("[email-verify] Failed to send verification email:", err);
+    logger.error({ err }, "Failed to send verification email");
     res.status(500).json({ error: "Failed to send email" });
   }
 });

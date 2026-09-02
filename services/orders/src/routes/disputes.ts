@@ -9,6 +9,7 @@ import {
 } from "../lib/disputes";
 import { DisputeReason, DisputeStatus, PaymentAction, OrderStatus } from "../generated/prisma/client";
 import { releasePayment, refundPayment } from "../lib/escrow";
+import { logger } from "../../../shared/logger";
 
 /** Open a dispute, list them for admin, and record a staff decision. */
 export const disputeRoutes = Router();
@@ -147,15 +148,15 @@ adminDisputeRoutes.patch("/disputes/:id", requireAdmin, async (req: Request, res
   // Handle escrow payment based on dispute resolution
   if (resolved.paymentAction === "RELEASE") {
     releasePayment(prisma, dispute.orderId).catch((err) => {
-      console.error(`[escrow] dispute release failed for order ${dispute.orderId}:`, err);
+      logger.error({ err, orderId: dispute.orderId }, "Escrow dispute release failed");
     });
   } else if (resolved.paymentAction === "REFUND") {
     refundPayment(prisma, dispute.orderId).catch((err) => {
-      console.error(`[escrow] dispute refund failed for order ${dispute.orderId}:`, err);
+      logger.error({ err, orderId: dispute.orderId }, "Escrow dispute refund failed");
     });
   } else if (resolved.paymentAction === "SPLIT" && resolved.splitBuyerAmount != null) {
     refundPayment(prisma, dispute.orderId, resolved.splitBuyerAmount).catch((err) => {
-      console.error(`[escrow] dispute split refund failed for order ${dispute.orderId}:`, err);
+      logger.error({ err, orderId: dispute.orderId }, "Escrow dispute split refund failed");
     });
   }
 
