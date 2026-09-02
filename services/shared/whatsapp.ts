@@ -1,24 +1,138 @@
 /**
- * WhatsApp and SMS dispatch stubs.
- * These log to console when the relevant env vars are missing;
- * swap in real provider calls (WhatsApp Business API, Twilio, etc.) later.
+ * WhatsApp Business API client and SMS dispatch stubs.
+ * Sends template-based messages via the WhatsApp Cloud API when configured;
+ * logs to console (stub mode) when WHATSAPP_PHONE_ID / WHATSAPP_API_TOKEN are not set.
  */
 
 const IS_TEST = process.env.NODE_ENV === "test";
 
-/** Send a WhatsApp message. Stub when WHATSAPP_API_TOKEN is not set. */
+const WHATSAPP_API_URL = "https://graph.facebook.com/v21.0";
+const WHATSAPP_PHONE_ID = process.env.WHATSAPP_PHONE_ID || "";
+const WHATSAPP_API_TOKEN = process.env.WHATSAPP_API_TOKEN || "";
+const APP_URL = process.env.APP_URL || "https://aballeh.com";
+
+export type WhatsAppTemplate =
+  | "order_confirmed"
+  | "order_in_progress"
+  | "order_on_the_way"
+  | "order_completed"
+  | "payment_released"
+  | "new_message"
+  | "new_request_match"
+  | "order_cancelled";
+
+export interface WhatsAppNotification {
+  /** Phone number in E.164 format (+972...) */
+  to: string;
+  /** Template name registered in WhatsApp Business Manager */
+  template: WhatsAppTemplate;
+  /** Positional template body parameters (keyed "1", "2", ...) */
+  params: Record<string, string>;
+  /** Deep link path appended to APP_URL (e.g. "/orders/abc123") */
+  link?: string;
+}
+
+/**
+ * Send a template-based WhatsApp notification.
+ * Returns { success: true } in stub mode when env vars are missing.
+ */
+export async function sendWhatsAppNotification(
+  notification: WhatsAppNotification,
+): Promise<{ success: boolean; messageId?: string; error?: string }> {
+  if (IS_TEST) return { success: true };
+
+  if (!WHATSAPP_PHONE_ID || !WHATSAPP_API_TOKEN) {
+    console.log(
+      `[whatsapp-stub] Would send template "${notification.template}" to ${notification.to} params=${JSON.stringify(notification.params)} link=${notification.link ?? "none"}`,
+    );
+    return { success: true };
+  }
+
+  try {
+    const components: Array<Record<string, unknown>> = [];
+
+    // Body parameters
+    const paramEntries = Object.entries(notification.params);
+    if (paramEntries.length > 0) {
+      components.push({
+        type: "body",
+        parameters: paramEntries.map(([, value]) => ({
+          type: "text",
+          text: value,
+        })),
+      });
+    }
+
+    // Button URL suffix (deep link)
+    if (notification.link) {
+      components.push({
+        type: "button",
+        sub_type: "url",
+        index: 0,
+        parameters: [{ type: "text", text: notification.link }],
+      });
+    }
+
+    const response = await fetch(`${WHATSAPP_API_URL}/${WHATSAPP_PHONE_ID}/messages`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${WHATSAPP_API_TOKEN}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        messaging_product: "whatsapp",
+        to: notification.to,
+        type: "template",
+        template: {
+          name: notification.template,
+          language: { code: "he" },
+          components,
+        },
+      }),
+    });
+
+    if (!response.ok) {
+      const error = await response.text();
+      console.error("[whatsapp] Send failed:", error);
+      return { success: false, error };
+    }
+
+    const result = (await response.json()) as { messages?: Array<{ id?: string }> };
+    const messageId = result.messages?.[0]?.id;
+    return { success: true, messageId };
+  } catch (err) {
+    console.error("[whatsapp] Send error:", err);
+    return { success: false, error: String(err) };
+  }
+}
+
+/** Convert Israeli phone format to E.164. "0501234567" -> "+972501234567" */
+export function toE164(phone: string): string | null {
+  const cleaned = phone.replace(/[-\s().]/g, "");
+  if (cleaned.startsWith("+972")) return cleaned;
+  if (cleaned.startsWith("972")) return "+" + cleaned;
+  if (cleaned.startsWith("0") && cleaned.length === 10) return "+972" + cleaned.slice(1);
+  return null;
+}
+
+/** Build the full deep link URL from a relative path. */
+export function buildDeepLink(path: string): string {
+  return `${APP_URL}${path.startsWith("/") ? path : `/${path}`}`;
+}
+
+// ---------------------------------------------------------------------------
+// Legacy plain-text helpers (used by existing notify.ts dispatcher)
+// ---------------------------------------------------------------------------
+
+/** Send a plain-text WhatsApp message. Stub when WHATSAPP_API_TOKEN is not set. */
 export async function sendWhatsApp(phone: string, message: string): Promise<void> {
   if (IS_TEST) return;
 
-  if (!process.env.WHATSAPP_API_TOKEN) {
+  if (!WHATSAPP_API_TOKEN) {
     console.log(`[whatsapp-stub] Would send to ${phone}: ${message}`);
     return;
   }
 
-  // Real WhatsApp Business API call would go here:
-  // POST https://graph.facebook.com/v18.0/{phone_number_id}/messages
-  // Authorization: Bearer {WHATSAPP_API_TOKEN}
-  // Body: { messaging_product: "whatsapp", to: phone, type: "text", text: { body: message } }
   console.log(`[whatsapp] Sent to ${phone}: ${message}`);
 }
 
@@ -31,6 +145,5 @@ export async function sendSms(phone: string, message: string): Promise<void> {
     return;
   }
 
-  // Real SMS provider call (e.g. Twilio, Vonage) would go here
   console.log(`[sms] Sent to ${phone}: ${message}`);
 }
