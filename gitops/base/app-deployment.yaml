@@ -71,10 +71,7 @@ spec:
                   name: daddy-app-secret
                   key: INTER_SERVICE_SECRET
             - name: GOOGLE_SITE_VERIFICATION
-              valueFrom:
-                secretKeyRef:
-                  name: daddy-app-secret
-                  key: GOOGLE_SITE_VERIFICATION
+              value: "foF9T4nW2AM4XjB2S0gq7wkQNiPB9Poq4i4IBryBYUo"
             - name: NEXT_PUBLIC_UMAMI_WEBSITE_ID
               valueFrom:
                 secretKeyRef:
