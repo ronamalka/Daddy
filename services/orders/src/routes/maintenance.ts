@@ -120,7 +120,7 @@ maintenanceRoutes.get("/my-visits", requireAuth, async (req: Request, res: Respo
 
 /** Mark a visit as completed and auto-schedule the next one. */
 maintenanceRoutes.post("/visits/:id/complete", requireAuth, async (req: Request, res: Response) => {
-  const visitId = req.params.id;
+  const visitId = String(req.params.id);
   const sellerId = req.user!.id;
   const { report, photos } = req.body;
 
@@ -208,7 +208,7 @@ maintenanceRoutes.get("/plans", requireAdmin, async (req: Request, res: Response
 
 /** Assign a handyman (seller) to a maintenance plan. */
 maintenanceRoutes.post("/plans/:id/assign", requireAdmin, async (req: Request, res: Response) => {
-  const planId = req.params.id;
+  const planId = String(req.params.id);
   const { sellerId } = req.body;
 
   if (!sellerId || typeof sellerId !== "string") {
