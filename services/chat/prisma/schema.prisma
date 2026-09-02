@@ -22,3 +22,19 @@ model Message {
   @@index([receiverId])
   @@index([receiverId, readAt])
 }
+
+model ChatViolation {
+  id         String   @id @default(cuid())
+  senderId   String
+  receiverId String
+  orderId    String?
+  content    String   // the blocked message content
+  pattern    String   // which pattern triggered
+  reason     String   // human-readable reason
+  dismissed  Boolean  @default(false)
+  warned     Boolean  @default(false)
+  createdAt  DateTime @default(now())
+
+  @@index([senderId])
+  @@index([createdAt])
+}
