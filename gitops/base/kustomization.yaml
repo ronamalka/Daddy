@@ -20,3 +20,4 @@ resources:
   - umami-deployment.yaml
   - umami-service.yaml
   - umami-route.yaml
+  - grafana/
