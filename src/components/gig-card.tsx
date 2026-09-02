@@ -5,6 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { Star, MapPin, Heart } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
+import { trackEvent } from "@/lib/analytics";
 
 interface GigCardProps {
   id: string;
@@ -38,7 +39,7 @@ export function GigCard({ id, title, image, seller, startingPrice, avgRating, re
                 <span className="text-4xl font-bold text-[rgb(var(--color-text-muted))]">א</span>
               </div>
             )}
-            <FavoriteButton isFavorite={isFavorite} onToggle={() => setIsFavorite(!isFavorite)} />
+            <FavoriteButton isFavorite={isFavorite} onToggle={() => { trackEvent("favorite_toggled", { gigId: id, action: isFavorite ? "remove" : "add" }); setIsFavorite(!isFavorite); }} />
           </div>
           <div className="flex flex-1 flex-col justify-between p-4">
             <div>
@@ -90,7 +91,7 @@ export function GigCard({ id, title, image, seller, startingPrice, avgRating, re
               <span className="text-5xl font-bold text-[rgb(var(--color-text-muted))]">א</span>
             </div>
           )}
-          <FavoriteButton isFavorite={isFavorite} onToggle={() => setIsFavorite(!isFavorite)} />
+          <FavoriteButton isFavorite={isFavorite} onToggle={() => { trackEvent("favorite_toggled", { gigId: id, action: isFavorite ? "remove" : "add" }); setIsFavorite(!isFavorite); }} />
         </div>
         <div className="p-4">
           <div className="mb-3 flex items-center gap-2.5">

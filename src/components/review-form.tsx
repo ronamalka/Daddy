@@ -3,6 +3,7 @@
 import { useState, useRef, useCallback } from "react";
 import { Star, Handshake, Clock, Coins } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
+import { trackEvent } from "@/lib/analytics";
 import { TurnstileWidget } from "@/components/turnstile-widget";
 
 const CRITERIA = [
@@ -51,6 +52,7 @@ export function ReviewForm({ orderId, sellerName, onSubmitted }: ReviewFormProps
         body: JSON.stringify({ comment, ...ratings, turnstileToken, _hp_field: "", _formLoadedAt: formLoadedAtRef.current }),
       });
       if (res.ok) {
+        trackEvent("review_submitted", { orderId, rating: Number(avg || 0) });
         onSubmitted();
       } else {
         const data = await res.json().catch(() => ({}));
