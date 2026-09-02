@@ -1,4 +1,5 @@
 import { scanMessage } from "./content-filter";
+import { messagesSent, violationsBlocked } from "./metrics";
 
 export const MAX_MESSAGE_LENGTH = 5000;
 
@@ -174,6 +175,7 @@ export function sendMessage(
             /* best-effort logging */
           });
       }
+      violationsBlocked.inc({ pattern_type: filterResult.pattern });
       return Promise.resolve({ ok: false, status: 422, error: BLOCKED_MESSAGE });
     }
   }
@@ -184,7 +186,10 @@ export function sendMessage(
     senderId,
     receiverId,
     orderId: orderId || null,
-  }).then((data) => ({ ok: true as const, status: 201, data }));
+  }).then((data) => {
+    messagesSent.inc();
+    return { ok: true as const, status: 201, data };
+  });
 }
 
 /** Load messages for this user, optionally filtered by chat partner or order. */

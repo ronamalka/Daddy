@@ -21,6 +21,7 @@ import { SlotPicker, type SlotOption } from "@/components/slot-picker";
 import { CancellationPolicyNote } from "@/components/cancellation-policy-note";
 import { QuotePriceBreakdown } from "@/components/quote-price-breakdown";
 import { quoteTotal } from "@/lib/quote-price";
+import { trackEvent } from "@/lib/analytics";
 
 interface ReviewData {
   id: string;
@@ -184,6 +185,7 @@ export default function SellerProfilePage() {
           gigs: Array.isArray(data.gigs) ? data.gigs : [],
           allReviews: Array.isArray(data.allReviews) ? data.allReviews : [],
         });
+        trackEvent("seller_profile_viewed");
       })
       .catch(() => {
         setSeller(null);

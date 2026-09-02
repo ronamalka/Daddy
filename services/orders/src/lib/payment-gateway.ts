@@ -5,6 +5,8 @@
  * adapter by setting PAYMENT_GATEWAY=payplus in the environment.
  */
 
+import { logger } from "../../../shared/logger";
+
 export interface ChargeParams {
   amount: number;
   currency: string;
@@ -39,7 +41,7 @@ export interface PaymentGateway {
 class StubGateway implements PaymentGateway {
   async createCharge(params: ChargeParams): Promise<ChargeResult> {
     const gatewayId = `stub_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
-    console.log(`[StubGateway] createCharge — order=${params.orderId} amount=${params.amount} ${params.currency} method=${params.method} → gatewayId=${gatewayId}`);
+    logger.info({ orderId: params.orderId, amount: params.amount, currency: params.currency, method: params.method, gatewayId }, "StubGateway: createCharge");
     return {
       gatewayId,
       status: "held",
@@ -48,7 +50,7 @@ class StubGateway implements PaymentGateway {
   }
 
   async releaseToSeller(gatewayId: string): Promise<ReleaseResult> {
-    console.log(`[StubGateway] releaseToSeller — gatewayId=${gatewayId}`);
+    logger.info({ gatewayId }, "StubGateway: releaseToSeller");
     return {
       status: "released",
       raw: { stub: true, message: "Simulated release to seller" },
@@ -56,7 +58,7 @@ class StubGateway implements PaymentGateway {
   }
 
   async refund(gatewayId: string, amount?: number): Promise<RefundResult> {
-    console.log(`[StubGateway] refund — gatewayId=${gatewayId} amount=${amount ?? "full"}`);
+    logger.info({ gatewayId, amount: amount ?? "full" }, "StubGateway: refund");
     return {
       status: "refunded",
       raw: { stub: true, message: "Simulated refund", amount },

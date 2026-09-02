@@ -68,3 +68,21 @@ model RequestResponse {
   @@index([requestId])
   @@index([sellerId])
 }
+
+model AnalyticsEvent {
+  id            String   @id @default(uuid()) @db.Uuid
+  eventName     String   @map("event_name")
+  eventCategory String   @map("event_category")
+  actorId       String?  @map("actor_id") @db.Uuid
+  actorRole     String?  @map("actor_role")
+  entityType    String?  @map("entity_type")
+  entityId      String?  @map("entity_id") @db.Uuid
+  properties    Json     @default("{}")
+  createdAt     DateTime @default(now()) @map("created_at") @db.Timestamptz()
+
+  @@map("analytics_events")
+  @@index([eventName], map: "idx_events_name")
+  @@index([eventCategory], map: "idx_events_category")
+  @@index([actorId], map: "idx_events_actor")
+  @@index([createdAt], map: "idx_events_created")
+}

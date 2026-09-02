@@ -3,6 +3,7 @@ import { auth } from "@/lib/auth";
 import { proxyRequest, REQUESTS_SERVICE, USERS_SERVICE } from "@/lib/gateway";
 import { verifyTurnstileToken } from "@/lib/turnstile";
 import { detectBot } from "@/lib/bot-detection";
+import { logger } from "@/lib/logger";
 import { isTwoHourLocalWindow, parseSlotIso } from "@/lib/availability";
 import { notifyNearbySellers } from "@/lib/nearby-request";
 import { parseRequestDetails } from "@/lib/request-details";
@@ -63,7 +64,7 @@ export async function POST(request: NextRequest) {
   });
 
   if (botCheck.isBot) {
-    console.warn(`[bot-detection] Service request blocked: ${botCheck.reason}`);
+    logger.warn({ reason: botCheck.reason }, "Bot detection: service request blocked");
     return NextResponse.json(
       { error: "הבקשה נחסמה. נסה שוב." },
       { status: 400 }

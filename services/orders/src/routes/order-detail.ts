@@ -9,6 +9,9 @@ import { buyerCancelPatch, sellerDeclinePatch } from "../lib/cancellation";
 import { canStartWork } from "../lib/materials";
 import { parseDeliveryEvidence } from "../../../shared/delivery-photos";
 import { releasePayment } from "../lib/escrow";
+import { logger } from "../../../shared/logger";
+import { ordersCompleted } from "../metrics";
+import { logEvent } from "../../../shared/analytics";
 
 const USERS_SERVICE_URL = process.env.USERS_SERVICE_URL || "http://localhost:4001";
 
@@ -281,7 +284,7 @@ orderDetailRoutes.patch("/:id", requireAuth, async (req: Request, res: Response)
         updateData.commissionAmount = Math.round(order.price * rate * 100) / 100;
       }
     } catch (err) {
-      console.error(`[commission] Failed to fetch rate for seller ${order.sellerId}:`, err);
+      logger.error({ err, sellerId: order.sellerId }, "Failed to fetch commission rate");
     }
   }
 
@@ -292,8 +295,23 @@ orderDetailRoutes.patch("/:id", requireAuth, async (req: Request, res: Response)
 
   // Auto-release escrow when order is marked COMPLETED
   if (status === "COMPLETED") {
+    ordersCompleted.inc({ category: order.jobType || "GIG" });
     releasePayment(prisma, id).catch((err) => {
-      console.error(`[escrow] auto-release failed for order ${id}:`, err);
+      logger.error({ err, orderId: id }, "Escrow auto-release failed");
+    });
+
+    // Log analytics event (fire-and-forget)
+    logEvent(prisma, {
+      eventName: "order.completed",
+      eventCategory: "order",
+      actorId: req.user!.id,
+      actorRole: "buyer",
+      entityType: "order",
+      entityId: id,
+      properties: {
+        price: order.price,
+        commission_amount: updateData.commissionAmount ?? 0,
+      },
     });
   }
 

@@ -2,6 +2,8 @@ import { Router, Request, Response } from "express";
 import { hash } from "bcryptjs";
 import { prisma } from "../db";
 import { createAndSendVerification } from "./email-verify";
+import { logger } from "../../../shared/logger";
+import { userRegistrations } from "../metrics";
 
 /** Routes for creating a new account. */
 export const registerRoutes = Router();
@@ -65,9 +67,11 @@ registerRoutes.post("/", async (req: Request, res: Response) => {
     },
   });
 
+  userRegistrations.inc({ role: user.role, method: "email" });
+
   // Send verification email (non-blocking -- don't fail registration if email fails)
   createAndSendVerification(user.id, user.email, user.name).catch((err) => {
-    console.error("[register] Failed to send verification email:", err);
+    logger.error({ err }, "Failed to send verification email during registration");
   });
 
   res.json({ id: user.id, name: user.name, email: user.email, role: user.role, emailVerified: false });

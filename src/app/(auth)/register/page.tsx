@@ -3,7 +3,7 @@
 import { signIn } from "next-auth/react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useState, useRef, useCallback, Suspense } from "react";
+import { useState, useRef, useCallback, useEffect, Suspense } from "react";
 import { LocationPicker } from "@/components/location-picker";
 import { ServicePicker } from "@/components/service-picker";
 import { PasswordStrength } from "@/components/password-strength";
@@ -12,6 +12,7 @@ import { LegalConsentFields } from "@/components/legal-consent-fields";
 import { TERMS_VERSION } from "@/lib/legal";
 import { oauthIntentCookie } from "@/lib/oauth-intent";
 import { postRegisterPath } from "@/lib/seller-ready";
+import { trackEvent } from "@/lib/analytics";
 
 interface ServiceAreaEntry {
   districtCode: number;
@@ -55,6 +56,10 @@ function RegisterForm() {
   const handleTurnstileExpire = useCallback(() => setTurnstileToken(""), []);
 
   const totalSteps = role === "SELLER" ? 3 : 2;
+
+  useEffect(() => {
+    trackEvent("signup_started", { role });
+  }, []);
 
   /** Creates the account and signs the user in. */
   async function handleSubmit() {
@@ -105,6 +110,7 @@ function RegisterForm() {
       setError("החשבון נוצר אבל ההתחברות נכשלה. נסה להתחבר מחדש.");
       setLoading(false);
     } else {
+      trackEvent("signup_completed", { role });
       setRegistered(true);
       // Brief pause to show the "check your email" message before redirect
       setTimeout(() => {

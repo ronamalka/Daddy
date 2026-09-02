@@ -7,6 +7,7 @@ import { Router, Request, Response } from "express";
 import { requireInternal } from "../../../shared/middleware";
 import { sendWhatsAppNotification, toE164, type WhatsAppTemplate } from "../../../shared/whatsapp";
 import { prisma } from "../index";
+import { logger } from "../../../shared/logger";
 
 export const whatsappRoutes = Router();
 
@@ -91,6 +92,6 @@ async function logAttempt(
       data: { userId, channel: "whatsapp", template, status, error: error ?? null },
     });
   } catch (err) {
-    console.error("[whatsapp-route] Failed to write NotificationLog:", err);
+    logger.error({ err, userId, template }, "Failed to write NotificationLog");
   }
 }

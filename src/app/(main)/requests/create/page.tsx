@@ -12,6 +12,7 @@ import { AddressPicker } from "@/components/address-picker";
 import { RequestPhotosField } from "@/components/request-photos-field";
 import { VisitWindowFields, visitWindowToIso, type VisitWindowValue } from "@/components/visit-window-fields";
 import { PREFERRED_WINDOWS, PREFERRED_WINDOW_LABELS, type PreferredWindow } from "@/lib/request-details";
+import { trackEvent } from "@/lib/analytics";
 
 /** Shows the form to post a new service request. */
 function CreateRequestPage() {
@@ -121,6 +122,7 @@ function CreateRequestPage() {
     });
 
     if (res.ok) {
+      trackEvent("request_submitted", { category: serviceSlug });
       const data = await res.json();
       router.push(`/requests/${data.id}`);
     } else {
