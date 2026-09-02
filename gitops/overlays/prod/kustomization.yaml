@@ -18,6 +18,11 @@ patches:
       - op: replace
         path: /spec/replicas
         value: 1
+  # Secrets are NOT patched here — they must be set manually in the cluster:
+  #   oc patch secret daddy-app-secret -n daddy-prod --type merge \
+  #     -p '{"stringData":{"AUTH_SECRET":"...","GOOGLE_CLIENT_ID":"...","GOOGLE_CLIENT_SECRET":"...","INTER_SERVICE_SECRET":"..."}}'
+  #   oc patch secret postgres-secret -n daddy-prod --type merge \
+  #     -p '{"stringData":{"POSTGRES_PASSWORD":"...","DATABASE_URL":"postgresql://daddy:<pw>@postgres:5432/daddy",...}}'
   - target:
       kind: Secret
       name: daddy-app-secret
@@ -28,37 +33,6 @@ patches:
       - op: replace
         path: /stringData/NEXT_PUBLIC_BASE_URL
         value: https://aballeh.com
-      - op: replace
-        path: /stringData/AUTH_SECRET
-        value: CHANGE_ME_PROD_AUTH_SECRET_AT_LEAST_32_CHARS
-      - op: replace
-        path: /stringData/INTER_SERVICE_SECRET
-        value: CHANGE_ME_PROD_INTER_SERVICE_SECRET
-  - target:
-      kind: Secret
-      name: postgres-secret
-    patch: |
-      - op: replace
-        path: /stringData/POSTGRES_PASSWORD
-        value: CHANGE_ME_PROD_PASSWORD
-      - op: replace
-        path: /stringData/DATABASE_URL
-        value: postgresql://daddy:CHANGE_ME_PROD_PASSWORD@postgres:5432/daddy
-      - op: replace
-        path: /stringData/USERS_DATABASE_URL
-        value: postgresql://daddy:CHANGE_ME_PROD_PASSWORD@postgres:5432/daddy_users
-      - op: replace
-        path: /stringData/GIGS_DATABASE_URL
-        value: postgresql://daddy:CHANGE_ME_PROD_PASSWORD@postgres:5432/daddy_gigs
-      - op: replace
-        path: /stringData/ORDERS_DATABASE_URL
-        value: postgresql://daddy:CHANGE_ME_PROD_PASSWORD@postgres:5432/daddy_orders
-      - op: replace
-        path: /stringData/REQUESTS_DATABASE_URL
-        value: postgresql://daddy:CHANGE_ME_PROD_PASSWORD@postgres:5432/daddy_requests
-      - op: replace
-        path: /stringData/CHAT_DATABASE_URL
-        value: postgresql://daddy:CHANGE_ME_PROD_PASSWORD@postgres:5432/daddy_chat
   - target:
       kind: PersistentVolumeClaim
       name: postgres-data
