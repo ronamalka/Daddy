@@ -1,5 +1,5 @@
 import { PrismaClient } from "./generated/prisma/client";
-import { MessageRepo, MessageRecord, groupConversations } from "./chat";
+import { MessageRepo, MessageRecord, ViolationRepo, groupConversations } from "./chat";
 
 /** Build a message store that reads and writes through the database. */
 export function prismaMessageRepo(prisma: PrismaClient): MessageRepo {
@@ -85,6 +85,24 @@ export function prismaMessageRepo(prisma: PrismaClient): MessageRepo {
         data: { readAt: new Date() },
       });
       return count;
+    },
+  };
+}
+
+/** Build a violation store that logs blocked messages through the database. */
+export function prismaViolationRepo(prisma: PrismaClient): ViolationRepo {
+  return {
+    async logViolation(data) {
+      await prisma.chatViolation.create({
+        data: {
+          senderId: data.senderId,
+          receiverId: data.receiverId,
+          orderId: data.orderId,
+          content: data.content,
+          pattern: data.pattern,
+          reason: data.reason,
+        },
+      });
     },
   };
 }

@@ -225,6 +225,20 @@ model CityCatalog {
   fetchedAt DateTime?
 }
 
+/// Audit log for WhatsApp / SMS / email dispatch attempts.
+model NotificationLog {
+  id        String   @id @default(cuid())
+  userId    String
+  channel   String   // "whatsapp", "sms", "email"
+  template  String
+  status    String   // "sent", "failed", "skipped"
+  error     String?
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([createdAt])
+}
+
 model PhoneOtp {
   id        String   @id @default(cuid())
   userId    String
