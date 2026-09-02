@@ -28,11 +28,18 @@ spec:
                 secretKeyRef:
                   name: postgres-secret
                   key: ORDERS_DATABASE_URL
+            - name: SERVICE_NAME
+              value: "orders"
             - name: INTER_SERVICE_SECRET
               valueFrom:
                 secretKeyRef:
                   name: daddy-app-secret
                   key: INTER_SERVICE_SECRET
+            - name: SENTRY_DSN
+              valueFrom:
+                secretKeyRef:
+                  name: daddy-app-secret
+                  key: SENTRY_DSN
           resources:
             requests:
               memory: "64Mi"
