@@ -5,6 +5,7 @@
  */
 
 import { sendWhatsApp, sendSms } from "./whatsapp";
+import { logger } from "./logger";
 
 export interface NotifyPayload {
   userId: string;
@@ -48,7 +49,7 @@ export async function dispatchExternalChannels(
 
   if (channels.email && payload.email) {
     // Email service integration (issue #89). For now, log.
-    console.log(`[email-stub] Would send to ${payload.email}: ${payload.title} - ${payload.message}`);
+    logger.debug({ email: payload.email, title: payload.title }, "Email stub: would send notification");
   }
 
   await Promise.allSettled(tasks);

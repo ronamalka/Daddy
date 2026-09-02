@@ -8,6 +8,7 @@ import {
 } from "../../../shared/request-teaser";
 import { parseRequestDetails, redactRequestStreet } from "../../../shared/request-details";
 import { prisma } from "../index";
+import { requestsCreated, quotesSent } from "../metrics";
 
 /** Routes for local service requests, seller quotes, and accepting a quote. */
 export const serviceRequestsRoutes = Router();
@@ -101,6 +102,7 @@ serviceRequestsRoutes.post("/", requireAuth, async (req: Request, res: Response)
     },
   });
 
+  requestsCreated.inc({ category: serviceSlug || "general" });
   res.json(created);
 });
 
@@ -201,6 +203,7 @@ serviceRequestsRoutes.post("/:id/respond", requireAuth, requireSeller, async (re
     },
   });
 
+  quotesSent.inc();
   res.json(response);
 });
 

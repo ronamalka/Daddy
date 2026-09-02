@@ -1,4 +1,5 @@
 import { prisma } from "./db";
+import { logger } from "../../shared/logger";
 import snapshot from "./data/israeli-cities.json";
 import {
   CITY_REFRESH_MS,
@@ -93,10 +94,10 @@ export async function refreshCityCatalogIfStale(): Promise<void> {
     await refreshCityCatalogFromGov();
   } catch (err) {
     if (isMissingCatalogSchema(err)) {
-      console.warn("City catalog skipped until schema is applied");
+      logger.warn("City catalog skipped until schema is applied");
       return;
     }
-    console.warn("City catalog refresh failed:", err instanceof Error ? err.message : err);
+    logger.warn({ err: err instanceof Error ? err.message : err }, "City catalog refresh failed");
   }
 }
 
