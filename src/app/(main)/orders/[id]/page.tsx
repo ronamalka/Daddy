@@ -5,7 +5,7 @@ import { useSession } from "next-auth/react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { ReviewForm } from "@/components/review-form";
-import { Star, Handshake, Clock, Coins, Tag, ClipboardText, ChatCircle, PaperPlaneTilt, ArrowsClockwise, Warning, Scales, ArrowClockwise, Receipt, FilePdf } from "@phosphor-icons/react";
+import { Star, Handshake, Clock, Coins, Tag, ClipboardText, ChatCircle, PaperPlaneTilt, ArrowsClockwise, Warning, Scales, ArrowClockwise, Receipt, FilePdf, ShieldCheck } from "@phosphor-icons/react";
 import { Dialog } from "@/components/ui/dialog";
 import { formatVisitWindow } from "@/lib/availability";
 import { DisputeDialog } from "@/components/orders/dispute-dialog";
@@ -20,6 +20,7 @@ import { ComposerAttach } from "@/components/chat/composer-attach";
 import { QuotePriceBreakdown } from "@/components/quote-price-breakdown";
 import { canShowMaterialsUpdateForm, hasPendingMaterialsAck } from "@/lib/materials";
 import { PaymentSection } from "@/components/orders/payment-section";
+import { WarrantyClaimDialog } from "@/components/orders/warranty-claim-dialog";
 
 interface GigRequirement {
   id: string;
@@ -51,6 +52,7 @@ interface OrderDetail {
   slotStart: string | null;
   slotEnd: string | null;
   createdAt: string;
+  updatedAt?: string;
   gig: { id: string; title: string; image: string | null; tiers: { tier: string; deliveryDays: number }[]; requirements: GigRequirement[] };
   buyer: { id: string; name: string; avatar: string | null };
   seller: { id: string; name: string; avatar: string | null };
@@ -72,6 +74,14 @@ interface OrderDetail {
     reason: string;
     description: string;
     photos: string[];
+    createdAt: string;
+  }[];
+  warrantyClaims?: {
+    id: string;
+    status: string;
+    description: string;
+    photos: string[];
+    resolution: string | null;
     createdAt: string;
   }[];
   payment?: {
@@ -142,6 +152,7 @@ export default function OrderDetailPage() {
   const [cancelSubmitting, setCancelSubmitting] = useState(false);
   const [disputeOpen, setDisputeOpen] = useState(false);
   const [deliverOpen, setDeliverOpen] = useState(false);
+  const [warrantyOpen, setWarrantyOpen] = useState(false);
   const [loadError, setLoadError] = useState(false);
   const [statusBusy, setStatusBusy] = useState(false);
   const [statusError, setStatusError] = useState("");
@@ -164,13 +175,22 @@ export default function OrderDetailPage() {
         }
         setLoadError(false);
 
-        // Check if invoice exists
+        // Check if invoice exists and load warranty claims
         try {
-          const invRes = await fetch(`/api/orders/${params.id}/invoice`);
+          const [invRes, warrantyRes] = await Promise.all([
+            fetch(`/api/orders/${params.id}/invoice`),
+            data.status === "COMPLETED" ? fetch(`/api/orders/${params.id}/warranty`) : Promise.resolve(null),
+          ]);
           if (invRes.ok) {
             const inv = await invRes.json();
             if (inv?.id) {
               data.invoice = { id: inv.id, invoiceNumber: inv.invoiceNumber, issuedAt: inv.issuedAt };
+            }
+          }
+          if (warrantyRes?.ok) {
+            const claims = await warrantyRes.json();
+            if (Array.isArray(claims)) {
+              data.warrantyClaims = claims;
             }
           }
         } catch {}
@@ -493,6 +513,26 @@ export default function OrderDetailPage() {
     ? new Date(order.slotStart).toISOString().slice(0, 10) === new Date().toISOString().slice(0, 10)
     : false;
 
+  const WARRANTY_DAYS = 30;
+  const isCompleted = order.status === "COMPLETED";
+  const completedDaysAgo = isCompleted
+    ? (now - new Date(order.updatedAt ?? order.createdAt).getTime()) / (1000 * 60 * 60 * 24)
+    : Infinity;
+  const withinWarranty = isCompleted && completedDaysAgo <= WARRANTY_DAYS;
+  const warrantyDaysLeft = withinWarranty ? Math.ceil(WARRANTY_DAYS - completedDaysAgo) : 0;
+  const hasOpenWarrantyClaim = order.warrantyClaims?.some(
+    (c) => c.status === "OPEN" || c.status === "UNDER_REVIEW"
+  );
+
+  const WARRANTY_STATUS_LABELS: Record<string, { label: string; bg: string; text: string }> = {
+    OPEN: { label: "פתוח", bg: "bg-[rgba(var(--color-accent-yellow),0.15)]", text: "text-[rgb(var(--color-warning))]" },
+    UNDER_REVIEW: { label: "בבדיקה", bg: "bg-[rgba(var(--color-primary),0.1)]", text: "text-[rgb(var(--color-primary))]" },
+    APPROVED_RESEND: { label: "אושר — שליחה מחדש", bg: "bg-[rgba(var(--color-success),0.15)]", text: "text-[rgb(var(--color-success))]" },
+    APPROVED_REFUND: { label: "אושר — החזר כספי", bg: "bg-[rgba(var(--color-success),0.15)]", text: "text-[rgb(var(--color-success))]" },
+    REJECTED: { label: "נדחה", bg: "bg-[rgba(var(--color-error),0.1)]", text: "text-[rgb(var(--color-error))]" },
+    CLOSED: { label: "נסגר", bg: "bg-[rgba(var(--color-text-muted),0.1)]", text: "text-[rgb(var(--color-text-muted))]" },
+  };
+
   return (
     <div className="mx-auto max-w-4xl px-4 py-8">
       {/* Order Header Card */}
@@ -531,6 +571,16 @@ export default function OrderDetailPage() {
             <Clock className="h-5 w-5 text-[rgb(var(--color-primary))]" />
             <span className="text-[14px] font-medium text-[rgb(var(--color-text))]">
               ביקור: {formatVisitWindow(new Date(order.slotStart), new Date(order.slotEnd))}
+            </span>
+          </div>
+        )}
+
+        {/* Warranty badge */}
+        {withinWarranty && (
+          <div className="mb-5 flex items-center gap-2 rounded-xl bg-[rgba(var(--color-success),0.08)] px-4 py-3">
+            <ShieldCheck className="h-5 w-5 text-[rgb(var(--color-success))]" weight="fill" />
+            <span className="text-[14px] font-medium text-[rgb(var(--color-success))]">
+              אחריות אבאל׳ה — {warrantyDaysLeft} {warrantyDaysLeft === 1 ? "יום" : "ימים"} נותרו
             </span>
           </div>
         )}
@@ -735,6 +785,15 @@ export default function OrderDetailPage() {
               הזמן שוב
             </button>
           )}
+          {isBuyer && withinWarranty && !hasOpenWarrantyClaim && (
+            <button
+              onClick={() => setWarrantyOpen(true)}
+              className="flex items-center gap-2 rounded-xl border-2 border-[rgba(var(--color-warning),0.3)] bg-[rgba(var(--color-accent-yellow),0.1)] px-5 py-2.5 text-[14px] font-semibold text-[rgb(var(--color-warning))] transition-all hover:bg-[rgba(var(--color-accent-yellow),0.2)]"
+            >
+              <ShieldCheck className="h-4 w-4" />
+              דווח על בעיה
+            </button>
+          )}
           {(isBuyer || isSeller) && isDisputableStatus(order.status) && !hasOpenDispute && !showBuyerDisputeInsteadOfCancel && (
             <button
               onClick={() => setDisputeOpen(true)}
@@ -807,6 +866,40 @@ export default function OrderDetailPage() {
                   {d.description ? ` — ${d.description}` : ""}
                 </li>
               ))}
+            </ul>
+          </div>
+        )}
+
+        {/* Warranty Claims Display */}
+        {order.warrantyClaims && order.warrantyClaims.length > 0 && (
+          <div className="mt-5 rounded-xl border border-[rgba(var(--color-warning),0.25)] bg-[rgba(var(--color-accent-yellow),0.06)] p-4">
+            <div className="mb-2 flex items-center gap-2">
+              <ShieldCheck className="h-4 w-4 text-[rgb(var(--color-warning))]" weight="fill" />
+              <p className="text-[13px] font-bold text-[rgb(var(--color-text))]">תביעות אחריות</p>
+            </div>
+            <ul className="space-y-2">
+              {order.warrantyClaims.map((c) => {
+                const statusInfo = WARRANTY_STATUS_LABELS[c.status] || WARRANTY_STATUS_LABELS.OPEN;
+                return (
+                  <li key={c.id} className="rounded-lg bg-[rgb(var(--color-surface))] p-3">
+                    <div className="flex items-center justify-between mb-1">
+                      <span className={`rounded-full px-2.5 py-0.5 text-[11px] font-semibold ${statusInfo.bg} ${statusInfo.text}`}>
+                        {statusInfo.label}
+                      </span>
+                      <span className="text-[12px] text-[rgb(var(--color-text-muted))]">
+                        {new Date(c.createdAt).toLocaleDateString("he-IL")}
+                      </span>
+                    </div>
+                    <p className="text-[13px] text-[rgb(var(--color-text-secondary))]">{c.description}</p>
+                    {c.resolution && (
+                      <p className="mt-2 rounded-lg bg-[rgb(var(--color-surface-elevated))] p-2 text-[12px] text-[rgb(var(--color-text-secondary))]">
+                        <span className="font-semibold text-[rgb(var(--color-primary))]">החלטה: </span>
+                        {c.resolution}
+                      </p>
+                    )}
+                  </li>
+                );
+              })}
             </ul>
           </div>
         )}
@@ -1177,6 +1270,25 @@ export default function OrderDetailPage() {
               photos: dispute.photos ?? [],
               createdAt: dispute.createdAt || new Date().toISOString(),
             }, ...(prev.disputes || [])],
+          } : prev);
+        }}
+      />
+
+      <WarrantyClaimDialog
+        open={warrantyOpen}
+        onOpenChange={setWarrantyOpen}
+        orderId={order.id}
+        onCreated={(claim) => {
+          setOrder((prev) => prev ? {
+            ...prev,
+            warrantyClaims: [{
+              id: claim.id,
+              status: claim.status,
+              description: claim.description,
+              photos: claim.photos ?? [],
+              resolution: null,
+              createdAt: claim.createdAt || new Date().toISOString(),
+            }, ...(prev.warrantyClaims || [])],
           } : prev);
         }}
       />
