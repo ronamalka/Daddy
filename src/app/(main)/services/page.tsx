@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { pageMetadata, serializeJsonLd } from "@/lib/seo";
+import { pageMetadata, serializeJsonLd, breadcrumbJsonLd } from "@/lib/seo";
 import { siteUrl } from "@/lib/site-url";
 import { LANDING_CATEGORIES } from "@/lib/landing-pages";
 
@@ -27,6 +27,11 @@ export default function ServicesIndexPage() {
       url: siteUrl(`/services/${slug}`),
     })),
   };
+
+  const breadcrumb = breadcrumbJsonLd([
+    { name: "ראשי", path: "/" },
+    { name: "שירותים", path: "/services" },
+  ]);
 
   return (
     <div className="min-h-screen bg-[rgb(var(--color-bg))]">
@@ -86,6 +91,10 @@ export default function ServicesIndexPage() {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: serializeJsonLd(jsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: serializeJsonLd(breadcrumb) }}
       />
     </div>
   );

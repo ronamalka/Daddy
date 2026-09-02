@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import type { Metadata } from "next";
-import { pageMetadata, serializeJsonLd } from "@/lib/seo";
+import { pageMetadata, serializeJsonLd, breadcrumbJsonLd } from "@/lib/seo";
 import { siteUrl } from "@/lib/site-url";
 import {
   LANDING_CATEGORIES,
@@ -53,14 +53,10 @@ export default async function CityPage({ params }: PageProps) {
     },
   };
 
-  const breadcrumbJsonLd = {
-    "@context": "https://schema.org",
-    "@type": "BreadcrumbList",
-    itemListElement: [
-      { "@type": "ListItem", position: 1, name: "ראשי", item: siteUrl("/") },
-      { "@type": "ListItem", position: 2, name: city.he },
-    ],
-  };
+  const breadcrumb = breadcrumbJsonLd([
+    { name: "ראשי", path: "/" },
+    { name: city.he, path: `/city/${citySlug}` },
+  ]);
 
   return (
     <div className="min-h-screen bg-[rgb(var(--color-bg))]">
@@ -163,7 +159,7 @@ export default async function CityPage({ params }: PageProps) {
       />
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: serializeJsonLd(breadcrumbJsonLd) }}
+        dangerouslySetInnerHTML={{ __html: serializeJsonLd(breadcrumb) }}
       />
     </div>
   );

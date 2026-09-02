@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: gigs-service
-          image: quay.io/rh_ee_rmalka/daddy-gigs-service:aefd6a8a
+          image: quay.io/rh_ee_rmalka/daddy-gigs-service:82657648
           ports:
             - containerPort: 4002
           env:
@@ -28,11 +28,18 @@ spec:
                 secretKeyRef:
                   name: postgres-secret
                   key: GIGS_DATABASE_URL
+            - name: SERVICE_NAME
+              value: "gigs"
             - name: INTER_SERVICE_SECRET
               valueFrom:
                 secretKeyRef:
                   name: daddy-app-secret
                   key: INTER_SERVICE_SECRET
+            - name: SENTRY_DSN
+              valueFrom:
+                secretKeyRef:
+                  name: daddy-app-secret
+                  key: SENTRY_DSN
           resources:
             requests:
               memory: "64Mi"

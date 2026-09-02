@@ -35,19 +35,59 @@ export interface PageMetaInput {
   images?: { url: string; alt?: string }[];
 }
 
-/** Shared title, description, canonical, and Open Graph for a public page. */
+/** Shared title, description, canonical, hreflang, and Open Graph for a public page. */
 export function pageMetadata(input: PageMetaInput): Metadata {
   const url = siteUrl(input.path);
   return {
     title: input.absoluteTitle ? { absolute: input.title } : input.title,
     description: input.description,
-    alternates: { canonical: input.path },
+    alternates: {
+      canonical: input.path,
+      languages: {
+        he: input.path,
+        "x-default": input.path,
+      },
+    },
     openGraph: {
       title: input.title,
       description: input.description,
       url,
       ...(input.images?.length ? { images: input.images } : {}),
     },
+  };
+}
+
+/** BreadcrumbList JSON-LD for structured navigation. */
+export function breadcrumbJsonLd(
+  items: { name: string; path: string }[],
+): Record<string, unknown> {
+  return {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: items.map((item, i) => ({
+      "@type": "ListItem",
+      position: i + 1,
+      name: item.name,
+      item: siteUrl(item.path),
+    })),
+  };
+}
+
+/** FAQPage JSON-LD for FAQ sections. */
+export function faqJsonLd(
+  items: { q: string; a: string }[],
+): Record<string, unknown> {
+  return {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: items.map((faq) => ({
+      "@type": "Question",
+      name: faq.q,
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: faq.a,
+      },
+    })),
   };
 }
 

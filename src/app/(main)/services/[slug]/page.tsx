@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import type { Metadata } from "next";
-import { pageMetadata, serializeJsonLd } from "@/lib/seo";
+import { pageMetadata, serializeJsonLd, breadcrumbJsonLd, faqJsonLd } from "@/lib/seo";
 import { siteUrl } from "@/lib/site-url";
 import { USERS_SERVICE, GIGS_SERVICE, proxyRequest } from "@/lib/gateway";
 import {
@@ -141,25 +141,13 @@ export default async function ServiceCategoryPage({ params }: PageProps) {
     },
   };
 
-  const faqJsonLd = {
-    "@context": "https://schema.org",
-    "@type": "FAQPage",
-    mainEntity: SERVICE_FAQ.map((item) => ({
-      "@type": "Question",
-      name: item.q,
-      acceptedAnswer: { "@type": "Answer", text: item.a },
-    })),
-  };
+  const breadcrumb = breadcrumbJsonLd([
+    { name: "ראשי", path: "/" },
+    { name: "שירותים", path: "/services" },
+    { name: cat.he, path: `/services/${slug}` },
+  ]);
 
-  const breadcrumbJsonLd = {
-    "@context": "https://schema.org",
-    "@type": "BreadcrumbList",
-    itemListElement: [
-      { "@type": "ListItem", position: 1, name: "ראשי", item: siteUrl("/") },
-      { "@type": "ListItem", position: 2, name: "שירותים", item: siteUrl("/services") },
-      { "@type": "ListItem", position: 3, name: cat.he },
-    ],
-  };
+  const faq = faqJsonLd(SERVICE_FAQ);
 
   return (
     <div className="min-h-screen bg-[rgb(var(--color-bg))]">
@@ -310,6 +298,28 @@ export default async function ServiceCategoryPage({ params }: PageProps) {
         </div>
       </section>
 
+      {/* Other Service Categories */}
+      <section className="mx-auto max-w-6xl px-4 py-12">
+        <div className="mb-8 text-center">
+          <h2 className="text-[24px] font-extrabold text-[rgb(var(--color-text))] md:text-[28px]">
+            שירותים נוספים
+          </h2>
+        </div>
+        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
+          {Object.entries(LANDING_CATEGORIES)
+            .filter(([s]) => s !== slug)
+            .map(([s, c]) => (
+              <Link
+                key={s}
+                href={`/services/${s}`}
+                className="rounded-xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] px-4 py-3 text-center text-[14px] font-medium text-[rgb(var(--color-text))] transition-all hover:border-[rgb(var(--color-primary))] hover:text-[rgb(var(--color-primary))] hover:shadow-md"
+              >
+                {c.he}
+              </Link>
+            ))}
+        </div>
+      </section>
+
       {/* FAQ */}
       <section className="bg-[rgb(var(--color-surface-elevated))] py-16">
         <div className="mx-auto max-w-3xl px-4">
@@ -367,11 +377,11 @@ export default async function ServiceCategoryPage({ params }: PageProps) {
       />
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: serializeJsonLd(faqJsonLd) }}
+        dangerouslySetInnerHTML={{ __html: serializeJsonLd(breadcrumb) }}
       />
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: serializeJsonLd(breadcrumbJsonLd) }}
+        dangerouslySetInnerHTML={{ __html: serializeJsonLd(faq) }}
       />
     </div>
   );

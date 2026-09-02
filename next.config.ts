@@ -1,4 +1,5 @@
 import type { NextConfig } from "next";
+import { withSentryConfig } from "@sentry/nextjs/config";
 
 const nextConfig: NextConfig = {
   output: "standalone",
@@ -53,4 +54,12 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default nextConfig;
+export default withSentryConfig(nextConfig, {
+  // Suppress source-map upload warnings when SENTRY_AUTH_TOKEN is absent (local dev)
+  silent: !process.env.SENTRY_AUTH_TOKEN,
+
+  // Disable source-map upload until a Sentry org/project/auth-token are configured
+  sourcemaps: {
+    disable: !process.env.SENTRY_AUTH_TOKEN,
+  },
+});

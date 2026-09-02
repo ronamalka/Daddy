@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
-import { Users, Briefcase, Bag, CurrencyDollar, Prohibit, ShieldCheck } from "@phosphor-icons/react";
+import { Users, Briefcase, Bag, CurrencyDollar, Prohibit, ShieldCheck, ChartLine } from "@phosphor-icons/react";
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { ModerationQueue } from "@/components/admin/moderation-queue";
@@ -151,6 +151,13 @@ export default function AdminPage() {
           >
             <ShieldCheck className="h-5 w-5" />
             בדיקת אימותים
+          </Link>
+          <Link
+            href="/admin/analytics"
+            className="inline-flex items-center gap-2 rounded-xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] px-5 py-3 text-[14px] font-semibold text-[rgb(var(--color-text))] shadow-[var(--shadow-sm)] hover:border-[rgb(var(--color-primary))] hover:text-[rgb(var(--color-primary))] transition-all"
+          >
+            <ChartLine className="h-5 w-5" />
+            אנליטיקס
           </Link>
           <Link
             href="/admin/warranty-claims"
