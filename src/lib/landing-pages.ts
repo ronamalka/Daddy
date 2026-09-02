@@ -24,6 +24,16 @@ export const LANDING_CITIES: Record<string, { he: string; lat: number; lng: numb
   "beer-sheva": { he: "באר שבע", lat: 31.2530, lng: 34.7915 },
   "bnei-brak": { he: "בני ברק", lat: 32.0834, lng: 34.8332 },
   holon: { he: "חולון", lat: 32.0114, lng: 34.7748 },
+  herzliya: { he: "הרצליה", lat: 32.1629, lng: 34.8447 },
+  "ramat-gan": { he: "רמת גן", lat: 32.0680, lng: 34.8241 },
+  "bat-yam": { he: "בת ים", lat: 32.0171, lng: 34.7514 },
+  rehovot: { he: "רחובות", lat: 31.8928, lng: 34.8113 },
+  "kfar-saba": { he: "כפר סבא", lat: 32.1780, lng: 34.9066 },
+  raanana: { he: "רעננה", lat: 32.1849, lng: 34.8708 },
+  modiin: { he: "מודיעין", lat: 31.8969, lng: 35.0104 },
+  "givatayim": { he: "גבעתיים", lat: 32.0716, lng: 34.8124 },
+  ashkelon: { he: "אשקלון", lat: 31.6688, lng: 34.5743 },
+  eilat: { he: "אילת", lat: 29.5577, lng: 34.9519 },
 };
 
 export const CATEGORY_SLUGS = Object.keys(LANDING_CATEGORIES);
