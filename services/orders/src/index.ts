@@ -11,6 +11,7 @@ import { materialsRoutes } from "./routes/materials";
 import { paymentRoutes, paymentHistoryRoutes } from "./routes/payments";
 import { invoiceRoutes } from "./routes/invoices";
 import { maintenanceRoutes } from "./routes/maintenance";
+import { warrantyRoutes, adminWarrantyRoutes } from "./routes/warranty";
 
 const pool = new pg.Pool({ connectionString: process.env.DATABASE_URL });
 const adapter = new PrismaPg(pool);
@@ -37,6 +38,8 @@ app.use("/payments", paymentHistoryRoutes);
 app.use("/orders", invoiceRoutes);
 app.use("/admin", adminDisputeRoutes);
 app.use("/maintenance", maintenanceRoutes);
+app.use("/orders", warrantyRoutes);
+app.use("/admin", adminWarrantyRoutes);
 
 /** Start the orders HTTP server. */
 app.listen(PORT, "0.0.0.0", () => {

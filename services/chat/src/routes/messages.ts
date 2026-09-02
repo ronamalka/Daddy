@@ -1,21 +1,25 @@
 import { Router, Request, Response } from "express";
 import { requireAuth } from "../../../shared/middleware";
-import { listConversations, listMessages, markRead, sendMessage, unreadCount, type MessageRepo } from "../chat";
+import { listConversations, listMessages, markRead, sendMessage, unreadCount, type MessageRepo, type ViolationRepo } from "../chat";
 
 /** Build the router for sending, listing, and marking chat messages. */
-export function createMessagesRouter(repo: MessageRepo) {
+export function createMessagesRouter(repo: MessageRepo, violationRepo?: ViolationRepo) {
   const router = Router();
 
   /** Send a new chat message. */
   router.post("/", requireAuth, async (req: Request, res: Response) => {
-    const result = await sendMessage(repo, {
-      senderId: req.user!.id,
-      senderRole: req.user!.role,
-      receiverId: req.body.receiverId,
-      content: req.body.content,
-      attachment: req.body.attachment,
-      orderId: req.body.orderId,
-    });
+    const result = await sendMessage(
+      repo,
+      {
+        senderId: req.user!.id,
+        senderRole: req.user!.role,
+        receiverId: req.body.receiverId,
+        content: req.body.content,
+        attachment: req.body.attachment,
+        orderId: req.body.orderId,
+      },
+      violationRepo,
+    );
 
     if (!result.ok) {
       res.status(result.status).json({ error: result.error });

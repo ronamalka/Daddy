@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { Archive } from "@phosphor-icons/react";
+import { Archive, ArrowClockwise } from "@phosphor-icons/react";
 import { formatVisitWindow } from "@/lib/availability";
 import { STATUS_COLORS, STATUS_LABELS } from "@/lib/order-status";
 import { orderHasOpenDispute } from "@/lib/disputes";
@@ -85,6 +85,16 @@ export function OrderCards({
                 <span className="rounded-full bg-[rgba(var(--color-error),0.1)] px-2.5 py-0.5 text-[11px] font-semibold text-[rgb(var(--color-error))]">
                   מחלוקת פתוחה
                 </span>
+              )}
+              {counterpart === "seller" && order.status === "COMPLETED" && (
+                <Link
+                  href={`/orders/rebook?seller=${order.sellerId}&from=${order.id}`}
+                  onClick={(e) => e.stopPropagation()}
+                  className="flex items-center gap-1 rounded-full bg-[rgba(var(--color-primary),0.1)] px-2.5 py-1 text-[11px] font-semibold text-[rgb(var(--color-primary))] hover:bg-[rgba(var(--color-primary),0.2)] transition-colors"
+                >
+                  <ArrowClockwise className="h-3 w-3" />
+                  הזמן שוב
+                </Link>
               )}
             </span>
           </Link>

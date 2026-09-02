@@ -204,3 +204,155 @@ ordersRoutes.get("/booked-slots/:sellerId", requireInternal, async (req: Request
       .map((row) => ({ slotStart: row.slotStart, slotEnd: row.slotEnd }))
   );
 });
+
+/** Return rebookable sellers — sellers with COMPLETED orders in the last 12 months, grouped by seller. */
+ordersRoutes.get("/rebookable", requireAuth, async (req: Request, res: Response) => {
+  const cutoff = new Date();
+  cutoff.setFullYear(cutoff.getFullYear() - 1);
+
+  const completed = await prisma.order.findMany({
+    where: {
+      buyerId: req.user!.id,
+      status: "COMPLETED",
+      updatedAt: { gte: cutoff },
+    },
+    select: {
+      id: true,
+      sellerId: true,
+      title: true,
+      price: true,
+      laborPrice: true,
+      materialsEstimate: true,
+      buyerSuppliesMaterials: true,
+      jobType: true,
+      updatedAt: true,
+    },
+    orderBy: { updatedAt: "desc" },
+  });
+
+  const grouped = new Map<string, { lastOrder: (typeof completed)[number]; count: number }>();
+  for (const order of completed) {
+    const existing = grouped.get(order.sellerId);
+    if (existing) {
+      existing.count++;
+    } else {
+      grouped.set(order.sellerId, { lastOrder: order, count: 1 });
+    }
+  }
+
+  const result = Array.from(grouped.entries()).map(([sellerId, { lastOrder, count }]) => ({
+    sellerId,
+    lastOrder: {
+      id: lastOrder.id,
+      title: lastOrder.title,
+      price: lastOrder.price,
+      laborPrice: lastOrder.laborPrice,
+      materialsEstimate: lastOrder.materialsEstimate,
+      buyerSuppliesMaterials: lastOrder.buyerSuppliesMaterials,
+      completedAt: lastOrder.updatedAt.toISOString(),
+      jobType: lastOrder.jobType,
+    },
+    orderCount: count,
+  }));
+
+  res.json(result);
+});
+
+/** Create a new order by rebooking a previous seller. */
+ordersRoutes.post("/rebook", requireAuth, async (req: Request, res: Response) => {
+  const {
+    sellerId,
+    title,
+    laborPrice: rawLaborPrice,
+    materialsEstimate,
+    buyerSuppliesMaterials,
+    slotStart,
+    slotEnd,
+  } = req.body;
+
+  const labor = laborAmount({ laborPrice: rawLaborPrice });
+  if (!sellerId || labor == null) {
+    res.status(400).json({ error: "Missing fields" });
+    return;
+  }
+
+  if (!String(title || "").trim()) {
+    res.status(400).json({ error: "Missing fields" });
+    return;
+  }
+
+  if (sellerId === req.user!.id) {
+    res.status(400).json({ error: "Cannot order your own gig" });
+    return;
+  }
+
+  const slot = parseRequiredSlot(slotStart, slotEnd);
+  if (!slot) {
+    res.status(400).json({ error: "A 2-hour visit window is required" });
+    return;
+  }
+
+  if (slot.start.getTime() <= Date.now()) {
+    res.status(400).json({ error: "Visit window must be in the future" });
+    return;
+  }
+
+  const buyerSupplies = buyerSuppliesMaterials !== false;
+  const materials =
+    materialsEstimate != null && Number(materialsEstimate) > 0 ? Number(materialsEstimate) : null;
+  const total = quoteTotal({
+    laborPrice: labor,
+    materialsEstimate: materials,
+    buyerSuppliesMaterials: buyerSupplies,
+  }) ?? labor;
+
+  try {
+    const order = await prisma.$transaction(async (tx) => {
+      const conflict = await tx.order.findFirst({
+        where: {
+          sellerId,
+          status: { not: "CANCELLED" },
+          slotStart: { lt: slot.end },
+          slotEnd: { gt: slot.start },
+        },
+        select: { id: true },
+      });
+
+      if (conflict) {
+        throw new Error("SLOT_CONFLICT");
+      }
+
+      return tx.order.create({
+        data: {
+          jobType: "LOCAL_REQUEST",
+          title: String(title).trim(),
+          buyerId: req.user!.id,
+          sellerId,
+          price: total,
+          laborPrice: labor,
+          materialsEstimate: materials,
+          buyerSuppliesMaterials: buyerSupplies,
+          dueDate: slot.end,
+          slotStart: slot.start,
+          slotEnd: slot.end,
+        },
+      });
+    });
+
+    res.status(201).json(order);
+
+    const note = buildNotification("ORDER_BOOKED", {
+      orderId: order.id,
+      service: order.title || undefined,
+      price: order.price,
+      date: order.slotStart ? order.slotStart.toLocaleDateString("he-IL") : undefined,
+    });
+    sendNotification({ userId: sellerId, ...note, entityId: order.id }).catch(() => {});
+  } catch (err) {
+    if (err instanceof Error && err.message === "SLOT_CONFLICT") {
+      res.status(409).json({ error: "That visit window is already booked" });
+      return;
+    }
+    throw err;
+  }
+});

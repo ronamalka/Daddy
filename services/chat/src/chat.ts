@@ -1,3 +1,5 @@
+import { scanMessage } from "./content-filter";
+
 export const MAX_MESSAGE_LENGTH = 5000;
 
 export type MessageRecord = {
@@ -72,6 +74,17 @@ export interface MessageRepo {
   markRead(args: { userId: string; orderId?: string; senderId?: string }): Promise<number>;
 }
 
+export interface ViolationRepo {
+  logViolation(data: {
+    senderId: string;
+    receiverId: string;
+    orderId: string | null;
+    content: string;
+    pattern: string;
+    reason: string;
+  }): Promise<void>;
+}
+
 /** Return the other person's id in this message. */
 export function peerId(userId: string, message: Pick<MessageRecord, "senderId" | "receiverId">): string {
   return message.senderId === userId ? message.receiverId : message.senderId;
@@ -110,8 +123,15 @@ function trimContent(content: unknown): string {
   return typeof content === "string" ? content.trim() : "";
 }
 
+const BLOCKED_MESSAGE =
+  "לא ניתן לשלוח פרטי קשר אישיים דרך הצ׳אט. כל התקשורת עוברת דרך אבאל׳ה כדי להגן על שני הצדדים — תשלום מאובטח, אחריות על העבודה, וחשבונית מסודרת.";
+
 /** Create a message after checking the receiver, the text, and any upload path. */
-export function sendMessage(repo: MessageRepo, input: SendMessageInput): Promise<ChatResult<MessageRecord>> {
+export function sendMessage(
+  repo: MessageRepo,
+  input: SendMessageInput,
+  violationRepo?: ViolationRepo,
+): Promise<ChatResult<MessageRecord>> {
   const content = trimContent(input.content);
   const { senderId, receiverId, orderId } = input;
   const attachment = parseAttachment(input.attachment);
@@ -133,6 +153,29 @@ export function sendMessage(repo: MessageRepo, input: SendMessageInput): Promise
   }
   if (receiverId === senderId) {
     return Promise.resolve({ ok: false, status: 400, error: "Cannot message yourself" });
+  }
+
+  // Content moderation: block off-platform contact sharing
+  if (content) {
+    const filterResult = scanMessage(content);
+    if (filterResult.blocked) {
+      // Log the violation asynchronously — don't block the response
+      if (violationRepo) {
+        violationRepo
+          .logViolation({
+            senderId,
+            receiverId,
+            orderId: orderId || null,
+            content,
+            pattern: filterResult.pattern,
+            reason: filterResult.reason,
+          })
+          .catch(() => {
+            /* best-effort logging */
+          });
+      }
+      return Promise.resolve({ ok: false, status: 422, error: BLOCKED_MESSAGE });
+    }
   }
 
   return repo.create({

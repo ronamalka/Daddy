@@ -118,10 +118,11 @@ model Order {
   createdAt DateTime    @default(now())
   updatedAt DateTime    @updatedAt
 
-  requirements OrderRequirement[]
-  disputes     Dispute[]
-  payments     Payment[]
-  invoice      Invoice?
+  requirements   OrderRequirement[]
+  disputes       Dispute[]
+  payments       Payment[]
+  invoice        Invoice?
+  warrantyClaims WarrantyClaim[]
 
   @@index([buyerId])
   @@index([sellerId])
@@ -246,6 +247,35 @@ model MaintenanceVisit {
 
   @@index([planId])
   @@index([scheduledAt])
+  @@index([status])
+}
+
+enum WarrantyStatus {
+  OPEN
+  UNDER_REVIEW
+  APPROVED_RESEND
+  APPROVED_REFUND
+  REJECTED
+  CLOSED
+}
+
+model WarrantyClaim {
+  id          String         @id @default(cuid())
+  orderId     String
+  buyerId     String
+  description String
+  photos      String[]       @default([])
+  status      WarrantyStatus @default(OPEN)
+  resolution  String?
+  resolvedAt  DateTime?
+  resolvedBy  String?
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  order Order @relation(fields: [orderId], references: [id])
+
+  @@index([orderId])
+  @@index([buyerId])
   @@index([status])
 }
 
