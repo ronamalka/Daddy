@@ -3,12 +3,14 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { pageMetadata, serializeJsonLd, breadcrumbJsonLd, faqJsonLd } from "@/lib/seo";
 import { siteUrl } from "@/lib/site-url";
-import { USERS_SERVICE, GIGS_SERVICE, proxyRequest } from "@/lib/gateway";
+import { GIGS_SERVICE, proxyRequest } from "@/lib/gateway";
 import {
   LANDING_CATEGORIES,
   LANDING_CITIES,
   CATEGORY_SLUGS,
   SERVICE_FAQ,
+  fetchSellersByService,
+  type SellerCard,
 } from "@/lib/landing-pages";
 
 interface PageProps {
@@ -30,15 +32,6 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   });
 }
 
-interface SellerCard {
-  id: string;
-  name: string;
-  avatar: string | null;
-  city: string | null;
-  avgRating: number;
-  totalReviews: number;
-}
-
 interface ReviewCard {
   id: string;
   rating: number;
@@ -47,69 +40,22 @@ interface ReviewCard {
   user?: { name: string; city: string | null };
 }
 
-/** Fetches top-rated sellers. Gracefully returns empty on failure. */
-async function fetchTopSellers(slug: string): Promise<SellerCard[]> {
+async function fetchRecentReviews(): Promise<ReviewCard[]> {
   try {
-    const { data, status } = await proxyRequest(
-      USERS_SERVICE,
-      `/providers?take=12`,
-    );
+    const { data, status } = await proxyRequest(GIGS_SERVICE, `/reviews?take=6`);
     if (status !== 200 || !Array.isArray(data)) return [];
-    return data
-      .filter(
-        (s: Record<string, unknown>) =>
-          s &&
-          typeof s.id === "string" &&
-          typeof s.name === "string" &&
-          Array.isArray(s.userServices) &&
-          (s.userServices as { serviceSlug: string }[]).some(
-            (us) =>
-              us.serviceSlug === slug ||
-              us.serviceSlug.includes(slug.replace(/-/g, "")),
-          ),
-      )
-      .slice(0, 8)
-      .map((s: Record<string, unknown>) => ({
-        id: s.id as string,
-        name: s.name as string,
-        avatar: typeof s.avatar === "string" ? s.avatar : null,
-        city: typeof s.city === "string" ? s.city : null,
-        avgRating: typeof s.avgRating === "number" ? s.avgRating : 0,
-        totalReviews:
-          typeof s.totalReviews === "number" ? s.totalReviews : 0,
-      }));
-  } catch {
-    return [];
-  }
-}
-
-/** Fetches recent reviews. Gracefully returns empty on failure. */
-async function fetchRecentReviews(slug: string): Promise<ReviewCard[]> {
-  try {
-    const { data, status } = await proxyRequest(
-      GIGS_SERVICE,
-      `/reviews?take=6`,
-    );
-    if (status !== 200 || !Array.isArray(data)) return [];
-    return data.slice(0, 6).map((r: Record<string, unknown>) => ({
-      id: (r.id as string) || String(Math.random()),
-      rating: typeof r.rating === "number" ? r.rating : 0,
-      comment: typeof r.comment === "string" ? r.comment : "",
-      createdAt: typeof r.createdAt === "string" ? r.createdAt : "",
-      user:
-        r.user && typeof r.user === "object"
-          ? {
-              name:
-                typeof (r.user as Record<string, unknown>).name === "string"
-                  ? ((r.user as Record<string, unknown>).name as string)
-                  : "משתמש",
-              city:
-                typeof (r.user as Record<string, unknown>).city === "string"
-                  ? ((r.user as Record<string, unknown>).city as string)
-                  : null,
-            }
+    return data.slice(0, 6).map((r: Record<string, unknown>) => {
+      const user = r.user as { name?: unknown; city?: unknown } | null | undefined;
+      return {
+        id: (r.id as string) || String(Math.random()),
+        rating: typeof r.rating === "number" ? r.rating : 0,
+        comment: typeof r.comment === "string" ? r.comment : "",
+        createdAt: typeof r.createdAt === "string" ? r.createdAt : "",
+        user: user && typeof user === "object"
+          ? { name: typeof user.name === "string" ? user.name : "משתמש", city: typeof user.city === "string" ? user.city : null }
           : undefined,
-    }));
+      };
+    });
   } catch {
     return [];
   }
@@ -121,8 +67,8 @@ export default async function ServiceCategoryPage({ params }: PageProps) {
   if (!cat) notFound();
 
   const [sellers, reviews] = await Promise.all([
-    fetchTopSellers(slug),
-    fetchRecentReviews(slug),
+    fetchSellersByService(slug),
+    fetchRecentReviews(),
   ]);
 
   const cityEntries = Object.entries(LANDING_CITIES).slice(0, 6);

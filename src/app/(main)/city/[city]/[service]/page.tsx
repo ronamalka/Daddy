@@ -3,13 +3,14 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { pageMetadata, serializeJsonLd, breadcrumbJsonLd, faqJsonLd } from "@/lib/seo";
 import { siteUrl } from "@/lib/site-url";
-import { USERS_SERVICE, proxyRequest } from "@/lib/gateway";
 import {
   LANDING_CATEGORIES,
   LANDING_CITIES,
   CATEGORY_SLUGS,
   CITY_SLUGS,
   SERVICE_FAQ,
+  fetchSellersByCityAndService,
+  type SellerCard,
 } from "@/lib/landing-pages";
 
 interface PageProps {
@@ -40,63 +41,13 @@ export async function generateMetadata({
   });
 }
 
-interface SellerCard {
-  id: string;
-  name: string;
-  avatar: string | null;
-  city: string | null;
-  avgRating: number;
-  totalReviews: number;
-}
-
-/** Fetches sellers from the users service. Gracefully returns empty on failure. */
-async function fetchLocalSellers(
-  serviceSlug: string,
-  cityHe: string,
-): Promise<SellerCard[]> {
-  try {
-    const { data, status } = await proxyRequest(
-      USERS_SERVICE,
-      `/providers?take=20`,
-    );
-    if (status !== 200 || !Array.isArray(data)) return [];
-    return data
-      .filter((s: Record<string, unknown>) => {
-        if (!s || typeof s.id !== "string" || typeof s.name !== "string")
-          return false;
-        const matchesCity =
-          typeof s.city === "string" && s.city.includes(cityHe);
-        const matchesService =
-          Array.isArray(s.userServices) &&
-          (s.userServices as { serviceSlug: string }[]).some(
-            (us) =>
-              us.serviceSlug === serviceSlug ||
-              us.serviceSlug.includes(serviceSlug.replace(/-/g, "")),
-          );
-        return matchesCity || matchesService;
-      })
-      .slice(0, 12)
-      .map((s: Record<string, unknown>) => ({
-        id: s.id as string,
-        name: s.name as string,
-        avatar: typeof s.avatar === "string" ? s.avatar : null,
-        city: typeof s.city === "string" ? s.city : null,
-        avgRating: typeof s.avgRating === "number" ? s.avgRating : 0,
-        totalReviews:
-          typeof s.totalReviews === "number" ? s.totalReviews : 0,
-      }));
-  } catch {
-    return [];
-  }
-}
-
 export default async function CityServicePage({ params }: PageProps) {
   const { city: citySlug, service: serviceSlug } = await params;
   const city = LANDING_CITIES[citySlug];
   const cat = LANDING_CATEGORIES[serviceSlug];
   if (!city || !cat) notFound();
 
-  const sellers = await fetchLocalSellers(serviceSlug, city.he);
+  const sellers = await fetchSellersByCityAndService(serviceSlug, city.he);
 
   const otherCities = Object.entries(LANDING_CITIES)
     .filter(([s]) => s !== citySlug)
