@@ -1,7 +1,9 @@
 import { afterEach, describe, expect, it } from "vitest";
 import {
+  breadcrumbJsonLd,
   collectPublicGigs,
   collectPublicSellers,
+  faqJsonLd,
   gigJsonLd,
   gigsListHasMore,
   gigPageMetadata,
@@ -124,7 +126,7 @@ describe("sitemap collectors", () => {
 });
 
 describe("page metadata", () => {
-  it("sets canonical and Open Graph URL for marketing pages", () => {
+  it("sets canonical, hreflang, and Open Graph URL for marketing pages", () => {
     process.env.NEXT_PUBLIC_BASE_URL = "https://daddy-app-daddy-dev.example";
     const meta = pageMetadata({
       title: "איך זה עובד",
@@ -132,7 +134,10 @@ describe("page metadata", () => {
       path: "/how-it-works",
     });
     expect(meta.title).toBe("איך זה עובד");
-    expect(meta.alternates).toEqual({ canonical: "/how-it-works" });
+    expect(meta.alternates).toEqual({
+      canonical: "/how-it-works",
+      languages: { he: "/how-it-works", "x-default": "/how-it-works" },
+    });
     expect(meta.openGraph?.url).toBe("https://daddy-app-daddy-dev.example/how-it-works");
   });
 
@@ -197,7 +202,10 @@ describe("seller JSON-LD", () => {
   it("builds a profile title from the daddy's name", () => {
     const meta = sellerPageMetadata(seller);
     expect(meta.title).toBe("יוסי הגולדן");
-    expect(meta.alternates).toEqual({ canonical: "/sellers/seed-user-seller1" });
+    expect(meta.alternates).toEqual({
+      canonical: "/sellers/seed-user-seller1",
+      languages: { he: "/sellers/seed-user-seller1", "x-default": "/sellers/seed-user-seller1" },
+    });
   });
 });
 
@@ -229,7 +237,10 @@ describe("gig Service JSON-LD", () => {
   it("sets the package canonical path", () => {
     const meta = gigPageMetadata(gig);
     expect(meta.title).toBe("הרכבת רהיטי איקאה");
-    expect(meta.alternates).toEqual({ canonical: "/gigs/seed-gig-ikea" });
+    expect(meta.alternates).toEqual({
+      canonical: "/gigs/seed-gig-ikea",
+      languages: { he: "/gigs/seed-gig-ikea", "x-default": "/gigs/seed-gig-ikea" },
+    });
   });
 });
 
@@ -244,5 +255,46 @@ describe("truncateMeta", () => {
     expect(truncateMeta("  שלום  עולם  ")).toBe("שלום עולם");
     expect(truncateMeta("א".repeat(200), 20).endsWith("…")).toBe(true);
     expect(truncateMeta("א".repeat(200), 20).length).toBe(20);
+  });
+});
+
+describe("breadcrumbJsonLd", () => {
+  it("builds a BreadcrumbList with positions starting at 1", () => {
+    process.env.NEXT_PUBLIC_BASE_URL = "https://abale.example";
+    const ld = breadcrumbJsonLd([
+      { name: "ראשי", path: "/" },
+      { name: "שירותים", path: "/services" },
+      { name: "אינסטלטור", path: "/services/plumbing" },
+    ]);
+    expect(ld["@type"]).toBe("BreadcrumbList");
+    const items = ld.itemListElement as { position: number; name: string; item: string }[];
+    expect(items).toHaveLength(3);
+    expect(items[0]).toEqual({
+      "@type": "ListItem",
+      position: 1,
+      name: "ראשי",
+      item: "https://abale.example",
+    });
+    expect(items[2]).toEqual({
+      "@type": "ListItem",
+      position: 3,
+      name: "אינסטלטור",
+      item: "https://abale.example/services/plumbing",
+    });
+  });
+});
+
+describe("faqJsonLd", () => {
+  it("builds a FAQPage with Question and Answer entities", () => {
+    const ld = faqJsonLd([
+      { q: "כמה עולה?", a: "חינם." },
+      { q: "איך מתחילים?", a: "נרשמים." },
+    ]);
+    expect(ld["@type"]).toBe("FAQPage");
+    const entities = ld.mainEntity as { "@type": string; name: string; acceptedAnswer: { text: string } }[];
+    expect(entities).toHaveLength(2);
+    expect(entities[0].name).toBe("כמה עולה?");
+    expect(entities[0].acceptedAnswer.text).toBe("חינם.");
+    expect(entities[1].name).toBe("איך מתחילים?");
   });
 });

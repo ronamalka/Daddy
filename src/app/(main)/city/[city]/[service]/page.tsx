@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import type { Metadata } from "next";
-import { pageMetadata, serializeJsonLd } from "@/lib/seo";
+import { pageMetadata, serializeJsonLd, breadcrumbJsonLd, faqJsonLd } from "@/lib/seo";
 import { siteUrl } from "@/lib/site-url";
 import { USERS_SERVICE, proxyRequest } from "@/lib/gateway";
 import {
@@ -129,25 +129,13 @@ export default async function CityServicePage({ params }: PageProps) {
     },
   };
 
-  const faqJsonLd = {
-    "@context": "https://schema.org",
-    "@type": "FAQPage",
-    mainEntity: SERVICE_FAQ.map((item) => ({
-      "@type": "Question",
-      name: item.q,
-      acceptedAnswer: { "@type": "Answer", text: item.a },
-    })),
-  };
+  const breadcrumb = breadcrumbJsonLd([
+    { name: "ראשי", path: "/" },
+    { name: city.he, path: `/city/${citySlug}` },
+    { name: cat.he, path: `/city/${citySlug}/${serviceSlug}` },
+  ]);
 
-  const breadcrumbJsonLd = {
-    "@context": "https://schema.org",
-    "@type": "BreadcrumbList",
-    itemListElement: [
-      { "@type": "ListItem", position: 1, name: "ראשי", item: siteUrl("/") },
-      { "@type": "ListItem", position: 2, name: city.he, item: siteUrl(`/city/${citySlug}`) },
-      { "@type": "ListItem", position: 3, name: cat.he },
-    ],
-  };
+  const faq = faqJsonLd(SERVICE_FAQ);
 
   return (
     <div className="min-h-screen bg-[rgb(var(--color-bg))]">
@@ -293,6 +281,19 @@ export default async function CityServicePage({ params }: PageProps) {
         </div>
       </section>
 
+      {/* Cross-link to national service page */}
+      <section className="mx-auto max-w-6xl px-4 py-8">
+        <p className="text-center text-[14px] text-[rgb(var(--color-text-secondary))]">
+          מחפש {cat.he} בכל הארץ?{" "}
+          <Link
+            href={`/services/${serviceSlug}`}
+            className="font-semibold text-[rgb(var(--color-primary))] hover:underline"
+          >
+            {cat.he} — כל האזורים
+          </Link>
+        </p>
+      </section>
+
       {/* FAQ */}
       <section className="bg-[rgb(var(--color-surface-elevated))] py-16">
         <div className="mx-auto max-w-3xl px-4">
@@ -350,11 +351,11 @@ export default async function CityServicePage({ params }: PageProps) {
       />
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: serializeJsonLd(faqJsonLd) }}
+        dangerouslySetInnerHTML={{ __html: serializeJsonLd(breadcrumb) }}
       />
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: serializeJsonLd(breadcrumbJsonLd) }}
+        dangerouslySetInnerHTML={{ __html: serializeJsonLd(faq) }}
       />
     </div>
   );
