@@ -21,6 +21,7 @@ import { notificationsRoutes } from "./routes/notifications";
 import { verificationRoutes } from "./routes/verification";
 import { addressesRoutes } from "./routes/addresses";
 import { commissionRoutes } from "./routes/commission";
+import { whatsappRoutes } from "./routes/whatsapp";
 import { startCityCatalogRefresh } from "./city-catalog";
 
 export { prisma };
@@ -54,6 +55,7 @@ app.use("/locations", locationsRoutes);
 app.use("/featured-daddies", featuredRoutes);
 app.use("/availability", availabilityRoutes);
 app.use("/notifications", notificationsRoutes);
+app.use("/notifications/whatsapp", whatsappRoutes);
 app.use("/verify", verificationRoutes);
 app.use("/addresses", addressesRoutes);
 
