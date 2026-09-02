@@ -42,7 +42,7 @@ export default function HowItWorksPage() {
   return (
     <div className="min-h-screen bg-[rgb(var(--color-bg))]">
       {/* Hero */}
-      <section className="bg-gradient-to-br from-slate-900 via-slate-900 to-[rgba(var(--color-primary),0.3)] py-20 text-center text-white">
+      <section className="bg-slate-900 py-20 text-center text-white">
         <div className="mx-auto max-w-4xl px-4">
           <h1 className="text-[36px] font-extrabold md:text-[48px]">איך זה עובד?</h1>
           <p className="mt-4 text-[18px] text-white/70">פשוט כמו לבקש מאבא. רק שפה אתה גם בוחר איזה אבא.</p>
@@ -60,8 +60,8 @@ export default function HowItWorksPage() {
         </div>
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
           {BUYER_STEPS.map((item, i) => (
-            <div key={i} className="group relative rounded-2xl bg-[rgb(var(--color-surface))] border border-[rgb(var(--color-border))] p-6 transition-all hover:shadow-lg hover:-translate-y-1">
-              <div className="absolute -top-3 -right-2 flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-[rgb(var(--color-primary))] to-[rgb(var(--color-primary-light))] text-[12px] font-extrabold text-white shadow-[0_4px_12px_rgba(var(--color-primary),0.3)]">{item.step}</div>
+            <div key={i} className="group relative rounded-2xl bg-[rgb(var(--color-surface))] border border-[rgb(var(--color-border))] p-6 transition-shadow hover:shadow-lg">
+              <div className="absolute -top-3 -right-2 flex h-8 w-8 items-center justify-center rounded-full bg-primary text-[12px] font-extrabold text-white shadow-md">{item.step}</div>
               <div className="mb-3 text-[rgb(var(--color-primary))]">
                 <item.Icon className="h-9 w-9" />
               </div>
@@ -84,8 +84,8 @@ export default function HowItWorksPage() {
           </div>
           <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
             {DADDY_STEPS.map((item, i) => (
-              <div key={i} className="group relative rounded-2xl bg-[rgb(var(--color-surface))] border border-[rgb(var(--color-border))] p-6 transition-all hover:shadow-lg hover:-translate-y-1">
-                <div className="absolute -top-3 -right-2 flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-[rgb(var(--color-success))] to-[rgb(var(--color-accent))] text-[12px] font-extrabold text-white shadow-[0_4px_12px_rgba(var(--color-success),0.3)]">{item.step}</div>
+              <div key={i} className="group relative rounded-2xl bg-[rgb(var(--color-surface))] border border-[rgb(var(--color-border))] p-6 transition-shadow hover:shadow-lg">
+                <div className="absolute -top-3 -right-2 flex h-8 w-8 items-center justify-center rounded-full bg-success text-[12px] font-extrabold text-white shadow-md">{item.step}</div>
                 <div className="mb-3 text-[rgb(var(--color-success))]">
                   <item.Icon className="h-9 w-9" />
                 </div>
@@ -134,12 +134,12 @@ export default function HowItWorksPage() {
       </section>
 
       {/* CTA */}
-      <section className="bg-gradient-to-br from-[rgb(var(--color-primary))] to-[rgb(var(--color-primary-light))] py-16 text-center text-white">
+      <section className="bg-primary py-16 text-center text-white">
         <div className="mx-auto max-w-3xl px-4">
           <h2 className="text-[28px] font-extrabold md:text-[32px]">נו, אז מה אומרים?</h2>
           <p className="mt-3 text-[16px] text-white/80">אלפי ישראלים כבר מצאו אבאל׳ה. אתה עדיין מנסה לבד?</p>
           <div className="mt-8 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
-            <Link href="/register" className="rounded-xl bg-white px-8 py-3.5 text-[15px] font-bold text-[rgb(var(--color-primary))] shadow-[0_4px_16px_rgba(0,0,0,0.15)] transition-all hover:shadow-[0_8px_24px_rgba(0,0,0,0.2)] hover:-translate-y-0.5">
+            <Link href="/register" className="rounded-xl bg-white px-8 py-3.5 text-[15px] font-bold text-[rgb(var(--color-primary))] shadow-md transition-shadow hover:shadow-lg">
               אני מחפש שירות
             </Link>
             <Link href="/become-a-daddy" className="rounded-xl border-2 border-white/40 px-8 py-3.5 text-[15px] font-bold text-white transition-all hover:bg-white/10">

@@ -35,25 +35,21 @@ export function CategoriesSection({
 
   SERVICE_CATEGORIES.forEach((cat, i) => {
     items.push(
-      <motion.button
+      <button
         key={cat.slug}
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.3, delay: 0.05 * i }}
         onClick={() => setSelectedCategory(selectedCategory === cat.slug ? "" : cat.slug)}
         className={cn(
-          "group relative overflow-hidden rounded-xl border p-5 text-right transition-all duration-300",
+          "group relative overflow-hidden rounded-xl border p-5 text-right transition-all duration-200",
           selectedCategory === cat.slug
-            ? "border-[rgb(var(--color-primary))] bg-[rgba(var(--color-primary),0.08)] shadow-[var(--shadow-glow)]"
-            : "border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] hover:border-[rgba(var(--color-primary),0.3)] hover:shadow-md hover:-translate-y-0.5"
+            ? "border-[rgb(var(--color-primary))] bg-[rgba(var(--color-primary),0.08)] ring-2 ring-[rgb(var(--color-primary))]"
+            : "border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] hover:border-[rgba(var(--color-primary),0.3)] hover:shadow-md"
         )}
       >
         <div className={cn(
           "mb-3 flex h-12 w-12 items-center justify-center rounded-lg transition-colors",
           selectedCategory === cat.slug
             ? "bg-[rgb(var(--color-primary))] text-white"
-            : "bg-[rgba(var(--color-primary),0.1)] text-[rgb(var(--color-primary))] group-hover:bg-[rgb(var(--color-primary))] group-hover:text-white"
+            : "bg-[rgba(var(--color-primary),0.1)] text-[rgb(var(--color-primary))] group-hover:text-[rgb(var(--color-primary))]"
         )}>
           <CategoryIcon slug={cat.slug} className="h-6 w-6" />
         </div>
@@ -66,7 +62,7 @@ export function CategoriesSection({
         <p className="mt-1 text-xs text-[rgb(var(--color-text-muted))]">
           {cat.services.length} שירותים
         </p>
-      </motion.button>
+      </button>
     );
 
     if (selectedCategory && i === mobileInsertAfter) {
@@ -137,7 +133,7 @@ function SubServicesPanel({
               onClick={() => { setSelectedService(svc.slug); setServiceSearch(svc.nameHe); }}
               className="group flex items-center gap-3 rounded-lg border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] p-4 text-right transition-all hover:border-[rgb(var(--color-primary))] hover:shadow-sm"
             >
-              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-[rgba(var(--color-primary),0.1)] text-[rgb(var(--color-primary))] transition-colors group-hover:bg-[rgb(var(--color-primary))] group-hover:text-white">
+              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-[rgba(var(--color-primary),0.1)] text-[rgb(var(--color-primary))] transition-colors group-hover:text-[rgb(var(--color-primary))]">
                 <CategoryIcon slug={svc.category} className="h-5 w-5" />
               </div>
               <div className="flex-1 min-w-0">

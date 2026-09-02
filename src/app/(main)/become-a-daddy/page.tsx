@@ -19,10 +19,10 @@ const BENEFITS: { title: string; desc: string; Icon: PhosphorIcon }[] = [
   { title: "פשוט כמו שיחת טלפון", desc: "פרופיל, הודעות, ביקורות. בלי אפליקציות מסובכות. אם אתה יודע לשלוח וואטסאפ — אתה יודע להשתמש באבאל׳ה.", Icon: Sparkle },
 ];
 
-const STEPS: { step: string; title: string; desc: string; Icon: PhosphorIcon; color: string }[] = [
-  { step: "01", title: "ספר מה אתה יודע", desc: "הרשם עם אימייל וספר על עצמך. 30 שנות ניסיון? תכתוב את זה. לקוחות אוהבים לדעת שמגיע אליהם מישהו שעשה את זה אלף פעם.", Icon: FileText, color: "from-[rgb(var(--color-primary))] to-[rgb(var(--color-primary-light))]" },
-  { step: "02", title: "הגדר שירותים", desc: "בחר מה אתה עושה מתוך העזרה הביתית שבאתר. עבודות טעונות רישיון (חשמל, גז, ביטוח) רק אם יש לך רישיון בתוקף — ואתה מציג אותו ללקוח.", Icon: GearSix, color: "from-[rgb(var(--color-success))] to-[rgb(var(--color-accent))]" },
-  { step: "03", title: "תתחיל לקבל טלפונים", desc: "לקוחות מהאזור שלך ימצאו אותך וישלחו הודעות. תגיע, תסדר, ותרוויח. כמו פעם, רק עם יותר ׳תודה רבה׳.", Icon: Rocket, color: "from-[rgb(var(--color-accent-yellow))] to-[rgb(var(--color-error))]" },
+const STEPS: { step: string; title: string; desc: string; Icon: PhosphorIcon }[] = [
+  { step: "01", title: "ספר מה אתה יודע", desc: "הרשם עם אימייל וספר על עצמך. 30 שנות ניסיון? תכתוב את זה. לקוחות אוהבים לדעת שמגיע אליהם מישהו שעשה את זה אלף פעם.", Icon: FileText },
+  { step: "02", title: "הגדר שירותים", desc: "בחר מה אתה עושה מתוך העזרה הביתית שבאתר. עבודות טעונות רישיון (חשמל, גז, ביטוח) רק אם יש לך רישיון בתוקף — ואתה מציג אותו ללקוח.", Icon: GearSix },
+  { step: "03", title: "תתחיל לקבל טלפונים", desc: "לקוחות מהאזור שלך ימצאו אותך וישלחו הודעות. תגיע, תסדר, ותרוויח. כמו פעם, רק עם יותר ׳תודה רבה׳.", Icon: Rocket },
 ];
 
 const TESTIMONIALS = [
@@ -36,7 +36,7 @@ export default function BecomeADaddyPage() {
   return (
     <div className="min-h-screen bg-[rgb(var(--color-bg))]">
       {/* Hero */}
-      <section className="bg-gradient-to-br from-slate-900 via-slate-900 to-[rgba(var(--color-success),0.3)] py-20 text-center text-white">
+      <section className="bg-slate-900 py-20 text-center text-white">
         <div className="mx-auto max-w-4xl px-4">
           <span className="inline-flex items-center gap-1.5 rounded-full bg-white/10 px-4 py-1.5 text-[13px] font-bold text-[rgb(var(--color-accent))] mb-6">
             <Wrench className="h-4 w-4" />
@@ -46,7 +46,7 @@ export default function BecomeADaddyPage() {
           <p className="mt-4 text-[18px] text-white/70 max-w-2xl mx-auto">
             הילדים גדלו, יש לך 30 שנות ניסיון, והידיים עדיין זוכרות הכל. הגיע הזמן שמישהו ייהנה מזה — ושאתה תרוויח מזה.
           </p>
-          <Link href="/onboarding" className="mt-8 inline-block rounded-xl bg-gradient-to-r from-[rgb(var(--color-success))] to-[rgb(var(--color-accent))] px-8 py-4 text-[16px] font-bold text-white shadow-[0_4px_16px_rgba(var(--color-success),0.3)] transition-all hover:shadow-[0_8px_24px_rgba(var(--color-success),0.4)] hover:-translate-y-0.5">
+          <Link href="/onboarding" className="mt-8 inline-block rounded-xl bg-[rgb(var(--color-success))] px-8 py-4 text-[16px] font-bold text-white shadow-sm transition-colors hover:opacity-90">
             הירשם עכשיו — בחינם
           </Link>
           <p className="mt-4 text-[13px] text-white/60 max-w-xl mx-auto">
@@ -63,8 +63,8 @@ export default function BecomeADaddyPage() {
         </div>
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {BENEFITS.map((item, i) => (
-            <div key={i} className="group rounded-2xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] p-6 transition-all hover:shadow-lg hover:-translate-y-1">
-              <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-[rgba(var(--color-success),0.1)] text-[rgb(var(--color-success))] transition-colors group-hover:bg-gradient-to-br group-hover:from-[rgb(var(--color-success))] group-hover:to-[rgb(var(--color-accent))] group-hover:text-white">
+            <div key={i} className="group rounded-2xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] p-6 transition-shadow hover:shadow-md">
+              <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-[rgba(var(--color-success),0.1)] text-[rgb(var(--color-success))] transition-colors group-hover:bg-[rgb(var(--color-success))] group-hover:text-white">
                 <item.Icon className="h-7 w-7" />
               </div>
               <h3 className="text-[16px] font-bold text-[rgb(var(--color-text))] mb-2">{item.title}</h3>
@@ -83,8 +83,8 @@ export default function BecomeADaddyPage() {
           </div>
           <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
             {STEPS.map((item, i) => (
-              <div key={i} className="group relative rounded-2xl bg-[rgb(var(--color-surface))] border border-[rgb(var(--color-border))] p-7 text-center transition-all hover:shadow-lg hover:-translate-y-1">
-                <div className={`mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br ${item.color} text-white shadow-lg`}>
+              <div key={i} className="group relative rounded-2xl bg-[rgb(var(--color-surface))] border border-[rgb(var(--color-border))] p-7 text-center transition-shadow hover:shadow-md">
+                <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-[rgb(var(--color-primary))] text-white">
                   <item.Icon className="h-8 w-8" />
                 </div>
                 <div className="text-[11px] font-extrabold text-[rgb(var(--color-text-muted))] mb-2">שלב {item.step}</div>
@@ -113,7 +113,7 @@ export default function BecomeADaddyPage() {
               <p className="text-[14px] leading-relaxed text-[rgb(var(--color-text))] mb-4">{t.text}</p>
               <div className="flex items-center justify-between border-t border-[rgb(var(--color-border))] pt-3">
                 <div className="flex items-center gap-2">
-                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-[rgb(var(--color-success))] to-[rgb(var(--color-accent))] text-[12px] font-bold text-white">{t.name[0]}</div>
+                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[rgb(var(--color-success))] text-[12px] font-bold text-white">{t.name[0]}</div>
                   <div>
                     <span className="text-[13px] font-semibold text-[rgb(var(--color-text))]">{t.name}</span>
                     <span className="text-[11px] text-[rgb(var(--color-text-muted))] mr-1">· {t.city}</span>
@@ -131,11 +131,11 @@ export default function BecomeADaddyPage() {
       </section>
 
       {/* CTA */}
-      <section className="bg-gradient-to-br from-[rgb(var(--color-success))] to-[rgb(var(--color-accent))] py-16 text-center text-white">
+      <section className="bg-[rgb(var(--color-success))] py-16 text-center text-white">
         <div className="mx-auto max-w-3xl px-4">
           <h2 className="text-[28px] font-extrabold md:text-[32px]">הידיים שלך עוד זוכרות</h2>
           <p className="mt-3 text-[16px] text-white/80">הגיע הזמן שמישהו ייהנה מזה. הרשמה בדקה, בלי עלות, בלי התחייבות.</p>
-          <Link href="/onboarding" className="mt-8 inline-block rounded-xl bg-white px-8 py-4 text-[16px] font-bold text-[rgb(var(--color-success))] shadow-[0_4px_16px_rgba(0,0,0,0.15)] transition-all hover:shadow-[0_8px_24px_rgba(0,0,0,0.2)] hover:-translate-y-0.5">
+          <Link href="/onboarding" className="mt-8 inline-block rounded-xl bg-white px-8 py-4 text-[16px] font-bold text-[rgb(var(--color-success))] shadow-sm transition-shadow hover:shadow-md">
             הירשם כאבאל׳ה עכשיו
           </Link>
         </div>

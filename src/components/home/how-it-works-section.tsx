@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { motion } from "framer-motion";
 import { MagnifyingGlass, Wrench } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
 import { SectionHeader } from "./section-header";
@@ -37,22 +36,21 @@ export function HowItWorksSection() {
 
         <div className="grid grid-cols-1 gap-4 pt-3 sm:grid-cols-2 lg:grid-cols-4">
           {(howItWorksTab === "buyer" ? BUYER_STEPS : DADDY_STEPS).map((item, i) => (
-            <motion.div
+            <div
               key={`${howItWorksTab}-${i}`}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3, delay: 0.08 * i }}
-              className="group relative rounded-xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] p-6 transition-all hover:shadow-md hover:-translate-y-0.5"
+              className="group rounded-xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] p-6 transition-shadow hover:shadow-md"
             >
-              <div className="absolute -top-3 -right-2 flex h-7 w-7 items-center justify-center rounded-full bg-[rgb(var(--color-primary))] text-xs font-extrabold text-white shadow-sm">
-                {String(i + 1).padStart(2, "0")}
-              </div>
-              <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-[rgba(var(--color-primary),0.1)] text-[rgb(var(--color-primary))]">
-                {item.icon}
+              <div className="mb-4 flex items-center gap-3">
+                <div className="flex h-7 w-7 items-center justify-center rounded-full bg-[rgb(var(--color-primary))] text-xs font-bold text-white">
+                  {String(i + 1).padStart(2, "0")}
+                </div>
+                <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-[rgba(var(--color-primary),0.1)] text-[rgb(var(--color-primary))]">
+                  {item.icon}
+                </div>
               </div>
               <h3 className="text-sm font-bold text-[rgb(var(--color-text))] mb-2">{item.title}</h3>
               <p className="text-xs leading-relaxed text-[rgb(var(--color-text-secondary))]">{item.desc}</p>
-            </motion.div>
+            </div>
           ))}
         </div>
       </div>

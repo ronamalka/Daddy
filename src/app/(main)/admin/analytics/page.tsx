@@ -198,7 +198,7 @@ function FunnelStep({ name, count, maxCount }: { name: string; count: number; ma
       </div>
       <div className="flex-1">
         <div
-          className="h-8 rounded-lg bg-gradient-to-l from-[rgb(var(--color-primary))] to-[rgb(var(--color-primary-light))] flex items-center justify-end px-3 transition-all duration-500"
+          className="h-8 rounded-lg bg-primary flex items-center justify-end px-3 transition-all duration-500"
           style={{ width: `${width}%` }}
         >
           <span className="text-[13px] font-bold text-white">{count}</span>

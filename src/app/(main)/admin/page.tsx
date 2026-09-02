@@ -28,35 +28,35 @@ const STAT_CARDS: {
   label: string;
   key: keyof Stats;
   icon: ReactNode;
-  gradient: string;
+  color: string;
   format: (v: number) => string;
 }[] = [
   {
     label: "משתמשים",
     key: "users",
     icon: <Users className="h-6 w-6 text-[rgb(var(--color-primary))]" />,
-    gradient: "from-[rgb(var(--color-primary))] to-[rgb(var(--color-primary-light))]",
+    color: "bg-primary",
     format: (v: number) => v.toString(),
   },
   {
     label: "שירותים",
     key: "gigs",
     icon: <Briefcase className="h-6 w-6 text-[rgb(var(--color-accent))]" />,
-    gradient: "from-[rgb(var(--color-accent))] to-[rgb(var(--color-success))]",
+    color: "bg-accent",
     format: (v: number) => v.toString(),
   },
   {
     label: "הזמנות",
     key: "orders",
     icon: <Bag className="h-6 w-6 text-[rgb(var(--color-error))]" />,
-    gradient: "from-[rgb(var(--color-error))] to-[rgb(var(--color-accent-yellow))]",
+    color: "bg-error",
     format: (v: number) => v.toString(),
   },
   {
     label: "הכנסות",
     key: "revenue",
     icon: <CurrencyDollar className="h-6 w-6 text-[rgb(var(--color-accent-yellow))]" />,
-    gradient: "from-[rgb(var(--color-accent-yellow))] to-[rgb(var(--color-error))]",
+    color: "bg-accent-yellow",
     format: (v: number) => `₪${v.toFixed(2)}`,
   },
 ];
@@ -125,7 +125,7 @@ export default function AdminPage() {
             className="relative overflow-hidden rounded-xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] p-6 shadow-[var(--shadow-sm)]"
           >
             <div
-              className={`absolute top-0 left-0 right-0 h-1 bg-gradient-to-r ${stat.gradient}`}
+              className={`absolute top-0 left-0 right-0 h-1 ${stat.color}`}
             />
             <div className="flex items-center justify-between mb-3">
               <div className="rounded-xl bg-[rgb(var(--color-surface-elevated))] border border-[rgb(var(--color-border-light))] p-2.5">
@@ -211,7 +211,7 @@ export default function AdminPage() {
                   <tr key={user.id} className="transition-colors hover:bg-[rgb(var(--color-surface-elevated))]">
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-2">
-                        <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-[rgb(var(--color-primary))] to-[rgb(var(--color-primary-light))] text-[13px] font-bold text-white">
+                        <div className="flex h-9 w-9 items-center justify-center rounded-full bg-primary text-[13px] font-bold text-white">
                           {user.name[0]}
                         </div>
                         <span className="text-[14px] font-semibold text-[rgb(var(--color-text))]">{user.name}</span>

@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { motion } from "framer-motion";
 import { ArrowLeft, Clock, MapPin } from "@phosphor-icons/react";
 import { getServiceBySlug } from "@/lib/services";
 import { relativeTimeHe } from "@/lib/request-teaser";
@@ -49,44 +48,37 @@ export function OpenRequestsTeaser({
           </p>
         ) : (
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {teasers.map((req, i) => {
+            {teasers.map((req) => {
               const svc = req.serviceSlug ? getServiceBySlug(req.serviceSlug) : null;
               const place = req.cityName || req.districtName;
               const href = canOpenDetail ? `/requests/${req.id}` : `/login?next=/requests/${req.id}`;
               return (
-                <motion.div
+                <Link
                   key={req.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.3, delay: 0.05 * i }}
+                  href={href}
+                  className="group block rounded-xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] p-5 transition-shadow duration-200 hover:shadow-md hover:border-[rgba(var(--color-primary),0.3)]"
                 >
-                  <Link
-                    href={href}
-                    className="group block rounded-xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] p-5 transition-all duration-300 hover:shadow-lg hover:border-[rgba(var(--color-primary),0.3)] hover:-translate-y-1"
-                  >
-                    <h3 className="text-base font-bold text-[rgb(var(--color-text))] group-hover:text-[rgb(var(--color-primary))] transition-colors">
-                      {req.title}
-                    </h3>
-                    <div className="mt-2 flex flex-wrap items-center gap-2 text-xs text-[rgb(var(--color-text-muted))]">
-                      {svc && <Badge variant="default" className="text-[10px]">{svc.nameHe}</Badge>}
-                      {place && (
-                        <span className="inline-flex items-center gap-1">
-                          <MapPin className="h-3 w-3" />
-                          {place}
-                        </span>
-                      )}
+                  <h3 className="text-base font-bold text-[rgb(var(--color-text))] group-hover:text-[rgb(var(--color-primary))] transition-colors">
+                    {req.title}
+                  </h3>
+                  <div className="mt-2 flex flex-wrap items-center gap-2 text-xs text-[rgb(var(--color-text-muted))]">
+                    {svc && <Badge variant="default" className="text-[10px]">{svc.nameHe}</Badge>}
+                    {place && (
                       <span className="inline-flex items-center gap-1">
-                        <Clock className="h-3 w-3" />
-                        {relativeTimeHe(req.createdAt)}
+                        <MapPin className="h-3 w-3" />
+                        {place}
                       </span>
-                    </div>
-                    <p className="mt-4 inline-flex items-center gap-1 text-sm font-bold text-[rgb(var(--color-primary))]">
-                      {canOpenDetail ? "צפה בבקשה והגב" : "התחבר כדי להגיב"}
-                      <ArrowLeft className="h-4 w-4" />
-                    </p>
-                  </Link>
-                </motion.div>
+                    )}
+                    <span className="inline-flex items-center gap-1">
+                      <Clock className="h-3 w-3" />
+                      {relativeTimeHe(req.createdAt)}
+                    </span>
+                  </div>
+                  <p className="mt-4 inline-flex items-center gap-1 text-sm font-bold text-[rgb(var(--color-primary))]">
+                    {canOpenDetail ? "צפה בבקשה והגב" : "התחבר כדי להגיב"}
+                    <ArrowLeft className="h-4 w-4" />
+                  </p>
+                </Link>
               );
             })}
           </div>
@@ -97,7 +89,7 @@ export function OpenRequestsTeaser({
             <>
               <Link
                 href="/requests"
-                className="inline-flex items-center justify-center rounded-xl bg-[rgb(var(--color-primary))] px-6 py-3 text-sm font-bold text-white shadow-[0_4px_16px_rgba(var(--color-primary),0.3)] hover:bg-[rgb(var(--color-primary-hover))]"
+                className="inline-flex items-center justify-center rounded-xl bg-[rgb(var(--color-primary))] px-6 py-3 text-sm font-bold text-white shadow-md hover:bg-[rgb(var(--color-primary-hover))]"
               >
                 לכל הבקשות
               </Link>
@@ -112,7 +104,7 @@ export function OpenRequestsTeaser({
             <>
               <Link
                 href="/login?next=/requests"
-                className="inline-flex items-center justify-center rounded-xl bg-[rgb(var(--color-primary))] px-6 py-3 text-sm font-bold text-white shadow-[0_4px_16px_rgba(var(--color-primary),0.3)] hover:bg-[rgb(var(--color-primary-hover))]"
+                className="inline-flex items-center justify-center rounded-xl bg-[rgb(var(--color-primary))] px-6 py-3 text-sm font-bold text-white shadow-md hover:bg-[rgb(var(--color-primary-hover))]"
               >
                 התחברו כדי להגיב להצעה
               </Link>
