@@ -721,19 +721,13 @@ export default function OrderDetailPage() {
             <button onClick={() => setReviewOpen(true)} className="flex items-center gap-2 rounded-xl bg-[rgb(var(--color-accent-yellow))] px-5 py-2.5 text-[14px] font-semibold text-[rgb(var(--color-text))] transition-all hover:opacity-80">כתוב חוות דעת</button>
           )}
           {isBuyer && order.status === "COMPLETED" && (
-            <button
-              onClick={() => {
-                if (order.gig.id) {
-                  router.push(`/gigs/${order.gig.id}`);
-                } else {
-                  router.push(`/sellers/${order.seller.id}`);
-                }
-              }}
+            <Link
+              href={`/orders/rebook?seller=${order.seller.id}&from=${order.id}`}
               className="flex items-center gap-2 rounded-xl border-2 border-[rgba(var(--color-primary),0.2)] bg-[rgba(var(--color-primary),0.05)] px-5 py-2.5 text-[14px] font-semibold text-[rgb(var(--color-primary))] transition-all hover:bg-[rgba(var(--color-primary),0.1)]"
             >
               <ArrowClockwise className="h-4 w-4" />
               הזמן שוב
-            </button>
+            </Link>
           )}
           {(isBuyer || isSeller) && isDisputableStatus(order.status) && !hasOpenDispute && !showBuyerDisputeInsteadOfCancel && (
             <button
