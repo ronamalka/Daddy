@@ -144,13 +144,22 @@ export default function AdminPage() {
 
       {/* Quick Actions */}
       <div className="mb-8">
-        <Link
-          href="/admin/verifications"
-          className="inline-flex items-center gap-2 rounded-xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] px-5 py-3 text-[14px] font-semibold text-[rgb(var(--color-text))] shadow-[var(--shadow-sm)] hover:border-[rgb(var(--color-primary))] hover:text-[rgb(var(--color-primary))] transition-all"
-        >
-          <ShieldCheck className="h-5 w-5" />
-          בדיקת אימותים
-        </Link>
+        <div className="flex flex-wrap gap-3">
+          <Link
+            href="/admin/verifications"
+            className="inline-flex items-center gap-2 rounded-xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] px-5 py-3 text-[14px] font-semibold text-[rgb(var(--color-text))] shadow-[var(--shadow-sm)] hover:border-[rgb(var(--color-primary))] hover:text-[rgb(var(--color-primary))] transition-all"
+          >
+            <ShieldCheck className="h-5 w-5" />
+            בדיקת אימותים
+          </Link>
+          <Link
+            href="/admin/warranty-claims"
+            className="inline-flex items-center gap-2 rounded-xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] px-5 py-3 text-[14px] font-semibold text-[rgb(var(--color-text))] shadow-[var(--shadow-sm)] hover:border-[rgb(var(--color-warning))] hover:text-[rgb(var(--color-warning))] transition-all"
+          >
+            <ShieldCheck className="h-5 w-5" />
+            תביעות אחריות
+          </Link>
+        </div>
       </div>
 
       <ModerationQueue
