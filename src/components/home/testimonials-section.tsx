@@ -1,6 +1,5 @@
 "use client";
 
-import { motion } from "framer-motion";
 import { Star } from "@phosphor-icons/react";
 import { Badge } from "@/components/ui/badge";
 import { SectionHeader } from "./section-header";
@@ -23,12 +22,8 @@ export function TestimonialsSection({ liveReviews }: TestimonialsSectionProps) {
             const isLive = "id" in review;
             const r = review as LiveReview & typeof FALLBACK_TESTIMONIALS[0];
             return (
-              <motion.div
+              <div
                 key={isLive ? r.id : i}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.3, delay: 0.1 * i }}
                 className="relative rounded-xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] p-6"
               >
                 <div className="flex gap-0.5 mb-3" aria-label={`דירוג ${r.rating} מתוך 10`}>
@@ -48,7 +43,7 @@ export function TestimonialsSection({ liveReviews }: TestimonialsSectionProps) {
                 </p>
                 <div className="flex items-center justify-between border-t border-[rgb(var(--color-border-light))] pt-3">
                   <div className="flex items-center gap-2">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-[rgb(var(--color-primary))] to-[rgb(var(--color-primary-light))] text-xs font-bold text-white">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[rgb(var(--color-primary))] text-xs font-bold text-white">
                       {(isLive ? r.user?.name : r.name)?.[0] ?? "א"}
                     </div>
                     <div>
@@ -63,7 +58,7 @@ export function TestimonialsSection({ liveReviews }: TestimonialsSectionProps) {
                 <p className="mt-2 text-[10px] text-[rgb(var(--color-text-muted))]">
                   על השירות של {isLive ? r.gig.user.name : r.daddyName}
                 </p>
-              </motion.div>
+              </div>
             );
           })}
         </div>

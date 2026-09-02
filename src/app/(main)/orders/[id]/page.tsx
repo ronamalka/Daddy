@@ -538,7 +538,7 @@ export default function OrderDetailPage() {
   return (
     <div className="mx-auto max-w-4xl px-4 py-8">
       {/* Order Header Card */}
-      <div className="mb-6 rounded-2xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] p-6 shadow-[0_2px_8px_rgba(var(--color-primary),0.06)]">
+      <div className="mb-6 rounded-2xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] p-6 shadow-sm">
         <div className="mb-5 flex items-start justify-between">
           <div className="flex-1">
             <h1 className="text-[20px] font-bold text-[rgb(var(--color-text))]">{order.gig.title}</h1>
@@ -996,7 +996,7 @@ export default function OrderDetailPage() {
 
       {/* Requirements Form */}
       {order.gig.requirements.length > 0 && (
-        <div className="mb-6 rounded-2xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] p-6 shadow-[0_2px_8px_rgba(var(--color-primary),0.06)]">
+        <div className="mb-6 rounded-2xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] p-6 shadow-sm">
           <div className="flex items-center gap-2 mb-4">
             <ClipboardText className="h-5 w-5 text-[rgb(var(--color-primary))]" />
             <h2 className="text-[16px] font-bold text-[rgb(var(--color-text))]">דרישות ההזמנה</h2>
@@ -1058,7 +1058,7 @@ export default function OrderDetailPage() {
       )}
 
       {/* Messages Section */}
-      <div className="rounded-2xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] shadow-[0_2px_8px_rgba(var(--color-primary),0.06)] overflow-hidden">
+      <div className="rounded-2xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] shadow-sm overflow-hidden">
         <div className="flex items-center justify-between gap-3 border-b border-[rgb(var(--color-border))] px-6 py-4">
         <div className="flex flex-1 items-center gap-2">
           <ChatCircle className="h-5 w-5 text-[rgb(var(--color-primary))]" />

@@ -14,7 +14,7 @@ export function ProfileProgress({ readiness, variant = "full" }: ProfileProgress
   const { completedCount, total, percent, complete, items } = readiness;
 
   return (
-    <div className="rounded-2xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] p-5 shadow-[0_4px_16px_rgba(var(--color-primary),0.06)]">
+    <div className="rounded-2xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] p-5 shadow-sm">
       <div className="mb-3 flex items-start justify-between gap-3">
         <div>
           <h2 className="text-[16px] font-bold text-[rgb(var(--color-text))]">
@@ -40,7 +40,7 @@ export function ProfileProgress({ readiness, variant = "full" }: ProfileProgress
         aria-label="התקדמות פרופיל אבאל׳ה"
       >
         <div
-          className="h-full rounded-full bg-gradient-to-l from-[rgb(var(--color-success))] to-[rgb(var(--color-primary))] transition-all"
+          className="h-full rounded-full bg-[rgb(var(--color-primary))] transition-all"
           style={{ width: `${percent}%` }}
         />
       </div>

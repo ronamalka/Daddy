@@ -138,9 +138,9 @@ export function ResultsView({
             {providers.map((p) => {
               const near = distanceLabel(p);
               return (
-                <Link key={p.id} href={`/sellers/${p.id}`} className="group rounded-xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] p-5 transition-all duration-300 hover:shadow-lg hover:border-[rgba(var(--color-primary),0.3)] hover:-translate-y-1">
+                <Link key={p.id} href={`/sellers/${p.id}`} className="group rounded-xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] p-5 transition-all duration-300 hover:shadow-lg hover:border-[rgba(var(--color-primary),0.3)]">
                   <div className="flex items-center gap-3 mb-4">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-[rgb(var(--color-primary))] to-[rgb(var(--color-primary-light))] text-base font-bold text-white shadow-sm">{p.name[0]}</div>
+                    <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary text-base font-bold text-white shadow-sm">{p.name[0]}</div>
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-bold text-[rgb(var(--color-text))] group-hover:text-[rgb(var(--color-primary))] transition-colors">{p.name}</p>
                       {p.serviceAreas.length > 0 && <p className="text-xs text-[rgb(var(--color-text-muted))] truncate flex items-center gap-1"><MapPin className="h-3 w-3" />{p.serviceAreas.map((a) => a.cityName || a.districtName).join(", ")}</p>}

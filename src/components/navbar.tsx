@@ -37,7 +37,7 @@ function UserAvatar({ name, size = "sm" }: { name: string; size?: "sm" | "md" })
       className={cn(
         sizeClasses,
         "inline-flex items-center justify-center rounded-full font-bold",
-        "bg-gradient-to-br from-[rgb(var(--color-primary))] to-[rgb(var(--color-primary-light))] text-white"
+        "bg-[rgb(var(--color-primary))] text-white"
       )}
     >
       {initial}
@@ -79,7 +79,7 @@ export function Navbar() {
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2 select-none">
           <Image src="/logo.jpeg" alt="אבאל׳ה" width={40} height={40} className="rounded-full" unoptimized />
-          <span className="text-gradient-hero text-xl font-extrabold tracking-tight hidden sm:inline">
+          <span className="text-[rgb(var(--color-primary))] text-xl font-extrabold tracking-tight hidden sm:inline">
             אבאל׳ה
           </span>
         </Link>
@@ -121,7 +121,7 @@ export function Navbar() {
                 open={profileOpen}
                 onOpenChange={setProfileOpen}
                 trigger={
-                  <button className="flex items-center gap-2 rounded-full p-1 transition-all duration-200 hover:ring-2 hover:ring-[rgba(var(--color-primary),0.2)]">
+                  <button className="flex items-center gap-2 rounded-full p-1 transition-all duration-200 hover:opacity-80">
                     <UserAvatar name={session.user.name || "U"} />
                   </button>
                 }

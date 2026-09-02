@@ -207,7 +207,7 @@ export default function TaxProfilePage() {
           <button
             type="submit"
             disabled={saving}
-            className="flex-1 rounded-xl bg-[rgb(var(--color-primary))] py-4 text-[15px] font-semibold text-white shadow-[0_4px_16px_rgba(var(--color-primary),0.3)] transition-all hover:bg-[rgb(var(--color-primary-hover))] disabled:opacity-40 disabled:cursor-not-allowed"
+            className="flex-1 rounded-xl bg-[rgb(var(--color-primary))] py-4 text-[15px] font-semibold text-white shadow-md transition-all hover:bg-[rgb(var(--color-primary-hover))] disabled:opacity-40 disabled:cursor-not-allowed"
           >
             {saving ? "שומר..." : "שמור פרטים"}
           </button>

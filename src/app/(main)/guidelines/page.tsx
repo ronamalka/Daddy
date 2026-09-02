@@ -30,7 +30,7 @@ const FORBIDDEN = [
 export default function GuidelinesPage() {
   return (
     <div className="min-h-screen bg-[rgb(var(--color-surface-elevated))]">
-      <section className="bg-gradient-to-br from-[rgb(var(--color-text))] via-[rgb(var(--color-text))] to-[rgba(var(--color-primary),0.2)] py-16 text-center text-white">
+      <section className="bg-[rgb(var(--color-text))] py-16 text-center text-white">
         <div className="mx-auto max-w-4xl px-4">
           <h1 className="text-[36px] font-extrabold md:text-[42px]">כללי קהילה</h1>
           <p className="mt-3 text-[15px] text-white/60">מה מותר, מה אסור, ומתי חייבים רישיון</p>

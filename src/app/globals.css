@@ -2,14 +2,13 @@
 
 /* ========================================
    אבאל׳ה Design System v2
-   Modern dark-first, shadcn-inspired tokens
    ======================================== */
 
 :root {
-  --color-primary: 108 92 231;
-  --color-primary-hover: 90 75 209;
-  --color-primary-light: 162 155 254;
-  --color-accent: 0 210 211;
+  --color-primary: 37 99 235;
+  --color-primary-hover: 29 78 216;
+  --color-primary-light: 96 165 250;
+  --color-accent: 245 158 11;
   --color-accent-warm: 255 107 107;
   --color-accent-yellow: 254 202 87;
 
@@ -28,10 +27,6 @@
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
   --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.07), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
   --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -4px rgba(0, 0, 0, 0.04);
-  --shadow-glow: 0 0 20px rgba(108, 92, 231, 0.15);
-
-  --gradient-hero: linear-gradient(135deg, rgb(var(--color-primary)) 0%, rgb(var(--color-accent)) 100%);
-  --gradient-card-featured: linear-gradient(135deg, rgb(var(--color-primary)) 0%, rgb(var(--color-primary-light)) 100%);
 
   --radius: 0.625rem;
   --radius-sm: 0.375rem;
@@ -66,7 +61,6 @@
   --shadow-sm: var(--shadow-sm);
   --shadow-md: var(--shadow-md);
   --shadow-lg: var(--shadow-lg);
-  --shadow-glow: var(--shadow-glow);
 
   --radius-sm: var(--radius-sm);
   --radius-md: var(--radius-md);
@@ -87,43 +81,6 @@ body {
   direction: rtl;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-}
-
-/* ========================================
-   Glass morphism utilities
-   ======================================== */
-
-.glass {
-  background: rgba(var(--color-surface), 0.7);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(var(--color-border), 0.5);
-}
-
-.glass-strong {
-  background: rgba(var(--color-surface), 0.85);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(var(--color-border), 0.6);
-}
-
-
-/* ========================================
-   Gradient text
-   ======================================== */
-
-.text-gradient-hero {
-  background: var(--gradient-hero);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-.text-gradient-featured {
-  background: var(--gradient-card-featured);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
 }
 
 /* ========================================
@@ -167,7 +124,7 @@ body {
 }
 .a11y-large-cursor,
 .a11y-large-cursor * {
-  cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32'%3E%3Ccircle cx='16' cy='16' r='14' fill='%236C5CE7' stroke='white' stroke-width='2'/%3E%3C/svg%3E") 16 16, auto !important;
+  cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32'%3E%3Ccircle cx='16' cy='16' r='14' fill='%232563EB' stroke='white' stroke-width='2'/%3E%3C/svg%3E") 16 16, auto !important;
 }
 .a11y-highlight-links a {
   text-decoration: underline !important;

@@ -29,14 +29,14 @@ export default function NotFound() {
         <div className="flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
           <Link
             href="/"
-            className="inline-flex items-center gap-2 rounded-xl bg-[rgb(var(--color-primary))] px-6 py-3.5 text-[16px] font-semibold text-white shadow-[0_4px_16px_rgba(var(--color-primary),0.2)] transition-all hover:bg-[rgb(var(--color-primary-hover))] hover:shadow-[0_8px_24px_rgba(var(--color-primary),0.3)] hover:-translate-y-0.5 active:scale-[0.98]"
+            className="inline-flex items-center gap-2 rounded-xl bg-[rgb(var(--color-primary))] px-6 py-3.5 text-[16px] font-semibold text-white shadow-md transition-all hover:bg-[rgb(var(--color-primary-hover))] hover:shadow-lg"
           >
             <House className="h-5 w-5" />
             חזור הביתה — אבא מחכה
           </Link>
           <Link
             href="/?search=true"
-            className="inline-flex items-center gap-2 rounded-xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] px-6 py-3.5 text-[16px] font-semibold text-[rgb(var(--color-text))] transition-all hover:bg-[rgb(var(--color-surface-elevated))] hover:-translate-y-0.5 active:scale-[0.98]"
+            className="inline-flex items-center gap-2 rounded-xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] px-6 py-3.5 text-[16px] font-semibold text-[rgb(var(--color-text))] transition-all hover:bg-[rgb(var(--color-surface-elevated))]"
           >
             <MagnifyingGlass className="h-5 w-5" />
             חפש שירות

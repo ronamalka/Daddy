@@ -157,7 +157,7 @@ export default function SubscriptionPage() {
         <div
           className={`relative rounded-2xl border p-6 transition-all ${
             !isPremium
-              ? "border-[rgb(var(--color-primary))] bg-[rgb(var(--color-surface))] shadow-[0_4px_16px_rgba(var(--color-primary),0.08)]"
+              ? "border-[rgb(var(--color-primary))] bg-[rgb(var(--color-surface))] shadow-md"
               : "border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))]"
           }`}
         >
@@ -193,12 +193,12 @@ export default function SubscriptionPage() {
         <div
           className={`relative rounded-2xl border p-6 transition-all ${
             isPremium
-              ? "border-[rgb(var(--color-accent-yellow))] bg-[rgb(var(--color-surface))] shadow-[0_4px_16px_rgba(218,165,32,0.15)]"
-              : "border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] hover:border-[rgb(var(--color-accent-yellow))] hover:shadow-[0_4px_16px_rgba(218,165,32,0.1)]"
+              ? "border-[rgb(var(--color-accent-yellow))] bg-[rgb(var(--color-surface))] shadow-md"
+              : "border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] hover:border-[rgb(var(--color-accent-yellow))] hover:shadow-md"
           }`}
         >
           {isPremium && (
-            <div className="absolute -top-3 right-6 rounded-full bg-gradient-to-r from-[rgb(var(--color-accent-yellow))] to-[rgb(218,165,32)] px-3 py-0.5 text-[12px] font-semibold text-white">
+            <div className="absolute -top-3 right-6 rounded-full bg-accent-yellow px-3 py-0.5 text-[12px] font-semibold text-white">
               המנוי הנוכחי
             </div>
           )}
@@ -241,7 +241,7 @@ export default function SubscriptionPage() {
               <button
                 onClick={() => handleAction("subscribe")}
                 disabled={actionLoading}
-                className="w-full rounded-xl bg-gradient-to-r from-[rgb(var(--color-accent-yellow))] to-[rgb(218,165,32)] py-3 text-[15px] font-bold text-white shadow-md hover:shadow-lg transition-all disabled:opacity-50"
+                className="w-full rounded-xl bg-accent-yellow py-3 text-[15px] font-bold text-white shadow-md hover:shadow-lg transition-shadow disabled:opacity-50"
               >
                 {actionLoading ? "מעבד..." : "שדרג לפרימיום"}
               </button>
@@ -251,7 +251,7 @@ export default function SubscriptionPage() {
                 <button
                   onClick={() => handleAction("renew")}
                   disabled={actionLoading}
-                  className="w-full rounded-xl bg-gradient-to-r from-[rgb(var(--color-accent-yellow))] to-[rgb(218,165,32)] py-3 text-[15px] font-bold text-white shadow-md hover:shadow-lg transition-all disabled:opacity-50"
+                  className="w-full rounded-xl bg-accent-yellow py-3 text-[15px] font-bold text-white shadow-md hover:shadow-lg transition-shadow disabled:opacity-50"
                 >
                   {actionLoading ? "מעבד..." : "חדש מנוי"}
                 </button>
