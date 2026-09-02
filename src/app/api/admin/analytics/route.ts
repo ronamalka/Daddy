@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
-import { proxyRequest, USERS_SERVICE, ORDERS_SERVICE } from "@/lib/gateway";
+import { proxyRequest, USERS_SERVICE, ORDERS_SERVICE, REQUESTS_SERVICE } from "@/lib/gateway";
 
 /** Aggregate analytics from users + orders services. Admin only. */
 export async function GET(request: NextRequest) {
@@ -70,12 +70,23 @@ export async function GET(request: NextRequest) {
 
     case "funnel": {
       const period = request.nextUrl.searchParams.get("period") || "30";
-      const funnelRes = await proxyRequest(
-        ORDERS_SERVICE,
-        `/api/analytics/funnel?period=${period}`,
-        { user },
-      );
-      return NextResponse.json(funnelRes.data ?? { steps: [] });
+      const [usersCountsRes, requestsCountsRes, ordersCountsRes] = await Promise.all([
+        proxyRequest(USERS_SERVICE, `/api/analytics/event-counts?period=${period}&names=signup_completed`, { user }),
+        proxyRequest(REQUESTS_SERVICE, `/api/analytics/event-counts?period=${period}&names=request.created`, { user }),
+        proxyRequest(ORDERS_SERVICE, `/api/analytics/event-counts?period=${period}&names=order.created,order.completed`, { user }),
+      ]);
+      const uc = usersCountsRes.data?.counts ?? {};
+      const rc = requestsCountsRes.data?.counts ?? {};
+      const oc = ordersCountsRes.data?.counts ?? {};
+      return NextResponse.json({
+        period: `${period}d`,
+        steps: [
+          { name: "signed_up", count: uc["signup_completed"] ?? 0 },
+          { name: "posted_request", count: rc["request.created"] ?? 0 },
+          { name: "order_created", count: oc["order.created"] ?? 0 },
+          { name: "order_completed", count: oc["order.completed"] ?? 0 },
+        ],
+      });
     }
 
     default:

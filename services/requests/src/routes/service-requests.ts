@@ -8,6 +8,7 @@ import {
 } from "../../../shared/request-teaser";
 import { parseRequestDetails, redactRequestStreet } from "../../../shared/request-details";
 import { prisma } from "../index";
+import { logEvent } from "../../../shared/analytics";
 import { requestsCreated, quotesSent } from "../metrics";
 
 /** Routes for local service requests, seller quotes, and accepting a quote. */
@@ -103,6 +104,17 @@ serviceRequestsRoutes.post("/", requireAuth, async (req: Request, res: Response)
   });
 
   requestsCreated.inc({ category: serviceSlug || "general" });
+
+  logEvent(prisma, {
+    eventName: "request.created",
+    eventCategory: "request",
+    actorId: req.user!.id,
+    actorRole: "buyer",
+    entityType: "service_request",
+    entityId: created.id,
+    properties: { serviceSlug: serviceSlug || "general", districtCode },
+  });
+
   res.json(created);
 });
 
@@ -204,6 +216,17 @@ serviceRequestsRoutes.post("/:id/respond", requireAuth, requireSeller, async (re
   });
 
   quotesSent.inc();
+
+  logEvent(prisma, {
+    eventName: "quote.sent",
+    eventCategory: "request",
+    actorId: req.user!.id,
+    actorRole: "seller",
+    entityType: "request_response",
+    entityId: response.id,
+    properties: { requestId: id, laborPrice: labor, materialsEstimate: materials },
+  });
+
   res.json(response);
 });
 
@@ -263,6 +286,16 @@ serviceRequestsRoutes.post("/:id/accept", requireAuth, async (req: Request, res:
           responses: { orderBy: { createdAt: "asc" } },
         },
       });
+    });
+
+    logEvent(prisma, {
+      eventName: "quote.accepted",
+      eventCategory: "request",
+      actorId: req.user!.id,
+      actorRole: "buyer",
+      entityType: "service_request",
+      entityId: id,
+      properties: { responseId, orderId },
     });
 
     res.json({ request: updated });

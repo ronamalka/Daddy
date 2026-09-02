@@ -10,6 +10,7 @@ import { applySecurity, generalRateLimit } from "../../shared/security";
 import { logger, createRequestLogger } from "../../shared/logger";
 import { initSentry, setupSentryErrorHandler } from "../../shared/sentry";
 import { serviceRequestsRoutes } from "./routes/service-requests";
+import { requestAnalyticsRoutes } from "./routes/analytics";
 
 const pool = new pg.Pool({ connectionString: process.env.DATABASE_URL });
 const adapter = new PrismaPg(pool);
@@ -35,6 +36,7 @@ app.get("/health", (_req, res) => {
 app.get("/metrics", metricsHandler());
 
 app.use("/service-requests", serviceRequestsRoutes);
+app.use("/api/analytics", requestAnalyticsRoutes);
 
 setupSentryErrorHandler(app);
 

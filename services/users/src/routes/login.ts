@@ -1,6 +1,7 @@
 import { Router, Request, Response } from "express";
 import { compare } from "bcryptjs";
 import { prisma } from "../index";
+import { logEvent } from "../../../shared/analytics";
 import { userLogins } from "../metrics";
 
 /** Routes for email-and-password login. */
@@ -38,5 +39,16 @@ loginRoutes.post("/", async (req: Request, res: Response) => {
   }
 
   userLogins.inc({ method: "email" });
+
+  logEvent(prisma, {
+    eventName: "login_completed",
+    eventCategory: "user",
+    actorId: user.id,
+    actorRole: user.role.toLowerCase(),
+    entityType: "user",
+    entityId: user.id,
+    properties: { method: "email" },
+  });
+
   res.json({ id: user.id, email: user.email, name: user.name, role: user.role, emailVerified: user.emailVerified });
 });
