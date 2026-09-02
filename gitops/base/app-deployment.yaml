@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: daddy-app
-          image: quay.io/rh_ee_rmalka/daddy-app:e323fa1d
+          image: quay.io/rh_ee_rmalka/daddy-app:27367903
           ports:
             - containerPort: 3000
           env:
