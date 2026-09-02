@@ -22,8 +22,14 @@ import type { PricingFilter, ProviderSort } from "@/components/home/results-view
 import { visitWindowToIso, type VisitWindowValue } from "@/components/visit-window-fields";
 import type { SelectedCity } from "@/components/city-filter";
 
+interface HomePageProps {
+  initialFeaturedDaddies: FeaturedDaddy[];
+  initialLiveReviews: LiveReview[];
+  initialRequestTeasers: RequestTeaser[];
+}
+
 /** Shows the home page with search, featured daddies, and how the site works. */
-export function HomePage() {
+export function HomePage({ initialFeaturedDaddies, initialLiveReviews, initialRequestTeasers }: HomePageProps) {
   const { data: session } = useSession();
   const [view, setView] = useState<"browse" | "results">("browse");
   const [selectedCategory, setSelectedCategory] = useState("");
@@ -41,11 +47,11 @@ export function HomePage() {
   const [reqWindow, setReqWindow] = useState<VisitWindowValue | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
-  const [featuredDaddies, setFeaturedDaddies] = useState<FeaturedDaddy[]>([]);
-  const [liveReviews, setLiveReviews] = useState<LiveReview[]>([]);
-  const [requestTeasers, setRequestTeasers] = useState<RequestTeaser[]>([]);
+  const [featuredDaddies, setFeaturedDaddies] = useState<FeaturedDaddy[]>(initialFeaturedDaddies);
+  const [liveReviews, setLiveReviews] = useState<LiveReview[]>(initialLiveReviews);
+  const [requestTeasers, setRequestTeasers] = useState<RequestTeaser[]>(initialRequestTeasers);
   const [fetchError, setFetchError] = useState<string | null>(null);
-  const [loadingFeatured, setLoadingFeatured] = useState(true);
+  const [loadingFeatured, setLoadingFeatured] = useState(false);
   const [rebookableSellers, setRebookableSellers] = useState<{ sellerId: string; seller: { id: string; name: string; avatar: string | null }; lastOrder: { id: string; title: string | null; price: number; completedAt: string; jobType: string }; orderCount: number }[]>([]);
   const [loadingRebookable, setLoadingRebookable] = useState(false);
 
@@ -60,35 +66,6 @@ export function HomePage() {
     ? ALL_SERVICES.filter((s) => s.category === selectedCategory)
     : [];
 
-  useEffect(() => {
-    let cancelled = false;
-    /** Loads featured daddies, recent reviews, and the public request teaser. */
-    async function fetchHomepageData() {
-      try {
-        const [daddies, reviews, teasers] = await Promise.all([
-          fetch("/api/featured-daddies").then((r) => r.json()).catch(() => []),
-          fetch("/api/recent-reviews").then((r) => r.json()).catch(() => []),
-          fetch("/api/service-requests/teaser").then((r) => r.json()).catch(() => []),
-        ]);
-        if (!cancelled) {
-          setFeaturedDaddies(Array.isArray(daddies) ? daddies : []);
-          setLiveReviews(Array.isArray(reviews) ? reviews : []);
-          setRequestTeasers(Array.isArray(teasers) ? teasers : []);
-          setLoadingFeatured(false);
-        }
-      } catch {
-        if (!cancelled) {
-          setFetchError("לא הצלחנו לטעון נתונים. נסה לרענן את הדף.");
-          setFeaturedDaddies([]);
-          setLiveReviews([]);
-          setRequestTeasers([]);
-          setLoadingFeatured(false);
-        }
-      }
-    }
-    fetchHomepageData();
-    return () => { cancelled = true; };
-  }, []);
 
   useEffect(() => {
     if (!session?.user) return;

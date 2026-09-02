@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: daddy-app
-          image: quay.io/rh_ee_rmalka/daddy-app:a6cd309b
+          image: quay.io/rh_ee_rmalka/daddy-app:ea1f386f
           ports:
             - containerPort: 3000
           env:
@@ -70,6 +70,21 @@ spec:
                 secretKeyRef:
                   name: daddy-app-secret
                   key: INTER_SERVICE_SECRET
+            - name: GOOGLE_SITE_VERIFICATION
+              valueFrom:
+                secretKeyRef:
+                  name: daddy-app-secret
+                  key: GOOGLE_SITE_VERIFICATION
+            - name: NEXT_PUBLIC_UMAMI_WEBSITE_ID
+              valueFrom:
+                secretKeyRef:
+                  name: daddy-app-secret
+                  key: NEXT_PUBLIC_UMAMI_WEBSITE_ID
+            - name: NEXT_PUBLIC_UMAMI_URL
+              valueFrom:
+                secretKeyRef:
+                  name: daddy-app-secret
+                  key: NEXT_PUBLIC_UMAMI_URL
           resources:
             requests:
               memory: "128Mi"
