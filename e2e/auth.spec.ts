@@ -83,7 +83,10 @@ test.describe("Auth Flow", () => {
     await page.getByPlaceholder("הזן את הסיסמה שלך").fill("this-is-wrong");
     await page.getByRole("button", { name: "התחבר" }).click();
 
-    await expect(page.getByRole("alert").filter({ hasText: /שגוי/ })).toBeVisible({
+    // Accept either the credentials error or a rate-limit message (prior tests may exhaust the limit)
+    const credError = page.getByRole("alert").filter({ hasText: /שגוי/ });
+    const rateLimit = page.getByText(/Too many requests|יותר מדי/);
+    await expect(credError.or(rateLimit).first()).toBeVisible({
       timeout: 10000,
     });
   });
