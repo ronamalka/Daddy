@@ -15,6 +15,7 @@ import { WazeNavigate } from "@/components/orders/waze-navigate";
 import { canShowSellerWaze } from "@/lib/waze";
 import { quoteTotal } from "@/lib/quote-price";
 import { shouldShowQuoteCompare, type AreaOverlap } from "@/lib/quote-compare";
+import { trackEvent } from "@/lib/analytics";
 
 interface ServiceRequestDetail {
   id: string;
@@ -103,6 +104,7 @@ export default function RequestDetailPage() {
         }),
       });
       if (res.ok) {
+        trackEvent("quote_submitted", { requestId: params.id as string });
         setSubmitted(true);
         setResponseMsg("");
         setProposedPrice("");
@@ -133,6 +135,7 @@ export default function RequestDetailPage() {
       });
       const data = await res.json().catch(() => ({}));
       if (res.ok && data.order?.id) {
+        trackEvent("quote_accepted", { requestId: params.id as string, orderId: data.order.id });
         router.push(`/orders/${data.order.id}`);
         return;
       }

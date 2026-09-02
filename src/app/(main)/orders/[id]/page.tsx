@@ -16,6 +16,7 @@ import { canShowSellerWaze } from "@/lib/waze";
 import { DISPUTE_REASON_LABELS, DISPUTE_STATUS_LABELS, isDisputableStatus, orderHasOpenDispute } from "@/lib/disputes";
 import { CANCELLATION_FEE_STATUS_LABELS, evaluateBuyerCancel } from "@/lib/cancellation";
 import { AttachmentBubble } from "@/components/chat/attachment-bubble";
+import { trackEvent } from "@/lib/analytics";
 import { ComposerAttach } from "@/components/chat/composer-attach";
 import { QuotePriceBreakdown } from "@/components/quote-price-breakdown";
 import { canShowMaterialsUpdateForm, hasPendingMaterialsAck } from "@/lib/materials";
@@ -278,6 +279,7 @@ export default function OrderDetailPage() {
       });
       if (res.ok) {
         const updated = await res.json();
+        trackEvent("order_status_changed", { orderId: params.id as string, status });
         setOrder((prev) => prev ? { ...prev, status: updated.status } : prev);
       } else {
         const data = await res.json().catch(() => ({}));

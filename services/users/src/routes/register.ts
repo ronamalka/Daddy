@@ -3,6 +3,7 @@ import { hash } from "bcryptjs";
 import { prisma } from "../db";
 import { createAndSendVerification } from "./email-verify";
 import { logger } from "../../../shared/logger";
+import { logEvent } from "../../../shared/analytics";
 import { userRegistrations } from "../metrics";
 
 /** Routes for creating a new account. */
@@ -68,6 +69,16 @@ registerRoutes.post("/", async (req: Request, res: Response) => {
   });
 
   userRegistrations.inc({ role: user.role, method: "email" });
+
+  logEvent(prisma, {
+    eventName: "signup_completed",
+    eventCategory: "user",
+    actorId: user.id,
+    actorRole: user.role.toLowerCase(),
+    entityType: "user",
+    entityId: user.id,
+    properties: { method: "email", role: user.role },
+  });
 
   // Send verification email (non-blocking -- don't fail registration if email fails)
   createAndSendVerification(user.id, user.email, user.name).catch((err) => {
