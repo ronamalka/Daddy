@@ -2,6 +2,7 @@ process.env.SERVICE_NAME = process.env.SERVICE_NAME || "users";
 
 import express from "express";
 import { extractUser } from "../../shared/middleware";
+import { metricsMiddleware, metricsHandler } from "../../shared/metrics";
 import { prisma } from "./db";
 import { applySecurity, authRateLimit, passwordResetRateLimit, generalRateLimit } from "../../shared/security";
 import { logger, createRequestLogger } from "../../shared/logger";
@@ -37,11 +38,14 @@ app.use(express.json({ limit: "1mb" }));
 app.use(createRequestLogger());
 app.use(extractUser);
 app.use(generalRateLimit);
+app.use(metricsMiddleware("users"));
 
 /** Return a simple OK so other systems know the users service is running. */
 app.get("/health", (_req, res) => {
   res.json({ status: "ok", service: "users" });
 });
+
+app.get("/metrics", metricsHandler());
 
 app.use("/register", authRateLimit, registerRoutes);
 app.use("/login", authRateLimit, loginRoutes);

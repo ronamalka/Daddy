@@ -5,6 +5,7 @@ import pg from "pg";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "./generated/prisma/client";
 import { extractUser } from "../../shared/middleware";
+import { metricsMiddleware, metricsHandler } from "../../shared/metrics";
 import { applySecurity, generalRateLimit } from "../../shared/security";
 import { logger, createRequestLogger } from "../../shared/logger";
 import { gigsRoutes } from "./routes/gigs";
@@ -25,11 +26,14 @@ app.use(express.json({ limit: "1mb" }));
 app.use(createRequestLogger());
 app.use(extractUser);
 app.use(generalRateLimit);
+app.use(metricsMiddleware("gigs"));
 
 /** Return a simple OK so other systems know the gigs service is running. */
 app.get("/health", (_req, res) => {
   res.json({ status: "ok", service: "gigs" });
 });
+
+app.get("/metrics", metricsHandler());
 
 app.use("/gigs", gigsRoutes);
 app.use("/gigs", gigDetailRoutes);

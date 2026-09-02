@@ -16,3 +16,4 @@ resources:
   - requests-deployment.yaml
   - chat-deployment.yaml
   - redis-deployment.yaml
+  - servicemonitor.yaml

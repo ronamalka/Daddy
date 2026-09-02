@@ -10,6 +10,7 @@ import { canStartWork } from "../lib/materials";
 import { parseDeliveryEvidence } from "../../../shared/delivery-photos";
 import { releasePayment } from "../lib/escrow";
 import { logger } from "../../../shared/logger";
+import { ordersCompleted } from "../metrics";
 
 const USERS_SERVICE_URL = process.env.USERS_SERVICE_URL || "http://localhost:4001";
 
@@ -293,6 +294,7 @@ orderDetailRoutes.patch("/:id", requireAuth, async (req: Request, res: Response)
 
   // Auto-release escrow when order is marked COMPLETED
   if (status === "COMPLETED") {
+    ordersCompleted.inc({ category: order.jobType || "GIG" });
     releasePayment(prisma, id).catch((err) => {
       logger.error({ err, orderId: id }, "Escrow auto-release failed");
     });

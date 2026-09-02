@@ -6,6 +6,7 @@ import { prisma } from "../index";
 import { parseRequiredSlot } from "../lib/slots";
 import { orderListWhere } from "../lib/order-list";
 import { laborAmount, quoteTotal } from "../lib/quote-price";
+import { ordersCreated } from "../metrics";
 
 /** Routes for listing orders, creating them, and reading booking stats. */
 export const ordersRoutes = Router();
@@ -119,6 +120,7 @@ ordersRoutes.post("/", requireAuth, async (req: Request, res: Response) => {
       });
     });
 
+    ordersCreated.inc({ category: jobType });
     res.status(201).json(order);
 
     // Notify seller about the new order (fire-and-forget)
@@ -353,6 +355,7 @@ ordersRoutes.post("/rebook", requireAuth, async (req: Request, res: Response) =>
       });
     });
 
+    ordersCreated.inc({ category: "REBOOK" });
     res.status(201).json(order);
 
     const note = buildNotification("ORDER_BOOKED", {
