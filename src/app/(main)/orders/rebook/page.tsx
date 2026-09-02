@@ -5,6 +5,7 @@ import { useSession } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { ArrowClockwise, Lock } from "@phosphor-icons/react";
 import { VisitWindowFields, visitWindowToIso, type VisitWindowValue } from "@/components/visit-window-fields";
+import { trackEvent } from "@/lib/analytics";
 
 interface PreviousOrder {
   id: string;
@@ -47,6 +48,7 @@ function RebookContent() {
   const [error, setError] = useState("");
 
   useEffect(() => {
+    trackEvent("rebook_clicked", { sellerId });
     if (!fromOrderId) {
       setLoading(false);
       return;

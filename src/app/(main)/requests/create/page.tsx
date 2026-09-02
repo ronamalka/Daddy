@@ -48,6 +48,7 @@ function CreateRequestPage() {
   useEffect(() => {
     const preset = searchParams.get("service");
     if (preset) setServiceSlug(preset);
+    trackEvent("request_started", { category: preset || "" });
   }, [searchParams]);
 
   if (status === "loading") {

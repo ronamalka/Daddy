@@ -7,6 +7,7 @@ import { ALL_SERVICES } from "@/lib/services";
 import { POPULAR_SEARCHES } from "./data";
 import { CategoryIcon } from "@/components/ui/category-icon";
 import { CityFilter, type SelectedCity } from "@/components/city-filter";
+import { trackEvent } from "@/lib/analytics";
 
 interface HeroSectionProps {
   serviceSearch: string;
@@ -82,7 +83,7 @@ export function HeroSection({
                   {filteredServices.slice(0, 12).map((svc) => (
                     <button
                       key={svc.slug}
-                      onClick={() => { setSelectedService(svc.slug); setServiceSearch(svc.nameHe); }}
+                      onClick={() => { setSelectedService(svc.slug); setServiceSearch(svc.nameHe); trackEvent("search_performed", { query: svc.nameHe, category: svc.category }); }}
                       className="flex w-full items-center gap-3 px-5 py-3.5 text-right transition-colors hover:bg-[rgb(var(--color-surface-elevated))]"
                     >
                       <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-[rgba(var(--color-primary),0.1)] text-[rgb(var(--color-primary))]">

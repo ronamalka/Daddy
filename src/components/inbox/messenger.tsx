@@ -9,6 +9,7 @@ import { cn } from "@/lib/utils";
 import { messagePreviewText } from "@/lib/message-validation";
 import { AttachmentBubble } from "@/components/chat/attachment-bubble";
 import { ComposerAttach } from "@/components/chat/composer-attach";
+import { trackEvent } from "@/lib/analytics";
 
 export interface Conversation {
   otherUserId: string;
@@ -184,6 +185,7 @@ export function MessengerInbox({ peerId }: { peerId?: string }) {
       }
     }
 
+    trackEvent("chat_opened", { peerId: otherId });
     loadThread(true);
     const interval = setInterval(() => loadThread(true), 4000);
     return () => {

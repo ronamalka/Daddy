@@ -180,6 +180,16 @@ orderDetailRoutes.patch("/:id", requireAuth, async (req: Request, res: Response)
     });
     res.json(updated);
 
+    logEvent(prisma, {
+      eventName: "order.cancelled",
+      eventCategory: "order",
+      actorId: req.user!.id,
+      actorRole: isBuyer ? "buyer" : "seller",
+      entityType: "order",
+      entityId: id,
+      properties: { cancelledBy: isBuyer ? "buyer" : "seller", price: order.price },
+    });
+
     // Notify both parties about the cancellation (fire-and-forget)
     const cancelNote = buildNotification("ORDER_CANCELLED", {
       orderId: id,
@@ -300,7 +310,9 @@ orderDetailRoutes.patch("/:id", requireAuth, async (req: Request, res: Response)
       logger.error({ err, orderId: id }, "Escrow auto-release failed");
     });
 
-    // Log analytics event (fire-and-forget)
+    const durationMs = new Date().getTime() - new Date(order.createdAt).getTime();
+    const durationDays = Math.round(durationMs / (1000 * 60 * 60 * 24));
+
     logEvent(prisma, {
       eventName: "order.completed",
       eventCategory: "order",
@@ -310,15 +322,44 @@ orderDetailRoutes.patch("/:id", requireAuth, async (req: Request, res: Response)
       entityId: id,
       properties: {
         price: order.price,
-        commission_amount: updateData.commissionAmount ?? 0,
+        commissionAmount: updateData.commissionAmount ?? 0,
+        commissionRate: updateData.commissionRate ?? 0,
+        durationDays,
+        jobType: order.jobType || "GIG",
       },
     });
+
+    if (updateData.commissionAmount) {
+      logEvent(prisma, {
+        eventName: "revenue.commission_collected",
+        eventCategory: "revenue",
+        actorId: order.sellerId,
+        actorRole: "seller",
+        entityType: "order",
+        entityId: id,
+        properties: {
+          amount: updateData.commissionAmount,
+          rate: updateData.commissionRate ?? 0,
+          orderPrice: order.price,
+        },
+      });
+    }
   }
 
   res.json(updated);
 
   // Fire-and-forget notifications for status transitions
   if (status === "IN_PROGRESS") {
+    logEvent(prisma, {
+      eventName: "order.confirmed",
+      eventCategory: "order",
+      actorId: req.user!.id,
+      actorRole: "seller",
+      entityType: "order",
+      entityId: id,
+      properties: { price: order.price },
+    });
+
     const note = buildNotification("ORDER_IN_PROGRESS", {
       orderId: id,
       service: order.title || undefined,
