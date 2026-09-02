@@ -14,6 +14,7 @@ import {
   TestimonialsSection,
   CtaSection,
   ResultsView,
+  RebookableSection,
 } from "@/components/home";
 import type { Provider, FeaturedDaddy, LiveReview, RequestTeaser } from "@/components/home/types";
 import { PRICE_PRESETS } from "@/components/home/data";
@@ -45,6 +46,8 @@ export function HomePage() {
   const [requestTeasers, setRequestTeasers] = useState<RequestTeaser[]>([]);
   const [fetchError, setFetchError] = useState<string | null>(null);
   const [loadingFeatured, setLoadingFeatured] = useState(true);
+  const [rebookableSellers, setRebookableSellers] = useState<{ sellerId: string; seller: { id: string; name: string; avatar: string | null }; lastOrder: { id: string; title: string | null; price: number; completedAt: string; jobType: string }; orderCount: number }[]>([]);
+  const [loadingRebookable, setLoadingRebookable] = useState(false);
 
   useEffect(() => {
     const slug = canonicalizeCategorySlug(new URLSearchParams(window.location.search).get("category"));
@@ -86,6 +89,26 @@ export function HomePage() {
     fetchHomepageData();
     return () => { cancelled = true; };
   }, []);
+
+  useEffect(() => {
+    if (!session?.user) return;
+    let cancelled = false;
+    setLoadingRebookable(true);
+    fetch("/api/orders/rebookable")
+      .then((r) => r.json())
+      .then((data) => {
+        if (!cancelled) {
+          setRebookableSellers(Array.isArray(data) ? data : []);
+        }
+      })
+      .catch(() => {
+        if (!cancelled) setRebookableSellers([]);
+      })
+      .finally(() => {
+        if (!cancelled) setLoadingRebookable(false);
+      });
+    return () => { cancelled = true; };
+  }, [session?.user]);
 
   useEffect(() => {
     if (!selectedService) return;
@@ -230,6 +253,10 @@ export function HomePage() {
       />
 
       <FeaturedDaddiesSection featuredDaddies={featuredDaddies} loading={loadingFeatured} />
+
+      {session?.user && (
+        <RebookableSection sellers={rebookableSellers} loading={loadingRebookable} />
+      )}
 
       <OpenRequestsTeaser
         teasers={requestTeasers}

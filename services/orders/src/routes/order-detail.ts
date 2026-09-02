@@ -1,6 +1,6 @@
 import { Router, Request, Response } from "express";
 import { requireAuth } from "../../../shared/middleware";
-import { sendNotification } from "../../../shared/internal-client";
+import { sendNotification, internalGet, internalPost } from "../../../shared/internal-client";
 import { buildNotification } from "../../../shared/notification-templates";
 import { prisma } from "../index";
 import { OrderStatus } from "../generated/prisma/client";
@@ -9,6 +9,84 @@ import { buyerCancelPatch, sellerDeclinePatch } from "../lib/cancellation";
 import { canStartWork } from "../lib/materials";
 import { parseDeliveryEvidence } from "../../../shared/delivery-photos";
 import { releasePayment } from "../lib/escrow";
+
+const USERS_SERVICE_URL = process.env.USERS_SERVICE_URL || "http://localhost:4001";
+
+/**
+ * Fire-and-forget WhatsApp notification for an order status change.
+ * Calls the users service WhatsApp endpoint via inter-service HTTP.
+ */
+async function notifyViaWhatsApp(
+  order: { id: string; buyerId: string; sellerId: string; title?: string | null; price?: number | null },
+  status: string,
+): Promise<void> {
+  const service = order.title || "הזמנה";
+  const notifications: Array<{
+    userId: string;
+    template: string;
+    params: Record<string, string>;
+    link: string;
+  }> = [];
+
+  switch (status) {
+    case "IN_PROGRESS":
+      notifications.push({
+        userId: order.buyerId,
+        template: "order_in_progress",
+        params: { "1": service },
+        link: `/orders/${order.id}`,
+      });
+      break;
+
+    case "ON_THE_WAY":
+      notifications.push({
+        userId: order.buyerId,
+        template: "order_on_the_way",
+        params: { "1": service },
+        link: `/orders/${order.id}`,
+      });
+      break;
+
+    case "DELIVERED":
+      notifications.push({
+        userId: order.buyerId,
+        template: "order_completed",
+        params: { "1": service },
+        link: `/orders/${order.id}`,
+      });
+      break;
+
+    case "COMPLETED":
+      notifications.push({
+        userId: order.sellerId,
+        template: "payment_released",
+        params: { "1": order.price ? `₪${order.price}` : "הסכום" },
+        link: `/orders/${order.id}`,
+      });
+      break;
+
+    case "CANCELLED":
+      notifications.push(
+        {
+          userId: order.buyerId,
+          template: "order_cancelled",
+          params: { "1": service },
+          link: `/orders/${order.id}`,
+        },
+        {
+          userId: order.sellerId,
+          template: "order_cancelled",
+          params: { "1": service },
+          link: `/orders/${order.id}`,
+        },
+      );
+      break;
+  }
+
+  for (const n of notifications) {
+    internalPost(USERS_SERVICE_URL, "/notifications/whatsapp/send", n).catch(() => {});
+  }
+}
 
 /** Routes for one order: details, status changes, and buyer requirements. */
 export const orderDetailRoutes = Router();
@@ -108,6 +186,9 @@ orderDetailRoutes.patch("/:id", requireAuth, async (req: Request, res: Response)
     sendNotification({ userId: otherParty, ...cancelNote, entityId: id }).catch(() => {});
     sendNotification({ userId: req.user!.id, ...cancelNote, entityId: id }).catch(() => {});
 
+    // WhatsApp notifications for cancellation
+    void notifyViaWhatsApp(order, "CANCELLED").catch(() => {});
+
     return;
   }
 
@@ -153,6 +234,9 @@ orderDetailRoutes.patch("/:id", requireAuth, async (req: Request, res: Response)
       },
     });
     res.json(updated);
+
+    void notifyViaWhatsApp(order, "ON_THE_WAY").catch(() => {});
+
     return;
   }
 
@@ -176,12 +260,34 @@ orderDetailRoutes.patch("/:id", requireAuth, async (req: Request, res: Response)
     const deliverNote = buildNotification("CONFIRM_COMPLETION", { orderId: id });
     sendNotification({ userId: order.buyerId, ...deliverNote, entityId: id }).catch(() => {});
 
+    void notifyViaWhatsApp(order, "DELIVERED").catch(() => {});
+
     return;
+  }
+
+  const updateData: Record<string, unknown> = { status };
+
+  // Record commission when order is marked COMPLETED
+  if (status === "COMPLETED") {
+    try {
+      const { data, status: commStatus } = await internalGet(
+        USERS_SERVICE_URL,
+        `/sellers/${order.sellerId}/commission`,
+      );
+      if (commStatus === 200 && data) {
+        const commData = data as { rate: number };
+        const rate = commData.rate;
+        updateData.commissionRate = rate;
+        updateData.commissionAmount = Math.round(order.price * rate * 100) / 100;
+      }
+    } catch (err) {
+      console.error(`[commission] Failed to fetch rate for seller ${order.sellerId}:`, err);
+    }
   }
 
   const updated = await prisma.order.update({
     where: { id },
-    data: { status },
+    data: updateData,
   });
 
   // Auto-release escrow when order is marked COMPLETED
@@ -201,6 +307,9 @@ orderDetailRoutes.patch("/:id", requireAuth, async (req: Request, res: Response)
     });
     sendNotification({ userId: order.buyerId, ...note, entityId: id }).catch(() => {});
   }
+
+  // WhatsApp notification for the status change
+  void notifyViaWhatsApp(order, status).catch(() => {});
 });
 
 /** Save the buyer's answers to the gig's requirement questions. */

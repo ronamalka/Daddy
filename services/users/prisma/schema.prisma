@@ -39,6 +39,9 @@ model User {
   osekNumber     String?
   legalName      String?
   businessAddress String?
+  commissionTier     String    @default("STANDARD")
+  commissionRate     Float     @default(0.15)
+  tierCalculatedAt   DateTime?
   suspendedAt   DateTime?
   suspendReason String?
   phoneVerified    Boolean  @default(false)
@@ -50,6 +53,10 @@ model User {
   licenseStatus    String?
   licensePhoto     String?
   licenseType      String?
+  subscriptionTier      String    @default("FREE")
+  subscriptionStartedAt DateTime?
+  subscriptionExpiresAt DateTime?
+  subscriptionPaymentId String?
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
@@ -219,6 +226,20 @@ model CityCatalog {
   id        Int       @id @default(1)
   source    String    @default("snapshot")
   fetchedAt DateTime?
+}
+
+/// Audit log for WhatsApp / SMS / email dispatch attempts.
+model NotificationLog {
+  id        String   @id @default(cuid())
+  userId    String
+  channel   String   // "whatsapp", "sms", "email"
+  template  String
+  status    String   // "sent", "failed", "skipped"
+  error     String?
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([createdAt])
 }
 
 model PhoneOtp {

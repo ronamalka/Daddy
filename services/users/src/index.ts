@@ -20,6 +20,9 @@ import { emailVerifyRoutes } from "./routes/email-verify";
 import { notificationsRoutes } from "./routes/notifications";
 import { verificationRoutes } from "./routes/verification";
 import { addressesRoutes } from "./routes/addresses";
+import { subscriptionRoutes } from "./routes/subscription";
+import { commissionRoutes } from "./routes/commission";
+import { whatsappRoutes } from "./routes/whatsapp";
 import { startCityCatalogRefresh } from "./city-catalog";
 
 export { prisma };
@@ -45,6 +48,7 @@ app.use("/profile", profileRoutes);
 app.use("/admin", adminRoutes);
 app.use("/providers", providersRoutes);
 app.use("/sellers", sellerRoutes);
+app.use("/sellers", commissionRoutes);
 app.use("/service-areas", serviceAreasRoutes);
 app.use("/service-prices", servicePricesRoutes);
 app.use("/user-services", userServicesRoutes);
@@ -52,8 +56,10 @@ app.use("/locations", locationsRoutes);
 app.use("/featured-daddies", featuredRoutes);
 app.use("/availability", availabilityRoutes);
 app.use("/notifications", notificationsRoutes);
+app.use("/notifications/whatsapp", whatsappRoutes);
 app.use("/verify", verificationRoutes);
 app.use("/addresses", addressesRoutes);
+app.use("/subscription", subscriptionRoutes);
 
 /** Start the users HTTP server. */
 app.listen(PORT, "0.0.0.0", () => {
