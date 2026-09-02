@@ -8,6 +8,7 @@ import { extractUser } from "../../shared/middleware";
 import { metricsMiddleware, metricsHandler } from "../../shared/metrics";
 import { applySecurity, generalRateLimit } from "../../shared/security";
 import { logger, createRequestLogger } from "../../shared/logger";
+import { initSentry, setupSentryErrorHandler } from "../../shared/sentry";
 import { createMessagesRouter } from "./routes/messages";
 import { createViolationsRouter } from "./routes/violations";
 import { prismaMessageRepo, prismaViolationRepo } from "./repo";
@@ -15,6 +16,9 @@ import { prismaMessageRepo, prismaViolationRepo } from "./repo";
 const pool = new pg.Pool({ connectionString: process.env.DATABASE_URL });
 const adapter = new PrismaPg(pool);
 export const prisma = new PrismaClient({ adapter });
+
+initSentry();
+
 const app = express();
 const PORT = Number(process.env.PORT) || 4005;
 
@@ -35,6 +39,8 @@ app.get("/metrics", metricsHandler());
 const violationRepo = prismaViolationRepo(prisma);
 app.use("/messages", createMessagesRouter(prismaMessageRepo(prisma), violationRepo));
 app.use("/violations", createViolationsRouter(prisma));
+
+setupSentryErrorHandler(app);
 
 /** Start the chat HTTP server. */
 app.listen(PORT, "0.0.0.0", () => {
