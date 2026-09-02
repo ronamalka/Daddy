@@ -35,7 +35,6 @@ export interface PageMetaInput {
   images?: { url: string; alt?: string }[];
 }
 
-/** Shared title, description, canonical, hreflang, and Open Graph for a public page. */
 export function pageMetadata(input: PageMetaInput): Metadata {
   const url = siteUrl(input.path);
   return {
@@ -57,7 +56,6 @@ export function pageMetadata(input: PageMetaInput): Metadata {
   };
 }
 
-/** BreadcrumbList JSON-LD for structured navigation. */
 export function breadcrumbJsonLd(
   items: { name: string; path: string }[],
 ): Record<string, unknown> {
@@ -73,7 +71,6 @@ export function breadcrumbJsonLd(
   };
 }
 
-/** FAQPage JSON-LD for FAQ sections. */
 export function faqJsonLd(
   items: { q: string; a: string }[],
 ): Record<string, unknown> {
@@ -91,7 +88,6 @@ export function faqJsonLd(
   };
 }
 
-/** Shortens plain text for meta descriptions. */
 export function truncateMeta(text: string, max = 160): string {
   const t = text.replace(/\s+/g, " ").trim();
   if (t.length <= max) return t;
@@ -104,35 +100,32 @@ export interface ListedGig {
   updatedAt?: string;
 }
 
-/** Reads gig rows from either a raw array or `{ gigs, hasMore }` (the real API). */
 export function parseGigsList(payload: unknown): ListedGig[] {
+  const wrapped = payload as { gigs?: unknown[] } | undefined;
   const rows = Array.isArray(payload)
     ? payload
-    : payload && typeof payload === "object" && Array.isArray((payload as { gigs?: unknown }).gigs)
-      ? (payload as { gigs: unknown[] }).gigs
+    : Array.isArray(wrapped?.gigs)
+      ? wrapped.gigs
       : [];
-  return rows.flatMap((row) => {
+  return rows.flatMap((raw) => {
+    const row = raw as Record<string, unknown>;
     if (!row || typeof row !== "object") return [];
-    const id = (row as { id?: unknown }).id;
-    if (typeof id !== "string" || !id) return [];
-    const sellerId = (row as { sellerId?: unknown }).sellerId;
-    const updatedAt = (row as { updatedAt?: unknown }).updatedAt;
+    if (typeof row.id !== "string" || !row.id) return [];
     return [{
-      id,
-      ...(typeof sellerId === "string" ? { sellerId } : {}),
-      ...(typeof updatedAt === "string" ? { updatedAt } : {}),
+      id: row.id,
+      ...(typeof row.sellerId === "string" ? { sellerId: row.sellerId } : {}),
+      ...(typeof row.updatedAt === "string" ? { updatedAt: row.updatedAt } : {}),
     }];
   });
 }
 
-/** True when the gigs list payload says another page exists. */
 export function gigsListHasMore(payload: unknown, pageSize: number): boolean {
   if (Array.isArray(payload)) return false;
-  if (payload && typeof payload === "object" && typeof (payload as { hasMore?: unknown }).hasMore === "boolean") {
-    return Boolean((payload as { hasMore: boolean }).hasMore);
+  const wrapped = payload as { hasMore?: boolean } | undefined;
+  if (wrapped && typeof wrapped === "object" && typeof wrapped.hasMore === "boolean") {
+    return wrapped.hasMore;
   }
-  const list = parseGigsList(payload);
-  return list.length >= pageSize;
+  return parseGigsList(payload).length >= pageSize;
 }
 
 export interface ListedSeller {
@@ -140,15 +133,13 @@ export interface ListedSeller {
   createdAt?: string;
 }
 
-/** Reads public seller ids from the providers API (a JSON array). */
 export function parseProvidersList(payload: unknown): ListedSeller[] {
   if (!Array.isArray(payload)) return [];
-  return payload.flatMap((row) => {
+  return payload.flatMap((raw) => {
+    const row = raw as Record<string, unknown>;
     if (!row || typeof row !== "object") return [];
-    const id = (row as { id?: unknown }).id;
-    if (typeof id !== "string" || !id) return [];
-    const createdAt = (row as { createdAt?: unknown }).createdAt;
-    return [{ id, ...(typeof createdAt === "string" ? { createdAt } : {}) }];
+    if (typeof row.id !== "string" || !row.id) return [];
+    return [{ id: row.id, ...(typeof row.createdAt === "string" ? { createdAt: row.createdAt } : {}) }];
   });
 }
 
@@ -160,7 +151,6 @@ async function defaultSitemapFetch(url: string): Promise<unknown> {
   return res.json().catch(() => null);
 }
 
-/** Pages every `/gigs?skip=&take=` response until hasMore is false. */
 export async function collectPublicGigs(
   gigsServiceUrl: string,
   fetchFn: SitemapFetcher = defaultSitemapFetch,
@@ -182,7 +172,6 @@ export async function collectPublicGigs(
   return all;
 }
 
-/** Pages `/providers?skip=&take=` for searchable public daddies. */
 export async function collectPublicSellers(
   usersServiceUrl: string,
   fetchFn: SitemapFetcher = defaultSitemapFetch,
@@ -216,7 +205,6 @@ export interface SellerSeo {
   totalReviews: number;
 }
 
-/** Loads the fields needed for seller `<title>`, description, and JSON-LD. */
 export async function loadSellerSeo(id: string): Promise<SellerSeo | null> {
   const { data, status } = await proxyRequest(USERS_SERVICE, `/sellers/${id}`);
   if (status !== 200 || !data?.id || typeof data.name !== "string") return null;
@@ -241,7 +229,6 @@ export async function loadSellerSeo(id: string): Promise<SellerSeo | null> {
   };
 }
 
-/** Title and description for a public daddy profile. */
 export function sellerPageMetadata(seller: SellerSeo): Metadata {
   const services = seller.userServices
     .map((us) => getServiceBySlug(us.serviceSlug)?.nameHe)
@@ -260,7 +247,6 @@ export function sellerPageMetadata(seller: SellerSeo): Metadata {
   });
 }
 
-/** JSON-LD for a daddy: Person + LocalBusiness, with AggregateRating when reviews exist. */
 export function sellerJsonLd(seller: SellerSeo): Record<string, unknown> {
   const url = siteUrl(`/sellers/${seller.id}`);
   const node: Record<string, unknown> = {
@@ -304,7 +290,6 @@ export interface GigSeo {
   startingPrice: number | null;
 }
 
-/** Loads the fields needed for gig `<title>`, description, and Service JSON-LD. */
 export async function loadGigSeo(id: string): Promise<GigSeo | null> {
   const { data, status } = await proxyRequest(GIGS_SERVICE, `/gigs/${id}`);
   if (status !== 200 || !data?.id || typeof data.title !== "string") return null;
@@ -334,7 +319,6 @@ export async function loadGigSeo(id: string): Promise<GigSeo | null> {
   };
 }
 
-/** Title and description for a public package page. */
 export function gigPageMetadata(gig: GigSeo): Metadata {
   const by = gig.sellerName ? ` מאת ${gig.sellerName}` : "";
   const description = gig.description
@@ -348,7 +332,6 @@ export function gigPageMetadata(gig: GigSeo): Metadata {
   });
 }
 
-/** JSON-LD Service (+ Offer / AggregateRating) for a public package. */
 export function gigJsonLd(gig: GigSeo): Record<string, unknown> {
   const url = siteUrl(`/gigs/${gig.id}`);
   const node: Record<string, unknown> = {
@@ -386,7 +369,7 @@ export function gigJsonLd(gig: GigSeo): Record<string, unknown> {
   return node;
 }
 
-/** Serializes JSON-LD so a `</script>` in user text cannot break out of the tag. */
+// Escapes `</script>` in user text to prevent tag breakout
 export function serializeJsonLd(data: unknown): string {
   return JSON.stringify(data).replace(/</g, "\\u003c");
 }

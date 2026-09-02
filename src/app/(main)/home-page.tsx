@@ -28,7 +28,6 @@ interface HomePageProps {
   initialRequestTeasers: RequestTeaser[];
 }
 
-/** Shows the home page with search, featured daddies, and how the site works. */
 export function HomePage({ initialFeaturedDaddies, initialLiveReviews, initialRequestTeasers }: HomePageProps) {
   const { data: session } = useSession();
   const [view, setView] = useState<"browse" | "results">("browse");
@@ -47,11 +46,9 @@ export function HomePage({ initialFeaturedDaddies, initialLiveReviews, initialRe
   const [reqWindow, setReqWindow] = useState<VisitWindowValue | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
-  const [featuredDaddies, setFeaturedDaddies] = useState<FeaturedDaddy[]>(initialFeaturedDaddies);
-  const [liveReviews, setLiveReviews] = useState<LiveReview[]>(initialLiveReviews);
-  const [requestTeasers, setRequestTeasers] = useState<RequestTeaser[]>(initialRequestTeasers);
-  const [fetchError, setFetchError] = useState<string | null>(null);
-  const [loadingFeatured, setLoadingFeatured] = useState(false);
+  const featuredDaddies = initialFeaturedDaddies;
+  const liveReviews = initialLiveReviews;
+  const requestTeasers = initialRequestTeasers;
   const [rebookableSellers, setRebookableSellers] = useState<{ sellerId: string; seller: { id: string; name: string; avatar: string | null }; lastOrder: { id: string; title: string | null; price: number; completedAt: string; jobType: string }; orderCount: number }[]>([]);
   const [loadingRebookable, setLoadingRebookable] = useState(false);
 
@@ -90,7 +87,6 @@ export function HomePage({ initialFeaturedDaddies, initialLiveReviews, initialRe
   useEffect(() => {
     if (!selectedService) return;
     let cancelled = false;
-    /** Fetches providers that match the selected service, city, price, and sort. */
     async function fetchProviders() {
       setLoadingProviders(true);
       const p = new URLSearchParams();
@@ -114,7 +110,6 @@ export function HomePage({ initialFeaturedDaddies, initialLiveReviews, initialRe
     return () => { cancelled = true; };
   }, [selectedService, selectedCity, sortBy, pricing, pricePreset]);
 
-  /** Sends a new service request from the homepage form. */
   async function submitRequest() {
     if (!reqTitle.trim() || !reqDesc.trim() || !reqWindow?.date) return;
     setSubmitting(true);
@@ -151,7 +146,6 @@ export function HomePage({ initialFeaturedDaddies, initialLiveReviews, initialRe
     setSubmitting(false);
   }
 
-  /** Clears the current search and returns to the browse view. */
   function resetSearch() {
     setView("browse");
     setSelectedCategory("");
@@ -214,14 +208,6 @@ export function HomePage({ initialFeaturedDaddies, initialLiveReviews, initialRe
 
       <StatsSection />
 
-      {fetchError && (
-        <div className="mx-auto max-w-4xl px-4 mt-8">
-          <div role="alert" className="rounded-lg border border-[rgba(var(--color-error),0.2)] bg-[rgba(var(--color-error),0.05)] px-5 py-4 text-center text-sm text-[rgb(var(--color-error))]">
-            {fetchError}
-          </div>
-        </div>
-      )}
-
       <CategoriesSection
         selectedCategory={selectedCategory}
         setSelectedCategory={setSelectedCategory}
@@ -229,7 +215,7 @@ export function HomePage({ initialFeaturedDaddies, initialLiveReviews, initialRe
         setServiceSearch={setServiceSearch}
       />
 
-      <FeaturedDaddiesSection featuredDaddies={featuredDaddies} loading={loadingFeatured} />
+      <FeaturedDaddiesSection featuredDaddies={featuredDaddies} loading={false} />
 
       {session?.user && (
         <RebookableSection sellers={rebookableSellers} loading={loadingRebookable} />
@@ -237,7 +223,7 @@ export function HomePage({ initialFeaturedDaddies, initialLiveReviews, initialRe
 
       <OpenRequestsTeaser
         teasers={requestTeasers}
-        loading={loadingFeatured}
+        loading={false}
         canOpenDetail={session?.user?.role === "SELLER" || session?.user?.role === "ADMIN"}
         signedIn={Boolean(session?.user)}
       />

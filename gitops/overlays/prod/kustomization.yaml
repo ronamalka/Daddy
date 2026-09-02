@@ -9,6 +9,7 @@ resources:
   - app-route-custom.yaml
   - certificate.yaml
   - router-rbac.yaml
+  - ../../base/umami-route.yaml
 
 patches:
   - target:
