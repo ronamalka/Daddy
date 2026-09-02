@@ -123,10 +123,23 @@ export default function NotificationPreferencesPage() {
 
           <ToggleRow
             label="ווטסאפ"
-            description="קבל התראות על הזמנות ופניות חדשות דרך ווטסאפ"
+            description="קבל עדכונים על הזמנות ישירות לווצאפ. ההודעות הן חד-כיווניות — לא ניתן להשיב."
             checked={prefs.notifyWhatsapp}
             onChange={() => toggle("notifyWhatsapp")}
           />
+
+          {prefs.notifyWhatsapp && (
+            <div className="mr-1 mt-1 space-y-1 text-[11px] text-[rgb(var(--color-text-muted))]">
+              <p>אירועים שישלחו הודעה:</p>
+              <ul className="list-disc pr-4 space-y-0.5">
+                <li>הזמנה אושרה על ידי בעל מקצוע</li>
+                <li>בעל המקצוע בדרך אליך</li>
+                <li>העבודה הושלמה — אשר קבלה</li>
+                <li>התשלום שוחרר</li>
+                <li>הזמנה בוטלה</li>
+              </ul>
+            </div>
+          )}
 
           <div className="h-px bg-[rgb(var(--color-border-light))]" />
 
