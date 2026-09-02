@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: gigs-service
-          image: quay.io/rh_ee_rmalka/daddy-gigs-service:fa2d0223
+          image: quay.io/rh_ee_rmalka/daddy-gigs-service:64c3448d
           ports:
             - containerPort: 4002
           env:

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { ShieldCheck, Image as ImageIcon, X } from "@phosphor-icons/react";
 import { Dialog } from "@/components/ui/dialog";
+import { trackEvent } from "@/lib/analytics";
 
 const MAX_WARRANTY_PHOTOS = 5;
 
@@ -75,6 +76,7 @@ export function WarrantyClaimDialog({ open, onOpenChange, orderId, onCreated }: 
       setSubmitting(false);
       return;
     }
+    trackEvent("warranty_claim_opened", { orderId });
     onCreated(data);
     reset();
     onOpenChange(false);
