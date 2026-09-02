@@ -9,3 +9,4 @@ export { CtaSection } from "./cta-section";
 export { OpenRequestsTeaser } from "./open-requests-teaser";
 export { ResultsView } from "./results-view";
 export { RequestsView } from "./requests-view";
+export { RebookableSection } from "./rebookable-section";
