@@ -1,5 +1,6 @@
 import { Router, Request, Response } from "express";
 import { prisma } from "../index";
+import { logEvent } from "../../../shared/analytics";
 import { userRegistrations, userLogins } from "../metrics";
 
 /** Routes for Google (and similar) sign-in. */
@@ -43,6 +44,17 @@ oauthRoutes.post("/", async (req: Request, res: Response) => {
       });
     }
     userLogins.inc({ method: "google" });
+
+    logEvent(prisma, {
+      eventName: "login_completed",
+      eventCategory: "user",
+      actorId: user.id,
+      actorRole: user.role.toLowerCase(),
+      entityType: "user",
+      entityId: user.id,
+      properties: { method: "google" },
+    });
+
     res.json(publicUser(user));
     return;
   }
@@ -58,5 +70,16 @@ oauthRoutes.post("/", async (req: Request, res: Response) => {
   });
 
   userRegistrations.inc({ role: user.role, method: "google" });
+
+  logEvent(prisma, {
+    eventName: "signup_completed",
+    eventCategory: "user",
+    actorId: user.id,
+    actorRole: user.role.toLowerCase(),
+    entityType: "user",
+    entityId: user.id,
+    properties: { method: "google", role: user.role },
+  });
+
   res.json(publicUser(user));
 });
