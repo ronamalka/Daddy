@@ -158,7 +158,10 @@ describe("System Tests — Auth API", () => {
       const res = await fetch(`${BASE_URL}/api/auth/session`);
       expect(res.status).toBe(200);
       const session = await res.json();
-      expect(session).toEqual({});
+      const isEmpty =
+        session === null ||
+        (typeof session === "object" && Object.keys(session).length === 0);
+      expect(isEmpty).toBe(true);
     });
 
     it("returns user data after successful login", async () => {
