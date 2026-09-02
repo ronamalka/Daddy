@@ -142,6 +142,7 @@ describe("page metadata", () => {
       "/how-it-works",
       "/become-a-daddy",
       "/about",
+      "/services",
       "/accessibility",
       "/terms",
       "/privacy",

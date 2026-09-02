@@ -1,5 +1,6 @@
 import { Router, Request, Response } from "express";
 import { prisma } from "../index";
+import { userRegistrations, userLogins } from "../metrics";
 
 /** Routes for Google (and similar) sign-in. */
 export const oauthRoutes = Router();
@@ -41,6 +42,7 @@ oauthRoutes.post("/", async (req: Request, res: Response) => {
         data: { avatar },
       });
     }
+    userLogins.inc({ method: "google" });
     res.json(publicUser(user));
     return;
   }
@@ -55,5 +57,6 @@ oauthRoutes.post("/", async (req: Request, res: Response) => {
     },
   });
 
+  userRegistrations.inc({ role: user.role, method: "google" });
   res.json(publicUser(user));
 });

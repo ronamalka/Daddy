@@ -2,6 +2,7 @@ import { Router, Request, Response } from "express";
 import { requireAuth } from "../../../shared/middleware";
 import { prisma } from "../index";
 import crypto from "crypto";
+import { logger } from "../../../shared/logger";
 
 /** Verification routes: phone OTP, identity upload, and license upload. */
 export const verificationRoutes = Router();
@@ -44,8 +45,8 @@ verificationRoutes.post("/phone/send", requireAuth, async (req: Request, res: Re
     },
   });
 
-  // Actual SMS delivery is issue #52. For now, log the code to console.
-  console.log(`[OTP] Code for ${user.phone}: ${code}`);
+  // Actual SMS delivery is issue #52. For now, log the code.
+  logger.info({ phone: user.phone, code }, "OTP code generated");
 
   res.json({ sent: true, phone: user.phone.replace(/.(?=.{4})/g, "*") });
 });

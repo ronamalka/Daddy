@@ -1,0 +1,186 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-dashboard-business
+data:
+  business-kpis.json: |
+    {
+      "uid": "daddy-business-kpis",
+      "title": "Daddy — Business KPIs",
+      "tags": ["daddy", "business"],
+      "timezone": "browser",
+      "refresh": "5m",
+      "time": { "from": "now-7d", "to": "now" },
+      "templating": {
+        "list": []
+      },
+      "panels": [
+        {
+          "id": 1,
+          "title": "User Registrations",
+          "type": "timeseries",
+          "gridPos": { "h": 8, "w": 12, "x": 0, "y": 0 },
+          "targets": [
+            {
+              "expr": "sum(increase(daddy_user_registrations_total[1d])) by (role)",
+              "legendFormat": "{{role}}"
+            }
+          ],
+          "fieldConfig": {
+            "defaults": {
+              "custom": { "fillOpacity": 20, "stacking": { "mode": "normal" } }
+            }
+          }
+        },
+        {
+          "id": 2,
+          "title": "User Logins",
+          "type": "timeseries",
+          "gridPos": { "h": 8, "w": 12, "x": 12, "y": 0 },
+          "targets": [
+            {
+              "expr": "sum(increase(daddy_user_logins_total[1d])) by (method)",
+              "legendFormat": "{{method}}"
+            }
+          ],
+          "fieldConfig": {
+            "defaults": {
+              "custom": { "fillOpacity": 20 }
+            }
+          }
+        },
+        {
+          "id": 3,
+          "title": "Orders Created vs Completed",
+          "type": "timeseries",
+          "gridPos": { "h": 8, "w": 12, "x": 0, "y": 8 },
+          "targets": [
+            {
+              "expr": "sum(increase(daddy_orders_created_total[1d]))",
+              "legendFormat": "Created"
+            },
+            {
+              "expr": "sum(increase(daddy_orders_completed_total[1d]))",
+              "legendFormat": "Completed"
+            }
+          ],
+          "fieldConfig": {
+            "defaults": {
+              "custom": { "fillOpacity": 10 }
+            }
+          }
+        },
+        {
+          "id": 4,
+          "title": "Commission Collected (ILS)",
+          "type": "timeseries",
+          "gridPos": { "h": 8, "w": 12, "x": 12, "y": 8 },
+          "targets": [
+            {
+              "expr": "sum(increase(daddy_commission_collected_total[1d])) / 100",
+              "legendFormat": "Daily Commission (ILS)"
+            }
+          ],
+          "fieldConfig": {
+            "defaults": {
+              "unit": "currencyILS",
+              "custom": { "fillOpacity": 30 }
+            }
+          }
+        },
+        {
+          "id": 5,
+          "title": "Request → Quote Funnel",
+          "type": "timeseries",
+          "gridPos": { "h": 8, "w": 12, "x": 0, "y": 16 },
+          "targets": [
+            {
+              "expr": "sum(increase(daddy_service_requests_created_total[1d]))",
+              "legendFormat": "Requests Created"
+            },
+            {
+              "expr": "sum(increase(daddy_quotes_sent_total[1d]))",
+              "legendFormat": "Quotes Sent"
+            },
+            {
+              "expr": "sum(increase(daddy_orders_created_total[1d]))",
+              "legendFormat": "Orders Created"
+            }
+          ],
+          "fieldConfig": {
+            "defaults": {
+              "custom": { "fillOpacity": 15 }
+            }
+          }
+        },
+        {
+          "id": 6,
+          "title": "Chat Messages Sent",
+          "type": "timeseries",
+          "gridPos": { "h": 8, "w": 6, "x": 12, "y": 16 },
+          "targets": [
+            {
+              "expr": "sum(increase(daddy_messages_sent_total[1d]))",
+              "legendFormat": "Messages"
+            }
+          ],
+          "fieldConfig": {
+            "defaults": {
+              "custom": { "fillOpacity": 20 }
+            }
+          }
+        },
+        {
+          "id": 7,
+          "title": "Chat Violations Blocked",
+          "type": "timeseries",
+          "gridPos": { "h": 8, "w": 6, "x": 18, "y": 16 },
+          "targets": [
+            {
+              "expr": "sum(increase(daddy_chat_violations_blocked_total[1d])) by (pattern_type)",
+              "legendFormat": "{{pattern_type}}"
+            }
+          ],
+          "fieldConfig": {
+            "defaults": {
+              "custom": { "fillOpacity": 20 },
+              "color": { "mode": "palette-classic" }
+            }
+          }
+        },
+        {
+          "id": 8,
+          "title": "Totals (All Time)",
+          "type": "stat",
+          "gridPos": { "h": 4, "w": 24, "x": 0, "y": 24 },
+          "targets": [
+            {
+              "expr": "sum(daddy_user_registrations_total)",
+              "legendFormat": "Users"
+            },
+            {
+              "expr": "sum(daddy_orders_created_total)",
+              "legendFormat": "Orders"
+            },
+            {
+              "expr": "sum(daddy_service_requests_created_total)",
+              "legendFormat": "Requests"
+            },
+            {
+              "expr": "sum(daddy_messages_sent_total)",
+              "legendFormat": "Messages"
+            }
+          ],
+          "fieldConfig": {
+            "defaults": {
+              "color": { "mode": "thresholds" },
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [{ "value": null, "color": "blue" }]
+              }
+            }
+          }
+        }
+      ],
+      "schemaVersion": 39
+    }

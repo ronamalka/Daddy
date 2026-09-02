@@ -1,4 +1,5 @@
 import nodemailer from "nodemailer";
+import { logger } from "./logger";
 
 const transporter = nodemailer.createTransport({
   host: process.env.SMTP_HOST || "smtp.gmail.com",
@@ -15,7 +16,7 @@ const FROM = process.env.SMTP_FROM || "אבאל׳ה <noreply@aballeh.com>";
 /** Sends an HTML email. Silently skips if SMTP is not configured. */
 export async function sendEmail(to: string, subject: string, html: string) {
   if (!process.env.SMTP_USER) {
-    console.warn("[email] SMTP not configured, skipping:", { to, subject });
+    logger.warn({ to, subject }, "SMTP not configured, skipping email");
     return;
   }
   await transporter.sendMail({ from: FROM, to, subject, html });

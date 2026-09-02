@@ -5,6 +5,7 @@
  */
 
 import crypto from "crypto";
+import { logger } from "./logger";
 
 const INTER_SERVICE_SECRET = process.env.INTER_SERVICE_SECRET || "dev-secret-change-in-production";
 const USERS_SERVICE_URL = process.env.USERS_SERVICE_URL || "http://localhost:4001";
@@ -28,7 +29,7 @@ export async function internalGet(
     const data = await res.json().catch(() => null);
     return { data, status: res.status };
   } catch (err) {
-    console.error(`[internal-client] GET ${serviceUrl}${path} failed:`, err);
+    logger.error({ err, url: `${serviceUrl}${path}` }, "Internal GET request failed");
     return { data: null, status: 502 };
   }
 }
@@ -51,7 +52,7 @@ export async function internalPost(
     const data = await res.json().catch(() => null);
     return { data, status: res.status };
   } catch (err) {
-    console.error(`[internal-client] POST ${serviceUrl}${path} failed:`, err);
+    logger.error({ err, url: `${serviceUrl}${path}` }, "Internal POST request failed");
     return { data: null, status: 502 };
   }
 }
@@ -67,6 +68,6 @@ export async function sendNotification(payload: {
 }): Promise<void> {
   const { status } = await internalPost(USERS_SERVICE_URL, "/notifications/send", payload);
   if (status >= 400) {
-    console.warn(`[notify] Failed to send ${payload.type} to user ${payload.userId} (HTTP ${status})`);
+    logger.warn({ type: payload.type, userId: payload.userId, status }, "Failed to send notification");
   }
 }

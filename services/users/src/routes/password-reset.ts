@@ -4,6 +4,7 @@ import { hash } from "bcryptjs";
 import { prisma } from "../db";
 import { sendEmail } from "../../../shared/email";
 import { passwordResetEmail } from "../../../shared/email-templates";
+import { logger } from "../../../shared/logger";
 
 /** Routes for requesting, checking, and using a password-reset token. */
 export const passwordResetRoutes = Router();
@@ -51,7 +52,7 @@ passwordResetRoutes.post("/request", async (req: Request, res: Response) => {
   // Send the reset email (non-blocking for anti-enumeration: always respond the same)
   const link = `${BASE_URL}/reset-password?token=${token}`;
   sendEmail(user.email, "איפוס סיסמה - אבאל׳ה", passwordResetEmail(user.name, link)).catch((err) => {
-    console.error("[password-reset] Failed to send reset email:", err);
+    logger.error({ err }, "Failed to send password reset email");
   });
 
   res.json({ message: "If the email exists, a reset link has been sent" });

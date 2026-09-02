@@ -6,6 +6,7 @@ import { passwordSchema, checkBreachedPassword } from "@/lib/password-policy";
 import { verifyTurnstileToken } from "@/lib/turnstile";
 import { detectBot } from "@/lib/bot-detection";
 import { enforceRateLimit } from "@/lib/rate-limit-redis";
+import { logger } from "@/lib/logger";
 
 const registerSchema = z.object({
   name: z.string().min(1).max(100),
@@ -50,7 +51,7 @@ export async function POST(request: NextRequest) {
   });
 
   if (botCheck.isBot) {
-    console.warn(`[bot-detection] Registration blocked: ${botCheck.reason}`);
+    logger.warn({ reason: botCheck.reason }, "Bot detection: registration blocked");
     return NextResponse.json(
       { error: "הבקשה נחסמה. נסה שוב." },
       { status: 400 }

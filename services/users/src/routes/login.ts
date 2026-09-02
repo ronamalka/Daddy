@@ -1,6 +1,7 @@
 import { Router, Request, Response } from "express";
 import { compare } from "bcryptjs";
 import { prisma } from "../index";
+import { userLogins } from "../metrics";
 
 /** Routes for email-and-password login. */
 export const loginRoutes = Router();
@@ -36,5 +37,6 @@ loginRoutes.post("/", async (req: Request, res: Response) => {
     return;
   }
 
+  userLogins.inc({ method: "email" });
   res.json({ id: user.id, email: user.email, name: user.name, role: user.role, emailVerified: user.emailVerified });
 });

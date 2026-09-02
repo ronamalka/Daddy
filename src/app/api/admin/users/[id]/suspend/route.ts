@@ -5,6 +5,7 @@ import { proxyRequest, USERS_SERVICE } from "@/lib/gateway";
 import { validateBody } from "@/lib/validate";
 import { revokeSessionsForUser } from "@/lib/session-revoke";
 import { logSecurityEvent, extractClientInfo } from "@/lib/security-logger";
+import { logger } from "@/lib/logger";
 
 const suspendSchema = z.object({
   reason: z.string().max(500).optional(),
@@ -32,7 +33,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
     try {
       await revokeSessionsForUser(id);
     } catch (err) {
-      console.error("[admin] failed to revoke sessions after suspend:", err);
+      logger.error({ err }, "Failed to revoke sessions after suspend");
     }
     logSecurityEvent("admin_action", {
       userId: user.id,
