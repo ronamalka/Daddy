@@ -8,6 +8,7 @@ import { extractUser } from "../../shared/middleware";
 import { metricsMiddleware, metricsHandler } from "../../shared/metrics";
 import { applySecurity, generalRateLimit } from "../../shared/security";
 import { logger, createRequestLogger } from "../../shared/logger";
+import { initSentry, setupSentryErrorHandler } from "../../shared/sentry";
 import { gigsRoutes } from "./routes/gigs";
 import { gigDetailRoutes } from "./routes/gig-detail";
 import { favoritesRoutes } from "./routes/favorites";
@@ -18,6 +19,9 @@ import { favoriteSellerRoutes } from "./routes/favorite-sellers";
 const pool = new pg.Pool({ connectionString: process.env.DATABASE_URL });
 const adapter = new PrismaPg(pool);
 export const prisma = new PrismaClient({ adapter });
+
+initSentry();
+
 const app = express();
 const PORT = Number(process.env.PORT) || 4002;
 
@@ -41,6 +45,8 @@ app.use("/favorites", favoritesRoutes);
 app.use("/reviews", reviewsRoutes);
 app.use("/recent-reviews", recentReviewsRoutes);
 app.use("/favorite-sellers", favoriteSellerRoutes);
+
+setupSentryErrorHandler(app);
 
 /** Start the gigs HTTP server. */
 app.listen(PORT, "0.0.0.0", () => {

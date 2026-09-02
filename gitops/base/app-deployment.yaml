@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: daddy-app
-          image: quay.io/rh_ee_rmalka/daddy-app:aa5ad1c4
+          image: quay.io/rh_ee_rmalka/daddy-app:82657648
           ports:
             - containerPort: 3000
           env:
@@ -85,6 +85,16 @@ spec:
                 secretKeyRef:
                   name: daddy-app-secret
                   key: NEXT_PUBLIC_UMAMI_URL
+            - name: SENTRY_DSN
+              valueFrom:
+                secretKeyRef:
+                  name: daddy-app-secret
+                  key: SENTRY_DSN
+            - name: NEXT_PUBLIC_SENTRY_DSN
+              valueFrom:
+                secretKeyRef:
+                  name: daddy-app-secret
+                  key: NEXT_PUBLIC_SENTRY_DSN
           resources:
             requests:
               memory: "128Mi"
