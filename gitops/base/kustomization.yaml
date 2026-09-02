@@ -17,3 +17,6 @@ resources:
   - chat-deployment.yaml
   - redis-deployment.yaml
   - servicemonitor.yaml
+  - umami-deployment.yaml
+  - umami-service.yaml
+  - umami-route.yaml

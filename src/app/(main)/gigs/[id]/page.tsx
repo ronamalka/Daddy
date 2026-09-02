@@ -9,6 +9,7 @@ import { Heart, Star, Clock, ArrowsClockwise, ChatCircle, CaretDown } from "@pho
 import { MarketplaceDisclaimer } from "@/components/marketplace-disclaimer";
 import { CancellationPolicyNote } from "@/components/cancellation-policy-note";
 import { SlotPicker, type SlotOption } from "@/components/slot-picker";
+import { trackEvent } from "@/lib/analytics";
 
 interface GigDetail {
   id: string;
@@ -105,6 +106,7 @@ export default function GigDetailPage() {
           reviewCount: typeof data.reviewCount === "number" ? data.reviewCount : 0,
         });
         setFavorited(Boolean(data.isFavorited));
+        trackEvent("gig_viewed", { category: data.category?.name || "" });
       })
       .catch(() => {
         if (!cancelled) setLoadError(true);

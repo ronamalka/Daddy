@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Heebo } from "next/font/google";
+import Script from "next/script";
 import { SessionProvider } from "@/components/session-provider";
 import { AccessibilityToolbar, A11Y_BOOTSTRAP_SCRIPT } from "@/components/accessibility-toolbar";
 import { CsrfProvider } from "@/components/csrf-provider";
@@ -90,6 +91,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <CookieConsentBanner />
           <AccessibilityToolbar />
         </SessionProvider>
+        {process.env.NEXT_PUBLIC_UMAMI_WEBSITE_ID && (
+          <Script
+            src={`${process.env.NEXT_PUBLIC_UMAMI_URL || ""}/script.js`}
+            data-website-id={process.env.NEXT_PUBLIC_UMAMI_WEBSITE_ID}
+            strategy="afterInteractive"
+          />
+        )}
       </body>
     </html>
   );

@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { googleAuthErrorMessage } from "@/lib/oauth-errors";
 import { safeInAppPath } from "@/lib/seller-ready";
+import { trackEvent } from "@/lib/analytics";
 
 /** Shows the login form so users can sign in. */
 export default function LoginPage() {
@@ -46,6 +47,7 @@ export default function LoginPage() {
       );
       setLoading(false);
     } else {
+      trackEvent("login_completed", { method: "credentials" });
       router.push(nextPath);
       router.refresh();
     }
@@ -53,6 +55,7 @@ export default function LoginPage() {
 
   /** Signs the user in with Google. */
   async function handleGoogleSignIn() {
+    trackEvent("login_google_clicked");
     setGoogleLoading(true);
     setError("");
     await signIn("google", { callbackUrl: nextPath });

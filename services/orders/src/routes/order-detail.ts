@@ -11,6 +11,7 @@ import { parseDeliveryEvidence } from "../../../shared/delivery-photos";
 import { releasePayment } from "../lib/escrow";
 import { logger } from "../../../shared/logger";
 import { ordersCompleted } from "../metrics";
+import { logEvent } from "../../../shared/analytics";
 
 const USERS_SERVICE_URL = process.env.USERS_SERVICE_URL || "http://localhost:4001";
 
@@ -297,6 +298,20 @@ orderDetailRoutes.patch("/:id", requireAuth, async (req: Request, res: Response)
     ordersCompleted.inc({ category: order.jobType || "GIG" });
     releasePayment(prisma, id).catch((err) => {
       logger.error({ err, orderId: id }, "Escrow auto-release failed");
+    });
+
+    // Log analytics event (fire-and-forget)
+    logEvent(prisma, {
+      eventName: "order.completed",
+      eventCategory: "order",
+      actorId: req.user!.id,
+      actorRole: "buyer",
+      entityType: "order",
+      entityId: id,
+      properties: {
+        price: order.price,
+        commission_amount: updateData.commissionAmount ?? 0,
+      },
     });
   }
 
