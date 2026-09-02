@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { ArrowClockwise, Lock } from "@phosphor-icons/react";
@@ -16,8 +16,19 @@ interface PreviousOrder {
   seller: { id: string; name: string; avatar: string | null };
 }
 
-/** Pre-filled rebook form for ordering from a previous seller. */
 export default function RebookPage() {
+  return (
+    <Suspense fallback={
+      <div className="flex items-center justify-center py-20">
+        <div className="h-10 w-10 animate-spin rounded-full border-4 border-[rgba(var(--color-primary),0.1)] border-t-[rgb(var(--color-primary))]" />
+      </div>
+    }>
+      <RebookContent />
+    </Suspense>
+  );
+}
+
+function RebookContent() {
   const { data: session } = useSession();
   const router = useRouter();
   const searchParams = useSearchParams();
