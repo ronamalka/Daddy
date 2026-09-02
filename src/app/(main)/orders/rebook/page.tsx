@@ -158,7 +158,7 @@ function RebookContent() {
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
-        <div className="rounded-2xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] p-6 shadow-[0_2px_8px_rgba(var(--color-primary),0.06)]">
+        <div className="rounded-2xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] p-6 shadow-sm">
           <h2 className="mb-4 text-[16px] font-bold text-[rgb(var(--color-text))]">פרטי העבודה</h2>
 
           <div className="space-y-4">
@@ -191,7 +191,7 @@ function RebookContent() {
           </div>
         </div>
 
-        <div className="rounded-2xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] p-6 shadow-[0_2px_8px_rgba(var(--color-primary),0.06)]">
+        <div className="rounded-2xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] p-6 shadow-sm">
           <h2 className="mb-4 text-[16px] font-bold text-[rgb(var(--color-text))]">תמחור</h2>
 
           <div className="space-y-4">
@@ -236,7 +236,7 @@ function RebookContent() {
           </div>
         </div>
 
-        <div className="rounded-2xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] p-6 shadow-[0_2px_8px_rgba(var(--color-primary),0.06)]">
+        <div className="rounded-2xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] p-6 shadow-sm">
           <h2 className="mb-4 text-[16px] font-bold text-[rgb(var(--color-text))]">חלון ביקור</h2>
           <VisitWindowFields value={visitWindow} onChange={setVisitWindow} />
         </div>

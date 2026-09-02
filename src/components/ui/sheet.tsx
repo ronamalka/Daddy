@@ -55,7 +55,7 @@ export function Sheet({ open, onOpenChange, children }: SheetProps) {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className="fixed inset-0 z-[100] bg-black/60 backdrop-blur-sm"
+            className="fixed inset-0 z-[100] bg-black/50"
             onClick={() => onOpenChange(false)}
             aria-hidden="true"
           />
@@ -70,7 +70,7 @@ export function Sheet({ open, onOpenChange, children }: SheetProps) {
             transition={{ type: "spring", damping: 30, stiffness: 300 }}
             className={cn(
               "fixed inset-y-0 end-0 z-[100] flex w-[min(85vw,24rem)] flex-col overflow-hidden",
-              "bg-[rgb(var(--color-surface))] shadow-2xl"
+              "bg-[rgb(var(--color-surface))] shadow-lg"
             )}
           >
             <div className="flex shrink-0 items-center justify-start px-3 pt-[max(0.75rem,env(safe-area-inset-top))]">

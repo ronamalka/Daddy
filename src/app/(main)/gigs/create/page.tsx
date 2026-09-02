@@ -9,10 +9,10 @@ import { categoriesFromPricedServices, type ServiceCategory } from "@/lib/servic
 
 const TIERS = ["BASIC", "STANDARD", "PREMIUM"] as const;
 
-const TIER_COLORS: Record<string, { gradient: string; label: string }> = {
-  BASIC: { gradient: "from-[rgb(var(--color-accent))] to-[rgb(var(--color-success))]", label: "חבילת בסיס" },
-  STANDARD: { gradient: "from-[rgb(var(--color-primary))] to-[rgb(var(--color-primary-light))]", label: "הכי פופולרי" },
-  PREMIUM: { gradient: "from-[rgb(var(--color-accent-yellow))] to-[rgb(var(--color-error))]", label: "שירות מלא" },
+const TIER_COLORS: Record<string, { color: string; label: string }> = {
+  BASIC: { color: "bg-accent", label: "חבילת בסיס" },
+  STANDARD: { color: "bg-primary", label: "הכי פופולרי" },
+  PREMIUM: { color: "bg-accent-yellow", label: "שירות מלא" },
 };
 
 interface TierData { title: string; description: string; price: string; deliveryDays: string; revisions: string; }
@@ -153,7 +153,7 @@ export default function CreateGigPage() {
       <>
       <form onSubmit={handlePreview} className="space-y-6">
         {/* Basic Info */}
-        <div className="rounded-2xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] p-6 shadow-[0_2px_8px_rgba(var(--color-primary),0.06)]">
+        <div className="rounded-2xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] p-6 shadow-sm">
           <h2 className="mb-5 text-[16px] font-bold text-[rgb(var(--color-text))]">מידע בסיסי</h2>
           <div className="space-y-5">
             <div><label className="mb-2 block text-[13px] font-semibold text-[rgb(var(--color-text-secondary))]">כותרת השירות</label><input value={title} onChange={(e) => setTitle(e.target.value)} required placeholder="אני אעשה משהו מדהים" className={inputClass} /></div>
@@ -164,14 +164,14 @@ export default function CreateGigPage() {
         </div>
 
         {/* Pricing Tiers */}
-        <div className="rounded-2xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] p-6 shadow-[0_2px_8px_rgba(var(--color-primary),0.06)]">
+        <div className="rounded-2xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] p-6 shadow-sm">
           <h2 className="mb-5 text-[16px] font-bold text-[rgb(var(--color-text))]">חבילות מחיר</h2>
           <div className="space-y-4">
             {TIERS.map((tier) => {
               const colors = TIER_COLORS[tier];
               return (
                 <div key={tier} className="relative overflow-hidden rounded-xl border border-[rgb(var(--color-border))] p-5">
-                  <div className={`absolute top-0 left-0 right-0 h-1 bg-gradient-to-r ${colors.gradient}`} />
+                  <div className={`absolute top-0 left-0 right-0 h-1 ${colors.color}`} />
                   <div className="mb-4"><h3 className="text-[14px] font-bold text-[rgb(var(--color-text))]">{tier}</h3><p className="text-[12px] text-[rgb(var(--color-text-muted))]">{colors.label}</p></div>
                   <div className="grid grid-cols-2 gap-3">
                     <input placeholder="שם החבילה" value={tiers[tier].title} onChange={(e) => updateTier(tier, "title", e.target.value)} className={inputClass} />
@@ -187,7 +187,7 @@ export default function CreateGigPage() {
         </div>
 
         {/* FAQs */}
-        <div className="rounded-2xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] p-6 shadow-[0_2px_8px_rgba(var(--color-primary),0.06)]">
+        <div className="rounded-2xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] p-6 shadow-sm">
           <div className="mb-4 flex items-center justify-between">
             <h2 className="text-[16px] font-bold text-[rgb(var(--color-text))]">שאלות נפוצות <span className="font-normal text-[rgb(var(--color-text-muted))] text-[13px]">(אופציונלי)</span></h2>
             <button type="button" onClick={() => setFaqs([...faqs, { question: "", answer: "" }])} className="text-[13px] font-semibold text-[rgb(var(--color-primary))] hover:underline">+ הוסף שאלה</button>
@@ -207,7 +207,7 @@ export default function CreateGigPage() {
         </div>
 
         {/* Requirements */}
-        <div className="rounded-2xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] p-6 shadow-[0_2px_8px_rgba(var(--color-primary),0.06)]">
+        <div className="rounded-2xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] p-6 shadow-sm">
           <div className="mb-4 flex items-center justify-between">
             <h2 className="text-[16px] font-bold text-[rgb(var(--color-text))]">דרישות מהקונה <span className="font-normal text-[rgb(var(--color-text-muted))] text-[13px]">(אופציונלי)</span></h2>
             <button type="button" onClick={() => setRequirements([...requirements, { question: "", required: true }])} className="text-[13px] font-semibold text-[rgb(var(--color-primary))] hover:underline">+ הוסף דרישה</button>
@@ -227,7 +227,7 @@ export default function CreateGigPage() {
           ))}
         </div>
 
-        <button type="submit" disabled={loading} className="w-full rounded-xl bg-[rgb(var(--color-primary))] py-4 text-[15px] font-semibold text-white shadow-[0_4px_16px_rgba(var(--color-primary),0.3)] transition-all hover:bg-[rgb(var(--color-primary-hover))] hover:shadow-[0_6px_20px_rgba(var(--color-primary),0.4)] disabled:opacity-40 disabled:cursor-not-allowed disabled:shadow-none">
+        <button type="submit" disabled={loading} className="w-full rounded-xl bg-[rgb(var(--color-primary))] py-4 text-[15px] font-semibold text-white shadow-md transition-all hover:bg-[rgb(var(--color-primary-hover))] disabled:opacity-40 disabled:cursor-not-allowed disabled:shadow-none">
           {loading ? <span className="flex items-center justify-center gap-2"><div className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />מפרסם...</span> : "פרסם חבילה"}
         </button>
       </form>
@@ -264,7 +264,7 @@ export default function CreateGigPage() {
                     const colors = TIER_COLORS[t.tier];
                     return (
                       <div key={t.tier} className="relative overflow-hidden rounded-xl border border-[rgb(var(--color-border))] p-4">
-                        <div className={`absolute top-0 left-0 right-0 h-1 bg-gradient-to-r ${colors.gradient}`} />
+                        <div className={`absolute top-0 left-0 right-0 h-1 ${colors.color}`} />
                         <p className="text-[12px] font-semibold text-[rgb(var(--color-text-muted))]">{colors.label}</p>
                         <p className="text-[14px] font-bold text-[rgb(var(--color-text))]">{t.title}</p>
                         <p className="mt-2 text-[20px] font-bold text-[rgb(var(--color-primary))]">₪{t.price}</p>
@@ -325,7 +325,7 @@ export default function CreateGigPage() {
                 type="button"
                 onClick={handlePublish}
                 disabled={loading}
-                className="flex-1 rounded-xl bg-[rgb(var(--color-primary))] py-3 text-[14px] font-semibold text-white shadow-[0_4px_16px_rgba(var(--color-primary),0.3)] transition-all hover:bg-[rgb(var(--color-primary-hover))] disabled:opacity-40 disabled:cursor-not-allowed"
+                className="flex-1 rounded-xl bg-[rgb(var(--color-primary))] py-3 text-[14px] font-semibold text-white shadow-md transition-all hover:bg-[rgb(var(--color-primary-hover))] disabled:opacity-40 disabled:cursor-not-allowed"
               >
                 {loading ? (
                   <span className="flex items-center justify-center gap-2">

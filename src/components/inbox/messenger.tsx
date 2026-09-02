@@ -77,7 +77,7 @@ function Avatar({ name, size = "md" }: { name: string; size?: "sm" | "md" }) {
     <div
       className={cn(
         cls,
-        "flex shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[rgb(var(--color-primary))] to-[rgb(var(--color-primary-light))] font-bold text-white"
+        "flex shrink-0 items-center justify-center rounded-full bg-primary font-bold text-white"
       )}
     >
       {initial}

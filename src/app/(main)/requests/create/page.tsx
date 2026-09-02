@@ -150,7 +150,7 @@ function CreateRequestPage() {
       )}
 
       <form onSubmit={handleSubmit} className="space-y-6">
-        <div className="rounded-xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] p-6 shadow-[0_2px_8px_rgba(var(--color-primary),0.06)]">
+        <div className="rounded-xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] p-6 shadow-sm">
           <h2 className="mb-5 text-[16px] font-bold text-[rgb(var(--color-text))]">מה אתה צריך?</h2>
           <div className="space-y-5">
             <div>
@@ -224,7 +224,7 @@ function CreateRequestPage() {
           </div>
         </div>
 
-        <div className="rounded-xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] p-6 shadow-[0_2px_8px_rgba(var(--color-primary),0.06)]">
+        <div className="rounded-xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] p-6 shadow-sm">
           <h2 className="mb-5 text-[16px] font-bold text-[rgb(var(--color-text))]">שירות ומיקום</h2>
           <div className="space-y-5">
             <div>
@@ -331,7 +331,7 @@ function CreateRequestPage() {
         <button
           type="submit"
           disabled={loading || uploadingPhotos || !visitWindow?.date || !serviceSlug || !location}
-          className="w-full rounded-xl bg-[rgb(var(--color-primary))] py-4 text-[15px] font-semibold text-white shadow-[0_4px_16px_rgba(var(--color-primary),0.3)] transition-all hover:bg-[rgb(var(--color-primary-hover))] hover:shadow-[0_6px_20px_rgba(var(--color-primary),0.4)] disabled:opacity-40 disabled:cursor-not-allowed"
+          className="w-full rounded-xl bg-[rgb(var(--color-primary))] py-4 text-[15px] font-semibold text-white shadow-md transition-all hover:bg-[rgb(var(--color-primary-hover))]  disabled:opacity-40 disabled:cursor-not-allowed"
         >
           {loading ? (
             <span className="flex items-center justify-center gap-2">

@@ -15,6 +15,7 @@ import { WazeNavigate } from "@/components/orders/waze-navigate";
 import { canShowSellerWaze } from "@/lib/waze";
 import { quoteTotal } from "@/lib/quote-price";
 import { shouldShowQuoteCompare, type AreaOverlap } from "@/lib/quote-compare";
+import { trackEvent } from "@/lib/analytics";
 
 interface ServiceRequestDetail {
   id: string;
@@ -103,6 +104,7 @@ export default function RequestDetailPage() {
         }),
       });
       if (res.ok) {
+        trackEvent("quote_submitted", { requestId: params.id as string });
         setSubmitted(true);
         setResponseMsg("");
         setProposedPrice("");
@@ -133,6 +135,7 @@ export default function RequestDetailPage() {
       });
       const data = await res.json().catch(() => ({}));
       if (res.ok && data.order?.id) {
+        trackEvent("quote_accepted", { requestId: params.id as string, orderId: data.order.id });
         router.push(`/orders/${data.order.id}`);
         return;
       }
@@ -184,7 +187,7 @@ export default function RequestDetailPage() {
         → חזרה
       </button>
 
-      <div className="rounded-xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] p-6 shadow-[0_4px_16px_rgba(var(--color-primary),0.08)]">
+      <div className="rounded-xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] p-6 shadow-md">
         <div className="flex items-start justify-between mb-4">
           <div>
             <h1 className="text-[22px] font-bold text-[rgb(var(--color-text))]">{request.title}</h1>
@@ -295,7 +298,7 @@ export default function RequestDetailPage() {
               <div key={resp.id} className="rounded-xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] p-5">
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center gap-2">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-[rgb(var(--color-primary))] to-[rgb(var(--color-primary-light))] text-[12px] font-bold text-white">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-[12px] font-bold text-white">
                       {resp.seller?.name?.[0] || "?"}
                     </div>
                     <span className="text-[14px] font-semibold text-[rgb(var(--color-text))]">{resp.seller?.name || "משתמש"}</span>
