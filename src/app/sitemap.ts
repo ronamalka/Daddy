@@ -14,7 +14,6 @@ import {
 } from "@/lib/landing-pages";
 import { getAllPosts } from "@/lib/blog";
 
-/** Builds the public sitemap: marketing pages, searchable daddies, and package URLs. */
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const now = new Date();
   const staticPages: MetadataRoute.Sitemap = MARKETING_SITEMAP_ENTRIES.map((entry) => ({

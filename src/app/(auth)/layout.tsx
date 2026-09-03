@@ -1,6 +1,10 @@
+import type { Metadata } from "next";
 import Image from "next/image";
 
-/** Shows login and signup pages next to a branding panel. */
+export const metadata: Metadata = {
+  robots: { index: false, follow: false },
+};
+
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex min-h-screen bg-[rgb(var(--color-surface-elevated))]">
