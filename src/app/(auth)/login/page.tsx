@@ -3,10 +3,11 @@
 import { signIn } from "next-auth/react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { googleAuthErrorMessage } from "@/lib/oauth-errors";
 import { safeInAppPath } from "@/lib/seller-ready";
 import { trackEvent } from "@/lib/analytics";
+import { TurnstileWidget } from "@/components/turnstile-widget";
 
 /** Shows the login form so users can sign in. */
 export default function LoginPage() {
@@ -15,6 +16,9 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
   const [nextPath, setNextPath] = useState("/");
+  const [turnstileToken, setTurnstileToken] = useState("");
+  const handleTurnstileVerify = useCallback((token: string) => setTurnstileToken(token), []);
+  const handleTurnstileExpire = useCallback(() => setTurnstileToken(""), []);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -35,6 +39,7 @@ export default function LoginPage() {
     const result = await signIn("credentials", {
       email: formData.get("email"),
       password: formData.get("password"),
+      turnstileToken,
       redirect: false,
     });
 
@@ -154,6 +159,7 @@ export default function LoginPage() {
               אבא לא שוכח. אבל אם כן...
             </Link>
           </div>
+          <TurnstileWidget onVerify={handleTurnstileVerify} onExpire={handleTurnstileExpire} />
           <button
             type="submit"
             disabled={isLoading}
