@@ -59,6 +59,10 @@
     "typescript": "^5",
     "vitest": "^4.1.10"
   },
+  "overrides": {
+    "deepmerge-ts": "^8.0.2",
+    "mysql2": "^3.24.3"
+  },
   "allowScripts": {
     "prisma@7.9.1": true,
     "@prisma/engines@7.9.1": true
