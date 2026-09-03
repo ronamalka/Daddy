@@ -15,7 +15,6 @@ const heebo = Heebo({
   display: "swap",
 });
 
-/** Site-wide defaults; `metadataBase` is resolved at request time from the env host. */
 export async function generateMetadata(): Promise<Metadata> {
   const base = await getRequestSiteUrl();
   return {
@@ -52,7 +51,6 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-/** Wraps every page with fonts, session, cookies, and shared UI. */
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   const base = getSiteUrl();
   const jsonLd = {

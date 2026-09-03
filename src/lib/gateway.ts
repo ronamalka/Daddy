@@ -6,7 +6,10 @@ const ORDERS_SERVICE = process.env.ORDERS_SERVICE_URL || "http://localhost:4003"
 const REQUESTS_SERVICE = process.env.REQUESTS_SERVICE_URL || "http://localhost:4004";
 const CHAT_SERVICE = process.env.CHAT_SERVICE_URL || "http://localhost:4005";
 
-const INTER_SERVICE_SECRET = process.env.INTER_SERVICE_SECRET || "dev-secret-change-in-production";
+if (!process.env.INTER_SERVICE_SECRET) {
+  throw new Error("INTER_SERVICE_SECRET environment variable is required");
+}
+const INTER_SERVICE_SECRET = process.env.INTER_SERVICE_SECRET;
 
 export { USERS_SERVICE, GIGS_SERVICE, ORDERS_SERVICE, REQUESTS_SERVICE, CHAT_SERVICE };
 
