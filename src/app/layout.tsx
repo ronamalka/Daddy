@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { headers } from "next/headers";
 import { Heebo } from "next/font/google";
 import Script from "next/script";
 import { SessionProvider } from "@/components/session-provider";
@@ -51,7 +52,8 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const nonce = (await headers()).get("x-nonce") ?? undefined;
   const base = getSiteUrl();
   const jsonLd = {
     "@context": "https://schema.org",
@@ -70,8 +72,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="he" dir="rtl" className={`${heebo.variable} ${heebo.className} antialiased`}>
       <head>
-        <script dangerouslySetInnerHTML={{ __html: A11Y_BOOTSTRAP_SCRIPT }} />
+        <script nonce={nonce} dangerouslySetInnerHTML={{ __html: A11Y_BOOTSTRAP_SCRIPT }} />
         <script
+          nonce={nonce}
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: serializeJsonLd(jsonLd) }}
         />
@@ -91,6 +94,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         </SessionProvider>
         {process.env.NEXT_PUBLIC_UMAMI_WEBSITE_ID && (
           <Script
+            nonce={nonce}
             src={`${process.env.NEXT_PUBLIC_UMAMI_URL || ""}/script.js`}
             data-website-id={process.env.NEXT_PUBLIC_UMAMI_WEBSITE_ID}
             strategy="afterInteractive"
