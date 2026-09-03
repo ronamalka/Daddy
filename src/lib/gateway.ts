@@ -6,16 +6,17 @@ const ORDERS_SERVICE = process.env.ORDERS_SERVICE_URL || "http://localhost:4003"
 const REQUESTS_SERVICE = process.env.REQUESTS_SERVICE_URL || "http://localhost:4004";
 const CHAT_SERVICE = process.env.CHAT_SERVICE_URL || "http://localhost:4005";
 
-if (!process.env.INTER_SERVICE_SECRET) {
-  throw new Error("INTER_SERVICE_SECRET environment variable is required");
+function getInterServiceSecret(): string {
+  const secret = process.env.INTER_SERVICE_SECRET;
+  if (!secret) throw new Error("INTER_SERVICE_SECRET environment variable is required");
+  return secret;
 }
-const INTER_SERVICE_SECRET = process.env.INTER_SERVICE_SECRET;
 
 export { USERS_SERVICE, GIGS_SERVICE, ORDERS_SERVICE, REQUESTS_SERVICE, CHAT_SERVICE };
 
 /** Signs a string with HMAC-SHA256 using the shared service secret. */
 export function signPayload(payload: string): string {
-  return crypto.createHmac("sha256", INTER_SERVICE_SECRET).update(payload).digest("hex");
+  return crypto.createHmac("sha256", getInterServiceSecret()).update(payload).digest("hex");
 }
 
 interface ProxyOptions {
@@ -30,7 +31,7 @@ export async function proxyRequest(serviceUrl: string, path: string, options: Pr
   const { method = "GET", body, user } = options;
 
   const serviceSignature = crypto
-    .createHmac("sha256", INTER_SERVICE_SECRET)
+    .createHmac("sha256", getInterServiceSecret())
     .update("service-call")
     .digest("hex");
 
