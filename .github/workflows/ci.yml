@@ -89,6 +89,8 @@ jobs:
         env:
           DATABASE_URL: "postgresql://dummy:dummy@localhost:5432/dummy"
       - run: npm run test:unit
+        env:
+          INTER_SERVICE_SECRET: "test-secret-for-ci"
 
   integration-tests:
     name: System & E2E Tests
