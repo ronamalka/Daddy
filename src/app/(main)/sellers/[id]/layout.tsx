@@ -7,7 +7,6 @@ type SellerLayoutProps = {
   params: Promise<{ id: string }>;
 };
 
-/** Per-profile title, description, and LocalBusiness / Person JSON-LD. */
 export async function generateMetadata({ params }: SellerLayoutProps): Promise<Metadata> {
   const { id } = await params;
   const seller = await loadSellerSeo(id);
@@ -17,7 +16,6 @@ export async function generateMetadata({ params }: SellerLayoutProps): Promise<M
   return sellerPageMetadata(seller);
 }
 
-/** Wraps a public daddy profile with crawler metadata. */
 export default async function SellerProfileLayout({ children, params }: SellerLayoutProps) {
   const { id } = await params;
   const seller = await loadSellerSeo(id);

@@ -14,6 +14,7 @@ import { checkLockout, recordFailedAttempt, resetAttempts } from "./account-lock
 import { getRedis } from "./redis";
 import { logSecurityEvent } from "./security-logger";
 import { isPasswordWeak } from "./password-policy";
+import { verifyTurnstileToken } from "./turnstile";
 import { OAUTH_INTENT_COOKIE, parseOauthRole } from "./oauth-intent";
 import "./auth-types";
 
@@ -59,11 +60,20 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       credentials: {
         email: { label: "Email", type: "email" },
         password: { label: "Password", type: "password" },
+        turnstileToken: { label: "Turnstile", type: "text" },
       },
       async authorize(credentials) {
         const email = credentials?.email as string;
         const password = credentials?.password as string;
+        const turnstileToken = credentials?.turnstileToken as string | undefined;
         if (!email || !password) return null;
+
+        if (turnstileToken) {
+          const valid = await verifyTurnstileToken(turnstileToken);
+          if (!valid) return null;
+        } else if (process.env.TURNSTILE_SECRET_KEY) {
+          return null;
+        }
 
         try {
           const lockout = await checkLockout(email);

@@ -2,7 +2,10 @@ import { Request, Response, NextFunction } from "express";
 import crypto from "crypto";
 import { AuthUser } from "./types";
 
-const INTER_SERVICE_SECRET = process.env.INTER_SERVICE_SECRET || "dev-secret-change-in-production";
+if (!process.env.INTER_SERVICE_SECRET) {
+  throw new Error("INTER_SERVICE_SECRET environment variable is required");
+}
+const INTER_SERVICE_SECRET = process.env.INTER_SERVICE_SECRET;
 
 declare global {
   namespace Express {

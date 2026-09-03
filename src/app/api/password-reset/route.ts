@@ -7,6 +7,7 @@ import { verifyTurnstileToken } from "@/lib/turnstile";
 import { detectBot } from "@/lib/bot-detection";
 import { enforceRateLimit } from "@/lib/rate-limit-redis";
 import { logger } from "@/lib/logger";
+import { revokeSessionsForUser } from "@/lib/session-revoke";
 
 const requestResetSchema = z.object({
   email: z.string().email().max(254),
@@ -102,6 +103,13 @@ export async function POST(request: NextRequest) {
       method: "POST",
       body: result.data,
     });
+
+    if (status === 200 && data && typeof data === "object" && "userId" in data) {
+      revokeSessionsForUser((data as { userId: string }).userId).catch((err) => {
+        logger.error({ err }, "Failed to revoke sessions after password reset");
+      });
+    }
+
     return NextResponse.json(data, { status });
   }
 

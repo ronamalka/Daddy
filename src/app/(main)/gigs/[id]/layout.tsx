@@ -7,7 +7,6 @@ type GigLayoutProps = {
   params: Promise<{ id: string }>;
 };
 
-/** Per-package title, description, and Service JSON-LD. */
 export async function generateMetadata({ params }: GigLayoutProps): Promise<Metadata> {
   const { id } = await params;
   const gig = await loadGigSeo(id);
@@ -17,7 +16,6 @@ export async function generateMetadata({ params }: GigLayoutProps): Promise<Meta
   return gigPageMetadata(gig);
 }
 
-/** Wraps a public package page with crawler metadata. */
 export default async function GigDetailLayout({ children, params }: GigLayoutProps) {
   const { id } = await params;
   const gig = await loadGigSeo(id);
