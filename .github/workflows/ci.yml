@@ -114,6 +114,8 @@ jobs:
       - name: Start services with docker-compose
         run: docker compose -f docker-compose.yml -f docker-compose.ci.yml up -d --build
         timeout-minutes: 10
+        env:
+          INTER_SERVICE_SECRET: "test-secret-for-ci"
 
       - name: Wait for services to be healthy
         run: |
