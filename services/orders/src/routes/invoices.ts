@@ -3,7 +3,10 @@ import { requireAuth } from "../../../shared/middleware";
 import { prisma } from "../index";
 
 const USERS_SERVICE = process.env.USERS_SERVICE_URL || "http://localhost:4001";
-const INTER_SERVICE_SECRET = process.env.INTER_SERVICE_SECRET || "dev-secret-change-in-production";
+if (!process.env.INTER_SERVICE_SECRET) {
+  throw new Error("INTER_SERVICE_SECRET environment variable is required");
+}
+const INTER_SERVICE_SECRET = process.env.INTER_SERVICE_SECRET;
 
 const VAT_RATE_MURSHE = 0.18;
 

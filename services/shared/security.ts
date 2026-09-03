@@ -44,6 +44,24 @@ export const passwordResetRateLimit = rateLimit({
   legacyHeaders: false,
 });
 
+export const otpSendRateLimit = rateLimit({
+  windowMs: 60 * 60 * 1000,
+  max: 5,
+  message: { error: "יותר מדי בקשות OTP. נסה שוב מאוחר יותר" },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+/** Validate password meets strength requirements (matches frontend rules). */
+export function validatePassword(password: string): string | null {
+  if (password.length < 8) return "הסיסמה חייבת להכיל לפחות 8 תווים";
+  if (!/[A-Z]/.test(password)) return "הסיסמה חייבת להכיל אות גדולה (A-Z)";
+  if (!/[a-z]/.test(password)) return "הסיסמה חייבת להכיל אות קטנה (a-z)";
+  if (!/[0-9]/.test(password)) return "הסיסמה חייבת להכיל ספרה (0-9)";
+  if (!/[^a-zA-Z0-9]/.test(password)) return "הסיסמה חייבת להכיל תו מיוחד (!@#$...)";
+  return null;
+}
+
 // ClusterIP services only see the BFF pod IP, and OpenShift probes hit
 // /health every few seconds. A 300 cap is exhausted by probes alone, which
 // then 429s seller gigs and chat DMs for every user on the platform.
