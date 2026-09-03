@@ -6,7 +6,14 @@ import { validateBody } from "@/lib/validate";
 
 const profileUpdateSchema = z.object({
   name: z.string().min(1).max(100).optional(),
-  phone: z.string().max(20).optional().nullable(),
+  phone: z.string().max(20).optional().nullable().refine(
+    (v) => {
+      if (!v) return true;
+      const cleaned = v.replace(/[-\s().]/g, "");
+      return /^0[2-9]\d{7,8}$/.test(cleaned) || /^\+972[2-9]\d{7,8}$/.test(cleaned);
+    },
+    { message: "מספר טלפון לא תקין. דוגמה: 050-1234567" }
+  ),
   bio: z.string().max(1000).optional().nullable(),
   avatar: z.string().max(500).optional().nullable(),
   city: z.string().max(100).optional().nullable(),
