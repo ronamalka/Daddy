@@ -1,6 +1,7 @@
 import { Router, Request, Response } from "express";
 import { compare, hash } from "bcryptjs";
 import { requireAuth } from "../../../shared/middleware";
+import { validatePassword } from "../../../shared/security";
 import { prisma } from "../index";
 import { evaluateSellerReadiness } from "../seller-ready";
 
@@ -162,8 +163,13 @@ profileRoutes.put("/password", requireAuth, async (req: Request, res: Response) 
     return;
   }
 
-  if (typeof newPassword !== "string" || newPassword.length < 8) {
-    res.status(400).json({ error: "הסיסמה חייבת להכיל לפחות 8 תווים" });
+  if (typeof newPassword !== "string") {
+    res.status(400).json({ error: "נדרשת סיסמה חדשה" });
+    return;
+  }
+  const passwordError = validatePassword(newPassword);
+  if (passwordError) {
+    res.status(400).json({ error: passwordError });
     return;
   }
 

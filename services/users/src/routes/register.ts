@@ -4,6 +4,7 @@ import { prisma } from "../db";
 import { createAndSendVerification } from "./email-verify";
 import { logger } from "../../../shared/logger";
 import { logEvent } from "../../../shared/analytics";
+import { validatePassword } from "../../../shared/security";
 import { userRegistrations } from "../metrics";
 
 /** Routes for creating a new account. */
@@ -24,8 +25,9 @@ registerRoutes.post("/", async (req: Request, res: Response) => {
     return;
   }
 
-  if (password.length < 6) {
-    res.status(400).json({ error: "Password must be at least 6 characters" });
+  const passwordError = validatePassword(password);
+  if (passwordError) {
+    res.status(400).json({ error: passwordError });
     return;
   }
 
