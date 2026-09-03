@@ -44,6 +44,14 @@ export const passwordResetRateLimit = rateLimit({
   legacyHeaders: false,
 });
 
+export const otpSendRateLimit = rateLimit({
+  windowMs: 60 * 60 * 1000,
+  max: 5,
+  message: { error: "יותר מדי בקשות OTP. נסה שוב מאוחר יותר" },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
 /** Validate password meets strength requirements (matches frontend rules). */
 export function validatePassword(password: string): string | null {
   if (password.length < 8) return "הסיסמה חייבת להכיל לפחות 8 תווים";

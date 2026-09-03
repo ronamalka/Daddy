@@ -115,5 +115,5 @@ passwordResetRoutes.post("/reset", async (req: Request, res: Response) => {
     data: { usedAt: new Date() },
   });
 
-  res.json({ message: "Password has been reset successfully" });
+  res.json({ message: "Password has been reset successfully", userId: reset.userId });
 });

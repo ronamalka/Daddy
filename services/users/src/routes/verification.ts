@@ -45,8 +45,8 @@ verificationRoutes.post("/phone/send", requireAuth, async (req: Request, res: Re
     },
   });
 
-  // Actual SMS delivery is issue #52. For now, log the code.
-  logger.info({ phone: user.phone, code }, "OTP code generated");
+  // Actual SMS delivery is issue #52.
+  logger.info({ phone: user.phone }, "OTP code generated");
 
   res.json({ sent: true, phone: user.phone.replace(/.(?=.{4})/g, "*") });
 });
@@ -84,7 +84,9 @@ verificationRoutes.post("/phone/check", requireAuth, async (req: Request, res: R
     return;
   }
 
-  if (otp.code !== code) {
+  const codeMatch = otp.code.length === code.length &&
+    crypto.timingSafeEqual(Buffer.from(otp.code), Buffer.from(code));
+  if (!codeMatch) {
     await prisma.phoneOtp.update({
       where: { id: otp.id },
       data: { attempts: otp.attempts + 1 },
