@@ -2,8 +2,6 @@ apiVersion: route.openshift.io/v1
 kind: Route
 metadata:
   name: umami
-  annotations:
-    cert-utils-operator.redhat-cop.io/certs-from-secret: aballeh-tls
 spec:
   host: analytics.aballeh.com
   to:
@@ -14,3 +12,5 @@ spec:
   tls:
     termination: edge
     insecureEdgeTerminationPolicy: Redirect
+    externalCertificate:
+      name: aballeh-tls
