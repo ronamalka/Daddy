@@ -2,6 +2,7 @@ import { Router, Request, Response } from "express";
 import { compare, hash } from "bcryptjs";
 import { requireAuth } from "../../../shared/middleware";
 import { validatePassword } from "../../../shared/security";
+import { toE164 } from "../../../shared/whatsapp";
 import { prisma } from "../index";
 import { evaluateSellerReadiness } from "../seller-ready";
 
@@ -112,12 +113,25 @@ profileRoutes.put("/", requireAuth, async (req: Request, res: Response) => {
     return;
   }
 
+  let normalizedPhone: string | null | undefined = undefined;
+  if (phone !== undefined) {
+    if (phone === null || phone === "") {
+      normalizedPhone = null;
+    } else {
+      normalizedPhone = toE164(phone);
+      if (!normalizedPhone) {
+        res.status(400).json({ error: "מספר טלפון לא תקין. דוגמה: 050-1234567" });
+        return;
+      }
+    }
+  }
+
   const updated = await prisma.user.update({
     where: { id: req.user!.id },
     data: {
       ...(name && { name }),
       ...(bio !== undefined && { bio }),
-      ...(phone !== undefined && { phone }),
+      ...(normalizedPhone !== undefined && { phone: normalizedPhone }),
       ...(city !== undefined && { city }),
       ...(cityCode !== undefined && { cityCode }),
       ...(districtCode !== undefined && { districtCode }),
