@@ -40,6 +40,8 @@ export default function CreateGigPage() {
   const [showPreview, setShowPreview] = useState(false);
   const [catalogCategories, setCatalogCategories] = useState<ServiceCategory[]>([]);
   const [catalogLoading, setCatalogLoading] = useState(true);
+  const [imageUploading, setImageUploading] = useState(false);
+  const [imageError, setImageError] = useState("");
 
   useEffect(() => {
     fetch("/api/service-prices")
@@ -86,6 +88,30 @@ export default function CreateGigPage() {
     const tierData = getValidTiers();
     if (tierData.length === 0) { setError("נדרשת לפחות חבילת מחיר אחת"); return; }
     setShowPreview(true);
+  }
+
+  async function handleImageUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setImageError("");
+    setImageUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      const res = await fetch("/api/upload", { method: "POST", body: formData });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.files?.[0]?.url) {
+          setImage(data.files[0].url);
+        }
+      } else {
+        const data = await res.json().catch(() => ({}));
+        setImageError((data as { error?: string }).error || "העלאת התמונה נכשלה");
+      }
+    } catch {
+      setImageError("העלאת התמונה נכשלה");
+    }
+    setImageUploading(false);
   }
 
   /** Creates the gig and opens its page. */
@@ -159,7 +185,21 @@ export default function CreateGigPage() {
             <div><label className="mb-2 block text-[13px] font-semibold text-[rgb(var(--color-text-secondary))]">כותרת השירות</label><input value={title} onChange={(e) => setTitle(e.target.value)} required placeholder="אני אעשה משהו מדהים" className={inputClass} /></div>
             <div><label className="mb-2 block text-[13px] font-semibold text-[rgb(var(--color-text-secondary))]">קטגוריה</label><select value={categoryId} onChange={(e) => setCategoryId(e.target.value)} required className={inputClass}><option value="">בחר קטגוריה מהמחירון</option>{catalogCategories.map((cat) => <option key={cat.slug} value={cat.slug}>{cat.nameHe}</option>)}</select></div>
             <div><label className="mb-2 block text-[13px] font-semibold text-[rgb(var(--color-text-secondary))]">תיאור</label><textarea value={description} onChange={(e) => setDescription(e.target.value)} required rows={5} placeholder="תאר את השירות שלך בפירוט..." className={inputClass} /></div>
-            <div><label className="mb-2 block text-[13px] font-semibold text-[rgb(var(--color-text-secondary))]">קישור לתמונה <span className="font-normal text-[rgb(var(--color-text-muted))] text-[13px]">(אופציונלי)</span></label><input value={image} onChange={(e) => setImage(e.target.value)} placeholder="https://..." className={inputClass} /></div>
+            <div>
+              <label className="mb-2 block text-[13px] font-semibold text-[rgb(var(--color-text-secondary))]">תמונת שירות <span className="font-normal text-[rgb(var(--color-text-muted))] text-[13px]">(אופציונלי)</span></label>
+              <div className="flex items-center gap-4">
+                {image && (
+                  <img src={image} alt="תמונת שירות" className="h-16 w-16 rounded-xl object-cover border border-[rgb(var(--color-border))]" />
+                )}
+                <div>
+                  <input type="file" accept="image/jpeg,image/png,image/webp" onChange={handleImageUpload} className="hidden" id="gig-image-upload" disabled={imageUploading} />
+                  <label htmlFor="gig-image-upload" className={`inline-block cursor-pointer rounded-xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface-elevated))] px-4 py-2.5 text-[13px] font-semibold text-[rgb(var(--color-text-secondary))] transition-all hover:border-[rgb(var(--color-primary))] hover:text-[rgb(var(--color-primary))] ${imageUploading ? "opacity-40 cursor-not-allowed" : ""}`}>
+                    {imageUploading ? "מעלה..." : image ? "החלף תמונה" : "העלה תמונה"}
+                  </label>
+                  {imageError && <p className="mt-1.5 text-[12px] text-[rgb(var(--color-error))]">{imageError}</p>}
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 

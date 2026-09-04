@@ -8,6 +8,11 @@ import { validateBody } from "@/lib/validate";
 /** Returns gigs with seller details. Can filter by district query param. */
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
+  const district = searchParams.get("district");
+  const requestedLimit = parseInt(searchParams.get("limit") || "20", 10);
+  if (district) {
+    searchParams.set("limit", String(requestedLimit * 3));
+  }
   const params = searchParams.toString();
   const path = params ? `/gigs?${params}` : "/gigs";
   const { data, status } = await proxyRequest(GIGS_SERVICE, path);
@@ -39,17 +44,17 @@ export async function GET(request: Request) {
     seller: sellerMap[gig.sellerId] || { id: gig.sellerId, name: "משתמש", avatar: null },
   })).filter((gig: { seller: { acceptingJobs?: boolean } }) => gig.seller.acceptingJobs !== false);
 
-  const district = searchParams.get("district");
   if (district) {
     enriched = enriched.filter((gig: { seller: { serviceAreas?: { districtName: string }[] } }) =>
       gig.seller.serviceAreas?.some((a: { districtName: string }) => a.districtName === district)
     );
   }
 
-  const filteredTotal = district || enriched.length !== data.gigs.length ? enriched.length : data.total;
-  const filteredHasMore = district || enriched.length !== data.gigs.length ? false : data.hasMore;
+  const wasFiltered = district || enriched.length !== data.gigs.length;
+  const sliced = wasFiltered ? enriched.slice(0, requestedLimit) : enriched;
+  const filteredHasMore = wasFiltered ? enriched.length > requestedLimit || data.hasMore : data.hasMore;
 
-  return NextResponse.json({ gigs: enriched, total: filteredTotal, hasMore: filteredHasMore });
+  return NextResponse.json({ gigs: sliced, total: wasFiltered ? enriched.length : data.total, hasMore: filteredHasMore });
 }
 
 /** Creates a new gig. Only sellers may call this. */

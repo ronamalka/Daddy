@@ -79,13 +79,13 @@ export default function AdminPage() {
     if (session?.user?.role !== "ADMIN") return;
 
     Promise.all([
-      fetch("/api/admin/stats").then((r) => r.json()),
-      fetch("/api/admin/users").then((r) => r.json()),
-      fetch("/api/admin/queue").then((r) => r.json()),
+      fetch("/api/admin/stats").then((r) => r.json()).catch(() => null),
+      fetch("/api/admin/users").then((r) => r.json()).catch(() => []),
+      fetch("/api/admin/queue").then((r) => r.json()).catch(() => ({ items: [] })),
     ]).then(([statsData, usersData, queueData]) => {
-      setStats(statsData);
-      setUsers(usersData);
-      setQueueItems(Array.isArray(queueData.items) ? queueData.items : []);
+      if (statsData) setStats(statsData);
+      setUsers(Array.isArray(usersData) ? usersData : []);
+      setQueueItems(Array.isArray(queueData?.items) ? queueData.items : []);
       setLoading(false);
     });
   }, [session]);

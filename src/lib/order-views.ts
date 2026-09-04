@@ -111,7 +111,7 @@ export function formatSlotClock(start: Date, end: Date): string {
 
 /** Returns a Hebrew month name and year. */
 export function formatMonthHeading(year: number, month: number): string {
-  return `${HEBREW_MONTHS[month - 1]} ${year}`;
+  return `${HEBREW_MONTHS[month - 1] ?? HEBREW_MONTHS[0]} ${year}`;
 }
 
 /** Moves a year and month by delta months. */

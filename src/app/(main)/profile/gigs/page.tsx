@@ -21,6 +21,7 @@ export default function MyGigsPage() {
   const { data: session } = useSession();
   const [gigs, setGigs] = useState<GigItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     if (!session?.user?.id) return;
@@ -30,13 +31,21 @@ export default function MyGigsPage() {
         setGigs(data.gigs || []);
         setLoading(false);
       })
-      .catch(() => setLoading(false));
+      .catch(() => { setLoading(false); setError("לא הצלחנו לטעון את הנתונים"); });
   }, [session?.user?.id]);
 
   if (!session || session.user.role !== "SELLER") {
     return (
       <div className="flex flex-col items-center justify-center py-20">
         <p className="text-[16px] text-[rgb(var(--color-text-secondary))]">גישה למוכרים בלבד</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="mx-auto max-w-3xl px-4 py-16 text-center">
+        <p className="text-[16px] text-[rgb(var(--color-error))]">{error}</p>
       </div>
     );
   }
