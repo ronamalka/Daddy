@@ -14,10 +14,14 @@ test.describe("Local job reviews", () => {
 
     const completeBtn = page.getByRole("button", { name: "אשר קבלה" });
     await expect(completeBtn).toBeVisible();
-    await completeBtn.click();
+    const [completeRes] = await Promise.all([
+      page.waitForResponse((r) => r.url().includes("/api/orders/") && r.request().method() === "PATCH"),
+      completeBtn.click(),
+    ]);
+    expect(completeRes.ok()).toBeTruthy();
 
     const writeReview = page.getByRole("button", { name: "כתוב חוות דעת" });
-    await expect(writeReview).toBeVisible({ timeout: 10000 });
+    await expect(writeReview).toBeVisible({ timeout: 15000 });
     await writeReview.click();
 
     await expect(page.getByText("לחץ על הציון המתאים בכל קריטריון (1-10)")).toBeVisible();

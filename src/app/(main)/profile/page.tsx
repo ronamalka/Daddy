@@ -62,123 +62,50 @@ export default function ProfilePage() {
         <div className="relative h-36 bg-primary">
         </div>
 
-        <div className="relative px-8 pb-8">
-          <div className="flex flex-col items-center -mt-14 sm:flex-row sm:items-end sm:gap-6">
-            <div className="flex h-28 w-28 items-center justify-center rounded-full border-4 border-[rgb(var(--color-surface))] bg-primary text-4xl font-bold text-white shadow-md">
+        <div className="relative px-6 pb-8">
+          {/* Profile header */}
+          <div className="flex flex-col items-center -mt-14 sm:flex-row sm:items-end sm:gap-5">
+            <div className="flex h-24 w-24 shrink-0 items-center justify-center rounded-full border-4 border-[rgb(var(--color-surface))] bg-primary text-3xl font-bold text-white shadow-md">
               {session.user.name[0]}
             </div>
-            <div className="mt-4 text-center sm:mt-0 sm:text-left sm:pb-1 flex-1">
-              <h1 className="text-[24px] font-bold text-[rgb(var(--color-text))]">{session.user.name}</h1>
-              <p className="mt-0.5 text-[14px] text-[rgb(var(--color-text-secondary))]">{session.user.email}</p>
+            <div className="mt-3 text-center sm:mt-0 sm:text-right sm:pb-1 flex-1 min-w-0">
+              <div className="flex items-center justify-center sm:justify-start gap-2">
+                <h1 className="text-[22px] font-bold text-[rgb(var(--color-text))] truncate">{session.user.name}</h1>
+                <span className={`shrink-0 rounded-full px-3 py-0.5 text-[12px] font-semibold ${roleStyle.bg} ${roleStyle.text}`}>
+                  {roleStyle.label}
+                </span>
+              </div>
+              <p className="mt-0.5 text-[14px] text-[rgb(var(--color-text-secondary))] truncate">{session.user.email}</p>
             </div>
-            <div className="flex flex-wrap items-center justify-center gap-3 mt-3 sm:mt-0 sm:mb-2 sm:justify-end">
-              <span className={`rounded-full px-4 py-1.5 text-[13px] font-semibold ${roleStyle.bg} ${roleStyle.text}`}>
-                {roleStyle.label}
-              </span>
-              <Link
-                href="/profile/edit"
-                className="rounded-full border border-[rgb(var(--color-border))] px-4 py-1.5 text-[13px] font-semibold text-[rgb(var(--color-text-secondary))] hover:border-[rgb(var(--color-primary))] hover:text-[rgb(var(--color-primary))] transition-all"
-              >
-                ערוך
-              </Link>
-              <Link
-                href="/profile/service-areas"
-                className="rounded-full border border-[rgb(var(--color-border))] px-4 py-1.5 text-[13px] font-semibold text-[rgb(var(--color-text-secondary))] hover:border-[rgb(var(--color-accent))] hover:text-[rgb(var(--color-accent))] transition-all flex items-center gap-1.5"
-              >
-                <MapPin className="h-3.5 w-3.5" />
-                אזורי שירות
-              </Link>
-              <Link
-                href="/profile/addresses"
-                className="rounded-full border border-[rgb(var(--color-border))] px-4 py-1.5 text-[13px] font-semibold text-[rgb(var(--color-text-secondary))] hover:border-[rgb(var(--color-accent))] hover:text-[rgb(var(--color-accent))] transition-all flex items-center gap-1.5"
-              >
-                <House className="h-3.5 w-3.5" />
-                כתובות
-              </Link>
-              <Link
-                href="/profile/services"
-                className="rounded-full border border-[rgb(var(--color-border))] px-4 py-1.5 text-[13px] font-semibold text-[rgb(var(--color-text-secondary))] hover:border-[rgb(var(--color-primary))] hover:text-[rgb(var(--color-primary))] transition-all flex items-center gap-1.5"
-              >
-                <Package className="h-3.5 w-3.5" />
-                שירותים
-              </Link>
-              <Link
-                href="/profile/prices"
-                className="rounded-full border border-[rgb(var(--color-border))] px-4 py-1.5 text-[13px] font-semibold text-[rgb(var(--color-text-secondary))] hover:border-[rgb(var(--color-accent-yellow))] hover:text-[rgb(var(--color-warning))] transition-all flex items-center gap-1.5"
-              >
-                <CurrencyDollar className="h-3.5 w-3.5" />
-                מחירון
-              </Link>
-              <Link
-                href="/profile/payments"
-                className="rounded-full border border-[rgb(var(--color-border))] px-4 py-1.5 text-[13px] font-semibold text-[rgb(var(--color-text-secondary))] hover:border-[rgb(var(--color-success))] hover:text-[rgb(var(--color-success))] transition-all flex items-center gap-1.5"
-              >
-                <CreditCard className="h-3.5 w-3.5" />
-                תשלומים
-              </Link>
-              {session.user.role === "SELLER" && (
-                <Link
-                  href="/profile/availability"
-                  className="rounded-full border border-[rgb(var(--color-border))] px-4 py-1.5 text-[13px] font-semibold text-[rgb(var(--color-text-secondary))] hover:border-[rgb(var(--color-primary))] hover:text-[rgb(var(--color-primary))] transition-all flex items-center gap-1.5"
-                >
-                  <CalendarBlank className="h-3.5 w-3.5" />
-                  זמינות
-                </Link>
-              )}
-              <Link
-                href="/profile/verification"
-                className="rounded-full border border-[rgb(var(--color-border))] px-4 py-1.5 text-[13px] font-semibold text-[rgb(var(--color-text-secondary))] hover:border-[rgb(var(--color-success))] hover:text-[rgb(var(--color-success))] transition-all flex items-center gap-1.5"
-              >
-                <ShieldCheck className="h-3.5 w-3.5" />
-                אימותים
-              </Link>
-              {session.user.role === "SELLER" && (
-                <Link
-                  href="/profile/gigs"
-                  className="rounded-full border border-[rgb(var(--color-border))] px-4 py-1.5 text-[13px] font-semibold text-[rgb(var(--color-text-secondary))] hover:border-[rgb(var(--color-primary))] hover:text-[rgb(var(--color-primary))] transition-all flex items-center gap-1.5"
-                >
-                  <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 12h16.5m-16.5 3.75h16.5M3.75 19.5h16.5M5.625 4.5h12.75a1.875 1.875 0 010 3.75H5.625a1.875 1.875 0 010-3.75z" />
-                  </svg>
-                  החבילות שלי
-                </Link>
-              )}
-              <Link
-                href="/profile/notifications"
-                className="rounded-full border border-[rgb(var(--color-border))] px-4 py-1.5 text-[13px] font-semibold text-[rgb(var(--color-text-secondary))] hover:border-[rgb(var(--color-accent))] hover:text-[rgb(var(--color-accent))] transition-all flex items-center gap-1.5"
-              >
-                <Bell className="h-3.5 w-3.5" />
-                התראות
-              </Link>
-              {session.user.role === "SELLER" && (
-                <Link
-                  href="/profile/tax"
-                  className="rounded-full border border-[rgb(var(--color-border))] px-4 py-1.5 text-[13px] font-semibold text-[rgb(var(--color-text-secondary))] hover:border-[rgb(var(--color-accent))] hover:text-[rgb(var(--color-accent))] transition-all flex items-center gap-1.5"
-                >
-                  <Receipt className="h-3.5 w-3.5" />
-                  פרופיל עסקי
-                </Link>
-              )}
+            <Link
+              href="/profile/edit"
+              className="mt-3 sm:mt-0 sm:mb-1 shrink-0 rounded-lg border border-[rgb(var(--color-border))] px-4 py-2 text-[13px] font-semibold text-[rgb(var(--color-text-secondary))] hover:border-[rgb(var(--color-primary))] hover:text-[rgb(var(--color-primary))] transition-all"
+            >
+              ערוך פרופיל
+            </Link>
+          </div>
+
+          {/* Navigation */}
+          <nav className="mt-5 -mx-6 px-6 overflow-x-auto scrollbar-hide">
+            <div className="flex gap-1 min-w-max pb-1">
+              <NavLink href="/profile/addresses" icon={<House className="h-4 w-4" />} label="כתובות" />
+              <NavLink href="/profile/services" icon={<Package className="h-4 w-4" />} label="שירותים" />
+              <NavLink href="/profile/prices" icon={<CurrencyDollar className="h-4 w-4" />} label="מחירון" />
+              <NavLink href="/profile/payments" icon={<CreditCard className="h-4 w-4" />} label="תשלומים" />
+              <NavLink href="/profile/verification" icon={<ShieldCheck className="h-4 w-4" />} label="אימותים" />
+              <NavLink href="/profile/notifications" icon={<Bell className="h-4 w-4" />} label="התראות" />
+              <NavLink href="/profile/service-areas" icon={<MapPin className="h-4 w-4" />} label="אזורי שירות" />
               {session.user.role === "SELLER" && (
                 <>
-                  <Link
-                    href="/profile/subscription"
-                    className="rounded-full border border-[rgb(var(--color-border))] px-4 py-1.5 text-[13px] font-semibold text-[rgb(var(--color-text-secondary))] hover:border-[rgb(var(--color-accent-yellow))] hover:text-[rgb(var(--color-warning))] transition-all flex items-center gap-1.5"
-                  >
-                    <Crown className="h-3.5 w-3.5" />
-                    מנוי פרימיום
-                  </Link>
-                  <Link
-                    href="/profile/commission"
-                    className="rounded-full border border-[rgb(var(--color-border))] px-4 py-1.5 text-[13px] font-semibold text-[rgb(var(--color-text-secondary))] hover:border-[rgb(var(--color-success))] hover:text-[rgb(var(--color-success))] transition-all flex items-center gap-1.5"
-                  >
-                    <ChartLineUp className="h-3.5 w-3.5" />
-                    עמלות ודרגות
-                  </Link>
+                  <NavLink href="/profile/availability" icon={<CalendarBlank className="h-4 w-4" />} label="זמינות" />
+                  <NavLink href="/profile/gigs" icon={<Package className="h-4 w-4" />} label="החבילות שלי" />
+                  <NavLink href="/profile/tax" icon={<Receipt className="h-4 w-4" />} label="פרופיל עסקי" />
+                  <NavLink href="/profile/subscription" icon={<Crown className="h-4 w-4" />} label="מנוי פרימיום" />
+                  <NavLink href="/profile/commission" icon={<ChartLineUp className="h-4 w-4" />} label="עמלות ודרגות" />
                 </>
               )}
             </div>
-          </div>
+          </nav>
 
           {readiness && (
             <div className="mt-6">
@@ -258,6 +185,18 @@ export default function ProfilePage() {
         </div>
       </div>
     </div>
+  );
+}
+
+function NavLink({ href, icon, label }: { href: string; icon: React.ReactNode; label: string }) {
+  return (
+    <Link
+      href={href}
+      className="flex items-center gap-1.5 rounded-lg px-3 py-2 text-[13px] font-medium text-[rgb(var(--color-text-secondary))] hover:bg-[rgba(var(--color-primary),0.08)] hover:text-[rgb(var(--color-primary))] transition-all whitespace-nowrap"
+    >
+      {icon}
+      {label}
+    </Link>
   );
 }
 

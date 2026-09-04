@@ -104,6 +104,14 @@ body {
   background-color: rgb(var(--color-text-muted));
 }
 
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
 /* ========================================
    Selection & Focus
    ======================================== */
