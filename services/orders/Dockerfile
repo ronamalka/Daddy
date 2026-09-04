@@ -5,8 +5,9 @@ WORKDIR /app/services/orders
 COPY services/orders/package.json services/orders/package-lock.json* ./
 RUN npm install
 
-COPY services/shared/ /app/services/shared/
+COPY services/shared/package.json services/shared/package-lock.json* /app/services/shared/
 RUN cd /app/services/shared && npm install
+COPY services/shared/ /app/services/shared/
 COPY services/tsconfig.base.json /app/services/tsconfig.base.json
 COPY services/orders/ ./
 
