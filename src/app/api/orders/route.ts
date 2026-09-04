@@ -171,6 +171,10 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Gig not found" }, { status: 404 });
   }
 
+  if (gig.sellerId === user.id) {
+    return NextResponse.json({ error: "לא ניתן להזמין שירות של עצמך" }, { status: 400 });
+  }
+
   const pricingTier = gig.tiers?.find((t: { tier: string }) => t.tier === tier);
   if (!pricingTier) {
     return NextResponse.json({ error: "Invalid tier" }, { status: 400 });
@@ -188,6 +192,7 @@ export async function POST(request: Request) {
       gigId,
       sellerId: gig.sellerId,
       tier,
+      title: gig.title,
       price: pricingTier.price,
       slotStart: parsedSlot.slot.start.toISOString(),
       slotEnd: parsedSlot.slot.end.toISOString(),

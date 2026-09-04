@@ -31,7 +31,7 @@ const onTheWaySchema = z
 
 const otherStatusSchema = z
   .object({
-    status: z.enum(["IN_PROGRESS", "COMPLETED", "CANCELLED"]),
+    status: z.enum(["IN_PROGRESS"]),
   })
   .strict();
 

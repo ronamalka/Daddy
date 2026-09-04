@@ -45,7 +45,7 @@ verificationRoutes.post("/phone/send", requireAuth, async (req: Request, res: Re
     },
   });
 
-  // Actual SMS delivery is issue #52.
+  // TODO(launch): Integrate real SMS provider (Twilio / Vonage) — issue #52
   logger.info({ phone: user.phone }, "OTP code generated");
 
   res.json({ sent: true, phone: user.phone.replace(/.(?=.{4})/g, "*") });
