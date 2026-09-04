@@ -31,7 +31,10 @@ export function SlotPicker({ sellerId, value, onChange }: SlotPickerProps) {
   useEffect(() => {
     setLoading(true);
     fetch(`/api/sellers/${sellerId}/availability`)
-      .then((res) => res.json())
+      .then((res) => {
+        if (!res.ok) throw new Error("fetch failed");
+        return res.json();
+      })
       .then((payload: SellerAvailability) => {
         setData(payload);
         const first = payload.slots?.[0]?.date ?? null;
