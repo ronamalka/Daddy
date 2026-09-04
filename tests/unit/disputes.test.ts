@@ -63,13 +63,13 @@ describe("parseDisputeInput", () => {
     const result = parseDisputeInput({
       reason: "QUALITY",
       description: "הדלת עקומה",
-      photos: ["/uploads/a.jpg", "https://cdn.example.com/b.png"],
+      photos: ["/uploads/a.jpg", "/uploads/b.png"],
     });
     expect(result).toEqual({
       ok: true,
       reason: "QUALITY",
       description: "הדלת עקומה",
-      photos: ["/uploads/a.jpg", "https://cdn.example.com/b.png"],
+      photos: ["/uploads/a.jpg", "/uploads/b.png"],
     });
   });
 
