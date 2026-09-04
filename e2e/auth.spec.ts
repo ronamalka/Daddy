@@ -12,7 +12,7 @@ test.describe("Auth Flow", () => {
     await expect(page.getByText("אישורים משפטיים")).toBeVisible({ timeout: 10000 });
     await page.getByPlaceholder("ישראל ישראלי").fill("ישראל ישראלי");
     await page.getByPlaceholder("you@example.com").fill("consent@example.com");
-    await page.getByPlaceholder(/לפחות 8 תווים/).fill("Password1!");
+    await page.getByPlaceholder(/לפחות 8 תווים/).fill("E2eTestP@ss2026!");
     await page.getByRole("button", { name: "המשך" }).click();
     await expect(page.getByRole("heading", { name: "בוא נכיר" })).toBeVisible();
   });
@@ -118,9 +118,11 @@ test.describe("Auth Flow", () => {
     await page.goto("/register");
     await page.getByPlaceholder("ישראל ישראלי").fill("Test User");
     await page.getByPlaceholder("you@example.com").fill("admin@daddy.com");
-    await page.getByPlaceholder(/לפחות 8 תווים/).fill("Password1!");
+    await page.getByPlaceholder(/לפחות 8 תווים/).fill("E2eTestP@ss2026!");
     await page.getByRole("checkbox", { name: /תנאי השימוש/ }).check();
     await page.getByRole("checkbox", { name: /18/ }).check();
+    // Wait for the password breach check to complete before proceeding
+    await expect(page.getByText(/לא נמצאה בדליפות ידועות/)).toBeVisible({ timeout: 15000 });
     await page.getByRole("button", { name: "המשך" }).click();
     await expect(page.getByRole("heading", { name: "איפה אתה פועל?" })).toBeVisible();
     await page.getByRole("button", { name: "דלג, אבחר אחר כך" }).click();
