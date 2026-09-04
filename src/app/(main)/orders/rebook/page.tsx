@@ -78,7 +78,7 @@ function RebookContent() {
           setBuyerSuppliesMaterials(data.buyerSuppliesMaterials ?? true);
         }
       })
-      .catch(() => {})
+      .catch(() => { setError("לא הצלחנו לטעון את פרטי ההזמנה הקודמת"); })
       .finally(() => setLoading(false));
   }, [fromOrderId, sellerId]);
 

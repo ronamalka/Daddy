@@ -157,9 +157,12 @@ export default function VerificationPage() {
         setMessage("תעודת הזהות הוגשה לבדיקה");
         setIdentityUrl("");
         fetchStatus();
+      } else {
+        const data = await res.json().catch(() => null);
+        setMessage(data?.error || "שגיאה בהגשת תעודת הזהות");
       }
     } catch {
-      // ignore
+      setMessage("שגיאת רשת");
     } finally {
       setIdentitySubmitting(false);
     }
@@ -180,9 +183,12 @@ export default function VerificationPage() {
         setLicenseUrl("");
         setLicenseType("");
         fetchStatus();
+      } else {
+        const data = await res.json().catch(() => null);
+        setMessage(data?.error || "שגיאה בהגשת הרישיון");
       }
     } catch {
-      // ignore
+      setMessage("שגיאת רשת");
     } finally {
       setLicenseSubmitting(false);
     }

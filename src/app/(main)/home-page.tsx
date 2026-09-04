@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useSession } from "next-auth/react";
 import { ALL_SERVICES, canonicalizeCategorySlug, getServiceBySlug } from "@/lib/services";
 import {
@@ -46,6 +46,10 @@ export function HomePage({ initialFeaturedDaddies, initialLiveReviews, initialRe
   const [reqWindow, setReqWindow] = useState<VisitWindowValue | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [requestError, setRequestError] = useState("");
+  const [turnstileToken, setTurnstileToken] = useState("");
+  const handleTurnstileVerify = useCallback((token: string) => setTurnstileToken(token), []);
+  const handleTurnstileExpire = useCallback(() => setTurnstileToken(""), []);
   const featuredDaddies = initialFeaturedDaddies;
   const liveReviews = initialLiveReviews;
   const requestTeasers = initialRequestTeasers;
@@ -128,20 +132,23 @@ export function HomePage({ initialFeaturedDaddies, initialLiveReviews, initialRe
           cityName: selectedCity?.cityName ?? null,
           slotStart,
           slotEnd,
+          turnstileToken: turnstileToken || undefined,
         }),
       });
       if (!res.ok) {
+        setRequestError("לא הצלחנו לשלוח את הבקשה. נסה שנית.");
         setSubmitting(false);
         return;
       }
       setSubmitted(true);
+      setRequestError("");
       setReqTitle("");
       setReqDesc("");
       setReqWindow(null);
       setShowRequestForm(false);
       setTimeout(() => setSubmitted(false), 4000);
     } catch {
-      // Keep the form open so the buyer can retry.
+      setRequestError("שגיאת רשת — הבקשה לא נשלחה.");
     }
     setSubmitting(false);
   }
@@ -189,6 +196,9 @@ export function HomePage({ initialFeaturedDaddies, initialLiveReviews, initialRe
         submitting={submitting}
         submitRequest={submitRequest}
         submitted={submitted}
+        requestError={requestError}
+        onTurnstileVerify={handleTurnstileVerify}
+        onTurnstileExpire={handleTurnstileExpire}
       />
     );
   }

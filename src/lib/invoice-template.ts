@@ -24,7 +24,7 @@ export function renderInvoiceHtml(invoice: InvoiceData): string {
   });
 
   const isMurshe = invoice.sellerOsekType === "murshe";
-  const title = isMurshe ? "חשבונית מס / קבלה" : "חשבונית מס";
+  const title = isMurshe ? "חשבונית מס" : "חשבונית עסקה / קבלה";
   const vatPercent = Math.round(invoice.vatRate * 100);
 
   const formatCurrency = (amount: number) =>

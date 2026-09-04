@@ -63,7 +63,7 @@ export default function ProfilePricesPage() {
         setPrices(merged);
         setLoading(false);
       })
-      .catch(() => setLoading(false));
+      .catch(() => { setLoading(false); setError("לא הצלחנו לטעון את הנתונים"); });
   }, []);
 
   /** Updates one field on a listed service price. */

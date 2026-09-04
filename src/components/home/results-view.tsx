@@ -10,6 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { VisitWindowFields, type VisitWindowValue } from "@/components/visit-window-fields";
 import { CityFilter, type SelectedCity } from "@/components/city-filter";
+import { TurnstileWidget } from "@/components/turnstile-widget";
 
 export type ProviderSort = "distance" | "price" | "rating";
 export type PricingFilter = "all" | "fixed" | "quote";
@@ -39,6 +40,9 @@ interface ResultsViewProps {
   submitting: boolean;
   submitRequest: () => void;
   submitted: boolean;
+  requestError?: string;
+  onTurnstileVerify?: (token: string) => void;
+  onTurnstileExpire?: () => void;
 }
 
 function distanceLabel(p: Provider): string | null {
@@ -54,6 +58,7 @@ export function ResultsView({
   sortBy, setSortBy, pricing, setPricing, pricePreset, setPricePreset,
   resetSearch, session, showRequestForm, setShowRequestForm,
   reqTitle, setReqTitle, reqDesc, setReqDesc, reqWindow, setReqWindow, submitting, submitRequest, submitted,
+  requestError, onTurnstileVerify, onTurnstileExpire,
 }: ResultsViewProps) {
   const locationLabel = selectedCity?.cityName;
 
@@ -189,6 +194,14 @@ export function ResultsView({
                   <div className="mb-3 text-right">
                     <VisitWindowFields value={reqWindow} onChange={setReqWindow} />
                   </div>
+                  {onTurnstileVerify && (
+                    <div className="mb-3">
+                      <TurnstileWidget onVerify={onTurnstileVerify} onExpire={onTurnstileExpire} />
+                    </div>
+                  )}
+                  {requestError && (
+                    <p className="mb-3 text-[13px] font-medium text-[rgb(var(--color-error))]">{requestError}</p>
+                  )}
                   <div className="flex gap-3">
                     <Button variant="outline" className="flex-1" onClick={() => setShowRequestForm(false)}>ביטול</Button>
                     <Button className="flex-1" onClick={submitRequest} disabled={submitting || !reqTitle.trim() || !reqDesc.trim() || !reqWindow?.date}>
