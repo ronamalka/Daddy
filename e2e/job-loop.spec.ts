@@ -113,8 +113,12 @@ test.describe("Real job loop", () => {
       await expect(buyer.page.getByText("החלפתי את הברז, הישן בשקית")).toBeVisible();
       await expect(buyer.page.getByText("בדקו את התמונות ואשרו שהעבודה הושלמה.")).toBeVisible();
       await expect(buyer.page.getByRole("button", { name: "אשר קבלה" })).toBeVisible();
-      await buyer.page.getByRole("button", { name: "אשר קבלה" }).click();
-      await expect(buyer.page.getByRole("button", { name: "כתוב חוות דעת" })).toBeVisible({ timeout: 10000 });
+      const [completeRes] = await Promise.all([
+        buyer.page.waitForResponse((r) => r.url().includes("/api/orders/") && r.request().method() === "PATCH"),
+        buyer.page.getByRole("button", { name: "אשר קבלה" }).click(),
+      ]);
+      expect(completeRes.ok()).toBeTruthy();
+      await expect(buyer.page.getByRole("button", { name: "כתוב חוות דעת" })).toBeVisible({ timeout: 15000 });
       await buyer.page.getByRole("button", { name: "כתוב חוות דעת" }).click();
       const reviewOpenedAt = Date.now();
       await expect(buyer.page.getByText("לחץ על הציון המתאים בכל קריטריון (1-10)")).toBeVisible();
