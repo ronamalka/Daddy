@@ -28,7 +28,7 @@ export default function ProfileServicesPage() {
         setMuted(Object.fromEntries(rows.map((row) => [row.serviceSlug, row.alertsMuted])));
         setLoading(false);
       })
-      .catch(() => setLoading(false));
+      .catch(() => { setLoading(false); setError("לא הצלחנו לטעון את הנתונים"); });
   }, []);
 
   /** Saves the list of services this seller offers and per-service request-alert mutes. */
@@ -91,7 +91,7 @@ export default function ProfileServicesPage() {
           <div className="h-8 w-8 animate-spin rounded-full border-4 border-[rgba(var(--color-primary),0.1)] border-t-[rgb(var(--color-primary))]" />
         </div>
       ) : (
-        <div className="rounded-2xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] p-6 shadow-[0_2px_8px_rgba(var(--color-primary),0.06)]">
+        <div className="rounded-2xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] p-6 shadow-sm">
           <ServicePicker selected={services} onChange={setServices} />
 
           {services.length > 0 && (

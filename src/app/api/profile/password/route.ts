@@ -5,6 +5,7 @@ import { proxyRequest, USERS_SERVICE } from "@/lib/gateway";
 import { validateBody } from "@/lib/validate";
 import { passwordSchema, checkBreachedPassword } from "@/lib/password-policy";
 import { logSecurityEvent, extractClientInfo } from "@/lib/security-logger";
+import { revokeSessionsForUser } from "@/lib/session-revoke";
 
 const changePasswordSchema = z.object({
   currentPassword: z.string().min(1).max(128),
@@ -42,6 +43,8 @@ export async function PUT(request: NextRequest) {
       outcome: "success",
       ...extractClientInfo(request),
     });
+
+    revokeSessionsForUser(session.user.id).catch(() => {});
   }
 
   return NextResponse.json(data ?? { error: "Service unavailable" }, { status });

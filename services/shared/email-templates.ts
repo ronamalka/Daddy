@@ -65,6 +65,31 @@ export function verificationEmail(name: string, link: string): string {
   `);
 }
 
+/** Email sent when someone tries to register with an already-registered address. */
+export function accountExistsEmail(name: string, resetLink: string): string {
+  return layout(`
+    <h2 style="margin:0 0 12px;font-size:20px;font-weight:700;color:#1e293b;">שלום ${name},</h2>
+    <p style="margin:0 0 20px;font-size:15px;line-height:1.6;color:#475569;">
+      מישהו ניסה להירשם לאבאל׳ה עם כתובת האימייל הזו, אבל כבר קיים חשבון על השם הזה.
+    </p>
+    <p style="margin:0 0 20px;font-size:15px;line-height:1.6;color:#475569;">
+      אם זה היית את/ה, אפשר להתחבר לחשבון הקיים. אם שכחת את הסיסמה, לחץ למטה כדי לאפס אותה.
+    </p>
+    <table width="100%" cellpadding="0" cellspacing="0">
+      <tr>
+        <td align="center" style="padding:8px 0 24px;">
+          <a href="${resetLink}" style="display:inline-block;background-color:#2563eb;color:#ffffff;font-size:16px;font-weight:600;text-decoration:none;padding:14px 36px;border-radius:12px;">
+            איפוס סיסמה
+          </a>
+        </td>
+      </tr>
+    </table>
+    <p style="margin:0;font-size:13px;line-height:1.5;color:#94a3b8;">
+      אם לא ניסית להירשם, אפשר להתעלם מהאימייל הזה. החשבון שלך בטוח.
+    </p>
+  `);
+}
+
 /** Email with a password-reset link. */
 export function passwordResetEmail(name: string, link: string): string {
   return layout(`

@@ -10,6 +10,7 @@ import {
 import { DisputeReason, DisputeStatus, PaymentAction, OrderStatus } from "../generated/prisma/client";
 import { releasePayment, refundPayment } from "../lib/escrow";
 import { logger } from "../../../shared/logger";
+import { logEvent } from "../../../shared/analytics";
 
 /** Open a dispute, list them for admin, and record a staff decision. */
 export const disputeRoutes = Router();
@@ -52,6 +53,16 @@ disputeRoutes.post("/:id/disputes", requireAuth, async (req: Request, res: Respo
       description: parsed.description,
       photos: parsed.photos,
     },
+  });
+
+  logEvent(prisma, {
+    eventName: "order.disputed",
+    eventCategory: "order",
+    actorId: req.user!.id,
+    actorRole: order.buyerId === req.user!.id ? "buyer" : "seller",
+    entityType: "dispute",
+    entityId: dispute.id,
+    properties: { orderId, reason: parsed.reason, price: order.price },
   });
 
   res.status(201).json(dispute);

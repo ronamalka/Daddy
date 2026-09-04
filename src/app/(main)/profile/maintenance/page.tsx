@@ -45,6 +45,7 @@ export default function ProfileMaintenancePage() {
   const { data: session } = useSession();
   const [plan, setPlan] = useState<MaintenancePlan | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
   const [cancelling, setCancelling] = useState(false);
 
   useEffect(() => {
@@ -61,7 +62,7 @@ export default function ProfileMaintenancePage() {
         if (data && data.id) setPlan(data);
         setLoading(false);
       })
-      .catch(() => setLoading(false));
+      .catch(() => { setLoading(false); setError("לא הצלחנו לטעון את הנתונים"); });
   }, [session]);
 
   async function handleCancel() {
@@ -99,6 +100,14 @@ export default function ProfileMaintenancePage() {
     return (
       <div className="flex items-center justify-center py-20">
         <div className="h-10 w-10 animate-spin rounded-full border-4 border-[rgba(var(--color-primary),0.1)] border-t-[rgb(var(--color-primary))]" />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="mx-auto max-w-2xl px-4 py-16 text-center">
+        <p className="text-[16px] text-[rgb(var(--color-error))]">{error}</p>
       </div>
     );
   }

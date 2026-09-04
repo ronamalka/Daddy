@@ -9,6 +9,7 @@ import { cn } from "@/lib/utils";
 import { messagePreviewText } from "@/lib/message-validation";
 import { AttachmentBubble } from "@/components/chat/attachment-bubble";
 import { ComposerAttach } from "@/components/chat/composer-attach";
+import { trackEvent } from "@/lib/analytics";
 
 export interface Conversation {
   otherUserId: string;
@@ -77,7 +78,7 @@ function Avatar({ name, size = "md" }: { name: string; size?: "sm" | "md" }) {
     <div
       className={cn(
         cls,
-        "flex shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[rgb(var(--color-primary))] to-[rgb(var(--color-primary-light))] font-bold text-white"
+        "flex shrink-0 items-center justify-center rounded-full bg-primary font-bold text-white"
       )}
     >
       {initial}
@@ -105,6 +106,7 @@ export function MessengerInbox({ peerId }: { peerId?: string }) {
   const [attachError, setAttachError] = useState("");
   const [attachBusy, setAttachBusy] = useState(false);
   const [sending, setSending] = useState(false);
+  const [sendError, setSendError] = useState("");
   const [newFromId, setNewFromId] = useState<string | null>(null);
   const [orderTitles, setOrderTitles] = useState<Record<string, string>>({});
   const bottomRef = useRef<HTMLDivElement>(null);
@@ -179,11 +181,11 @@ export function MessengerInbox({ peerId }: { peerId?: string }) {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ senderId: otherId }),
         });
-        emitMessagesChanged();
         loadConversations();
       }
     }
 
+    trackEvent("chat_opened", { peerId: otherId });
     loadThread(true);
     const interval = setInterval(() => loadThread(true), 4000);
     return () => {
@@ -211,23 +213,30 @@ export function MessengerInbox({ peerId }: { peerId?: string }) {
     e.preventDefault();
     if ((!draft.trim() && !attachment) || !peerId || sending || attachBusy) return;
     setSending(true);
-    const res = await fetch("/api/messages", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        receiverId: peerId,
-        content: draft,
-        ...(attachment ? { attachment } : {}),
-      }),
-    });
-    if (res.ok) {
-      const created = await res.json();
-      setMessages((prev) => [...prev, created]);
-      setDraft("");
-      setAttachment(null);
-      setAttachError("");
-      emitMessagesChanged();
-      loadConversations();
+    setSendError("");
+    try {
+      const res = await fetch("/api/messages", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          receiverId: peerId,
+          content: draft,
+          ...(attachment ? { attachment } : {}),
+        }),
+      });
+      if (res.ok) {
+        const created = await res.json();
+        setMessages((prev) => [...prev, created]);
+        setDraft("");
+        setAttachment(null);
+        setAttachError("");
+        emitMessagesChanged();
+        loadConversations();
+      } else {
+        setSendError("לא הצלחנו לשלוח את ההודעה. נסה שנית.");
+      }
+    } catch {
+      setSendError("שגיאת רשת — ההודעה לא נשלחה.");
     }
     setSending(false);
   }
@@ -425,6 +434,9 @@ export function MessengerInbox({ peerId }: { peerId?: string }) {
         </div>
         {attachError && (
           <p className="mx-auto mt-2 max-w-2xl text-[12px] text-[rgb(var(--color-error))]">{attachError}</p>
+        )}
+        {sendError && (
+          <p className="mx-auto mt-2 max-w-2xl text-[12px] text-[rgb(var(--color-error))]">{sendError}</p>
         )}
       </form>
     </div>

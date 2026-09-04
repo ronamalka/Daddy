@@ -63,7 +63,7 @@ export default function ProfilePricesPage() {
         setPrices(merged);
         setLoading(false);
       })
-      .catch(() => setLoading(false));
+      .catch(() => { setLoading(false); setError("לא הצלחנו לטעון את הנתונים"); });
   }, []);
 
   /** Updates one field on a listed service price. */
@@ -148,7 +148,7 @@ export default function ProfilePricesPage() {
           </button>
         </div>
       ) : (
-        <div className="rounded-xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] shadow-[0_2px_8px_rgba(var(--color-primary),0.06)]">
+        <div className="rounded-xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] shadow-sm">
           <div className="px-6 py-4 bg-[rgb(var(--color-bg))] border-b border-[rgb(var(--color-border-light))] rounded-t-xl">
             <p className="text-[13px] text-[rgb(var(--color-text-secondary))]">
               הגדר מחיר עבודה לכל שירות, וציין אם החומרים כלולים או שהלקוח מביא אותם. שירותים ללא מחיר לא יופיעו במחירון הפומבי שלך.

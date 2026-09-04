@@ -15,6 +15,7 @@ export default function EditProfilePage() {
   const [name, setName] = useState("");
   const [bio, setBio] = useState("");
   const [phone, setPhone] = useState("");
+  const [phoneError, setPhoneError] = useState("");
   const [city, setCity] = useState("");
   const [cityCode, setCityCode] = useState<number | undefined>(undefined);
   const [districtCode, setDistrictCode] = useState<number | undefined>(undefined);
@@ -26,6 +27,7 @@ export default function EditProfilePage() {
   const [payoutAccountNumber, setPayoutAccountNumber] = useState("");
 
   useEffect(() => {
+    if (!session?.user) return;
     fetch("/api/profile")
       .then((r) => r.json())
       .then((data) => {
@@ -42,8 +44,9 @@ export default function EditProfilePage() {
           setPayoutAccountNumber(data.payoutAccountNumber || "");
         }
         setLoading(false);
-      });
-  }, []);
+      })
+      .catch(() => { setLoading(false); setError("לא הצלחנו לטעון את הפרופיל"); });
+  }, [session]);
 
   if (!session) {
     return <div className="flex items-center justify-center py-20"><p className="text-[rgb(var(--color-text-secondary))]">התחבר כדי לערוך את הפרופיל.</p></div>;
@@ -60,9 +63,21 @@ export default function EditProfilePage() {
     setDistrictCode(val.districtCode);
   }, []);
 
+  /** Validates an Israeli phone number (05X-XXXXXXX or +972XXXXXXXXX). */
+  function isValidIsraeliPhone(value: string): boolean {
+    if (!value) return true;
+    const cleaned = value.replace(/[-\s().]/g, "");
+    return /^0[2-9]\d{7,8}$/.test(cleaned) || /^\+972[2-9]\d{7,8}$/.test(cleaned);
+  }
+
   /** Saves the user's profile details. */
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    setPhoneError("");
+    if (phone && !isValidIsraeliPhone(phone)) {
+      setPhoneError("מספר טלפון לא תקין. דוגמה: 050-1234567");
+      return;
+    }
     setSaving(true);
     setError("");
     try {
@@ -139,8 +154,21 @@ export default function EditProfilePage() {
             onChange={handleLocationChange}
           />
           <div>
-            <label className="mb-2 block text-[13px] font-semibold text-[rgb(var(--color-text-secondary))]">טלפון</label>
-            <input value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="050-0000000" className={inputClass} />
+            <label htmlFor="phone" className="mb-2 block text-[13px] font-semibold text-[rgb(var(--color-text-secondary))]">טלפון</label>
+            <input
+              id="phone"
+              type="tel"
+              inputMode="tel"
+              autoComplete="tel"
+              dir="ltr"
+              value={phone}
+              onChange={(e) => { setPhone(e.target.value); setPhoneError(""); }}
+              placeholder="050-1234567"
+              className={`${inputClass}${phoneError ? " border-[rgb(var(--color-error))]" : ""}`}
+            />
+            {phoneError && (
+              <p className="mt-1.5 text-[12px] text-[rgb(var(--color-error))]">{phoneError}</p>
+            )}
           </div>
           <div>
             <label className="mb-2 block text-[13px] font-semibold text-[rgb(var(--color-text-secondary))]">ביו</label>
@@ -204,7 +232,7 @@ export default function EditProfilePage() {
           <p role="alert" className="text-[13px] font-medium text-[rgb(var(--color-error))]">{error}</p>
         )}
 
-        <button type="submit" disabled={saving} className="w-full rounded-xl bg-[rgb(var(--color-primary))] py-4 text-[15px] font-semibold text-white shadow-[0_4px_16px_rgba(var(--color-primary),0.3)] transition-all hover:bg-[rgb(var(--color-primary-hover))] disabled:opacity-40 disabled:cursor-not-allowed">
+        <button type="submit" disabled={saving} className="w-full rounded-xl bg-[rgb(var(--color-primary))] py-4 text-[15px] font-semibold text-white shadow-md transition-all hover:bg-[rgb(var(--color-primary-hover))] disabled:opacity-40 disabled:cursor-not-allowed">
           {saving ? "שומר..." : "שמור שינויים"}
         </button>
       </form>

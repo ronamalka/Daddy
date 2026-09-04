@@ -283,9 +283,9 @@ export default function SellerProfilePage() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="mb-6 overflow-hidden rounded-2xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] shadow-[0_4px_16px_rgba(var(--color-primary),0.08)]"
+        className="mb-6 overflow-hidden rounded-2xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] shadow-md"
       >
-        <div className="relative h-40 bg-gradient-to-r from-[rgb(var(--color-primary))] via-[rgb(var(--color-primary-light))] to-[rgb(var(--color-accent))]">
+        <div className="relative h-40 bg-primary">
           <div className="absolute inset-0 overflow-hidden">
             <div className="absolute -top-16 -right-16 h-56 w-56 rounded-full bg-white/10" />
             <div className="absolute -bottom-10 -left-10 h-40 w-40 rounded-full bg-white/5" />
@@ -297,7 +297,7 @@ export default function SellerProfilePage() {
           <div className="flex flex-col items-center -mt-14 sm:flex-row sm:items-end sm:gap-6">
             {/* Avatar */}
             <div className="relative">
-              <div className="relative flex h-28 w-28 items-center justify-center overflow-hidden rounded-full border-4 border-[rgb(var(--color-surface))] bg-gradient-to-br from-[rgb(var(--color-primary))] to-[rgb(var(--color-primary-light))] text-4xl font-bold text-white shadow-[0_4px_16px_rgba(var(--color-primary),0.25)]">
+              <div className="relative flex h-28 w-28 items-center justify-center overflow-hidden rounded-full border-4 border-[rgb(var(--color-surface))] bg-primary text-4xl font-bold text-white shadow-md">
                 {seller.avatar ? (
                   <Image src={seller.avatar} alt={seller.name} fill className="rounded-full object-cover" unoptimized />
                 ) : (
@@ -505,14 +505,14 @@ export default function SellerProfilePage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2, duration: 0.5 }}
-          className="mb-6 rounded-2xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] p-6 shadow-[0_2px_8px_rgba(var(--color-primary),0.06)]"
+          className="mb-6 rounded-2xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] p-6 shadow-sm"
         >
           <div className="flex items-center justify-between mb-5">
             <h2 className="text-[18px] font-bold text-[rgb(var(--color-text))]">דירוג מפורט</h2>
             <span className="text-[13px] text-[rgb(var(--color-text-muted))]">מבוסס על {rb.count} חוות דעת</span>
           </div>
           <div className="flex flex-col md:flex-row gap-6">
-            <div className="flex flex-col items-center justify-center rounded-xl bg-gradient-to-br from-[rgb(var(--color-primary))] to-[rgb(var(--color-primary-light))] p-6 text-white min-w-[140px]">
+            <div className="flex flex-col items-center justify-center rounded-xl bg-primary p-6 text-white min-w-[140px]">
               <p className="text-[42px] font-bold leading-none">
                 <AnimatedCounter value={rb.overall} />
               </p>
@@ -535,7 +535,7 @@ export default function SellerProfilePage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3, duration: 0.5 }}
-          className="mb-6 rounded-2xl border border-[rgba(var(--color-primary),0.2)] bg-[rgba(var(--color-primary),0.04)] p-6 backdrop-blur-sm"
+          className="mb-6 rounded-2xl border border-[rgba(var(--color-primary),0.2)] bg-[rgba(var(--color-primary),0.04)] p-6"
         >
           <div className="flex items-center gap-2 mb-4">
             <ChatCircleDots className="h-5 w-5 text-[rgb(var(--color-primary))]" />
@@ -562,7 +562,7 @@ export default function SellerProfilePage() {
                 <button
                   type="submit"
                   disabled={!msgText.trim() || msgSending}
-                  className="flex items-center gap-2 rounded-xl bg-[rgb(var(--color-primary))] px-6 py-3 text-[14px] font-semibold text-white transition-all hover:bg-[rgb(var(--color-primary-hover))] hover:shadow-[0_4px_16px_rgba(var(--color-primary),0.25)] disabled:opacity-40"
+                  className="flex items-center gap-2 rounded-xl bg-[rgb(var(--color-primary))] px-6 py-3 text-[14px] font-semibold text-white transition-all hover:bg-[rgb(var(--color-primary-hover))] hover:shadow-md disabled:opacity-40"
                 >
                   <PaperPlaneTilt className="h-4 w-4" />
                   שלח
@@ -649,7 +649,7 @@ function ReviewsTab({ reviews }: { reviews: ReviewData[] }) {
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: index * 0.05 }}
-          className="rounded-2xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] p-5 transition-all hover:shadow-[0_2px_8px_rgba(var(--color-primary),0.06)]"
+          className="rounded-2xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] p-5 transition-all hover:shadow-sm"
         >
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-3">

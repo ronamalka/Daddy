@@ -80,6 +80,9 @@ export default function RequestDetailPage() {
       .then((data) => {
         if (data.request) {
           setRequest(data.request);
+          for (const resp of data.request.responses || []) {
+            trackEvent("quote_viewed", { requestId: data.request.id, sellerId: resp.seller?.id || "" });
+          }
         }
         setLoading(false);
       })
@@ -187,7 +190,7 @@ export default function RequestDetailPage() {
         → חזרה
       </button>
 
-      <div className="rounded-xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] p-6 shadow-[0_4px_16px_rgba(var(--color-primary),0.08)]">
+      <div className="rounded-xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] p-6 shadow-md">
         <div className="flex items-start justify-between mb-4">
           <div>
             <h1 className="text-[22px] font-bold text-[rgb(var(--color-text))]">{request.title}</h1>
@@ -298,7 +301,7 @@ export default function RequestDetailPage() {
               <div key={resp.id} className="rounded-xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] p-5">
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center gap-2">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-[rgb(var(--color-primary))] to-[rgb(var(--color-primary-light))] text-[12px] font-bold text-white">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-[12px] font-bold text-white">
                       {resp.seller?.name?.[0] || "?"}
                     </div>
                     <span className="text-[14px] font-semibold text-[rgb(var(--color-text))]">{resp.seller?.name || "משתמש"}</span>

@@ -8,6 +8,7 @@ type ConversationRow = {
   lastMessage: {
     id: string;
     content: string;
+    attachment: string | null;
     senderId: string;
     receiverId: string;
     orderId: string | null;

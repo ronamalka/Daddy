@@ -37,7 +37,7 @@ export default function ServiceAreasPage() {
         }
         setLoading(false);
       })
-      .catch(() => setLoading(false));
+      .catch(() => { setLoading(false); setError("לא הצלחנו לטעון את הנתונים"); });
   }, []);
 
   /** Saves the seller's service areas. */
@@ -105,7 +105,7 @@ export default function ServiceAreasPage() {
           <div className="h-8 w-8 animate-spin rounded-full border-4 border-[rgba(var(--color-primary),0.1)] border-t-[rgb(var(--color-primary))]" />
         </div>
       ) : (
-        <div className="rounded-2xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] p-6 shadow-[0_2px_8px_rgba(var(--color-primary),0.06)]">
+        <div className="rounded-2xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] p-6 shadow-sm">
           <LocationPicker
             mode="multi"
             areas={areas}

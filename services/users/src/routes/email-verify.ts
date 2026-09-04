@@ -4,6 +4,7 @@ import { prisma } from "../db";
 import { sendEmail } from "../../../shared/email";
 import { verificationEmail } from "../../../shared/email-templates";
 import { logger } from "../../../shared/logger";
+import { logEvent } from "../../../shared/analytics";
 
 /** Routes for email verification. */
 export const emailVerifyRoutes = Router();
@@ -91,6 +92,14 @@ emailVerifyRoutes.get("/verify", async (req: Request, res: Response) => {
   await prisma.user.update({
     where: { id: verification.userId },
     data: { emailVerified: true },
+  });
+
+  logEvent(prisma, {
+    eventName: "user.verified",
+    eventCategory: "user",
+    actorId: verification.userId,
+    entityType: "user",
+    entityId: verification.userId,
   });
 
   res.json({ message: "Email verified successfully", verified: true });

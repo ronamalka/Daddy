@@ -59,7 +59,7 @@ export default function GigDetailPage() {
   const [related, setRelated] = useState<RelatedGig[]>([]);
   const [activeImage, setActiveImage] = useState(0);
   const [flaggingReviewId, setFlaggingReviewId] = useState<string | null>(null);
-  const [flagReason, setFlagReason] = useState("");
+  const [flagReason, setFlagReason] = useState<Record<string, string>>({});
   const [flaggedReviews, setFlaggedReviews] = useState<Set<string>>(new Set());
   const [orderError, setOrderError] = useState<string | null>(null);
   const [selectedSlot, setSelectedSlot] = useState<SlotOption | null>(null);
@@ -68,16 +68,17 @@ export default function GigDetailPage() {
 
   /** Reports a review with the reason the user typed. */
   async function flagReview(reviewId: string) {
-    if (!flagReason.trim()) return;
+    const reason = flagReason[reviewId] || "";
+    if (!reason.trim()) return;
     const res = await fetch(`/api/reviews/${reviewId}/flag`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ reason: flagReason }),
+      body: JSON.stringify({ reason }),
     });
     if (res.ok) {
       setFlaggedReviews((prev) => new Set(prev).add(reviewId));
       setFlaggingReviewId(null);
-      setFlagReason("");
+      setFlagReason((prev) => { const next = { ...prev }; delete next[reviewId]; return next; });
     }
   }
 
@@ -231,7 +232,7 @@ export default function GigDetailPage() {
 
           {/* Seller Info */}
           <Link href={`/sellers/${gig.seller?.id ?? ""}`} className="mb-6 flex items-center gap-3 group">
-            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-[rgb(var(--color-primary))] to-[rgb(var(--color-primary-light))] text-[14px] font-bold text-white">
+            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary text-[14px] font-bold text-white">
               {sellerName[0]}
             </div>
             <div>
@@ -328,7 +329,7 @@ export default function GigDetailPage() {
                 {gig.reviews.map((review) => (
                   <div key={review.id} className="py-4 first:pt-0 last:pb-0">
                     <div className="mb-2 flex items-center gap-3">
-                      <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-[rgb(var(--color-accent))] to-[rgb(var(--color-success))] text-[12px] font-bold text-white">
+                      <div className="flex h-9 w-9 items-center justify-center rounded-full bg-accent text-[12px] font-bold text-white">
                         {(review.user?.name || "משתמש")[0]}
                       </div>
                       <div className="flex-1">
@@ -344,15 +345,15 @@ export default function GigDetailPage() {
                     </div>
 
                     {/* Sub-ratings */}
-                    {(review.communicationRating || review.qualityRating || review.timelinessRating) && (
+                    {(review.communicationRating != null || review.qualityRating != null || review.timelinessRating != null) && (
                       <div className="mb-2 flex flex-wrap gap-3 text-[12px]">
-                        {review.communicationRating && (
+                        {review.communicationRating != null && (
                           <span className="text-[rgb(var(--color-text-secondary))]">תקשורת: <span className="font-semibold text-[rgb(var(--color-text))]">{review.communicationRating}/5</span></span>
                         )}
-                        {review.qualityRating && (
+                        {review.qualityRating != null && (
                           <span className="text-[rgb(var(--color-text-secondary))]">איכות: <span className="font-semibold text-[rgb(var(--color-text))]">{review.qualityRating}/5</span></span>
                         )}
-                        {review.timelinessRating && (
+                        {review.timelinessRating != null && (
                           <span className="text-[rgb(var(--color-text-secondary))]">עמידה בזמנים: <span className="font-semibold text-[rgb(var(--color-text))]">{review.timelinessRating}/5</span></span>
                         )}
                       </div>
@@ -381,21 +382,21 @@ export default function GigDetailPage() {
                         ) : (
                           <div className="flex gap-2 mt-1">
                             <input
-                              value={flagReason}
-                              onChange={(e) => setFlagReason(e.target.value)}
+                              value={flagReason[review.id] || ""}
+                              onChange={(e) => setFlagReason((prev) => ({ ...prev, [review.id]: e.target.value }))}
                               placeholder="סיבת הדיווח..."
                               aria-label="סיבת הדיווח על ביקורת"
                               className="flex-1 rounded-[8px] border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] px-3 py-1.5 text-[12px] focus:border-[rgb(var(--color-accent-warm))] focus:outline-none"
                             />
                             <button
                               onClick={() => flagReview(review.id)}
-                              disabled={!flagReason.trim()}
+                              disabled={!(flagReason[review.id] || "").trim()}
                               className="rounded-[8px] bg-[rgb(var(--color-accent-warm))] px-3 py-1.5 text-[12px] font-semibold text-white hover:bg-[rgb(var(--color-error))] disabled:opacity-40"
                             >
                               דווח
                             </button>
                             <button
-                              onClick={() => { setFlaggingReviewId(null); setFlagReason(""); }}
+                              onClick={() => { setFlaggingReviewId(null); }}
                               className="rounded-[8px] border border-[rgb(var(--color-border))] px-2 py-1.5 text-[12px] text-[rgb(var(--color-text-secondary))] hover:bg-[rgb(var(--color-surface-elevated))]"
                             >
                               ביטול
@@ -437,7 +438,7 @@ export default function GigDetailPage() {
 
         {/* Right Column — Pricing */}
         <div>
-          <div className="sticky top-4 overflow-hidden rounded-2xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] shadow-[0_4px_16px_rgba(var(--color-primary),0.08)]">
+          <div className="sticky top-4 overflow-hidden rounded-2xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] shadow-md">
             {/* Tier Tabs */}
             <div className="flex border-b border-[rgb(var(--color-border))]">
               {sortedTiers.map((tier) => {
@@ -445,7 +446,7 @@ export default function GigDetailPage() {
                 return (
                   <button
                     key={tier.tier}
-                    onClick={() => setSelectedTier(tier.tier)}
+                    onClick={() => { setSelectedTier(tier.tier); setSelectedSlot(null); }}
                     className={`relative flex-1 py-3.5 text-center text-[13px] font-semibold transition-colors ${
                       isActive ? "text-[rgb(var(--color-primary))]" : "text-[rgb(var(--color-text-muted))] hover:text-[rgb(var(--color-text-secondary))]"
                     }`}
@@ -492,7 +493,7 @@ export default function GigDetailPage() {
                 <button
                   onClick={handleOrder}
                   disabled={ordering || gig.seller?.id === session?.user?.id || !selectedSlot}
-                  className="w-full rounded-xl bg-[rgb(var(--color-primary))] py-3.5 text-[14px] font-semibold text-white shadow-[0_4px_16px_rgba(var(--color-primary),0.3)] transition-all hover:bg-[rgb(var(--color-primary-hover))] hover:shadow-[0_6px_20px_rgba(var(--color-primary),0.4)] disabled:opacity-40 disabled:cursor-not-allowed disabled:shadow-none"
+                  className="w-full rounded-xl bg-[rgb(var(--color-primary))] py-3.5 text-[14px] font-semibold text-white shadow-md transition-all hover:bg-[rgb(var(--color-primary-hover))]  disabled:opacity-40 disabled:cursor-not-allowed disabled:shadow-none"
                 >
                   {ordering ? "מבצע הזמנה..." : `המשך (₪${currentTier.price})`}
                 </button>

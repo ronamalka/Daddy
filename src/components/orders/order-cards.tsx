@@ -42,7 +42,7 @@ export function OrderCards({
           <Link
             key={order.id}
             href={`/orders/${order.id}`}
-            className="group flex items-center gap-4 rounded-2xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] p-5 transition-all hover:border-[rgba(var(--color-primary-light),0.3)] hover:shadow-[0_4px_16px_rgba(var(--color-primary),0.08)]"
+            className="group flex items-center gap-4 rounded-2xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] p-5 transition-all hover:border-[rgba(var(--color-primary-light),0.3)] hover:shadow-md"
           >
             <div className="relative h-16 w-16 flex-shrink-0 overflow-hidden rounded-xl bg-[rgba(var(--color-primary),0.1)]">
               {order.gig.image ? (

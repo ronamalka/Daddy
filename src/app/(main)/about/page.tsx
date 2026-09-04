@@ -30,7 +30,7 @@ export default function AboutPage() {
   return (
     <div className="min-h-screen bg-[rgb(var(--color-bg))]">
       {/* Hero */}
-      <section className="bg-gradient-to-br from-slate-900 via-slate-900 to-[rgba(var(--color-primary),0.3)] py-20 text-center text-white">
+      <section className="bg-slate-900 py-20 text-center text-white">
         <div className="mx-auto max-w-4xl px-4">
           <h1 className="text-[36px] font-extrabold md:text-[48px]">על אבאל׳ה</h1>
           <p className="mt-4 text-[18px] text-white/70">הכל התחיל כשמישהו אמר &quot;אבא, הברז מטפטף&quot; ואבא אמר &quot;שנייה, אני בא&quot;</p>
@@ -76,7 +76,7 @@ export default function AboutPage() {
 
       {/* For Dads */}
       <section className="mx-auto max-w-3xl px-4 py-16">
-        <div className="rounded-2xl border border-[rgb(var(--color-border))] bg-gradient-to-br from-[rgb(var(--color-surface))] to-[rgba(var(--color-success),0.05)] p-8 md:p-12">
+        <div className="rounded-2xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] p-8 md:p-12">
           <div className="flex items-center gap-2 mb-6">
             <Wrench className="h-6 w-6 text-[rgb(var(--color-success))]" />
             <h2 className="text-[24px] font-extrabold text-[rgb(var(--color-text))]">לאבות שקוראים את זה</h2>
@@ -92,7 +92,7 @@ export default function AboutPage() {
               אתה לא מתחיל מחדש. אתה ממשיך.
             </p>
           </div>
-          <Link href="/become-a-daddy" className="mt-6 inline-flex items-center gap-2 rounded-xl bg-[rgb(var(--color-success))] px-6 py-3 text-[15px] font-bold text-white transition-all hover:bg-[rgb(var(--color-success))]/90 hover:-translate-y-0.5">
+          <Link href="/become-a-daddy" className="mt-6 inline-flex items-center gap-2 rounded-xl bg-[rgb(var(--color-success))] px-6 py-3 text-[15px] font-bold text-white transition-colors hover:opacity-90">
             הצטרף כאבאל׳ה
           </Link>
         </div>
@@ -123,7 +123,7 @@ export default function AboutPage() {
         </div>
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {VALUES.map((item, i) => (
-            <div key={i} className="group rounded-2xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] p-6 text-center transition-all hover:shadow-lg hover:-translate-y-1">
+            <div key={i} className="group rounded-2xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] p-6 text-center transition-shadow hover:shadow-md">
               <div className="mb-4 flex justify-center text-[rgb(var(--color-primary))]">
                 <item.Icon className="h-10 w-10" />
               </div>
@@ -135,7 +135,7 @@ export default function AboutPage() {
       </section>
 
       {/* Stats */}
-      <section className="bg-gradient-to-br from-[rgb(var(--color-primary))] to-[rgb(var(--color-primary-light))] py-12">
+      <section className="bg-[rgb(var(--color-primary))] py-12">
         <div className="mx-auto max-w-4xl px-4">
           <div className="grid grid-cols-2 gap-6 md:grid-cols-4">
             {STATS.map((stat, i) => (
@@ -157,7 +157,7 @@ export default function AboutPage() {
           <h2 className="text-[28px] font-extrabold text-[rgb(var(--color-text))] md:text-[32px]">רוצה להצטרף למשפחה?</h2>
           <p className="mt-3 text-[15px] text-[rgb(var(--color-text-secondary))]">בין אם אתה צריך אבאל׳ה או רוצה להיות אחד — יש לך מקום בשולחן</p>
           <div className="mt-8 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
-            <Link href="/register" className="rounded-xl bg-gradient-to-r from-[rgb(var(--color-primary))] to-[rgb(var(--color-primary-light))] px-8 py-3.5 text-[15px] font-bold text-white shadow-[0_4px_16px_rgba(var(--color-primary),0.3)] transition-all hover:shadow-[0_8px_24px_rgba(var(--color-primary),0.4)] hover:-translate-y-0.5">
+            <Link href="/register" className="rounded-xl bg-[rgb(var(--color-primary))] px-8 py-3.5 text-[15px] font-bold text-white shadow-sm transition-colors hover:bg-[rgb(var(--color-primary-hover))]">
               הירשם עכשיו
             </Link>
             <Link href="/how-it-works" className="rounded-xl border-2 border-[rgb(var(--color-primary))] px-8 py-3.5 text-[15px] font-bold text-[rgb(var(--color-primary))] transition-all hover:bg-[rgb(var(--color-primary))] hover:text-white">

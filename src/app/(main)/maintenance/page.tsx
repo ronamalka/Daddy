@@ -96,7 +96,7 @@ export default function MaintenancePage() {
   return (
     <div className="min-h-screen bg-[rgb(var(--color-bg))]">
       {/* Hero */}
-      <section className="bg-gradient-to-br from-slate-900 via-slate-900 to-[rgba(var(--color-primary),0.3)] py-20 text-center text-white">
+      <section className="bg-slate-900 py-20 text-center text-white">
         <div className="mx-auto max-w-4xl px-4">
           <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-2 text-[13px] font-bold">
             <Wrench className="h-4 w-4" />
@@ -145,8 +145,8 @@ export default function MaintenancePage() {
         ) : (
           <>
             {/* Plan card */}
-            <div className="rounded-2xl border-2 border-[rgb(var(--color-primary))] bg-[rgb(var(--color-surface))] overflow-hidden shadow-[0_4px_24px_rgba(var(--color-primary),0.1)]">
-              <div className="bg-gradient-to-r from-[rgb(var(--color-primary))] to-[rgb(var(--color-primary-light))] px-8 py-5">
+            <div className="rounded-2xl border-2 border-[rgb(var(--color-primary))] bg-[rgb(var(--color-surface))] overflow-hidden shadow-md">
+              <div className="bg-primary px-8 py-5">
                 <h2 className="text-[20px] font-bold text-white">תוכנית בסיסית</h2>
                 <div className="mt-1 flex items-baseline gap-1">
                   <span className="text-[36px] font-extrabold text-white">99₪</span>
@@ -173,7 +173,7 @@ export default function MaintenancePage() {
                 <button
                   onClick={handleSubscribe}
                   disabled={subscribing}
-                  className="w-full rounded-xl bg-[rgb(var(--color-primary))] py-4 text-[16px] font-bold text-white shadow-[0_4px_16px_rgba(var(--color-primary),0.3)] transition-all hover:bg-[rgb(var(--color-primary-hover))] hover:shadow-[0_8px_24px_rgba(var(--color-primary),0.4)] hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full rounded-xl bg-[rgb(var(--color-primary))] py-4 text-[16px] font-bold text-white shadow-md transition-all hover:bg-[rgb(var(--color-primary-hover))]  disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {subscribing ? "מעבד..." : "הרשם לתוכנית"}
                 </button>

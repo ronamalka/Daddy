@@ -47,6 +47,7 @@ function RegisterForm() {
   const [selectedCity, setSelectedCity] = useState<{ cityCode: number; cityName: string; districtCode: number; districtName: string } | null>(null);
   const [serviceAreas, setServiceAreas] = useState<ServiceAreaEntry[]>([]);
   const [selectedServices, setSelectedServices] = useState<string[]>([]);
+  const [passwordValid, setPasswordValid] = useState(false);
   const [turnstileToken, setTurnstileToken] = useState("");
   const [acceptedTerms, setAcceptedTerms] = useState(false);
   const [confirmedAge18, setConfirmedAge18] = useState(false);
@@ -60,6 +61,18 @@ function RegisterForm() {
   useEffect(() => {
     trackEvent("signup_started", { role });
   }, []);
+
+  useEffect(() => {
+    if (acceptedTerms && confirmedAge18) {
+      trackEvent("signup_consent_given", { role });
+    }
+  }, [acceptedTerms, confirmedAge18]);
+
+  useEffect(() => {
+    if (selectedCity?.cityName) {
+      trackEvent("signup_city_selected", { city: selectedCity.cityName });
+    }
+  }, [selectedCity]);
 
   /** Creates the account and signs the user in. */
   async function handleSubmit() {
@@ -133,10 +146,18 @@ function RegisterForm() {
     return true;
   }
 
+  const handlePasswordValidChange = useCallback((valid: boolean) => {
+    setPasswordValid(valid);
+  }, []);
+
   /** Moves to the next sign-up step, or submits the form. */
   function handleNext() {
     if (step === 1) {
       if (!ensureLegalConsent()) return;
+      if (!passwordValid) {
+        setError("יש לבחור סיסמה חזקה שלא נמצאה בדליפות נתונים.");
+        return;
+      }
       setStep(2);
     } else if (step === 2 && role === "SELLER") {
       setStep(3);
@@ -173,14 +194,13 @@ function RegisterForm() {
     <div className="w-full max-w-md">
       <div className="mb-8 text-center lg:hidden">
         <h2
-          className="text-3xl font-extrabold tracking-[-0.02em] bg-clip-text text-transparent"
-          style={{ backgroundImage: "linear-gradient(135deg, rgb(var(--color-primary)) 0%, rgb(var(--color-primary-light)) 50%, rgb(var(--color-accent)) 100%)" }}
+          className="text-3xl font-extrabold tracking-[-0.02em] text-[rgb(var(--color-primary))]"
         >
           אבאל׳ה
         </h2>
       </div>
 
-      <div className="rounded-2xl bg-[rgb(var(--color-surface))] p-8 shadow-[0_4px_16px_rgba(var(--color-primary),0.08)]">
+      <div className="rounded-2xl bg-[rgb(var(--color-surface))] p-8 shadow-md">
         <div className="mb-6 flex items-center justify-center gap-2">
           {Array.from({ length: totalSteps }, (_, i) => i + 1).map((s) => (
             <div
@@ -223,7 +243,7 @@ function RegisterForm() {
               type="button"
               onClick={handleGoogleSignUp}
               disabled={googleLoading || loading}
-              className="flex w-full items-center justify-center gap-3 rounded-xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface-elevated))] py-3.5 text-[16px] font-medium text-[rgb(var(--color-text))] transition-all hover:bg-[rgb(var(--color-bg))] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex w-full items-center justify-center gap-3 rounded-xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface-elevated))] py-3.5 text-[16px] font-medium text-[rgb(var(--color-text))] transition-all hover:bg-[rgb(var(--color-bg))] disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {googleLoading ? (
                 <svg className="h-5 w-5 animate-spin" viewBox="0 0 24 24" fill="none">
@@ -259,7 +279,7 @@ function RegisterForm() {
             <div>
               <label htmlFor="password" className="mb-1.5 block text-[14px] font-medium text-[rgb(var(--color-text))]">סיסמה</label>
               <input id="password" type="password" required minLength={8} placeholder="לפחות 8 תווים, אות גדולה, ספרה ותו מיוחד" value={password} onChange={(e) => setPassword(e.target.value)} className={inputClass} />
-              <PasswordStrength password={password} />
+              <PasswordStrength password={password} onValidChange={handlePasswordValidChange} />
             </div>
             <div>
               <label className="mb-1.5 block text-[14px] font-medium text-[rgb(var(--color-text))]">אני רוצה</label>
@@ -302,7 +322,7 @@ function RegisterForm() {
               onIndependentContractorChange={setIndependentContractor}
             />
             <TurnstileWidget onVerify={handleTurnstileVerify} onExpire={handleTurnstileExpire} />
-            <button type="submit" className="w-full rounded-xl bg-[rgb(var(--color-primary))] py-3.5 text-[16px] font-semibold text-white shadow-[0_4px_16px_rgba(var(--color-primary),0.08)] transition-all hover:bg-[rgb(var(--color-primary-hover))] active:scale-[0.98]">
+            <button type="submit" className="w-full rounded-xl bg-[rgb(var(--color-primary))] py-3.5 text-[16px] font-semibold text-white shadow-sm transition-colors hover:bg-[rgb(var(--color-primary-hover))]">
               המשך
             </button>
           </form>
@@ -330,7 +350,7 @@ function RegisterForm() {
                 type="button"
                 onClick={handleNext}
                 disabled={loading}
-                className="flex-1 rounded-xl bg-[rgb(var(--color-primary))] py-3.5 text-[16px] font-semibold text-white shadow-[0_4px_16px_rgba(var(--color-primary),0.08)] transition-all hover:bg-[rgb(var(--color-primary-hover))] active:scale-[0.98] disabled:opacity-50"
+                className="flex-1 rounded-xl bg-[rgb(var(--color-primary))] py-3.5 text-[16px] font-semibold text-white shadow-sm transition-colors hover:bg-[rgb(var(--color-primary-hover))] disabled:opacity-50"
               >
                 {role === "SELLER" ? "המשך" : loading ? "יוצר חשבון..." : "צור חשבון"}
               </button>
@@ -362,7 +382,7 @@ function RegisterForm() {
                 type="button"
                 onClick={handleSubmit}
                 disabled={loading}
-                className="flex-1 rounded-xl bg-[rgb(var(--color-primary))] py-3.5 text-[16px] font-semibold text-white shadow-[0_4px_16px_rgba(var(--color-primary),0.08)] transition-all hover:bg-[rgb(var(--color-primary-hover))] active:scale-[0.98] disabled:opacity-50"
+                className="flex-1 rounded-xl bg-[rgb(var(--color-primary))] py-3.5 text-[16px] font-semibold text-white shadow-sm transition-colors hover:bg-[rgb(var(--color-primary-hover))] disabled:opacity-50"
               >
                 {loading ? (
                   <span className="flex items-center justify-center gap-2">

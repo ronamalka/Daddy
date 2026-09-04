@@ -5,6 +5,7 @@ import { prisma } from "../db";
 import { sendEmail } from "../../../shared/email";
 import { passwordResetEmail } from "../../../shared/email-templates";
 import { logger } from "../../../shared/logger";
+import { validatePassword } from "../../../shared/security";
 
 /** Routes for requesting, checking, and using a password-reset token. */
 export const passwordResetRoutes = Router();
@@ -86,8 +87,9 @@ passwordResetRoutes.post("/reset", async (req: Request, res: Response) => {
     return;
   }
 
-  if (password.length < 6) {
-    res.status(400).json({ error: "Password must be at least 6 characters" });
+  const passwordError = validatePassword(password);
+  if (passwordError) {
+    res.status(400).json({ error: passwordError });
     return;
   }
 
@@ -113,5 +115,5 @@ passwordResetRoutes.post("/reset", async (req: Request, res: Response) => {
     data: { usedAt: new Date() },
   });
 
-  res.json({ message: "Password has been reset successfully" });
+  res.json({ message: "Password has been reset successfully", userId: reset.userId });
 });
