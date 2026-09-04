@@ -7,6 +7,10 @@ on:
     branches: [main, dev, stg]
   workflow_dispatch:
 
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
 env:
   REGISTRY: quay.io
   IMAGE_NAME: ${{ secrets.QUAY_USER }}/daddy
