@@ -2,7 +2,6 @@ import { proxyRequest, USERS_SERVICE, GIGS_SERVICE, ORDERS_SERVICE, REQUESTS_SER
 import { mapRequestTeasers } from "@/lib/request-teaser";
 import type { FeaturedDaddy, LiveReview, RequestTeaser } from "@/components/home/types";
 
-/** Fetches up to six featured sellers with ratings and completed-order counts. */
 export async function fetchFeaturedDaddies(): Promise<FeaturedDaddy[]> {
   try {
     const { data: sellers } = await proxyRequest(USERS_SERVICE, "/featured-daddies");
@@ -33,7 +32,6 @@ export async function fetchFeaturedDaddies(): Promise<FeaturedDaddy[]> {
   }
 }
 
-/** Fetches recent reviews with buyer and seller names filled in. */
 export async function fetchRecentReviews(): Promise<LiveReview[]> {
   try {
     const { data: reviews } = await proxyRequest(GIGS_SERVICE, "/recent-reviews");
@@ -41,10 +39,10 @@ export async function fetchRecentReviews(): Promise<LiveReview[]> {
     if (!Array.isArray(reviews)) return [];
 
     const enriched = await Promise.all(
-      reviews.map(async (r: Record<string, unknown>) => {
-        const userId = typeof r.userId === "string" ? r.userId : "";
-        const rawGig = r.gig as { title?: string; sellerId?: string } | null;
-        const sellerId = (typeof r.sellerId === "string" ? r.sellerId : null) || rawGig?.sellerId;
+      reviews.map(async (r: { id?: string; rating?: number; comment?: string; userId?: string; sellerId?: string; gig?: { title?: string; sellerId?: string }; ratingAttitude?: number; ratingTimeliness?: number; ratingPrice?: number; ratingQuality?: number; createdAt?: string }) => {
+        const userId = r.userId ?? "";
+        const rawGig = r.gig ?? null;
+        const sellerId = r.sellerId ?? rawGig?.sellerId;
         const [userRes, sellerRes] = await Promise.all([
           proxyRequest(USERS_SERVICE, `/sellers/${userId}`),
           sellerId
@@ -53,14 +51,14 @@ export async function fetchRecentReviews(): Promise<LiveReview[]> {
         ]);
 
         return {
-          id: typeof r.id === "string" ? r.id : String(Math.random()),
-          rating: typeof r.rating === "number" ? r.rating : 0,
-          comment: typeof r.comment === "string" ? r.comment : "",
-          ratingAttitude: typeof r.ratingAttitude === "number" ? r.ratingAttitude : null,
-          ratingTimeliness: typeof r.ratingTimeliness === "number" ? r.ratingTimeliness : null,
-          ratingPrice: typeof r.ratingPrice === "number" ? r.ratingPrice : null,
-          ratingQuality: typeof r.ratingQuality === "number" ? r.ratingQuality : null,
-          createdAt: typeof r.createdAt === "string" ? r.createdAt : "",
+          id: r.id ?? String(Math.random()),
+          rating: r.rating ?? 0,
+          comment: r.comment ?? "",
+          ratingAttitude: r.ratingAttitude ?? null,
+          ratingTimeliness: r.ratingTimeliness ?? null,
+          ratingPrice: r.ratingPrice ?? null,
+          ratingQuality: r.ratingQuality ?? null,
+          createdAt: r.createdAt ?? "",
           user: { name: userRes.data?.name || "Unknown", city: userRes.data?.city || null },
           gig: {
             title: rawGig?.title || "עבודת שטח",
@@ -76,7 +74,6 @@ export async function fetchRecentReviews(): Promise<LiveReview[]> {
   }
 }
 
-/** Fetches recent open request teasers (city + service + age only). */
 export async function fetchRequestTeasers(): Promise<RequestTeaser[]> {
   try {
     const { data } = await proxyRequest(REQUESTS_SERVICE, "/service-requests/teaser");

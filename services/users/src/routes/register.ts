@@ -2,8 +2,11 @@ import { Router, Request, Response } from "express";
 import { hash } from "bcryptjs";
 import { prisma } from "../db";
 import { createAndSendVerification } from "./email-verify";
+import { sendEmail } from "../../../shared/email";
+import { accountExistsEmail } from "../../../shared/email-templates";
 import { logger } from "../../../shared/logger";
 import { logEvent } from "../../../shared/analytics";
+import { validatePassword } from "../../../shared/security";
 import { userRegistrations } from "../metrics";
 
 /** Routes for creating a new account. */
@@ -24,8 +27,9 @@ registerRoutes.post("/", async (req: Request, res: Response) => {
     return;
   }
 
-  if (password.length < 6) {
-    res.status(400).json({ error: "Password must be at least 6 characters" });
+  const passwordError = validatePassword(password);
+  if (passwordError) {
+    res.status(400).json({ error: passwordError });
     return;
   }
 
@@ -36,7 +40,17 @@ registerRoutes.post("/", async (req: Request, res: Response) => {
 
   const existing = await prisma.user.findUnique({ where: { email } });
   if (existing) {
-    res.status(409).json({ error: "Email already exists" });
+    // Anti-enumeration: return the same shape as a successful registration
+    const BASE_URL = process.env.BASE_URL || "http://localhost:3000";
+    sendEmail(
+      existing.email,
+      "ניסיון הרשמה לאבאל׳ה",
+      accountExistsEmail(existing.name, `${BASE_URL}/forgot-password`),
+    ).catch((err) => {
+      logger.error({ err }, "Failed to send account-exists notification");
+    });
+
+    res.json({ id: existing.id, name: existing.name, email: existing.email, role: existing.role, emailVerified: existing.emailVerified });
     return;
   }
 

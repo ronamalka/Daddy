@@ -1,6 +1,7 @@
 import { Router, Request, Response } from "express";
 import { requireAuth, requireSeller } from "../../../shared/middleware";
 import { prisma } from "../db";
+import { logEvent } from "../../../shared/analytics";
 
 export const subscriptionRoutes = Router();
 
@@ -98,6 +99,16 @@ subscriptionRoutes.post("/subscribe", requireAuth, requireSeller, async (req: Re
     },
   });
 
+  logEvent(prisma, {
+    eventName: "revenue.subscription_payment",
+    eventCategory: "revenue",
+    actorId: userId,
+    actorRole: "seller",
+    entityType: "subscription",
+    entityId: userId,
+    properties: { price: PREMIUM_PRICE, tier: "PREMIUM" },
+  });
+
   res.json({
     tier: updated.subscriptionTier,
     startedAt: updated.subscriptionStartedAt,
@@ -130,6 +141,16 @@ subscriptionRoutes.post("/cancel", requireAuth, requireSeller, async (req: Reque
   // The subscription remains usable until the expiresAt date.
   const expiresAt = user.subscriptionExpiresAt;
   const formatted = expiresAt.toLocaleDateString("he-IL");
+
+  logEvent(prisma, {
+    eventName: "revenue.subscription_churned",
+    eventCategory: "revenue",
+    actorId: userId,
+    actorRole: "seller",
+    entityType: "subscription",
+    entityId: userId,
+    properties: { expiresAt: expiresAt.toISOString() },
+  });
 
   res.json({
     tier: "PREMIUM",
@@ -175,6 +196,16 @@ subscriptionRoutes.post("/renew", requireAuth, requireSeller, async (req: Reques
       subscriptionStartedAt: true,
       subscriptionExpiresAt: true,
     },
+  });
+
+  logEvent(prisma, {
+    eventName: "revenue.subscription_payment",
+    eventCategory: "revenue",
+    actorId: userId,
+    actorRole: "seller",
+    entityType: "subscription",
+    entityId: userId,
+    properties: { price: PREMIUM_PRICE, tier: "PREMIUM", type: "renewal" },
   });
 
   res.json({

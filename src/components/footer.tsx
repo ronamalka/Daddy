@@ -5,7 +5,6 @@ import Image from "next/image";
 import { Wrench, FileText, Shield } from "@phosphor-icons/react";
 import { BUSINESS_DISCLOSURE, LEGAL_CONTACTS } from "@/lib/legal";
 
-/** Site footer with company details and links to legal and account pages. */
 export function Footer() {
   return (
     <footer className="border-t border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))]">
@@ -14,7 +13,7 @@ export function Footer() {
           <div>
             <div className="flex items-center gap-2 mb-2">
               <Image src="/logo.jpeg" alt="אבאל׳ה" width={36} height={36} className="rounded-full" unoptimized />
-              <span className="text-gradient-hero text-xl font-extrabold">אבאל׳ה</span>
+              <span className="text-[rgb(var(--color-primary))] text-xl font-extrabold">אבאל׳ה</span>
             </div>
             <p className="text-sm text-[rgb(var(--color-text-muted))] mt-2 max-w-xs">
               פלטפורמה לחיבור בין לקוחות לנותני שירות עצמאיים. אבאל׳ה אינה נותנת את השירות בשטח ואינה מעסיקה את האבאל׳ות.
@@ -70,7 +69,6 @@ export function Footer() {
   );
 }
 
-/** Simple footer text link. */
 function FooterLink({ href, children }: { href: string; children: React.ReactNode }) {
   return (
     <Link

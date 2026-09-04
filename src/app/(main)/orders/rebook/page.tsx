@@ -5,6 +5,7 @@ import { useSession } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { ArrowClockwise, Lock } from "@phosphor-icons/react";
 import { VisitWindowFields, visitWindowToIso, type VisitWindowValue } from "@/components/visit-window-fields";
+import { trackEvent } from "@/lib/analytics";
 
 interface PreviousOrder {
   id: string;
@@ -47,6 +48,7 @@ function RebookContent() {
   const [error, setError] = useState("");
 
   useEffect(() => {
+    trackEvent("rebook_clicked", { sellerId });
     if (!fromOrderId) {
       setLoading(false);
       return;
@@ -76,7 +78,7 @@ function RebookContent() {
           setBuyerSuppliesMaterials(data.buyerSuppliesMaterials ?? true);
         }
       })
-      .catch(() => {})
+      .catch(() => { setError("לא הצלחנו לטעון את פרטי ההזמנה הקודמת"); })
       .finally(() => setLoading(false));
   }, [fromOrderId, sellerId]);
 
@@ -158,7 +160,7 @@ function RebookContent() {
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
-        <div className="rounded-2xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] p-6 shadow-[0_2px_8px_rgba(var(--color-primary),0.06)]">
+        <div className="rounded-2xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] p-6 shadow-sm">
           <h2 className="mb-4 text-[16px] font-bold text-[rgb(var(--color-text))]">פרטי העבודה</h2>
 
           <div className="space-y-4">
@@ -191,7 +193,7 @@ function RebookContent() {
           </div>
         </div>
 
-        <div className="rounded-2xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] p-6 shadow-[0_2px_8px_rgba(var(--color-primary),0.06)]">
+        <div className="rounded-2xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] p-6 shadow-sm">
           <h2 className="mb-4 text-[16px] font-bold text-[rgb(var(--color-text))]">תמחור</h2>
 
           <div className="space-y-4">
@@ -236,7 +238,7 @@ function RebookContent() {
           </div>
         </div>
 
-        <div className="rounded-2xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] p-6 shadow-[0_2px_8px_rgba(var(--color-primary),0.06)]">
+        <div className="rounded-2xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] p-6 shadow-sm">
           <h2 className="mb-4 text-[16px] font-bold text-[rgb(var(--color-text))]">חלון ביקור</h2>
           <VisitWindowFields value={visitWindow} onChange={setVisitWindow} />
         </div>

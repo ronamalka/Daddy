@@ -7,6 +7,7 @@ import { ALL_SERVICES } from "@/lib/services";
 import { POPULAR_SEARCHES } from "./data";
 import { CategoryIcon } from "@/components/ui/category-icon";
 import { CityFilter, type SelectedCity } from "@/components/city-filter";
+import { trackEvent } from "@/lib/analytics";
 
 interface HeroSectionProps {
   serviceSearch: string;
@@ -24,59 +25,38 @@ export function HeroSection({
   serviceSearch, setServiceSearch, setSelectedService, selectedCity, setSelectedCity, setView, filteredServices,
 }: HeroSectionProps) {
   return (
-    <section className="relative overflow-hidden">
-      <div className="absolute inset-0 bg-gradient-to-br from-[rgb(var(--color-bg))] via-[rgb(var(--color-surface))] to-[rgb(var(--color-bg))]" />
-      <div className="absolute inset-0">
-        <div className="absolute top-20 left-[15%] h-64 w-64 rounded-full bg-[rgba(var(--color-primary),0.06)] blur-3xl" />
-        <div className="absolute bottom-20 right-[10%] h-72 w-72 rounded-full bg-[rgba(var(--color-accent),0.04)] blur-3xl" />
-      </div>
-
-      <div className="relative mx-auto max-w-5xl px-4 pt-20 pb-24 md:pt-32 md:pb-32">
+    <section className="bg-[rgb(var(--color-bg))]">
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.4 }}
+        className="relative mx-auto max-w-5xl px-4 pt-20 pb-24 md:pt-32 md:pb-32"
+      >
         <div className="text-center">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.5 }}
-            className="mb-6"
-          >
+          <div className="mb-6">
             <Image
               src="/logo.jpeg"
               alt="אבאל׳ה"
               width={160}
               height={160}
-              className="mx-auto rounded-full shadow-xl"
+              className="mx-auto rounded-full shadow-md"
               priority
               unoptimized
             />
-          </motion.div>
+          </div>
 
-          <motion.h1
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.1 }}
-            className="mb-6 text-4xl font-extrabold leading-tight tracking-tight text-[rgb(var(--color-text))] md:text-6xl"
-          >
-            <span className="text-gradient-hero">כל אחד צריך אבאל׳ה</span>
-          </motion.h1>
+          <h1 className="mb-6 text-4xl font-extrabold leading-tight tracking-tight text-[rgb(var(--color-text))] md:text-6xl">
+            <span className="text-[rgb(var(--color-primary))]">כל אחד צריך אבאל׳ה</span>
+          </h1>
 
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-            className="mx-auto mb-10 max-w-xl text-base leading-relaxed text-[rgb(var(--color-text-secondary))] md:text-lg"
-          >
+          <p className="mx-auto mb-10 max-w-xl text-base leading-relaxed text-[rgb(var(--color-text-secondary))] md:text-lg">
             אבא תמיד יודע לסדר. גם אם הוא לא שלך. מהרכבת ארון שסירב להתרכב ועד הוזלת חשבונות שגרמו לך לבכות.
-          </motion.p>
+          </p>
 
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.3 }}
-            className="mx-auto max-w-2xl"
-          >
+          <div className="mx-auto max-w-2xl">
             <div className="space-y-2">
               <div className="relative">
-                <div className="flex overflow-hidden rounded-xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] shadow-lg transition-shadow focus-within:shadow-xl focus-within:border-[rgb(var(--color-primary-light))]">
+                <div className="flex overflow-hidden rounded-xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] shadow-sm transition-shadow focus-within:border-[rgb(var(--color-primary-light))]">
                 <div className="flex flex-1 items-center gap-3 px-5">
                   <MagnifyingGlass className="h-5 w-5 flex-shrink-0 text-[rgb(var(--color-text-muted))]" />
                   <input
@@ -103,7 +83,7 @@ export function HeroSection({
                   {filteredServices.slice(0, 12).map((svc) => (
                     <button
                       key={svc.slug}
-                      onClick={() => { setSelectedService(svc.slug); setServiceSearch(svc.nameHe); }}
+                      onClick={() => { setSelectedService(svc.slug); setServiceSearch(svc.nameHe); trackEvent("search_performed", { query: svc.nameHe, category: svc.category }); }}
                       className="flex w-full items-center gap-3 px-5 py-3.5 text-right transition-colors hover:bg-[rgb(var(--color-surface-elevated))]"
                     >
                       <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-[rgba(var(--color-primary),0.1)] text-[rgb(var(--color-primary))]">
@@ -140,9 +120,9 @@ export function HeroSection({
                 </button>
               ))}
             </div>
-          </motion.div>
+          </div>
         </div>
-      </div>
+      </motion.div>
     </section>
   );
 }

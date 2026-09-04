@@ -101,6 +101,31 @@ function setRateLimitHeaders(response: NextResponse, request: NextRequest, pathn
   }
 }
 
+// --- CSP Nonce ---
+
+/** Generates a random base64 nonce for Content-Security-Policy. */
+function generateNonce(): string {
+  const array = new Uint8Array(16);
+  crypto.getRandomValues(array);
+  return btoa(String.fromCharCode(...array));
+}
+
+/** Builds a CSP header string with the given nonce and strict-dynamic. */
+function buildCsp(nonce: string): string {
+  return [
+    "default-src 'self'",
+    `script-src 'self' 'nonce-${nonce}' 'strict-dynamic' https://challenges.cloudflare.com https://analytics.aballeh.com`,
+    "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+    "img-src 'self' data: blob: https:",
+    "font-src 'self' https://fonts.gstatic.com",
+    "connect-src 'self' https://accounts.google.com https://challenges.cloudflare.com https://analytics.aballeh.com",
+    "frame-src https://challenges.cloudflare.com",
+    "frame-ancestors 'none'",
+    "base-uri 'self'",
+    "form-action 'self' https://accounts.google.com",
+  ].join("; ");
+}
+
 // --- CSRF Protection (Double-Submit Cookie) ---
 
 const CSRF_COOKIE = "csrf_token";
@@ -130,18 +155,32 @@ export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const isApi = pathname.startsWith("/api/");
 
-  // Non-API routes: only seed the CSRF cookie
+  // Non-API routes: generate CSP nonce, set security headers, seed CSRF cookie
   if (!isApi) {
-    if (request.cookies.get(CSRF_COOKIE)) {
-      return NextResponse.next();
-    }
-    const response = NextResponse.next();
-    response.cookies.set(CSRF_COOKIE, generateToken(), {
-      httpOnly: false,
-      sameSite: "strict",
-      secure: process.env.NODE_ENV === "production",
-      path: "/",
+    const nonce = generateNonce();
+    const requestHeaders = new Headers(request.headers);
+    requestHeaders.set("x-nonce", nonce);
+
+    const response = NextResponse.next({
+      request: { headers: requestHeaders },
     });
+
+    response.headers.set("Content-Security-Policy", buildCsp(nonce));
+    response.headers.set("X-Frame-Options", "DENY");
+    response.headers.set("X-Content-Type-Options", "nosniff");
+    response.headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
+    response.headers.set("Permissions-Policy", "camera=(), microphone=(), geolocation=()");
+    response.headers.set("Strict-Transport-Security", "max-age=31536000; includeSubDomains");
+
+    if (!request.cookies.get(CSRF_COOKIE)) {
+      response.cookies.set(CSRF_COOKIE, generateToken(), {
+        httpOnly: false,
+        sameSite: "strict",
+        secure: process.env.NODE_ENV === "production",
+        path: "/",
+      });
+    }
+
     return response;
   }
 

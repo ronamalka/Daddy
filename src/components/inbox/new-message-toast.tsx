@@ -74,7 +74,7 @@ export function NewMessageToast() {
             router.push(toast.href);
             setToast(null);
           }}
-          className="fixed bottom-20 start-4 z-[80] flex max-w-sm items-start gap-3 rounded-2xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] p-3 text-start shadow-[0_8px_32px_rgba(var(--color-primary),0.18)] md:bottom-6"
+          className="fixed bottom-20 start-4 z-[80] flex max-w-sm items-start gap-3 rounded-2xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] p-3 text-start shadow-lg md:bottom-6"
         >
           <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[rgba(var(--color-primary),0.12)] text-[rgb(var(--color-primary))]">
             <ChatCircle className="h-5 w-5" weight="fill" />

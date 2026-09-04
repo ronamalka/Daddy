@@ -93,6 +93,8 @@ interface RevenueData {
 }
 
 interface FunnelData {
+  funnel?: string;
+  period?: string;
   steps: { name: string; count: number }[];
 }
 
@@ -187,8 +189,12 @@ function FunnelStep({ name, count, maxCount }: { name: string; count: number; ma
   const labels: Record<string, string> = {
     signed_up: "נרשמו",
     posted_request: "פרסמו בקשה",
+    accepted_quote: "קיבלו הצעה",
     order_created: "נוצרה הזמנה",
     order_completed: "הזמנה הושלמה",
+    sent_quote: "שלחו הצעה",
+    got_order: "קיבלו הזמנה",
+    completed_order: "השלימו הזמנה",
   };
 
   return (
@@ -198,7 +204,7 @@ function FunnelStep({ name, count, maxCount }: { name: string; count: number; ma
       </div>
       <div className="flex-1">
         <div
-          className="h-8 rounded-lg bg-gradient-to-l from-[rgb(var(--color-primary))] to-[rgb(var(--color-primary-light))] flex items-center justify-end px-3 transition-all duration-500"
+          className="h-8 rounded-lg bg-primary flex items-center justify-end px-3 transition-all duration-500"
           style={{ width: `${width}%` }}
         >
           <span className="text-[13px] font-bold text-white">{count}</span>
@@ -217,6 +223,8 @@ export default function AnalyticsPage() {
   const [breakdowns, setBreakdowns] = useState<BreakdownData | null>(null);
   const [revenueData, setRevenueData] = useState<RevenueData | null>(null);
   const [funnelData, setFunnelData] = useState<FunnelData | null>(null);
+  const [funnelType, setFunnelType] = useState<"buyer" | "seller">("buyer");
+  const [funnelPeriod, setFunnelPeriod] = useState("30");
 
   const fetchSection = useCallback(
     async (section: string, params?: Record<string, string>) => {
@@ -247,6 +255,13 @@ export default function AnalyticsPage() {
       setLoading(false);
     });
   }, [session, fetchSection]);
+
+  useEffect(() => {
+    if (session?.user?.role !== "ADMIN" || activeTab !== "funnel") return;
+    fetchSection("funnel", { period: funnelPeriod, type: funnelType }).then((fn) => {
+      if (fn) setFunnelData(fn);
+    });
+  }, [session, activeTab, funnelType, funnelPeriod, fetchSection]);
 
   if (!session || session.user.role !== "ADMIN") {
     return (
@@ -679,7 +694,37 @@ export default function AnalyticsPage() {
       {activeTab === "funnel" && funnelData && (
         <div className="space-y-8">
           <div className="rounded-xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] p-6 shadow-[var(--shadow-sm)]">
-            <h3 className="text-[16px] font-bold text-[rgb(var(--color-text))] mb-6">משפך המרה (30 ימים)</h3>
+            <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
+              <h3 className="text-[16px] font-bold text-[rgb(var(--color-text))]">
+                משפך המרה — {funnelType === "buyer" ? "קונים" : "בעלי מקצוע"} ({funnelPeriod} ימים)
+              </h3>
+              <div className="flex items-center gap-3">
+                <div className="flex rounded-lg border border-[rgb(var(--color-border))] overflow-hidden">
+                  {(["buyer", "seller"] as const).map((t) => (
+                    <button
+                      key={t}
+                      onClick={() => setFunnelType(t)}
+                      className={`px-3 py-1.5 text-[13px] font-medium transition-colors ${
+                        funnelType === t
+                          ? "bg-[rgb(var(--color-primary))] text-white"
+                          : "bg-[rgb(var(--color-surface))] text-[rgb(var(--color-text-secondary))] hover:bg-[rgb(var(--color-surface-elevated))]"
+                      }`}
+                    >
+                      {t === "buyer" ? "קונים" : "בעלי מקצוע"}
+                    </button>
+                  ))}
+                </div>
+                <select
+                  value={funnelPeriod}
+                  onChange={(e) => setFunnelPeriod(e.target.value)}
+                  className="rounded-lg border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] px-3 py-1.5 text-[13px] text-[rgb(var(--color-text))] focus:border-[rgb(var(--color-primary))] focus:outline-none"
+                >
+                  <option value="7">7 ימים</option>
+                  <option value="30">30 ימים</option>
+                  <option value="90">90 ימים</option>
+                </select>
+              </div>
+            </div>
             {funnelData.steps.length > 0 ? (
               <div className="space-y-2">
                 {funnelData.steps.map((step) => (
@@ -709,8 +754,12 @@ export default function AnalyticsPage() {
                     const rate = prev.count > 0 ? Math.round((step.count / prev.count) * 100) : 0;
                     const stepLabels: Record<string, string> = {
                       posted_request: "הרשמה → בקשה",
-                      order_created: "בקשה → הזמנה",
+                      accepted_quote: "בקשה → קבלת הצעה",
+                      order_created: "הצעה → הזמנה",
                       order_completed: "הזמנה → השלמה",
+                      sent_quote: "הרשמה → שליחת הצעה",
+                      got_order: "הצעה → הזמנה",
+                      completed_order: "הזמנה → השלמה",
                     };
                     return (
                       <div

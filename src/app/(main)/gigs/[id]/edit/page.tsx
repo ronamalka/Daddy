@@ -33,11 +33,22 @@ export default function EditGigPage() {
   const [faqs, setFaqs] = useState<FaqData[]>([]);
   const [requirements, setRequirements] = useState<RequirementData[]>([]);
   const [catalogCategories, setCatalogCategories] = useState<ServiceCategory[]>([]);
+  const [unauthorized, setUnauthorized] = useState(false);
+  const [imageUploading, setImageUploading] = useState(false);
+  const [imageError, setImageError] = useState("");
 
   useEffect(() => {
     fetch(`/api/gigs/${params.id}`)
-      .then((r) => r.json())
+      .then((r) => {
+        if (!r.ok) throw new Error("fetch failed");
+        return r.json();
+      })
       .then((gig) => {
+        if (session?.user?.id && gig.sellerId && gig.sellerId !== session.user.id) {
+          setUnauthorized(true);
+          setLoading(false);
+          return;
+        }
         setTitle(gig.title);
         setDescription(gig.description);
         setCategoryId(canonicalizeCategorySlug(gig.category?.slug) || gig.category?.slug || "");
@@ -60,8 +71,12 @@ export default function EditGigPage() {
         setFaqs(gig.faqs?.map((f: { question: string; answer: string }) => ({ question: f.question, answer: f.answer })) || []);
         setRequirements(gig.requirements?.map((r: { question: string; required: boolean }) => ({ question: r.question, required: r.required })) || []);
         setLoading(false);
+      })
+      .catch(() => {
+        setError("לא ניתן לטעון את פרטי השירות");
+        setLoading(false);
       });
-  }, [params.id]);
+  }, [params.id, session?.user?.id]);
 
   useEffect(() => {
     fetch("/api/service-prices")
@@ -77,6 +92,10 @@ export default function EditGigPage() {
     return <div className="flex items-center justify-center py-20"><p className="text-[rgb(var(--color-text-secondary))]">גישה למוכרים בלבד</p></div>;
   }
 
+  if (unauthorized) {
+    return <div className="flex items-center justify-center py-20"><p className="text-[rgb(var(--color-text-secondary))]">אין לך הרשאה לערוך שירות זה</p></div>;
+  }
+
   if (loading) {
     return <div className="flex items-center justify-center py-20"><div className="h-10 w-10 animate-spin rounded-full border-4 border-[rgba(var(--color-primary),0.1)] border-t-[rgb(var(--color-primary))]" /></div>;
   }
@@ -84,6 +103,30 @@ export default function EditGigPage() {
   /** Updates one field on a price package. */
   function updateTier(tier: string, field: keyof TierData, value: string) {
     setTiers((prev) => ({ ...prev, [tier]: { ...prev[tier], [field]: value } }));
+  }
+
+  async function handleImageUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setImageError("");
+    setImageUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      const res = await fetch("/api/upload", { method: "POST", body: formData });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.files?.[0]?.url) {
+          setImage(data.files[0].url);
+        }
+      } else {
+        const data = await res.json().catch(() => ({}));
+        setImageError((data as { error?: string }).error || "העלאת התמונה נכשלה");
+      }
+    } catch {
+      setImageError("העלאת התמונה נכשלה");
+    }
+    setImageUploading(false);
   }
 
   /** Saves the edited gig details. */
@@ -100,22 +143,27 @@ export default function EditGigPage() {
 
     if (tierData.length === 0) { setError("נדרשת לפחות חבילת מחיר אחת"); setSaving(false); return; }
 
-    const res = await fetch(`/api/gigs/${params.id}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        title, description, image: image || null, categoryId,
-        tiers: tierData,
-        faqs: faqs.filter((f) => f.question && f.answer),
-        requirements: requirements.filter((r) => r.question),
-      }),
-    });
+    try {
+      const res = await fetch(`/api/gigs/${params.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title, description, image: image || null, categoryId,
+          tiers: tierData,
+          faqs: faqs.filter((f) => f.question && f.answer),
+          requirements: requirements.filter((r) => r.question),
+        }),
+      });
 
-    if (res.ok) {
-      router.push(`/gigs/${params.id}`);
-    } else {
-      const data = await res.json();
-      setError(data.error || "עדכון השירות נכשל");
+      if (res.ok) {
+        router.push(`/gigs/${params.id}`);
+      } else {
+        const data = await res.json().catch(() => ({}));
+        setError((data as { error?: string }).error || "עדכון השירות נכשל");
+        setSaving(false);
+      }
+    } catch {
+      setError("לא הצלחנו לשמור. נסה שוב.");
       setSaving(false);
     }
   }
@@ -145,7 +193,21 @@ export default function EditGigPage() {
               return options.map((c) => <option key={c.slug} value={c.slug}>{c.nameHe}</option>);
             })()}</select></div>
             <div><label className="mb-2 block text-[13px] font-semibold text-[rgb(var(--color-text-secondary))]">תיאור</label><textarea value={description} onChange={(e) => setDescription(e.target.value)} required rows={5} className={inputClass} /></div>
-            <div><label className="mb-2 block text-[13px] font-semibold text-[rgb(var(--color-text-secondary))]">קישור לתמונה</label><input value={image} onChange={(e) => setImage(e.target.value)} className={inputClass} /></div>
+            <div>
+              <label className="mb-2 block text-[13px] font-semibold text-[rgb(var(--color-text-secondary))]">תמונת שירות</label>
+              <div className="flex items-center gap-4">
+                {image && (
+                  <img src={image} alt="תמונת שירות" className="h-16 w-16 rounded-xl object-cover border border-[rgb(var(--color-border))]" />
+                )}
+                <div>
+                  <input type="file" accept="image/jpeg,image/png,image/webp" onChange={handleImageUpload} className="hidden" id="gig-image-upload" disabled={imageUploading} />
+                  <label htmlFor="gig-image-upload" className={`inline-block cursor-pointer rounded-xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface-elevated))] px-4 py-2.5 text-[13px] font-semibold text-[rgb(var(--color-text-secondary))] transition-all hover:border-[rgb(var(--color-primary))] hover:text-[rgb(var(--color-primary))] ${imageUploading ? "opacity-40 cursor-not-allowed" : ""}`}>
+                    {imageUploading ? "מעלה..." : image ? "החלף תמונה" : "העלה תמונה"}
+                  </label>
+                  {imageError && <p className="mt-1.5 text-[12px] text-[rgb(var(--color-error))]">{imageError}</p>}
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -206,7 +268,7 @@ export default function EditGigPage() {
           ))}
         </div>
 
-        <button type="submit" disabled={saving} className="w-full rounded-xl bg-[rgb(var(--color-primary))] py-4 text-[15px] font-semibold text-white shadow-[0_4px_16px_rgba(var(--color-primary),0.3)] transition-all hover:bg-[rgb(var(--color-primary-hover))] disabled:opacity-40 disabled:cursor-not-allowed">
+        <button type="submit" disabled={saving} className="w-full rounded-xl bg-[rgb(var(--color-primary))] py-4 text-[15px] font-semibold text-white shadow-md transition-all hover:bg-[rgb(var(--color-primary-hover))] disabled:opacity-40 disabled:cursor-not-allowed">
           {saving ? "שומר..." : "שמור שינויים"}
         </button>
       </form>

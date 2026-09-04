@@ -58,24 +58,20 @@ export default function ProfilePage() {
 
   return (
     <div className="mx-auto max-w-2xl px-4 py-8">
-      <div className="overflow-hidden rounded-2xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] shadow-[0_4px_16px_rgba(var(--color-primary),0.08)]">
-        <div className="relative h-36" style={{ background: "linear-gradient(135deg, rgb(var(--color-primary)) 0%, rgb(var(--color-primary-light)) 50%, rgb(var(--color-accent)) 100%)" }}>
-          <div className="absolute inset-0 overflow-hidden">
-            <div className="absolute -top-10 -right-10 h-40 w-40 rounded-full bg-white/10" />
-            <div className="absolute -bottom-20 -left-10 h-40 w-40 rounded-full bg-white/5" />
-          </div>
+      <div className="overflow-hidden rounded-2xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] shadow-md">
+        <div className="relative h-36 bg-primary">
         </div>
 
         <div className="relative px-8 pb-8">
           <div className="flex flex-col items-center -mt-14 sm:flex-row sm:items-end sm:gap-6">
-            <div className="flex h-28 w-28 items-center justify-center rounded-full border-4 border-[rgb(var(--color-surface))] bg-gradient-to-br from-[rgb(var(--color-primary))] to-[rgb(var(--color-primary-light))] text-4xl font-bold text-white shadow-[0_4px_16px_rgba(var(--color-primary),0.08)]">
+            <div className="flex h-28 w-28 items-center justify-center rounded-full border-4 border-[rgb(var(--color-surface))] bg-primary text-4xl font-bold text-white shadow-md">
               {session.user.name[0]}
             </div>
             <div className="mt-4 text-center sm:mt-0 sm:text-left sm:pb-1 flex-1">
               <h1 className="text-[24px] font-bold text-[rgb(var(--color-text))]">{session.user.name}</h1>
               <p className="mt-0.5 text-[14px] text-[rgb(var(--color-text-secondary))]">{session.user.email}</p>
             </div>
-            <div className="flex items-center gap-3 mt-3 sm:mt-0 sm:mb-2">
+            <div className="flex flex-wrap items-center justify-center gap-3 mt-3 sm:mt-0 sm:mb-2 sm:justify-end">
               <span className={`rounded-full px-4 py-1.5 text-[13px] font-semibold ${roleStyle.bg} ${roleStyle.text}`}>
                 {roleStyle.label}
               </span>
@@ -227,7 +223,7 @@ export default function ProfilePage() {
               </div>
               <div className="rounded-xl bg-[rgb(var(--color-surface-elevated))] border border-[rgb(var(--color-border-light))] p-4 text-center">
                 <p className="text-[24px] font-bold text-[rgb(var(--color-accent-yellow))]">{stats.reviewsGiven}</p>
-                <p className="mt-1 text-[12px] font-medium uppercase tracking-[0.05em] text-[rgb(var(--color-text-muted))]">ביקורות שנתנתי</p>
+                <p className="mt-1 text-[12px] font-medium uppercase tracking-[0.05em] text-[rgb(var(--color-text-muted))]">ביקורות שנתתי</p>
               </div>
             </div>
           )}

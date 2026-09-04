@@ -21,6 +21,7 @@ export default function MyGigsPage() {
   const { data: session } = useSession();
   const [gigs, setGigs] = useState<GigItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     if (!session?.user?.id) return;
@@ -30,13 +31,21 @@ export default function MyGigsPage() {
         setGigs(data.gigs || []);
         setLoading(false);
       })
-      .catch(() => setLoading(false));
+      .catch(() => { setLoading(false); setError("לא הצלחנו לטעון את הנתונים"); });
   }, [session?.user?.id]);
 
   if (!session || session.user.role !== "SELLER") {
     return (
       <div className="flex flex-col items-center justify-center py-20">
         <p className="text-[16px] text-[rgb(var(--color-text-secondary))]">גישה למוכרים בלבד</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="mx-auto max-w-3xl px-4 py-16 text-center">
+        <p className="text-[16px] text-[rgb(var(--color-error))]">{error}</p>
       </div>
     );
   }
@@ -50,7 +59,7 @@ export default function MyGigsPage() {
         </div>
         <Link
           href="/gigs/create"
-          className="rounded-xl bg-[rgb(var(--color-primary))] px-5 py-2.5 text-[14px] font-semibold text-white transition-all hover:bg-[rgb(var(--color-primary-hover))] shadow-[0_4px_16px_rgba(var(--color-primary),0.3)]"
+          className="rounded-xl bg-[rgb(var(--color-primary))] px-5 py-2.5 text-[14px] font-semibold text-white transition-all hover:bg-[rgb(var(--color-primary-hover))] shadow-md"
         >
           + חבילה חדשה
         </Link>
@@ -61,7 +70,7 @@ export default function MyGigsPage() {
           <div className="h-8 w-8 animate-spin rounded-full border-4 border-[rgba(var(--color-primary),0.1)] border-t-[rgb(var(--color-primary))]" />
         </div>
       ) : gigs.length === 0 ? (
-        <div className="rounded-2xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] p-12 text-center shadow-[0_2px_8px_rgba(var(--color-primary),0.06)]">
+        <div className="rounded-2xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] p-12 text-center shadow-sm">
           <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-[rgba(var(--color-primary),0.1)]">
             <svg className="h-8 w-8 text-[rgb(var(--color-primary))]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
@@ -86,7 +95,7 @@ export default function MyGigsPage() {
             return (
               <div
                 key={gig.id}
-                className="group rounded-2xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] p-5 transition-all hover:shadow-[0_4px_16px_rgba(var(--color-primary),0.08)]"
+                className="group rounded-2xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] p-5 transition-all hover:shadow-md"
               >
                 <div className="flex gap-5">
                   {gig.image ? (
@@ -96,7 +105,7 @@ export default function MyGigsPage() {
                       className="h-24 w-32 rounded-xl object-cover"
                     />
                   ) : (
-                    <div className="flex h-24 w-32 items-center justify-center rounded-xl bg-gradient-to-br from-[rgba(var(--color-primary),0.1)] to-[rgba(var(--color-primary-light),0.1)]">
+                    <div className="flex h-24 w-32 items-center justify-center rounded-xl bg-[rgba(var(--color-primary),0.08)]">
                       <svg className="h-8 w-8 text-[rgb(var(--color-primary-light))]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
                         <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.41a2.25 2.25 0 013.182 0l2.909 2.91m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
                       </svg>

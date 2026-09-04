@@ -3,6 +3,7 @@
 import { useState, useRef, useCallback } from "react";
 import { Star, Handshake, Clock, Coins } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
+import { trackEvent } from "@/lib/analytics";
 import { TurnstileWidget } from "@/components/turnstile-widget";
 
 const CRITERIA = [
@@ -51,6 +52,7 @@ export function ReviewForm({ orderId, sellerName, onSubmitted }: ReviewFormProps
         body: JSON.stringify({ comment, ...ratings, turnstileToken, _hp_field: "", _formLoadedAt: formLoadedAtRef.current }),
       });
       if (res.ok) {
+        trackEvent("review_submitted", { orderId, rating: Number(avg || 0) });
         onSubmitted();
       } else {
         const data = await res.json().catch(() => ({}));
@@ -86,7 +88,7 @@ export function ReviewForm({ orderId, sellerName, onSubmitted }: ReviewFormProps
                   className={cn(
                     "h-9 w-9 rounded-lg text-[13px] font-semibold transition-all",
                     ratings[c.key] === n
-                      ? "bg-[rgb(var(--color-primary))] text-white shadow-[0_2px_8px_rgba(var(--color-primary),0.3)]"
+                      ? "bg-[rgb(var(--color-primary))] text-white shadow-md"
                       : ratings[c.key] > 0 && n <= ratings[c.key]
                       ? "bg-[rgba(var(--color-primary),0.1)] text-[rgb(var(--color-primary))]"
                       : "bg-[rgb(var(--color-surface-elevated))] text-[rgb(var(--color-text-muted))] hover:bg-[rgba(var(--color-primary),0.1)] hover:text-[rgb(var(--color-primary))]"
@@ -104,7 +106,7 @@ export function ReviewForm({ orderId, sellerName, onSubmitted }: ReviewFormProps
       </div>
 
       {avg && (
-        <div className="mt-5 flex items-center gap-3 rounded-xl bg-gradient-to-r from-[rgba(var(--color-primary),0.1)] to-[rgba(var(--color-accent),0.1)] p-4">
+        <div className="mt-5 flex items-center gap-3 rounded-xl bg-[rgba(var(--color-primary),0.08)] p-4">
           <div className="text-[28px] font-bold text-[rgb(var(--color-primary))]" aria-label={`ציון כללי: ${avg} מתוך 10`}>{avg}</div>
           <div>
             <p className="text-[13px] font-semibold text-[rgb(var(--color-text))]">ציון כללי</p>

@@ -114,7 +114,7 @@ export function toE164(phone: string): string | null {
   const cleaned = phone.replace(/[-\s().]/g, "");
   if (cleaned.startsWith("+972")) return cleaned;
   if (cleaned.startsWith("972")) return "+" + cleaned;
-  if (cleaned.startsWith("0") && cleaned.length === 10) return "+972" + cleaned.slice(1);
+  if (cleaned.startsWith("0") && (cleaned.length === 9 || cleaned.length === 10)) return "+972" + cleaned.slice(1);
   return null;
 }
 

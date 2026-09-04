@@ -3,10 +3,11 @@
 import { signIn } from "next-auth/react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { googleAuthErrorMessage } from "@/lib/oauth-errors";
 import { safeInAppPath } from "@/lib/seller-ready";
 import { trackEvent } from "@/lib/analytics";
+import { TurnstileWidget } from "@/components/turnstile-widget";
 
 /** Shows the login form so users can sign in. */
 export default function LoginPage() {
@@ -15,6 +16,9 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
   const [nextPath, setNextPath] = useState("/");
+  const [turnstileToken, setTurnstileToken] = useState("");
+  const handleTurnstileVerify = useCallback((token: string) => setTurnstileToken(token), []);
+  const handleTurnstileExpire = useCallback(() => setTurnstileToken(""), []);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -35,6 +39,7 @@ export default function LoginPage() {
     const result = await signIn("credentials", {
       email: formData.get("email"),
       password: formData.get("password"),
+      turnstileToken,
       redirect: false,
     });
 
@@ -67,14 +72,13 @@ export default function LoginPage() {
     <div className="w-full max-w-md">
       <div className="mb-8 text-center lg:hidden">
         <h2
-          className="text-3xl font-extrabold tracking-[-0.02em] bg-clip-text text-transparent"
-          style={{ backgroundImage: "linear-gradient(135deg, rgb(var(--color-primary)) 0%, rgb(var(--color-primary-light)) 50%, rgb(var(--color-accent)) 100%)" }}
+          className="text-3xl font-extrabold tracking-[-0.02em] text-[rgb(var(--color-primary))]"
         >
           אבאל׳ה
         </h2>
       </div>
 
-      <div className="rounded-2xl bg-[rgb(var(--color-surface))] p-8 shadow-[0_4px_16px_rgba(var(--color-primary),0.08)]">
+      <div className="rounded-2xl bg-[rgb(var(--color-surface))] p-8 shadow-md">
         <h1 className="mb-2 text-center text-[24px] font-bold tracking-[-0.01em] text-[rgb(var(--color-text))]">
           שוב פה? יופי, חיכינו לך
         </h1>
@@ -95,7 +99,7 @@ export default function LoginPage() {
           type="button"
           onClick={handleGoogleSignIn}
           disabled={isLoading}
-          className="mb-5 flex w-full items-center justify-center gap-3 rounded-xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface-elevated))] py-3.5 text-[16px] font-medium text-[rgb(var(--color-text))] transition-all hover:bg-[rgb(var(--color-bg))] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
+          className="mb-5 flex w-full items-center justify-center gap-3 rounded-xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface-elevated))] py-3.5 text-[16px] font-medium text-[rgb(var(--color-text))] transition-all hover:bg-[rgb(var(--color-bg))] disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {googleLoading ? (
             <svg className="h-5 w-5 animate-spin" viewBox="0 0 24 24" fill="none">
@@ -155,10 +159,11 @@ export default function LoginPage() {
               אבא לא שוכח. אבל אם כן...
             </Link>
           </div>
+          <TurnstileWidget onVerify={handleTurnstileVerify} onExpire={handleTurnstileExpire} />
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full rounded-xl bg-[rgb(var(--color-primary))] py-3.5 text-[16px] font-semibold text-white shadow-[0_4px_16px_rgba(var(--color-primary),0.08)] transition-all hover:bg-[rgb(var(--color-primary-hover))] hover:shadow-[0_8px_32px_rgba(var(--color-primary),0.12)] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full rounded-xl bg-[rgb(var(--color-primary))] py-3.5 text-[16px] font-semibold text-white shadow-sm transition-colors hover:bg-[rgb(var(--color-primary-hover))] disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {loading ? (
               <span className="flex items-center justify-center gap-2">

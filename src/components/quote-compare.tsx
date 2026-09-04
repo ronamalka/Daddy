@@ -103,7 +103,7 @@ export function QuoteCompare({
           return (
             <article
               key={quote.id}
-              className="flex flex-col rounded-xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] p-4 shadow-[0_4px_16px_rgba(var(--color-primary),0.06)] sm:min-w-[240px] sm:max-w-[280px] sm:flex-1"
+              className="flex flex-col rounded-xl border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] p-4 shadow-sm sm:min-w-[240px] sm:max-w-[280px] sm:flex-1"
             >
               <div className="flex items-start justify-between gap-2">
                 {sellerHref ? (

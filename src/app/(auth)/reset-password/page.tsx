@@ -121,7 +121,7 @@ function ResetPasswordForm() {
         </p>
         <Link
           href="/forgot-password"
-          className="inline-block rounded-xl bg-[rgb(var(--color-primary))] px-8 py-3.5 text-[16px] font-semibold text-white transition-all hover:bg-[rgb(var(--color-primary-hover))] active:scale-[0.98]"
+          className="inline-block rounded-xl bg-[rgb(var(--color-primary))] px-8 py-3.5 text-[16px] font-semibold text-white transition-all hover:bg-[rgb(var(--color-primary-hover))]"
         >
           בקש קישור חדש
         </Link>
@@ -145,7 +145,7 @@ function ResetPasswordForm() {
         </p>
         <Link
           href="/login"
-          className="inline-block rounded-xl bg-[rgb(var(--color-primary))] px-8 py-3.5 text-[16px] font-semibold text-white transition-all hover:bg-[rgb(var(--color-primary-hover))] active:scale-[0.98]"
+          className="inline-block rounded-xl bg-[rgb(var(--color-primary))] px-8 py-3.5 text-[16px] font-semibold text-white transition-all hover:bg-[rgb(var(--color-primary-hover))]"
         >
           התחבר
         </Link>
@@ -206,7 +206,7 @@ function ResetPasswordForm() {
         <button
           type="submit"
           disabled={loading}
-          className="w-full rounded-xl bg-[rgb(var(--color-primary))] py-3.5 text-[16px] font-semibold text-white shadow-[0_4px_16px_rgba(var(--color-primary),0.08)] transition-all hover:bg-[rgb(var(--color-primary-hover))] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
+          className="w-full rounded-xl bg-[rgb(var(--color-primary))] py-3.5 text-[16px] font-semibold text-white shadow-sm transition-colors hover:bg-[rgb(var(--color-primary-hover))] disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {loading ? (
             <span className="flex items-center justify-center gap-2">
@@ -231,14 +231,13 @@ export default function ResetPasswordPage() {
     <div className="w-full max-w-md">
       <div className="mb-8 text-center lg:hidden">
         <h2
-          className="text-3xl font-extrabold tracking-[-0.02em] bg-clip-text text-transparent"
-          style={{ backgroundImage: "linear-gradient(135deg, rgb(var(--color-primary)) 0%, rgb(var(--color-primary-light)) 50%, rgb(var(--color-accent)) 100%)" }}
+          className="text-3xl font-extrabold tracking-[-0.02em] text-[rgb(var(--color-primary))]"
         >
           אבאל׳ה
         </h2>
       </div>
 
-      <div className="rounded-2xl bg-[rgb(var(--color-surface))] p-8 shadow-[0_4px_16px_rgba(var(--color-primary),0.08)]">
+      <div className="rounded-2xl bg-[rgb(var(--color-surface))] p-8 shadow-md">
         <Suspense fallback={
           <div className="text-center py-12">
             <svg className="mx-auto h-8 w-8 animate-spin text-[rgb(var(--color-primary))]" viewBox="0 0 24 24" fill="none">

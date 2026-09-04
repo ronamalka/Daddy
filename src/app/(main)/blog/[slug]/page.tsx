@@ -122,7 +122,7 @@ export default async function BlogPostPage(props: PageProps) {
       />
 
       {/* Hero */}
-      <section className="bg-gradient-to-br from-slate-900 via-slate-900 to-[rgba(var(--color-primary),0.3)] py-16 text-white">
+      <section className="bg-slate-900 py-16 text-white">
         <div className="mx-auto max-w-3xl px-4">
           <Link
             href="/blog"
