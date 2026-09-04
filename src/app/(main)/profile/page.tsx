@@ -71,7 +71,7 @@ export default function ProfilePage() {
               <h1 className="text-[24px] font-bold text-[rgb(var(--color-text))]">{session.user.name}</h1>
               <p className="mt-0.5 text-[14px] text-[rgb(var(--color-text-secondary))]">{session.user.email}</p>
             </div>
-            <div className="flex items-center gap-3 mt-3 sm:mt-0 sm:mb-2">
+            <div className="flex flex-wrap items-center justify-center gap-3 mt-3 sm:mt-0 sm:mb-2 sm:justify-end">
               <span className={`rounded-full px-4 py-1.5 text-[13px] font-semibold ${roleStyle.bg} ${roleStyle.text}`}>
                 {roleStyle.label}
               </span>
@@ -223,7 +223,7 @@ export default function ProfilePage() {
               </div>
               <div className="rounded-xl bg-[rgb(var(--color-surface-elevated))] border border-[rgb(var(--color-border-light))] p-4 text-center">
                 <p className="text-[24px] font-bold text-[rgb(var(--color-accent-yellow))]">{stats.reviewsGiven}</p>
-                <p className="mt-1 text-[12px] font-medium uppercase tracking-[0.05em] text-[rgb(var(--color-text-muted))]">ביקורות שנתנתי</p>
+                <p className="mt-1 text-[12px] font-medium uppercase tracking-[0.05em] text-[rgb(var(--color-text-muted))]">ביקורות שנתתי</p>
               </div>
             </div>
           )}

@@ -126,12 +126,18 @@ profileRoutes.put("/", requireAuth, async (req: Request, res: Response) => {
     }
   }
 
+  const currentUser = await prisma.user.findUnique({
+    where: { id: req.user!.id },
+    select: { phone: true },
+  });
+
   const updated = await prisma.user.update({
     where: { id: req.user!.id },
     data: {
       ...(name && { name }),
       ...(bio !== undefined && { bio }),
       ...(normalizedPhone !== undefined && { phone: normalizedPhone }),
+      ...(normalizedPhone !== undefined && normalizedPhone !== currentUser?.phone && { phoneVerified: false, phoneVerifiedAt: null }),
       ...(city !== undefined && { city }),
       ...(cityCode !== undefined && { cityCode }),
       ...(districtCode !== undefined && { districtCode }),
