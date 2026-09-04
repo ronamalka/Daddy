@@ -181,7 +181,6 @@ export function MessengerInbox({ peerId }: { peerId?: string }) {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ senderId: otherId }),
         });
-        emitMessagesChanged();
         loadConversations();
       }
     }
