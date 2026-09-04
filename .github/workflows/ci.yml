@@ -116,9 +116,28 @@ jobs:
         env:
           DATABASE_URL: "postgresql://dummy:dummy@localhost:5432/dummy"
 
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4
+        with:
+          driver: docker-container
+
+      - name: Pre-build service images with cache
+        run: |
+          for svc in users gigs orders requests chat; do
+            docker buildx build \
+              --file services/$svc/Dockerfile \
+              --load \
+              --cache-from type=gha,scope=ci-$svc \
+              --cache-to type=gha,mode=max,scope=ci-$svc \
+              -t daddy-$svc-service \
+              .
+          done
+        env:
+          DOCKER_BUILDKIT: "1"
+
       - name: Start services with docker-compose
-        run: docker compose -f docker-compose.yml -f docker-compose.ci.yml up -d --build
-        timeout-minutes: 10
+        run: docker compose -f docker-compose.yml -f docker-compose.ci.yml up -d
+        timeout-minutes: 20
         env:
           INTER_SERVICE_SECRET: "test-secret-for-ci"
 
