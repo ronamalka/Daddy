@@ -70,7 +70,7 @@ export function canOpenDispute(input: {
 
 /** True if a photo URL is a stored upload or https image, not a script URL. */
 export function isAllowedPhotoUrl(url: string): boolean {
-  return url.startsWith("/uploads/") || url.startsWith("https://");
+  return /^\/uploads\/[a-zA-Z0-9_-]+\.[a-zA-Z0-9]+$/.test(url);
 }
 
 export type DisputeInputResult =

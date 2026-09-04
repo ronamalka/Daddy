@@ -115,13 +115,9 @@ export default function ChatModerationPage() {
   }
 
   const todayViolations = violations.filter((v) => {
-    const today = new Date();
-    const created = new Date(v.createdAt);
-    return (
-      created.getDate() === today.getDate() &&
-      created.getMonth() === today.getMonth() &&
-      created.getFullYear() === today.getFullYear()
-    );
+    const todayStr = new Date().toISOString().slice(0, 10);
+    const createdStr = new Date(v.createdAt).toISOString().slice(0, 10);
+    return createdStr === todayStr;
   }).length;
 
   const repeatOffenders = new Set(

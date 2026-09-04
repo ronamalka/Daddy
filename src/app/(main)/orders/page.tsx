@@ -36,6 +36,7 @@ export default function OrdersPage() {
   }, [selling]);
 
   useEffect(() => {
+    if (!session?.user) { setLoading(false); return; }
     fetch("/api/orders")
       .then((r) => r.json())
       .then((data) => {
@@ -47,7 +48,7 @@ export default function OrdersPage() {
       .finally(() => {
         setLoading(false);
       });
-  }, []);
+  }, [session]);
 
   useEffect(() => {
     if (tab) return;
