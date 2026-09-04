@@ -47,6 +47,7 @@ function RegisterForm() {
   const [selectedCity, setSelectedCity] = useState<{ cityCode: number; cityName: string; districtCode: number; districtName: string } | null>(null);
   const [serviceAreas, setServiceAreas] = useState<ServiceAreaEntry[]>([]);
   const [selectedServices, setSelectedServices] = useState<string[]>([]);
+  const [passwordValid, setPasswordValid] = useState(false);
   const [turnstileToken, setTurnstileToken] = useState("");
   const [acceptedTerms, setAcceptedTerms] = useState(false);
   const [confirmedAge18, setConfirmedAge18] = useState(false);
@@ -145,10 +146,18 @@ function RegisterForm() {
     return true;
   }
 
+  const handlePasswordValidChange = useCallback((valid: boolean) => {
+    setPasswordValid(valid);
+  }, []);
+
   /** Moves to the next sign-up step, or submits the form. */
   function handleNext() {
     if (step === 1) {
       if (!ensureLegalConsent()) return;
+      if (!passwordValid) {
+        setError("יש לבחור סיסמה חזקה שלא נמצאה בדליפות נתונים.");
+        return;
+      }
       setStep(2);
     } else if (step === 2 && role === "SELLER") {
       setStep(3);
@@ -270,7 +279,7 @@ function RegisterForm() {
             <div>
               <label htmlFor="password" className="mb-1.5 block text-[14px] font-medium text-[rgb(var(--color-text))]">סיסמה</label>
               <input id="password" type="password" required minLength={8} placeholder="לפחות 8 תווים, אות גדולה, ספרה ותו מיוחד" value={password} onChange={(e) => setPassword(e.target.value)} className={inputClass} />
-              <PasswordStrength password={password} />
+              <PasswordStrength password={password} onValidChange={handlePasswordValidChange} />
             </div>
             <div>
               <label className="mb-1.5 block text-[14px] font-medium text-[rgb(var(--color-text))]">אני רוצה</label>
