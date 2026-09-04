@@ -230,8 +230,9 @@ export default function OrderDetailPage() {
       fetch(`/api/orders/${params.id}`)
         .then((r) => r.json())
         .then((data) => {
+          if (!data?.id) return;
+          setOrder((prev) => prev ? { ...prev, ...data } : prev);
           if (data.messages?.length > (order.messages?.length ?? 0)) {
-            setOrder((prev) => prev ? { ...prev, messages: data.messages } : prev);
             fetch("/api/messages/mark-read", {
               method: "POST",
               headers: { "Content-Type": "application/json" },
@@ -249,20 +250,24 @@ export default function OrderDetailPage() {
     e.preventDefault();
     if ((!message.trim() && !attachment) || attachBusy) return;
     setSending(true);
-    const res = await fetch(`/api/orders/${params.id}/messages`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        content: message,
-        ...(attachment ? { attachment } : {}),
-      }),
-    });
-    if (res.ok) {
-      const msg = await res.json();
-      setOrder((prev) => prev ? { ...prev, messages: [...prev.messages, msg] } : prev);
-      setMessage("");
-      setAttachment(null);
-      setAttachError("");
+    try {
+      const res = await fetch(`/api/orders/${params.id}/messages`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          content: message,
+          ...(attachment ? { attachment } : {}),
+        }),
+      });
+      if (res.ok) {
+        const msg = await res.json();
+        setOrder((prev) => prev ? { ...prev, messages: [...prev.messages, msg] } : prev);
+        setMessage("");
+        setAttachment(null);
+        setAttachError("");
+      }
+    } catch {
+      // network error — allow retry
     }
     setSending(false);
   }
@@ -411,7 +416,7 @@ export default function OrderDetailPage() {
         return r.json();
       })
       .then((data) => {
-        if (data) setOrder(data);
+        if (data) setOrder((prev) => prev ? { ...prev, ...data } : data);
       })
       .catch(() => {});
     setReviewOpen(false);
@@ -487,7 +492,7 @@ export default function OrderDetailPage() {
     setCancelSubmitting(false);
   }
 
-  const [now] = useState(() => Date.now());
+  const now = Date.now();
 
   if (loadError) {
     return (
@@ -503,6 +508,15 @@ export default function OrderDetailPage() {
 
   const isBuyer = session?.user?.id === order.buyer.id;
   const isSeller = session?.user?.id === order.seller.id;
+
+  if (session?.user && !isBuyer && !isSeller) {
+    return (
+      <div className="flex flex-col items-center justify-center py-20">
+        <p className="text-[16px] text-[rgb(var(--color-text-secondary))]">אין לך הרשאה לצפות בהזמנה זו</p>
+      </div>
+    );
+  }
+
   const statusInfo = STATUS_STYLE[order.status] || STATUS_STYLE.PENDING;
   const daysLeft = order.dueDate ? Math.ceil((new Date(order.dueDate).getTime() - now) / (1000 * 60 * 60 * 24)) : null;
   const buyerCancel = evaluateBuyerCancel({
@@ -514,14 +528,16 @@ export default function OrderDetailPage() {
   });
   const hasOpenDispute = orderHasOpenDispute(order.disputes);
   const showBuyerDisputeInsteadOfCancel = isBuyer && (order.status === "IN_PROGRESS" || order.status === "ON_THE_WAY") && !hasOpenDispute;
+  const toIsraelDate = (d: Date) => d.toLocaleDateString("en-CA", { timeZone: "Asia/Jerusalem" });
   const isBookedDay = order.slotStart
-    ? new Date(order.slotStart).toISOString().slice(0, 10) === new Date().toISOString().slice(0, 10)
+    ? toIsraelDate(new Date(order.slotStart)) === toIsraelDate(new Date())
     : false;
 
   const WARRANTY_DAYS = 30;
   const isCompleted = order.status === "COMPLETED";
+  // TODO: Use dedicated completedAt timestamp once added to schema
   const completedDaysAgo = isCompleted
-    ? (now - new Date(order.updatedAt ?? order.createdAt).getTime()) / (1000 * 60 * 60 * 24)
+    ? (now - new Date(order.cancelledAt ?? order.updatedAt ?? order.createdAt).getTime()) / (1000 * 60 * 60 * 24)
     : Infinity;
   const withinWarranty = isCompleted && completedDaysAgo <= WARRANTY_DAYS;
   const warrantyDaysLeft = withinWarranty ? Math.ceil(WARRANTY_DAYS - completedDaysAgo) : 0;
@@ -956,7 +972,7 @@ export default function OrderDetailPage() {
             )}
 
             {/* Flag Review */}
-            {!isSeller && !flagSubmitted && (
+            {isSeller && !flagSubmitted && (
               <div className="mt-3 border-t border-[rgb(var(--color-border))] pt-3">
                 {!showFlagForm ? (
                   <button

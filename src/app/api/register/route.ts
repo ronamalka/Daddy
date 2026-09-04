@@ -86,10 +86,6 @@ export async function POST(request: NextRequest) {
     turnstileToken: _t,
     _hp_field: _h,
     _formLoadedAt: _f,
-    acceptedTerms: _terms,
-    confirmedAge18: _age,
-    independentContractor: _ic,
-    termsVersion: _tv,
     ...cleanData
   } = result.data;
 
