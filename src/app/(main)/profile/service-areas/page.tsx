@@ -37,7 +37,7 @@ export default function ServiceAreasPage() {
         }
         setLoading(false);
       })
-      .catch(() => setLoading(false));
+      .catch(() => { setLoading(false); setError("לא הצלחנו לטעון את הנתונים"); });
   }, []);
 
   /** Saves the seller's service areas. */

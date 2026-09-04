@@ -24,6 +24,21 @@ export function GigCard({ id, title, image, seller, startingPrice, avgRating, re
   const [isFavorite, setIsFavorite] = useState(false);
   const sellerName = seller?.name || "משתמש";
 
+  const handleFavoriteToggle = async () => {
+    const newState = !isFavorite;
+    setIsFavorite(newState);
+    trackEvent("favorite_toggled", { gigId: id, action: newState ? "add" : "remove" });
+    try {
+      await fetch("/api/favorites", {
+        method: newState ? "POST" : "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ gigId: id }),
+      });
+    } catch {
+      setIsFavorite(!newState);
+    }
+  };
+
   if (variant === "list") {
     return (
       <div>
@@ -39,7 +54,7 @@ export function GigCard({ id, title, image, seller, startingPrice, avgRating, re
                 <span className="text-4xl font-bold text-[rgb(var(--color-text-muted))]">א</span>
               </div>
             )}
-            <FavoriteButton isFavorite={isFavorite} onToggle={() => { trackEvent("favorite_toggled", { gigId: id, action: isFavorite ? "remove" : "add" }); setIsFavorite(!isFavorite); }} />
+            <FavoriteButton isFavorite={isFavorite} onToggle={handleFavoriteToggle} />
           </div>
           <div className="flex flex-1 flex-col justify-between p-4">
             <div>
@@ -91,7 +106,7 @@ export function GigCard({ id, title, image, seller, startingPrice, avgRating, re
               <span className="text-5xl font-bold text-[rgb(var(--color-text-muted))]">א</span>
             </div>
           )}
-          <FavoriteButton isFavorite={isFavorite} onToggle={() => { trackEvent("favorite_toggled", { gigId: id, action: isFavorite ? "remove" : "add" }); setIsFavorite(!isFavorite); }} />
+          <FavoriteButton isFavorite={isFavorite} onToggle={handleFavoriteToggle} />
         </div>
         <div className="p-4">
           <div className="mb-3 flex items-center gap-2.5">

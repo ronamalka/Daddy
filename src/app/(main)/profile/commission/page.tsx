@@ -37,7 +37,7 @@ const TIER_STYLES: Record<string, { color: string; bg: string; icon: string }> =
 };
 
 const ALL_TIERS = [
-  { key: "STANDARD", label: "רגיל", rate: 15, range: "1-5" },
+  { key: "STANDARD", label: "רגיל", rate: 15, range: "0-5" },
   { key: "SILVER", label: "כסף", rate: 12, range: "6-15" },
   { key: "GOLD", label: "זהב", rate: 10, range: "16-30" },
   { key: "PLATINUM", label: "פלטינה", rate: 8, range: "31+" },
@@ -116,16 +116,17 @@ export default function CommissionPage() {
     ? ALL_TIERS.find((t) => t.key === commission.nextTier)
     : null;
 
-  // Calculate progress bar for next tier
+  function parseRangeMin(range: string): number {
+    if (range.endsWith("+")) return parseInt(range);
+    return parseInt(range.split("-")[0]);
+  }
+
   let progressPercent = 100;
   if (nextTierMeta && currentTierMeta) {
-    const currentMin = currentTierIdx > 0 ? ALL_TIERS[currentTierIdx].rate : 0;
-    const nextMin = ALL_TIERS[currentTierIdx + 1]
-      ? parseInt(ALL_TIERS[currentTierIdx + 1].range)
-      : commission.completedOrders90d;
-    const currentRangeStart = parseInt(currentTierMeta.range);
-    const total = nextMin - currentRangeStart;
-    const progress = commission.completedOrders90d - currentRangeStart;
+    const rangeStart = parseRangeMin(currentTierMeta.range);
+    const rangeEnd = parseRangeMin(nextTierMeta.range);
+    const total = rangeEnd - rangeStart;
+    const progress = commission.completedOrders90d - rangeStart;
     progressPercent = total > 0 ? Math.min(100, Math.max(0, (progress / total) * 100)) : 100;
   }
 

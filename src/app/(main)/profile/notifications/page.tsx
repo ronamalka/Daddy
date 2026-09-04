@@ -41,7 +41,7 @@ export default function NotificationPreferencesPage() {
         }
         setLoading(false);
       })
-      .catch(() => setLoading(false));
+      .catch(() => { setLoading(false); setError("לא הצלחנו לטעון את הנתונים"); });
   }, []);
 
   if (!session) {

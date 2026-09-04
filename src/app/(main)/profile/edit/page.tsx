@@ -27,6 +27,7 @@ export default function EditProfilePage() {
   const [payoutAccountNumber, setPayoutAccountNumber] = useState("");
 
   useEffect(() => {
+    if (!session?.user) return;
     fetch("/api/profile")
       .then((r) => r.json())
       .then((data) => {
@@ -43,8 +44,9 @@ export default function EditProfilePage() {
           setPayoutAccountNumber(data.payoutAccountNumber || "");
         }
         setLoading(false);
-      });
-  }, []);
+      })
+      .catch(() => { setLoading(false); setError("לא הצלחנו לטעון את הפרופיל"); });
+  }, [session]);
 
   if (!session) {
     return <div className="flex items-center justify-center py-20"><p className="text-[rgb(var(--color-text-secondary))]">התחבר כדי לערוך את הפרופיל.</p></div>;

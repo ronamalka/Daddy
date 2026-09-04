@@ -28,7 +28,7 @@ export default function ProfileServicesPage() {
         setMuted(Object.fromEntries(rows.map((row) => [row.serviceSlug, row.alertsMuted])));
         setLoading(false);
       })
-      .catch(() => setLoading(false));
+      .catch(() => { setLoading(false); setError("לא הצלחנו לטעון את הנתונים"); });
   }, []);
 
   /** Saves the list of services this seller offers and per-service request-alert mutes. */

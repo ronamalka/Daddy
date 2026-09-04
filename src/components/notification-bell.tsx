@@ -56,7 +56,7 @@ export function NotificationBell() {
     if (isOpen) {
       setReadIds(new Set(notifications.map((n) => n.id)));
       const persistedIds = notifications
-        .filter((n) => n.type === "NEW_NEARBY_REQUEST" && !n.read)
+        .filter((n) => !n.read)
         .map((n) => n.id);
       if (persistedIds.length > 0) {
         fetch("/api/notifications/mark-read", {

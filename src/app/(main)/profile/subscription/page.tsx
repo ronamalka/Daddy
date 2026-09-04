@@ -205,7 +205,7 @@ export default function SubscriptionPage() {
           }`}
         >
           {isPremium && (
-            <div className="absolute -top-3 right-6 rounded-full bg-accent-yellow px-3 py-0.5 text-[12px] font-semibold text-white">
+            <div className="absolute -top-3 right-6 rounded-full bg-[rgb(var(--color-accent-yellow))] px-3 py-0.5 text-[12px] font-semibold text-white">
               המנוי הנוכחי
             </div>
           )}
@@ -248,7 +248,7 @@ export default function SubscriptionPage() {
               <button
                 onClick={() => handleAction("subscribe")}
                 disabled={actionLoading}
-                className="w-full rounded-xl bg-accent-yellow py-3 text-[15px] font-bold text-white shadow-md hover:shadow-lg transition-shadow disabled:opacity-50"
+                className="w-full rounded-xl bg-[rgb(var(--color-accent-yellow))] py-3 text-[15px] font-bold text-white shadow-md hover:shadow-lg transition-shadow disabled:opacity-50"
               >
                 {actionLoading ? "מעבד..." : "שדרג לפרימיום"}
               </button>
@@ -258,7 +258,7 @@ export default function SubscriptionPage() {
                 <button
                   onClick={() => handleAction("renew")}
                   disabled={actionLoading}
-                  className="w-full rounded-xl bg-accent-yellow py-3 text-[15px] font-bold text-white shadow-md hover:shadow-lg transition-shadow disabled:opacity-50"
+                  className="w-full rounded-xl bg-[rgb(var(--color-accent-yellow))] py-3 text-[15px] font-bold text-white shadow-md hover:shadow-lg transition-shadow disabled:opacity-50"
                 >
                   {actionLoading ? "מעבד..." : "חדש מנוי"}
                 </button>

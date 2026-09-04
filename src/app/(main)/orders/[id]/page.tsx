@@ -267,7 +267,7 @@ export default function OrderDetailPage() {
         setAttachError("");
       }
     } catch {
-      // network error — allow retry
+      setStatusError("שליחת ההודעה נכשלה. נסה שוב.");
     }
     setSending(false);
   }
