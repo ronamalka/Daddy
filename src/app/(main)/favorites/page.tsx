@@ -40,6 +40,7 @@ export default function FavoritesPage() {
   const [tab, setTab] = useState<Tab>("gigs");
 
   useEffect(() => {
+    if (!session?.user) { setLoading(false); return; }
     Promise.all([
       fetch("/api/favorites").then((r) => r.json()).catch(() => []),
       fetch("/api/favorite-sellers").then((r) => r.json()).catch(() => []),
@@ -48,7 +49,7 @@ export default function FavoritesPage() {
       setSellers(Array.isArray(sellersData) ? sellersData : []);
       setLoading(false);
     });
-  }, []);
+  }, [session]);
 
   if (!session) {
     return (

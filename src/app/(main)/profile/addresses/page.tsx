@@ -130,6 +130,7 @@ export default function AddressesPage() {
   }
 
   async function handleDelete(id: string) {
+    if (!confirm("למחוק כתובת זו?")) return;
     setSaving(true);
     setError("");
     setSuccess("");
