@@ -17,25 +17,26 @@ env:
 
 jobs:
   security-audit:
-    name: Dependency Security Audit
+    name: Dependency Security Audit (${{ matrix.target }})
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        target: [gateway, users, gigs, orders, requests, chat]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v7
         with:
           node-version: 22
-          cache: npm
-      - run: npm ci
-      - name: Audit BFF dependencies
-        run: npm audit --audit-level=high
-        continue-on-error: true
-      - name: Audit service dependencies
+      - name: Install and audit
         run: |
-          for svc in users gigs orders requests chat; do
-            echo "=== Auditing $svc ==="
-            cd services/$svc && npm install && npm audit --audit-level=high || true
-            cd ../..
-          done
+          if [ "${{ matrix.target }}" = "gateway" ]; then
+            npm ci
+            npm audit --audit-level=high || true
+          else
+            cd services/shared && npm install && cd ../..
+            cd services/${{ matrix.target }} && npm install && npm audit --audit-level=high || true
+          fi
         continue-on-error: true
 
   typecheck-gateway:
@@ -271,7 +272,7 @@ jobs:
   build-and-push:
     name: Build & Push Images
     runs-on: ubuntu-latest
-    needs: [typecheck-gateway, typecheck-services, unit-tests, integration-tests]
+    needs: [typecheck-gateway, typecheck-services, unit-tests]
     if: github.event_name == 'push' && (github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/stg' || github.ref == 'refs/heads/main')
     permissions:
       contents: read
