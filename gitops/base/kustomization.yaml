@@ -18,6 +18,10 @@ resources:
   - redis-deployment.yaml
   - servicemonitor.yaml
   - prometheus-rules.yaml
+  - hpa.yaml
+  - pdb.yaml
+  - db-backup-cronjob.yaml
+  - alertmanager-config.yaml
   - umami-deployment.yaml
   - umami-service.yaml
   - grafana/
