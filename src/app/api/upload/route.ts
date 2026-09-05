@@ -9,7 +9,14 @@ import {
   uploadDir,
 } from "@/lib/upload-security";
 
-const UPLOAD_BASE_URL = process.env.UPLOAD_BASE_URL || "/uploads";
+/**
+ * Base URL for uploaded files. Should point to a separate domain or CDN in
+ * production so that user-uploaded content can never execute scripts under the
+ * app's origin. In local dev we fall back to the same-origin `/uploads` path
+ * and log a warning on every upload.
+ */
+const UPLOAD_BASE_URL = process.env.UPLOAD_BASE_URL || "";
+const UPLOAD_BASE_URL_IS_DEFAULT = !process.env.UPLOAD_BASE_URL;
 
 /** Saves uploaded files after size and type checks. Requires a signed-in user. */
 export async function POST(request: NextRequest) {
@@ -77,11 +84,27 @@ export async function POST(request: NextRequest) {
     const filePath = join(dir, validation.sanitizedName!);
     await writeFile(filePath, outputBuffer);
 
+    const baseUrl = UPLOAD_BASE_URL_IS_DEFAULT ? "/uploads" : UPLOAD_BASE_URL;
     results.push({
-      url: `${UPLOAD_BASE_URL}/${validation.sanitizedName}`,
+      url: `${baseUrl}/${validation.sanitizedName}`,
       name: validation.sanitizedName!,
     });
   }
 
-  return NextResponse.json({ files: results }, { status: 200 });
+  if (UPLOAD_BASE_URL_IS_DEFAULT) {
+    console.warn(
+      "[upload] UPLOAD_BASE_URL is not set — serving uploads from the same origin. " +
+        "This is a security risk in production. Set UPLOAD_BASE_URL to a separate domain or CDN."
+    );
+  }
+
+  return NextResponse.json(
+    { files: results },
+    {
+      status: 200,
+      headers: {
+        "X-Content-Type-Options": "nosniff",
+      },
+    }
+  );
 }

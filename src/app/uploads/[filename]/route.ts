@@ -44,8 +44,10 @@ export async function GET(
       status: 200,
       headers: {
         "Content-Type": contentType,
-        "Content-Disposition": "inline",
+        "Content-Disposition": `attachment; filename="${filename}"`,
         "X-Content-Type-Options": "nosniff",
+        "Content-Security-Policy": "default-src 'none'; img-src 'self'; style-src 'none'; script-src 'none'",
+        "Cache-Control": "public, max-age=31536000, immutable",
       },
     });
   } catch {
