@@ -12,13 +12,14 @@ resources:
   - umami-route.yaml
 
 patches:
+  # HPA manages replicas — set deployment to 2 as baseline (HPA overrides)
   - target:
       kind: Deployment
       name: daddy-app
     patch: |
       - op: replace
         path: /spec/replicas
-        value: 1
+        value: 2
   # Secrets are NOT patched here — they must be set manually in the cluster:
   #   oc patch secret daddy-app-secret -n daddy-prod --type merge \
   #     -p '{"stringData":{"AUTH_SECRET":"...","GOOGLE_CLIENT_ID":"...","GOOGLE_CLIENT_SECRET":"...","INTER_SERVICE_SECRET":"..."}}'
@@ -41,6 +42,15 @@ patches:
       - op: replace
         path: /spec/resources/requests/storage
         value: 10Gi
+  # Prod HPA: min 2, max 10 for main app; min 2, max 8 for microservices (base defaults)
+  # Prod backups: larger PVC
+  - target:
+      kind: PersistentVolumeClaim
+      name: db-backups
+    patch: |
+      - op: replace
+        path: /spec/resources/requests/storage
+        value: 20Gi
 
 labels:
   - pairs:

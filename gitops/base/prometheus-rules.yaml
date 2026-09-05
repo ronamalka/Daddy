@@ -107,3 +107,43 @@ spec:
               Container {{ $labels.container }} in pod {{ $labels.pod }}
               is using {{ $value | humanizePercentage }} of its memory limit
               for the last 5 minutes.
+
+    - name: daddy-backup-health
+      rules:
+        # ------------------------------------------------------------------
+        # Backup job failed
+        # ------------------------------------------------------------------
+        - alert: DaddyBackupFailed
+          expr: |
+            kube_job_status_failed{
+              namespace=~"daddy-.*",
+              job_name=~"db-backup.*"
+            } > 0
+          for: 0m
+          labels:
+            severity: critical
+          annotations:
+            summary: "Database backup job failed"
+            description: >
+              The database backup CronJob in namespace {{ $labels.namespace }}
+              has failed. Check job logs: oc logs job/{{ $labels.job_name }}
+              -n {{ $labels.namespace }}.
+
+        # ------------------------------------------------------------------
+        # No successful backup in 26 hours (daily schedule + buffer)
+        # ------------------------------------------------------------------
+        - alert: DaddyBackupMissing
+          expr: |
+            (time() - kube_cronjob_status_last_successful_time{
+              namespace=~"daddy-.*",
+              cronjob="db-backup"
+            }) > 93600
+          for: 0m
+          labels:
+            severity: critical
+          annotations:
+            summary: "No successful database backup in 26 hours"
+            description: >
+              The last successful database backup in namespace
+              {{ $labels.namespace }} was more than 26 hours ago.
+              Expected: daily at 02:00 UTC.
