@@ -12,5 +12,8 @@ export default defineConfig({
     include: ["tests/**/*.test.ts"],
     globals: true,
     testTimeout: 15000,
+    env: {
+      INTER_SERVICE_SECRET: "test-secret-for-unit-tests",
+    },
   },
 });

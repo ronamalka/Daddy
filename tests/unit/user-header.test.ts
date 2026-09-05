@@ -2,7 +2,7 @@ import { describe, it, expect, vi } from "vitest";
 import crypto from "crypto";
 import { extractUser } from "../../services/shared/middleware";
 
-const SECRET = process.env.INTER_SERVICE_SECRET || "dev-secret-change-in-production";
+const SECRET = process.env.INTER_SERVICE_SECRET || "test-secret-for-unit-tests";
 
 function sign(payload: string) {
   return crypto.createHmac("sha256", SECRET).update(payload).digest("hex");
