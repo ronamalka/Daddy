@@ -5,16 +5,35 @@ import {
   rateLimitKey,
   resolveRateLimitTier,
 } from "@/lib/rate-limit";
-import { checkRateLimit as redisRateLimit } from "@/lib/rate-limit-redis";
 
-const RATE_LIMIT_WINDOW_SECONDS = Math.ceil(RATE_LIMIT_WINDOW_MS / 1000);
+interface RateLimitEntry {
+  count: number;
+  resetAt: number;
+}
 
-/** Returns the client IP from request headers. */
+/**
+ * In-memory store — per-process, not shared across pods.
+ * Critical auth paths (login, register, password-reset) also enforce a
+ * Redis-backed limit at the route handler level. See rate-limit-redis.ts.
+ *
+ * ioredis CANNOT be imported here — middleware runs in the Edge Runtime
+ * which does not support Node.js APIs (net, tls, Buffer).
+ */
+const store = new Map<string, RateLimitEntry>();
+
+setInterval(() => {
+  const now = Date.now();
+  for (const [key, entry] of store) {
+    if (now > entry.resetAt) {
+      store.delete(key);
+    }
+  }
+}, 60_000);
+
 function getClientIp(request: NextRequest): string {
   return clientIpFromHeaders(request.headers);
 }
 
-/** Reads the Auth.js session cookie if present. */
 function getSessionToken(request: NextRequest): string | undefined {
   return (
     request.cookies.get("authjs.session-token")?.value ||
@@ -22,63 +41,68 @@ function getSessionToken(request: NextRequest): string | undefined {
   );
 }
 
-/**
- * Checks the Redis-backed rate limit for this request.
- *
- * Uses the same tier-based limits (auth, write, public, default) and
- * per-IP+session key scheme as before, but backed by Redis so counters
- * are shared across all pods.
- *
- * On Redis failure the request is allowed through (fail-open) so a
- * Redis outage does not block legitimate users.
- */
-async function applyRateLimit(
-  request: NextRequest,
-  pathname: string
-): Promise<{ blocked: NextResponse | null; limit: number; remaining: number }> {
+function limitStoreKey(request: NextRequest, pathname: string): { key: string; limit: number } {
   const method = request.method;
   const tier = resolveRateLimitTier(pathname, method);
   const ip = getClientIp(request);
-  const key = `mw:${rateLimitKey(ip, getSessionToken(request), tier.limit)}`;
+  const key = rateLimitKey(ip, getSessionToken(request), tier.limit);
+  return { key, limit: tier.limit };
+}
 
-  const result = await redisRateLimit(key, tier.limit, RATE_LIMIT_WINDOW_SECONDS);
+function checkRateLimit(request: NextRequest, pathname: string): NextResponse | null {
+  const { key, limit } = limitStoreKey(request, pathname);
+  const now = Date.now();
 
-  if (!result.allowed) {
+  let entry = store.get(key);
+  if (!entry || now > entry.resetAt) {
+    entry = { count: 0, resetAt: now + RATE_LIMIT_WINDOW_MS };
+    store.set(key, entry);
+  }
+
+  entry.count++;
+
+  if (entry.count > limit) {
+    const retryAfter = Math.ceil((entry.resetAt - now) / 1000);
+    const ip = getClientIp(request);
     console.warn(
-      `[rate-limit] ${ip} exceeded ${tier.limit} req/min on ${method} ${pathname}`
+      `[rate-limit] ${ip} exceeded ${limit} req/min on ${request.method} ${pathname}`
     );
-    const blocked = new NextResponse(
+    return new NextResponse(
       JSON.stringify({ error: "Too many requests. Try again later." }),
       {
         status: 429,
         headers: {
           "Content-Type": "application/json",
-          "Retry-After": String(result.retryAfterSeconds),
-          "X-RateLimit-Limit": String(tier.limit),
+          "Retry-After": String(retryAfter),
+          "X-RateLimit-Limit": String(limit),
           "X-RateLimit-Remaining": "0",
+          "X-RateLimit-Reset": String(Math.ceil(entry.resetAt / 1000)),
         },
       }
     );
-    return { blocked, limit: tier.limit, remaining: 0 };
   }
 
-  return {
-    blocked: null,
-    limit: tier.limit,
-    remaining: Math.max(0, tier.limit - result.current),
-  };
+  return null;
+}
+
+function setRateLimitHeaders(response: NextResponse, request: NextRequest, pathname: string) {
+  const { key, limit } = limitStoreKey(request, pathname);
+  const entry = store.get(key);
+  if (entry) {
+    response.headers.set("X-RateLimit-Limit", String(limit));
+    response.headers.set("X-RateLimit-Remaining", String(Math.max(0, limit - entry.count)));
+    response.headers.set("X-RateLimit-Reset", String(Math.ceil(entry.resetAt / 1000)));
+  }
 }
 
 // --- CSP Nonce ---
 
-/** Generates a random base64 nonce for Content-Security-Policy. */
 function generateNonce(): string {
   const array = new Uint8Array(16);
   crypto.getRandomValues(array);
   return btoa(String.fromCharCode(...array));
 }
 
-/** Builds a CSP header string with the given nonce and strict-dynamic. */
 function buildCsp(nonce: string): string {
   return [
     "default-src 'self'",
@@ -104,26 +128,22 @@ const CSRF_EXEMPT = [
   "/api/auth",
 ];
 
-/** Creates a random hex CSRF token. */
 function generateToken(): string {
   const array = new Uint8Array(32);
   crypto.getRandomValues(array);
   return Array.from(array, (b) => b.toString(16).padStart(2, "0")).join("");
 }
 
-/** Returns true if this path skips CSRF checks. */
 function isCsrfExempt(pathname: string): boolean {
   return CSRF_EXEMPT.some((prefix) => pathname.startsWith(prefix));
 }
 
 // --- Main Middleware ---
 
-/** Rate-limits API routes, checks CSRF on writes, and sets the CSRF cookie. */
-export async function middleware(request: NextRequest) {
+export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const isApi = pathname.startsWith("/api/");
 
-  // Non-API routes: generate CSP nonce, set security headers, seed CSRF cookie
   if (!isApi) {
     const nonce = generateNonce();
     const requestHeaders = new Headers(request.headers);
@@ -152,9 +172,9 @@ export async function middleware(request: NextRequest) {
     return response;
   }
 
-  // Rate limiting (Redis-backed, shared across all pods)
-  const { blocked, limit, remaining } = await applyRateLimit(request, pathname);
-  if (blocked) return blocked;
+  // Rate limiting (in-memory, per-pod)
+  const rateLimited = checkRateLimit(request, pathname);
+  if (rateLimited) return rateLimited;
 
   // CSRF validation for mutations
   if (MUTATION_METHODS.has(request.method) && !isCsrfExempt(pathname)) {
@@ -173,10 +193,8 @@ export async function middleware(request: NextRequest) {
   }
 
   const response = NextResponse.next();
-  response.headers.set("X-RateLimit-Limit", String(limit));
-  response.headers.set("X-RateLimit-Remaining", String(remaining));
+  setRateLimitHeaders(response, request, pathname);
 
-  // Set CSRF cookie if missing
   if (!request.cookies.get(CSRF_COOKIE)) {
     response.cookies.set(CSRF_COOKIE, generateToken(), {
       httpOnly: false,
