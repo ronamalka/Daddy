@@ -251,9 +251,15 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         }
       }
 
-      // Validate the JTI still exists in Redis (revoke-all deletes them).
-      // Skip on initial sign-in (user is set) since we just created the key.
-      if (!user && token.id && token.jti) {
+      // JTI revocation check: when revoke-all deletes JTI keys from Redis,
+      // subsequent requests with the old token should be rejected.
+      // Gated behind ENABLE_JTI_VALIDATION to allow gradual rollout —
+      // existing sessions created before this code was deployed don't have
+      // JTI keys in Redis and would be falsely invalidated.
+      if (
+        process.env.ENABLE_JTI_VALIDATION === "true" &&
+        !user && token.id && token.jti
+      ) {
         const valid = await isSessionValid(
           token.id as string,
           token.jti as string
