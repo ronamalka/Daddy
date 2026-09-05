@@ -17,7 +17,7 @@ const registerSchema = z.object({
   confirmedAge18: z.literal(true),
   independentContractor: z.boolean().optional(),
   termsVersion: z.string().optional(),
-  turnstileToken: z.string().optional(),
+  turnstileToken: z.string().min(1, "CAPTCHA token is required"),
   _hp_field: z.string().max(0).optional(),
   _formLoadedAt: z.number().optional(),
   cityCode: z.number().optional(),
@@ -58,7 +58,11 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  if (result.data.turnstileToken) {
+  const skipCaptcha =
+    process.env.SKIP_CAPTCHA === "true" ||
+    (process.env.NODE_ENV === "development" && !process.env.TURNSTILE_SECRET_KEY);
+
+  if (!skipCaptcha) {
     const ip = request.headers.get("x-forwarded-for")?.split(",")[0].trim();
     const valid = await verifyTurnstileToken(result.data.turnstileToken, ip);
     if (!valid) {
@@ -67,11 +71,6 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       );
     }
-  } else if (process.env.TURNSTILE_SECRET_KEY) {
-    return NextResponse.json(
-      { error: "אימות CAPTCHA חסר." },
-      { status: 400 }
-    );
   }
 
   const breached = await checkBreachedPassword(result.data.password);
