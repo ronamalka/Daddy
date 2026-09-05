@@ -9,6 +9,8 @@ export function getRedis(): Redis {
   if (!redis) {
     redis = new Redis(REDIS_URL, {
       maxRetriesPerRequest: 1,
+      lazyConnect: true,
+      enableOfflineQueue: false,
       connectTimeout: 1500,
       retryStrategy(times) {
         if (times > 2) return null;
