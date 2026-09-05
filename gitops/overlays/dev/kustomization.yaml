@@ -10,6 +10,7 @@ components:
   - ../../components/seed-job
 
 patches:
+  # HPA manages replicas — set deployment to 1 as baseline (HPA overrides)
   - target:
       kind: Deployment
       name: daddy-app
@@ -27,6 +28,32 @@ patches:
       - op: replace
         path: /stringData/NEXT_PUBLIC_BASE_URL
         value: https://daddy-app-daddy-dev.apps.cluster-x8bxx.x8bxx.sandbox2963.opentlc.com
+  # Dev HPA: min 1, max 3 for all services
+  - target:
+      kind: HorizontalPodAutoscaler
+    patch: |
+      - op: replace
+        path: /spec/minReplicas
+        value: 1
+      - op: replace
+        path: /spec/maxReplicas
+        value: 3
+  # Dev backups: weekly instead of daily, 3-day retention
+  - target:
+      kind: CronJob
+      name: db-backup
+    patch: |
+      - op: replace
+        path: /spec/schedule
+        value: "0 2 * * 0"
+  # Smaller backup PVC for dev
+  - target:
+      kind: PersistentVolumeClaim
+      name: db-backups
+    patch: |
+      - op: replace
+        path: /spec/resources/requests/storage
+        value: 2Gi
 
 labels:
   - pairs:

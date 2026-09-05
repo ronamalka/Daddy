@@ -1,0 +1,80 @@
+# Pod Disruption Budgets for all Daddy services
+# Ensures at least 1 pod stays available during voluntary disruptions
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: daddy-app-pdb
+  labels:
+    app: daddy-app
+    app.kubernetes.io/part-of: daddy
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: daddy-app
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: users-service-pdb
+  labels:
+    app: users-service
+    app.kubernetes.io/part-of: daddy
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: users-service
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: gigs-service-pdb
+  labels:
+    app: gigs-service
+    app.kubernetes.io/part-of: daddy
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: gigs-service
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: orders-service-pdb
+  labels:
+    app: orders-service
+    app.kubernetes.io/part-of: daddy
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: orders-service
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: requests-service-pdb
+  labels:
+    app: requests-service
+    app.kubernetes.io/part-of: daddy
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: requests-service
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: chat-service-pdb
+  labels:
+    app: chat-service
+    app.kubernetes.io/part-of: daddy
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: chat-service
