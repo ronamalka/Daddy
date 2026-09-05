@@ -14,7 +14,7 @@ const nextConfig: NextConfig = {
         headers: [
           { key: "Content-Security-Policy", value: "default-src 'none'; img-src 'self'; style-src 'none'; script-src 'none'" },
           { key: "X-Content-Type-Options", value: "nosniff" },
-          { key: "Content-Disposition", value: "inline" },
+          { key: "Content-Disposition", value: "attachment" },
           { key: "Cache-Control", value: "public, max-age=31536000, immutable" },
         ],
       },
