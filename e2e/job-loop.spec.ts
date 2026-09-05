@@ -105,11 +105,11 @@ test.describe("Real job loop", () => {
       await deliverDialog.getByPlaceholder("לדוגמה: החלפתי את הברז, הישן בשקית").fill("החלפתי את הברז, הישן בשקית");
       await deliverDialog.getByRole("button", { name: "שלח מסירה" }).click();
       await expect(seller.page.getByText("נמסר").first()).toBeVisible({ timeout: 10000 });
-      await expect(seller.page.getByAltText("תמונת המסירה 1")).toBeVisible();
+      await expect(seller.page.getByAltText("תמונת המסירה 1").first()).toBeVisible();
       await expect(seller.page.getByText("החלפתי את הברז, הישן בשקית")).toBeVisible();
 
       await buyer.page.reload();
-      await expect(buyer.page.getByAltText("תמונת המסירה 1")).toBeVisible({ timeout: 10000 });
+      await expect(buyer.page.getByAltText("תמונת המסירה 1").first()).toBeVisible({ timeout: 10000 });
       await expect(buyer.page.getByText("החלפתי את הברז, הישן בשקית")).toBeVisible();
       await expect(buyer.page.getByText("בדקו את התמונות ואשרו שהעבודה הושלמה.")).toBeVisible();
       await expect(buyer.page.getByRole("button", { name: "אשר קבלה" })).toBeVisible();
