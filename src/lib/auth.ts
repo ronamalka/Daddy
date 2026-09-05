@@ -17,10 +17,13 @@ import { logSecurityEvent } from "./security-logger";
 import { isPasswordWeak } from "./password-policy";
 import { verifyTurnstileToken } from "./turnstile";
 import { OAUTH_INTENT_COOKIE, parseOauthRole } from "./oauth-intent";
-import { logger } from "./logger";
 import "./auth-types";
 
-const authLogger = logger.child({ module: "auth" });
+const authLogger = {
+  warn: (obj: Record<string, unknown>, msg?: string) => console.warn(`[auth] ${msg ?? ""}`, obj),
+  error: (obj: Record<string, unknown>, msg?: string) => console.error(`[auth] ${msg ?? ""}`, obj),
+  info: (obj: Record<string, unknown>, msg?: string) => console.info(`[auth] ${msg ?? ""}`, obj),
+};
 
 const USERS_SERVICE = process.env.USERS_SERVICE_URL || "http://localhost:4001";
 
