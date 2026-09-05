@@ -8,6 +8,13 @@ export const ATTACHMENT_PATH_RE = new RegExp(
   "i"
 );
 
+const ALLOWED_UPLOAD_HOSTS: Set<string> = new Set(
+  (process.env.UPLOAD_ALLOWED_HOSTS || "")
+    .split(",")
+    .map((h) => h.trim().toLowerCase())
+    .filter(Boolean)
+);
+
 const CONTENT_TYPES: Record<string, string> = {
   jpg: "image/jpeg",
   jpeg: "image/jpeg",
@@ -27,10 +34,12 @@ export function isAllowedAttachmentUrl(url: unknown): url is string {
   // Same-origin /uploads path
   if (ATTACHMENT_PATH_RE.test(url)) return true;
 
-  // External domain (CDN / separate upload origin)
+  // External domain (CDN / separate upload origin) — only allowed hosts
+  if (ALLOWED_UPLOAD_HOSTS.size === 0) return false;
   try {
     const parsed = new URL(url);
     if (parsed.protocol !== "https:") return false;
+    if (!ALLOWED_UPLOAD_HOSTS.has(parsed.hostname.toLowerCase())) return false;
     const filename = parsed.pathname.split("/").pop() || "";
     return ATTACHMENT_FILENAME_RE.test(filename);
   } catch {
