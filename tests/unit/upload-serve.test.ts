@@ -55,7 +55,7 @@ describe("GET /uploads/:filename", () => {
     const res = await GET(getRequest(), { params: Promise.resolve({ filename: FILENAME }) });
     expect(res.status).toBe(200);
     expect(res.headers.get("Content-Type")).toBe("image/jpeg");
-    expect(res.headers.get("Content-Disposition")).toBe("inline");
+    expect(res.headers.get("Content-Disposition")).toBe(`attachment; filename="${FILENAME}"`);
     const body = Buffer.from(await res.arrayBuffer());
     expect(body.equals(bytes)).toBe(true);
   });

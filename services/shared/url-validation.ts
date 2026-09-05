@@ -80,6 +80,11 @@ export function validatePhotoUrl(url: unknown): UrlValidationResult {
 
   const trimmed = url.trim();
 
+  // Enforce reasonable URL length
+  if (trimmed.length > 2048) {
+    return { ok: false, error: "כתובת URL ארוכה מדי" };
+  }
+
   // Allow same-origin relative upload paths (/uploads/UUID.ext)
   if (isRequestPhotoUrl(trimmed)) {
     return { ok: true, url: trimmed };
@@ -123,11 +128,6 @@ export function validatePhotoUrl(url: unknown): UrlValidationResult {
   // Only allow known hosts
   if (!ALLOWED_HOSTS.has(hostname)) {
     return { ok: false, error: "ניתן להעלות תמונות רק מדומיינים מורשים" };
-  }
-
-  // Enforce reasonable URL length
-  if (trimmed.length > 2048) {
-    return { ok: false, error: "כתובת URL ארוכה מדי" };
   }
 
   return { ok: true, url: trimmed };
