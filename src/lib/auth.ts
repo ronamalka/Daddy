@@ -12,6 +12,7 @@ import crypto from "crypto";
 import { cookies } from "next/headers";
 import { checkLockout, recordFailedAttempt, resetAttempts } from "./account-lockout";
 import { getRedis } from "./redis";
+import { isSessionValid } from "./session-revoke";
 import { logSecurityEvent } from "./security-logger";
 import { isPasswordWeak } from "./password-policy";
 import { verifyTurnstileToken } from "./turnstile";
@@ -231,6 +232,23 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             SESSION_MAX_AGE
           );
         } catch {}
+      }
+
+      // Validate the JTI still exists in Redis (revoke-all deletes them).
+      // Skip on initial sign-in (user is set) since we just created the key.
+      if (!user && token.id && token.jti) {
+        const valid = await isSessionValid(
+          token.id as string,
+          token.jti as string
+        );
+        if (!valid) {
+          logSecurityEvent("session_revoked", {
+            userId: token.id as string,
+            outcome: "blocked",
+            metadata: { jti: token.jti as string },
+          });
+          return null;
+        }
       }
 
       return token;
