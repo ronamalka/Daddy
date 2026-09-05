@@ -12,11 +12,15 @@ import crypto from "crypto";
 import { cookies } from "next/headers";
 import { checkLockout, recordFailedAttempt, resetAttempts } from "./account-lockout";
 import { getRedis } from "./redis";
+import { isSessionValid } from "./session-revoke";
 import { logSecurityEvent } from "./security-logger";
 import { isPasswordWeak } from "./password-policy";
 import { verifyTurnstileToken } from "./turnstile";
 import { OAUTH_INTENT_COOKIE, parseOauthRole } from "./oauth-intent";
+import { logger } from "./logger";
 import "./auth-types";
+
+const authLogger = logger.child({ module: "auth" });
 
 const USERS_SERVICE = process.env.USERS_SERVICE_URL || "http://localhost:4001";
 
@@ -35,11 +39,12 @@ async function readOauthRole(): Promise<"BUYER" | "SELLER"> {
     const role = parseOauthRole(store.get(OAUTH_INTENT_COOKIE)?.value);
     try {
       store.delete(OAUTH_INTENT_COOKIE);
-    } catch {
-      /* Cookie delete is best-effort during the OAuth callback. */
+    } catch (err) {
+      authLogger.warn({ err, cookie: OAUTH_INTENT_COOKIE }, "Failed to delete OAuth intent cookie (best-effort)");
     }
     return role;
-  } catch {
+  } catch (err) {
+    authLogger.warn({ err }, "Failed to read OAuth role cookie, defaulting to BUYER");
     return "BUYER";
   }
 }
@@ -86,7 +91,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             return null;
           }
         } catch (err) {
-          console.error("[auth] lockout check failed, continuing login:", err);
+          authLogger.error({ err, email, operation: "lockout_check" }, "Lockout check failed, continuing login");
         }
 
         const res = await fetch(`${USERS_SERVICE}/login`, {
@@ -108,7 +113,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
               metadata: { attempts },
             });
           } catch (err) {
-            console.error("[auth] failed to record lockout attempt:", err);
+            authLogger.error({ err, email, operation: "record_failed_attempt" }, "Failed to record lockout attempt");
             logSecurityEvent("login_failure", { email, outcome: "failure" });
           }
           return null;
@@ -117,7 +122,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         try {
           await resetAttempts(email);
         } catch (err) {
-          console.error("[auth] failed to reset lockout attempts:", err);
+          authLogger.error({ err, email, operation: "reset_attempts" }, "Failed to reset lockout attempts after login");
         }
         const user = await res.json();
         logSecurityEvent("login_success", {
@@ -194,7 +199,12 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             "EX",
             SESSION_MAX_AGE
           );
-        } catch {}
+        } catch (err) {
+          authLogger.error(
+            { err, userId: token.id, operation: "session_jti_store" },
+            "Redis failed to store session JTI on login"
+          );
+        }
       }
 
       if (trigger === "update" && session) {
@@ -230,7 +240,29 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             "EX",
             SESSION_MAX_AGE
           );
-        } catch {}
+        } catch (err) {
+          authLogger.error(
+            { err, userId: token.id, operation: "session_jti_rotate" },
+            "Redis failed during JTI rotation"
+          );
+        }
+      }
+
+      // Validate the JTI still exists in Redis (revoke-all deletes them).
+      // Skip on initial sign-in (user is set) since we just created the key.
+      if (!user && token.id && token.jti) {
+        const valid = await isSessionValid(
+          token.id as string,
+          token.jti as string
+        );
+        if (!valid) {
+          logSecurityEvent("session_revoked", {
+            userId: token.id as string,
+            outcome: "blocked",
+            metadata: { jti: token.jti as string },
+          });
+          return null;
+        }
       }
 
       return token;

@@ -14,6 +14,7 @@ resources:
 #     -p '{"stringData":{"POSTGRES_PASSWORD":"...","DATABASE_URL":"..."}}'
 
 patches:
+  # HPA manages replicas — set deployment to 1 as baseline (HPA overrides)
   - target:
       kind: Deployment
       name: daddy-app
@@ -54,6 +55,16 @@ patches:
       - op: replace
         path: /spec/resources/requests/storage
         value: 5Gi
+  # Stg HPA: min 1, max 4 for all services
+  - target:
+      kind: HorizontalPodAutoscaler
+    patch: |
+      - op: replace
+        path: /spec/minReplicas
+        value: 1
+      - op: replace
+        path: /spec/maxReplicas
+        value: 4
 
 labels:
   - pairs:

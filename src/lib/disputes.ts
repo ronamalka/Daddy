@@ -68,9 +68,19 @@ export function canOpenDispute(input: {
   return { ok: true };
 }
 
-/** True if a photo URL is a stored upload or https image, not a script URL. */
+/** True if a photo URL is a stored upload (same-origin or external CDN), not a script URL. */
 export function isAllowedPhotoUrl(url: string): boolean {
-  return /^\/uploads\/[a-zA-Z0-9_-]+\.[a-zA-Z0-9]+$/.test(url);
+  // Same-origin path
+  if (/^\/uploads\/[a-zA-Z0-9_-]+\.[a-zA-Z0-9]+$/.test(url)) return true;
+  // External CDN origin (https only)
+  try {
+    const parsed = new URL(url);
+    if (parsed.protocol !== "https:") return false;
+    const filename = parsed.pathname.split("/").pop() || "";
+    return /^[a-zA-Z0-9_-]+\.[a-zA-Z0-9]+$/.test(filename);
+  } catch {
+    return false;
+  }
 }
 
 export type DisputeInputResult =

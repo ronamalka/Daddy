@@ -1,0 +1,115 @@
+# Automated daily database backup CronJob
+# Backs up all 6 Daddy databases to a PVC with 7-day retention
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: db-backups
+  labels:
+    app: postgres
+    app.kubernetes.io/part-of: daddy
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: db-backup
+  labels:
+    app: postgres
+    app.kubernetes.io/part-of: daddy
+spec:
+  schedule: "0 2 * * *"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      activeDeadlineSeconds: 1800
+      backoffLimit: 2
+      template:
+        metadata:
+          labels:
+            app: db-backup
+        spec:
+          restartPolicy: OnFailure
+          containers:
+            - name: backup
+              image: postgres:16-alpine
+              command:
+                - /bin/sh
+                - -c
+                - |
+                  set -e
+                  TIMESTAMP=$(date +%Y%m%d-%H%M%S)
+                  BACKUP_DIR="/backups/${TIMESTAMP}"
+                  mkdir -p "${BACKUP_DIR}"
+
+                  echo "[$(date -Iseconds)] Starting backup to ${BACKUP_DIR}"
+
+                  DATABASES="daddy daddy_users daddy_gigs daddy_orders daddy_requests daddy_chat"
+                  FAILED=0
+
+                  for DB in ${DATABASES}; do
+                    echo "[$(date -Iseconds)] Backing up ${DB}..."
+                    if pg_dump -h postgres -U "${PGUSER}" -d "${DB}" \
+                        --format=custom --compress=6 \
+                        -f "${BACKUP_DIR}/${DB}.dump" 2>/dev/null; then
+                      SIZE=$(du -h "${BACKUP_DIR}/${DB}.dump" | cut -f1)
+                      echo "[$(date -Iseconds)] OK: ${DB} (${SIZE})"
+                    else
+                      echo "[$(date -Iseconds)] FAILED: ${DB}"
+                      FAILED=$((FAILED + 1))
+                    fi
+                  done
+
+                  # Verify backups are non-empty
+                  for DUMP in "${BACKUP_DIR}"/*.dump; do
+                    if [ ! -s "${DUMP}" ]; then
+                      echo "[$(date -Iseconds)] ERROR: Empty backup file ${DUMP}"
+                      FAILED=$((FAILED + 1))
+                    fi
+                  done
+
+                  # Prune backups older than 7 days
+                  echo "[$(date -Iseconds)] Pruning backups older than 7 days..."
+                  find /backups -maxdepth 1 -type d -mtime +7 -exec rm -rf {} + 2>/dev/null || true
+
+                  TOTAL=$(du -sh /backups 2>/dev/null | cut -f1)
+                  echo "[$(date -Iseconds)] Total backup storage used: ${TOTAL}"
+
+                  if [ "${FAILED}" -gt 0 ]; then
+                    echo "[$(date -Iseconds)] BACKUP COMPLETED WITH ${FAILED} FAILURES"
+                    exit 1
+                  fi
+
+                  echo "[$(date -Iseconds)] All backups completed successfully"
+              env:
+                - name: PGUSER
+                  valueFrom:
+                    secretKeyRef:
+                      name: postgres-secret
+                      key: POSTGRES_USER
+                - name: PGPASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      name: postgres-secret
+                      key: POSTGRES_PASSWORD
+              volumeMounts:
+                - name: backups
+                  mountPath: /backups
+              resources:
+                requests:
+                  memory: "64Mi"
+                  cpu: "10m"
+                limits:
+                  memory: "256Mi"
+                  cpu: "250m"
+          volumes:
+            - name: backups
+              persistentVolumeClaim:
+                claimName: db-backups
