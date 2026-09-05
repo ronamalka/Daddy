@@ -1,3 +1,5 @@
+import { isSafePhotoUrl } from "../../../shared/url-validation";
+
 export const DISPUTE_REASONS = ["NO_SHOW", "DAMAGE", "DIFFERENT_PRICE", "QUALITY"] as const;
 export type DisputeReason = (typeof DISPUTE_REASONS)[number];
 
@@ -46,9 +48,9 @@ export function canOpenDispute(input: {
   return { ok: true };
 }
 
-/** True if a photo URL is a stored upload or https image, not a script URL. */
+/** True if a photo URL passes SSRF validation (same-origin upload or allowed HTTPS host). */
 export function isAllowedPhotoUrl(url: string): boolean {
-  return url.startsWith("/uploads/") || url.startsWith("https://");
+  return isSafePhotoUrl(url);
 }
 
 export type DisputeInputResult =

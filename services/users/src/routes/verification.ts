@@ -3,6 +3,7 @@ import { requireAuth } from "../../../shared/middleware";
 import { prisma } from "../index";
 import crypto from "crypto";
 import { logger } from "../../../shared/logger";
+import { validatePhotoUrl } from "../../../shared/url-validation";
 
 /** Verification routes: phone OTP, identity upload, and license upload. */
 export const verificationRoutes = Router();
@@ -121,10 +122,16 @@ verificationRoutes.post("/identity/upload", requireAuth, async (req: Request, re
     return;
   }
 
+  const urlCheck = validatePhotoUrl(photoUrl);
+  if (!urlCheck.ok) {
+    res.status(400).json({ error: urlCheck.error });
+    return;
+  }
+
   await prisma.user.update({
     where: { id: userId },
     data: {
-      identityPhoto: photoUrl,
+      identityPhoto: urlCheck.url,
       identityStatus: "PENDING",
       identityReviewedAt: null,
       identityReviewedBy: null,
@@ -148,10 +155,16 @@ verificationRoutes.post("/license/upload", requireAuth, async (req: Request, res
     return;
   }
 
+  const urlCheck = validatePhotoUrl(photoUrl);
+  if (!urlCheck.ok) {
+    res.status(400).json({ error: urlCheck.error });
+    return;
+  }
+
   await prisma.user.update({
     where: { id: userId },
     data: {
-      licensePhoto: photoUrl,
+      licensePhoto: urlCheck.url,
       licenseType,
       licenseStatus: "PENDING",
     },
