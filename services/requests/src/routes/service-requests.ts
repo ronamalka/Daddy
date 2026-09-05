@@ -6,10 +6,11 @@ import {
   mapRequestTeasers,
   requestTeaserWhere,
 } from "../../../shared/request-teaser";
-import { parseRequestDetails, redactRequestStreet } from "../../../shared/request-details";
+import { redactRequestStreet } from "../../../shared/request-details";
 import { prisma } from "../index";
 import { logEvent } from "../../../shared/analytics";
 import { requestsCreated, quotesSent } from "../metrics";
+import { createServiceRequestSchema } from "../schemas/service-request";
 
 /** Routes for local service requests, seller quotes, and accepting a quote. */
 export const serviceRequestsRoutes = Router();
@@ -55,30 +56,36 @@ serviceRequestsRoutes.get("/", requireAuth, async (req: Request, res: Response) 
 
 /** Create a new local service request with location details, photos, and a visit window. */
 serviceRequestsRoutes.post("/", requireAuth, async (req: Request, res: Response) => {
-  const { title, description, serviceSlug, districtCode, districtName, cityCode, cityName, slotStart, slotEnd } = req.body;
+  const parsed = createServiceRequestSchema.safeParse(req.body);
 
-  if (!title?.trim() || !description?.trim()) {
-    res.status(400).json({ error: "Title and description are required" });
+  if (!parsed.success) {
+    const firstIssue = parsed.error.issues[0];
+    res.status(400).json({ error: firstIssue?.message ?? "Invalid request body" });
     return;
   }
 
-  if (!slotStart || !slotEnd) {
-    res.status(400).json({ error: "A 2-hour visit window is required" });
-    return;
-  }
-
-  const details = parseRequestDetails(req.body);
-  if (!details.ok) {
-    res.status(400).json({ error: details.error });
-    return;
-  }
+  const {
+    title,
+    description,
+    serviceSlug,
+    districtCode,
+    districtName,
+    cityCode,
+    cityName,
+    slotStart,
+    slotEnd,
+    street,
+    floor,
+    preferredWindow,
+    photos,
+    unlisted,
+  } = parsed.data;
 
   const start = new Date(slotStart);
   const end = new Date(slotEnd);
-  if (Number.isNaN(start.getTime()) || Number.isNaN(end.getTime()) || end <= start) {
-    res.status(400).json({ error: "Invalid visit window" });
-    return;
-  }
+
+  /** De-duplicate photos while preserving order. */
+  const uniquePhotos = [...new Set(photos)];
 
   const created = await prisma.serviceRequest.create({
     data: {
@@ -90,11 +97,11 @@ serviceRequestsRoutes.post("/", requireAuth, async (req: Request, res: Response)
       districtName: districtName || null,
       cityCode: cityCode ? Number(cityCode) : null,
       cityName: cityName || null,
-      street: details.value.street,
-      floor: details.value.floor,
-      preferredWindow: details.value.preferredWindow,
-      photos: details.value.photos,
-      unlisted: req.body.unlisted === true,
+      street: street?.trim() || null,
+      floor: floor?.trim() || null,
+      preferredWindow: preferredWindow || null,
+      photos: uniquePhotos,
+      unlisted,
       slotStart: start,
       slotEnd: end,
     },
