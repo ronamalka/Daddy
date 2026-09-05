@@ -178,17 +178,25 @@ describe("System Tests — Auth API", () => {
         .concat(csrf.cookieHeader.split("; ").filter(Boolean))
         .join("; ");
 
-      const sessionRes = await fetch(`${BASE_URL}/api/auth/session`, {
-        headers: { Cookie: allCookies },
-      });
-      expect(sessionRes.status).toBe(200);
-      const session = (await sessionRes.json()) as {
-        user?: { id: string; email: string; role: string };
-      };
-      expect(session.user).toBeDefined();
-      expect(session.user?.email).toBe("admin@daddy.com");
-      expect(session.user?.id).toBeTruthy();
-      expect(session.user?.role).toBe("ADMIN");
+      // Session may not be available immediately after login — retry briefly
+      let session: { user?: { id: string; email: string; role: string } } | null = null;
+      for (let attempt = 0; attempt < 5; attempt++) {
+        const sessionRes = await fetch(`${BASE_URL}/api/auth/session`, {
+          headers: { Cookie: allCookies },
+        });
+        expect(sessionRes.status).toBe(200);
+        const body = await sessionRes.json();
+        if (body && typeof body === "object" && body.user) {
+          session = body;
+          break;
+        }
+        await new Promise((r) => setTimeout(r, 500));
+      }
+      expect(session).not.toBeNull();
+      expect(session!.user).toBeDefined();
+      expect(session!.user?.email).toBe("admin@daddy.com");
+      expect(session!.user?.id).toBeTruthy();
+      expect(session!.user?.role).toBe("ADMIN");
     });
   });
 
