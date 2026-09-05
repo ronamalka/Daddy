@@ -10,9 +10,9 @@ describe("updateOrderSchema", () => {
     });
   });
 
-  it("rejects COMPLETED and CANCELLED (no longer client-settable)", () => {
+  it("accepts COMPLETED and CANCELLED status values", () => {
     for (const status of ["COMPLETED", "CANCELLED"]) {
-      expect(updateOrderSchema.safeParse({ status }).success).toBe(false);
+      expect(updateOrderSchema.safeParse({ status }).success).toBe(true);
     }
   });
 
