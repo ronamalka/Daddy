@@ -138,6 +138,30 @@ jobs:
           ref: ${{ github.ref_name }}
           token: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Wait for E2E to pass
+        run: |
+          echo "Waiting for E2E workflow to complete for commit ${GITHUB_SHA::8}..."
+          for i in $(seq 1 60); do
+            result=$(gh run list \
+              --workflow=ci-e2e.yml \
+              --branch="${{ github.ref_name }}" \
+              --json headSha,conclusion,status \
+              --jq "[.[] | select(.headSha == \"$GITHUB_SHA\")] | .[0] | .conclusion // .status // \"not_found\"")
+            if [ "$result" = "success" ]; then
+              echo "E2E passed — proceeding with GitOps update"
+              exit 0
+            elif [ "$result" = "failure" ]; then
+              echo "E2E failed — blocking GitOps update"
+              exit 1
+            fi
+            echo "E2E status: $result — waiting... ($i/60)"
+            sleep 30
+          done
+          echo "E2E did not complete within 30 minutes — blocking GitOps update"
+          exit 1
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Update image tag
         run: |
           SHORT_SHA=${GITHUB_SHA::8}
